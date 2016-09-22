@@ -1,0 +1,11 @@
+{
+  "name": "neo",
+  "version": "0.1.0",
+  "main": "main.js",
+  "scripts": {
+      "hello": "echo 'hello'"
+  },
+  "dependencies": {
+    "request": "^2.75.0"
+  }
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>PaintBBS NEO</title>
+
+    <script type="text/javascript" src="index.js"></script>
+    <style type="text/css">
+      #color {
+        float: left; 
+        border: 2px solid white; 
+        width: 24px; height: 20px; 
+	    background-color: #800000;
+      }
+      #color_value {
+        position: absolute; 
+        left: 40px; 
+        margin-top: 4px;
+      }
+      #slider_container {
+        float: left; 
+        margin-left: 10px; margin-top: 4px; 
+        position: relative;
+      }
+      #slider {
+        float: left; 
+        width: 150px; height: 2px; 
+		margin-top: 6px; margin-left: 57px; margin-right: 7px;
+        border: 2px solid white;
+        background-color: #f0e0d6;
+      }
+      #handle {
+        position: absolute; 
+        left: 66px;
+		width: 7px; height: 15px;
+        border: 2px solid white; 
+        background-color: #800000;
+      }
+    </style>
+  </head>
+
+  <body bgcolor="#ffffee" 
+        style="margin: 5px 10px; padding: 0; -webkit-user-select: none;"
+>
+
+  <div ontouchstart="oe.touchStart();"
+	   ontouchmove="oe.touchMove();"
+	   ontouchend="oe.touchEnd();"
+       onmousemove = "oe.touchMove();"
+       onmousedown = "oe.touchStart()"
+       onmouseup = "oe.touchEnd()">
+
+    <div style="margin: 0; margin-bottom: 5px; font-size: 16px;">
+      <input type="button" id="undo" value="Undo" />
+    </div>
+
+    <canvas id="canvas" width="300" height="300" style="margin:0; padding:0">
+    </canvas>
+
+    <div style="margin-top: 5px; font-size: 16px;">
+      <div id="color"></div>
+	  <div id="color_value">800000</div>
+	  <div id="slider_container" 
+	       ontouchstart="slider_touch();"
+		   ontouchmove="slider_touch();"
+		   onmousemove="slider_touch();"
+		   onmousedown="slider_dragging = true; slider_touch();"
+		   onmouseup="slider_dragging = false;"
+		   onmouseleave="slider_dragging = false;">
+
+        <div id="slider"></div>
+		<div id="handle"></div>
+		<div id="slider_value" style="float: left; width: 14px;">2</div>
+	  </div>
+    </div>
+
+	<div style="float: left; margin-left: 10px;">
+		<input type="button" value="全消し" onclick="oe.init();"/>
+	</div>
+  </div>
+
+  <div style="clear:both; padding-top:20px;">
+    <select id="target" name="target">
+      <option value="jun.2chan.net/oe">お絵sql</option>
+      <option value="zip.2chan.net/p">お絵かき</option>
+      <option value="nov.2chan.net/q">落書き</option>
+      <option value="cgi.2chan.net/u">落書き裏</option>
+    </select>
+    <input id="submit" type="button" value="送信" 
+           onclick="oe.submit(document.getElementById('target').value);">
+  </div>
+
+  <script type="text/javascript">
+    init();
+  </script>
+  </body>
+</html>
+
+<!--
+  <body>
+    <hr>
+    <a href="#" onclick="openExternal('http://jun.2chan.net/oe');">
+       external link test
+    </a>
+    <a href="#" onclick="postImage('http://localhost/pbbs222_8/picpost.php');">
+       request test
+    </a>
+
+  </body>
+-->
+
+
+
