@@ -1,115 +1,146 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+    <link rel="stylesheet" type="text/css" media="all" href="styles.css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
 
+    <script src="index.js"></script>
+    <script src="assets/commands.js"></script>
+    <script src="assets/tools.js"></script>
+	<script src="assets/oe.js"></script>
+    <script>
+        var oe;
+        var toolRadio;
+        var colorRadio;
+        var rgbaSlider;
+        var sizeSlider;
+        var params;
+
+        function init() {
+            /*
+            -----------------------------------------------------------------------
+            パラメーターチェック
+            -----------------------------------------------------------------------
+            */
+            params = new Object;
+			var pair = location.search.substring(1).split('&');
+            for (var i = 0; pair[i]; i++) {
+                var tmp = pair[i].split('=');
+                params[tmp[0]] = tmp[1];
+            }
+
+            params.width = parseInt(params.width || 300);
+            params.height = parseInt(params.height || 300);
+            params.appletWidth = params.width > 250 ? params.width + 150 : 400;
+            params.appletHeight = params.height > 240 ? params.height + 180 : 420;
+
+            var canvas = document.getElementById("canvas");
+            canvas.style.width = params.width + "px";
+            canvas.style.height = params.height + "px";
+
+            var container = document.getElementById("container");
+            container.style.width = params.appletWidth + "px";
+            container.style.height = params.appletHeight + "px";
+
+             /*
+            -----------------------------------------------------------------------
+            コンポーネントの初期化
+            -----------------------------------------------------------------------
+            */
+            initComponents();
+        }
+
+
+        /*
+        -----------------------------------------------------------------------
+        コンポーネントの初期化
+        -----------------------------------------------------------------------
+        */
+        function initComponents() {
+            oe = new Oe();
+            oe.onUpdateCanvas = null; //updateCanvasHandler;
+            var canvas = document.getElementById("canvas");
+            oe.build(canvas, params.width, params.height);
+            canvas.oncontextmenu = function() {return false;};
+        }
+
+    </script>
     <title>PaintBBS NEO</title>
+</head>
 
-    <script type="text/javascript" src="index.js"></script>
-    <style type="text/css">
-      #color {
-        float: left; 
-        border: 2px solid white; 
-        width: 24px; height: 20px; 
-	    background-color: #800000;
-      }
-      #color_value {
-        position: absolute; 
-        left: 40px; 
-        margin-top: 4px;
-      }
-      #slider_container {
-        float: left; 
-        margin-left: 10px; margin-top: 4px; 
-        position: relative;
-      }
-      #slider {
-        float: left; 
-        width: 150px; height: 2px; 
-		margin-top: 6px; margin-left: 57px; margin-right: 7px;
-        border: 2px solid white;
-        background-color: #f0e0d6;
-      }
-      #handle {
-        position: absolute; 
-        left: 66px;
-		width: 7px; height: 15px;
-        border: 2px solid white; 
-        background-color: #800000;
-      }
-    </style>
-  </head>
+<body onLoad = "init();">
 
-  <body bgcolor="#ffffee" 
-        style="margin: 5px 10px; padding: 0; -webkit-user-select: none;"
->
-
-  <div ontouchstart="oe.touchStart();"
-	   ontouchmove="oe.touchMove();"
-	   ontouchend="oe.touchEnd();"
-       onmousemove = "oe.touchMove();"
-       onmousedown = "oe.touchStart()"
-       onmouseup = "oe.touchEnd()">
-
-    <div style="margin: 0; margin-bottom: 5px; font-size: 16px;">
-      <input type="button" id="undo" value="Undo" />
+<div id="container" style="width:450px; height:470px; margin:auto;">
+    <div id="footerButtons">
     </div>
-
-    <canvas id="canvas" width="300" height="300" style="margin:0; padding:0">
-    </canvas>
-
-    <div style="margin-top: 5px; font-size: 16px;">
-      <div id="color"></div>
-	  <div id="color_value">800000</div>
-	  <div id="slider_container" 
-	       ontouchstart="slider_touch();"
-		   ontouchmove="slider_touch();"
-		   onmousemove="slider_touch();"
-		   onmousedown="slider_dragging = true; slider_touch();"
-		   onmouseup="slider_dragging = false;"
-		   onmouseleave="slider_dragging = false;">
-
-        <div id="slider"></div>
-		<div id="handle"></div>
-		<div id="slider_value" style="float: left; width: 14px;">2</div>
-	  </div>
+    <div id="center">
+        <div id="painterContainer">
+            <div id="tools">
+            </div>
+            <div id="painterWrapper">
+                <div id="upper">
+                </div>
+                <div id="painter">
+                    <div id="canvas">
+                    </div>
+                </div>
+                <div id="lower">
+                </div>
+            </div>
+        </div>
     </div>
+    <div id="headerButtons">
+    </div>
+</div>
 
-	<div style="float: left; margin-left: 10px;">
-		<input type="button" value="全消し" onclick="oe.init();"/>
-	</div>
-  </div>
+<hr>
+<input type="button" value="undo" onclick="oe.undo();" />
+<input type="button" value="redo" onclick="oe.redo();" />
+<input type="button" value="+" onclick="if (oe.zoom < 12) {oe.zoom += 1; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);}" />
+<input type="button" value="-" onclick="if (oe.zoom > 0) {oe.zoom -= 1; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);}" />
+<br>
 
-  <div style="clear:both; padding-top:20px;">
-    <select id="target" name="target">
-      <option value="jun.2chan.net/oe">お絵sql</option>
-      <option value="zip.2chan.net/p">お絵かき</option>
-      <option value="nov.2chan.net/q">落書き</option>
-      <option value="cgi.2chan.net/u">落書き裏</option>
-    </select>
-    <input id="submit" type="button" value="送信" 
-           onclick="oe.submit(document.getElementById('target').value);">
-  </div>
-
-  <script type="text/javascript">
-    init();
-  </script>
-  </body>
-</html>
+ペンの太さ（1~30）<input type="text" size=3 value="1" onchange="oe.lineWidth = this.value-0;" />
+<input type="color" onchange="oe.foregroundColor = this.value;"/>
+<br>
 
 <!--
-  <body>
-    <hr>
-    <a href="#" onclick="openExternal('http://jun.2chan.net/oe');">
-       external link test
-    </a>
-    <a href="#" onclick="postImage('http://localhost/pbbs222_8/picpost.php');">
-       request test
-    </a>
-
-  </body>
+透明度（0~1）<input type="text" size=3 value="1" onchange="oe.alpha = this.value-0;" />
+<br>
 -->
+
+
+レイヤー
+<select onchange="oe.current = this.value-0;">
+<option>1
+<option selected=true>0
+</select>
+<br>
+1<input type="checkbox" checked=true onchange="oe.visible[1] = this.checked; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight)"/>
+表示<br>
+0<input type="checkbox" checked=true onchange="oe.visible[0] = this.checked; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight)"/>
+表示<br>
+
+<hr>
+<div>
+    <input type="button" value="全消し" onclick="oe.clearCanvas(true);"/>
+</div>
+
+<div style="clear:both; padding-top:20px;">
+    <select id="target" name="target">
+        <option value="jun.2chan.net/oe">お絵sql</option>
+        <option value="zip.2chan.net/p">お絵かき</option>
+        <option value="nov.2chan.net/q">落書き</option>
+        <option value="cgi.2chan.net/u">落書き裏</option>
+    </select>
+    <input id="submit" type="button" value="送信" 
+           onclick="submit(document.getElementById('target').value);">
+</div>
+
+
+</body>
+</html>
 
 
 

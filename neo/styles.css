@@ -1,0 +1,84 @@
+*{
+    line-height:18px;
+    -webkit-user-select: none;
+}
+
+body{
+    margin:0;
+    background-color: #ffffee;
+}
+
+#container{
+    position: relative;
+    background: url("assets/images/bg.png");
+    border: 1px dotted #800000;
+}
+
+#center{
+    display: table;
+    position: relative;
+    height: 100%;
+    margin: auto;
+}
+
+#tools{
+    width: 50px;
+    height: 450px;
+    position:absolute;
+    top: 0;
+    right: 0;
+    background-color: #e8efff;
+}
+
+#painterContainer{
+    display:table-cell;
+    vertical-align: middle;
+    position: relative;
+}
+
+#painterWrapper{
+    padding: 0 55px 0 0;
+    position: relative;
+
+}
+
+#upper {
+    height:30px;
+    padding-right: 20px;
+    text-align:right;
+}
+
+#lower {
+    height:30px;
+}
+
+#painter {
+    position: relative;
+    padding: 20px 20px 20px 20px;
+//  background-color: #9ac;
+}
+
+#canvas {
+    width: 300px;
+    height: 300px;
+    background-color: white;
+    border: 1px solid #efefff;
+}
+
+#headerButtons {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+#footerButtons {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+}
+
+#activityIndicator{
+	background-image:url(assets/images/indicator.gif);
+	width:32px;
+	height:32px;
+}
