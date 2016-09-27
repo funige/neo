@@ -155,6 +155,7 @@ var Oekaki = function (id) {
             };
             fileReader.readAsArrayBuffer(body);
         }
+        activate();　　//送信完了したらアクティブに戻す
     };
 
 	this.init = function() {
