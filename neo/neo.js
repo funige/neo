@@ -1,39 +1,36 @@
 'use strict';
 
-const shell = require('electron').shell;
+var Neo = function() {
+};
 
-function openExternal(url) {
-    shell.openExternal(url);
-}
+Neo.version = "0.2.1";
 
-function getSizeString(len) {
-    var result = String(len);
-    while (result.length < 8) {
-        result = "0" + result;
-    }
-    return result;
-}
+Neo.openURL = function(url) {
+    require('electron').shell.openExternal(url);
+};
 
-function submit(board) {
-    var blob = oe.getPNG();
+Neo.submit = function(board, blob) {
     var url = "http://" + board + "/paintpost.php";
 
-    var headerLength = getSizeString(0);
-    var imgLength = getSizeString(blob.size);
+    var headerLength = this.getSizeString(0);
+    var imgLength = this.getSizeString(blob.size);
     var body = new Blob(['P', // PaintBBS
                          headerLength,
                          imgLength,
                          '\r\n', 
                          blob], {type: 'blob'});
 
-    if (0) {
+    if (1) {
         // xhrで直接送信する場合
-        var oReq = new XMLHttpRequest();
-        oReq.open("POST", url, true);
-        oReq.onload = function (e) {
-            console.log(oReq.response);
+        var request = new XMLHttpRequest();
+        request.open("POST", url, true);
+        request.onload = function (e) {
+            console.log(request.response);
+
+            var exitURL = "http://" + board + "/futaba.php?mode=paintcom";
+            location.href = exitURL;
         }
-        oReq.send(body);
+        request.send(body);
 
     } else {
         // node経由で送信する場合
@@ -59,10 +56,10 @@ function submit(board) {
                 if (body) console.log(body);
 
                 var exitURL = "http://" + board + "/futaba.php?mode=paintcom";
-                openExternal(exitURL);
+                Neo.openURL(exitURL);
             });
         };
         fileReader.readAsArrayBuffer(body);
     }
-}
+};
 

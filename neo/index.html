@@ -5,17 +5,20 @@
     <link rel="stylesheet" type="text/css" media="all" href="styles.css" />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
 
-    <script src="index.js"></script>
-    <script src="assets/commands.js"></script>
+    <script src="neo.js"></script>
+	<script src="assets/painter.js"></script>
     <script src="assets/tools.js"></script>
-	<script src="assets/oe.js"></script>
+    <script src="assets/commands.js"></script>
+    <script src="assets/widgets.js"></script>
+    <script src="assets/utils.js"></script>
     <script>
         var oe;
-        var toolRadio;
-        var colorRadio;
-        var rgbaSlider;
-        var sizeSlider;
         var params;
+
+//      var toolRadio;
+//      var colorRadio;
+//      var rgbaSlider;
+//      var sizeSlider;
 
         function init() {
             /*
@@ -24,7 +27,7 @@
             -----------------------------------------------------------------------
             */
             params = new Object;
-			var pair = location.search.substring(1).split('&');
+            var pair = location.search.substring(1).split('&');
             for (var i = 0; pair[i]; i++) {
                 var tmp = pair[i].split('=');
                 params[tmp[0]] = tmp[1];
@@ -43,12 +46,10 @@
             container.style.width = params.appletWidth + "px";
             container.style.height = params.appletHeight + "px";
 
-             /*
-            -----------------------------------------------------------------------
-            コンポーネントの初期化
-            -----------------------------------------------------------------------
-            */
+
+            // コンポーネントの初期化
             initComponents();
+            initButtons();
         }
 
 
@@ -58,11 +59,28 @@
         -----------------------------------------------------------------------
         */
         function initComponents() {
-            oe = new Oe();
-            oe.onUpdateCanvas = null; //updateCanvasHandler;
+            oe = new Neo.Painter();
+//          oe.onUpdateCanvas = null; //updateCanvasHandler;
             var canvas = document.getElementById("canvas");
             oe.build(canvas, params.width, params.height);
             canvas.oncontextmenu = function() {return false;};
+
+            document.getElementById("copyright").innerHTML += "v" + Neo.version;
+        }
+
+        /*
+        -----------------------------------------------------------------------
+        ボタンへの機能の割当
+        -----------------------------------------------------------------------
+        */
+
+        function initButtons() {
+            new Neo.Button().init("undo").onmouseup = function() {new Neo.UndoCommand(oe).execute();};
+            new Neo.Button().init("redo").onmouseup = function () {new Neo.RedoCommand(oe).execute();};
+            new Neo.Button().init("submit").onmouseup = function() {new Neo.SubmitCommand(oe).execute();};
+            new Neo.Button().init("copyright").onmouseup = function() {new Neo.CopyrightCommand(oe).execute();};
+            new Neo.Button().init("zoomPlus").onmouseup = function() {new Neo.ZoomPlusCommand(oe).execute();};
+            new Neo.Button().init("zoomMinus").onmouseup = function() {new Neo.ZoomMinusCommand(oe).execute();};
         }
 
     </script>
@@ -72,17 +90,21 @@
 <body onLoad = "init();">
 
 <div id="container" style="width:450px; height:470px; margin:auto;">
-    <div id="footerButtons">
-    </div>
     <div id="center">
         <div id="painterContainer">
             <div id="tools">
             </div>
             <div id="painterWrapper">
                 <div id="upper">
-                </div>
+                    <div id="redo">やり直し</div>
+                    <div id="undo">元に戻す</div>
+               </div>
                 <div id="painter">
                     <div id="canvas">
+                         <div id="scrollH" data-ui=true></div>
+                         <div id="scrollV" data-ui=true></div>
+                         <div id="zoomPlusWrapper"><div id="zoomPlus">+</div></div>
+                         <div id="zoomMinusWrapper"><div id="zoomMinus">-</div></div>
                     </div>
                 </div>
                 <div id="lower">
@@ -92,23 +114,114 @@
     </div>
     <div id="headerButtons">
     </div>
+    <div id="footerButtons">
+        <div class="button" id="submit">投稿</div>
+        <div class="button" id="copyright">(C)しいちゃん PaintBBS NEO</div>
+    </div>
 </div>
 
-<hr>
-<input type="button" value="undo" onclick="oe.undo();" />
-<input type="button" value="redo" onclick="oe.redo();" />
-<input type="button" value="+" onclick="if (oe.zoom < 12) {oe.zoom += 1; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);}" />
-<input type="button" value="-" onclick="if (oe.zoom > 0) {oe.zoom -= 1; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);}" />
+<!-- コントロール -->
+<!--
+<br>
+<div>
+<div class="toolTip"><div class="label">鉛筆</div></div>
+<div class="toolTip"><div class="label">通常</div></div>
+<div class="toolTip"><div class="label">消しペン</div></div>
+<div class="toolTip"><div class="label">ﾃｷｽﾄ</div></div>
+</div>
+
+<div class="colorTips">
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-black.png" style="opacity:0.5;">
+    </div>
+    <br>
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div>
+    <br>
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div>
+    <br>
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div>
+    <br>
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div>
+    <br>
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div>
+    <br>
+    <div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div><div class="colorTip">
+        <img src="assets/images/topleft-white.png" style="opacity:0.9">
+    </div>
+</div>
+
+<div class="colorSlider" style="margin:3px;">
+    <div class="slider" style="width: 12px;"></div>
+    <div class="label">R0</div>
+</div>
+<div class="colorSlider" style="margin:3px;">
+    <div class="slider" style="width: 12px;"></div>
+    <div class="label">G0</div>
+</div>
+<div class="colorSlider" style="margin:3px;">
+    <div class="slider" style="width: 12px;"></div>
+    <div class="label">B0</div>
+</div>
+<div class="colorSlider" style="margin:3px;">
+    <div class="slider" style="width: 12px;"></div>
+    <div class="label">A255</div>
+</div>
+
+<div class="sizeSlider" style="margin:3px;">
+    <div class="slider" style="height: 12px;"></div>
+<div class="label">9px</div>
+</div>
+
+<div class="reserveControl" style="margin:3px; margin-top:4px;">
+</div>
+<div class="layerControl" style="margin:3px; margin-top:6px;">
+</div>
+-->
 <br>
 
-ペンの太さ（1~30）<input type="text" size=3 value="1" onchange="oe.lineWidth = this.value-0;" />
-<input type="color" onchange="oe.foregroundColor = this.value;"/>
+<!-- 仮コントロール -->
+<div style="margin:5px;">
+<input id="colorTmp" type="color" onchange="oe.foregroundColor = this.value;"/>
+<select style="font-size:14px;" onchange="console.log(this.value); oe.selectTool(this.value);">
+<option value="0" selected=true>鉛筆
+<option value="1">消しゴム
+<option value="2">塗り潰し
+</select>
+</div>
+
+<input id="widthTmp" type="range" value="1" min="1" max="30" step="1" onmousemove="oe.lineWidth = this.value-0; $('#lineWidth').html(this.value);" />
+ペンの太さ: <span id="lineWidth">1</span>
 <br>
 
 <!--
-透明度（0~1）<input type="text" size=3 value="1" onchange="oe.alpha = this.value-0;" />
-<br>
+<input id="alphaTmp" type="range" value="1" min="0" max="1" step="0.01" onmousemove="oe.alpha = this.value-0; $('#alpha').html(this.value)" />
+透明度: <span id="alpha">1</span>
 -->
+<br>
 
 
 レイヤー
@@ -135,7 +248,7 @@
         <option value="cgi.2chan.net/u">落書き裏</option>
     </select>
     <input id="submit" type="button" value="送信" 
-           onclick="submit(document.getElementById('target').value);">
+           onclick="oe.submit(document.getElementById('target').value);">
 </div>
 
 

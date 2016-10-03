@@ -10,7 +10,7 @@ body{
 
 #container{
     position: relative;
-    background: url("assets/images/bg.png");
+    background: #e8efff url("assets/images/bg.png");
     border: 1px dotted #800000;
 }
 
@@ -59,6 +59,7 @@ body{
 }
 
 #canvas {
+    position: relative;
     width: 300px;
     height: 300px;
     background-color: white;
@@ -82,3 +83,248 @@ body{
 	width:32px;
 	height:32px;
 }
+
+
+/*
+-----------------------
+	Controls
+-----------------------
+*/
+
+#zoomMinus {
+    padding: 0;
+    margin: 0;
+    width:16px;
+    height:16px;
+}
+
+#zoomPlus {
+    padding: 0;
+    margin: 0;
+    width:16px;
+    height:16px;
+}
+
+#zoomMinusWrapper {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 19px;
+    height: 19px;
+    text-align:center;
+    color: white;
+}
+
+#zoomPlusWrapper {
+    position: absolute;
+    left: -20px;
+    bottom: -20px;
+    width: 19px;
+    height: 19px;
+    text-overflow: hidden;
+    text-align:center;
+    color: white;
+}
+
+#scrollH {
+    position: absolute;
+    bottom: -20px;
+    width: 100%;
+    height: 20px;
+    background-color: #eee;
+}
+
+#scrollV {
+    position: absolute;
+    right: -20px;
+    width: 20px;
+    height: 100%;
+    background-color: #eee;
+}
+
+/*
+-----------------------
+	Widgets
+-----------------------
+*/
+
+.button {
+    display: inline-block;
+    border: 1px solid white;
+    height: 19px;
+    padding: 3px;
+    height: 16px;
+    font-size: 15px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+    color: #efefff;
+    background-color: #a1b8d8;
+    margin-right: 4px;
+    border-left: 1px solid #a1b8d8;
+    border-top: 1px solid #a1b8d8;
+    border-right: 1px solid rgba(0, 0, 0, 0);
+    border-bottom: 1px solid rgba(0, 0, 0, 0);
+    box-shadow: 0 0 0 1px #a1b8d8, 0 0 0 2px #efefff;
+
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    margin: 1px;
+
+}
+
+.button:hover {
+    border-top: 1px solid #e6ffff;
+    border-left: 1px solid #e6ffff;
+    box-shadow: 0 0 0 1px black, 0 0 0 2px #efefff;
+}
+
+.button:active,.buttonActive {
+    border-top: 1px solid #708097;
+    border-left: 1px solid #708097;
+    background-color: #708097;
+}
+
+.toolTip {
+    position:relative;
+    background-color: #d3d8ff;
+    margin: 3px; 
+    padding: 0;
+
+    width: 46px;
+    height: 18px;
+    border-top: 1px solid #ffffff;
+    border-left: 1px solid #ffffff;
+    border-right: 1px solid #9397b2;
+    border-bottom: 1px solid #9397b2;
+    box-shadow: 0 0 0 1px #7474ab;
+}
+
+.toolTip:active {
+    background-color: #9397b2;
+    border-top: 1px solid rgba(0, 0, 0, 0);
+    border-left: 1px solid rgba(0, 0, 0, 0);
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+}
+
+.toolTip div.label {
+    position: absolute;
+    bottom: -4px;
+    left: 1px;
+    color: #5c5482;
+    font-size:11px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+}
+
+.colorTips {
+    margin-top: 3px; 
+    margin-bottom: -2px; 
+}
+
+.colorTip {
+     display: inline-block;
+     width: 22px;
+     height: 18px;
+     margin-left: 3px;
+     margin-right: 1px;
+     background: #efefff;
+     box-shadow: 0 0 0 1px #7474ab;
+}
+
+.colorTipActive {
+     display: inline-block;
+     width: 22px;
+     height: 18px;
+     margin-left: 3px;
+     margin-right:1px;
+     background: magenta;
+     box-shadow: 0 0 0 1px black;
+}
+
+.colorSlider {
+     background-color: #d8d8f0;
+     width: 48px;
+     height:13px;
+     box-shadow: 0 0 0 1px #7474ab;
+     position: relative;
+}
+
+.colorSlider .label {
+    position: absolute;
+    bottom: -3px;
+    color: #5a5781;
+    font-size:12px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+    vertical-align: middle;
+}
+
+.colorSlider .slider {
+    position: absolute;
+    height: 100%;
+    left: 0px;
+    width: 50%;
+    background-color: #fa9696;
+    box-shadow: -1px 0 0 0px rgba(0, 0, 0, 0.3) inset;
+}
+
+.sizeSlider {
+     background-color: #d8d8f0;
+     width: 48px;
+     height:33px;
+     box-shadow: 0 0 0 1px #7474ab;
+     position: relative;
+}
+
+.sizeSlider .label {
+    position: absolute;
+    bottom: -3px;
+    color: #5a5781;
+    font-size:12px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+    vertical-align: middle;
+}
+
+.sizeSlider .slider {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    height: 33%;
+    background-color: #82f238;
+    box-shadow: 0 -1px 0 0px rgba(0, 0, 0, 0.3) inset;
+}
+
+.reserveControl {
+    width: 48px;
+    height: 13px;
+
+    background-color: #d8d8f0;
+    box-shadow: 0 0 0 1px #7474ab;
+    position: relative;
+}
+
+.layerControl {
+    width: 48px;
+    height: 20px;
+    background-color: #d8d8f0;
+    box-shadow: 0 0 0 1px #7474ab;
+    position: relative;
+}
+
+.layerControler .label {
+    position: absolute;
+    bottom: -3px;
+    color: #5a5781;
+    font-size:12px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+    vertical-align: middle;
+}
+

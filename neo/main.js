@@ -6,7 +6,10 @@ const shell = require('electron').shell;
 let win;
 
 function createWindow() {
-    win = new BrowserWindow({width: 1000, height: 750});
+    win = new BrowserWindow({
+        width: 1000, height: 750,
+//      'web-preferences': {'web-security': false}
+    });
     win.loadURL('file://' + __dirname + '/index.html');
     win.webContents.openDevTools(); // width: 550px
 
