@@ -573,9 +573,6 @@ Neo.Painter.prototype.prepareDrawing = function () {
 
     this._currentColor = [r, g, b, a];
     this._currentMask = [maskR, maskG, maskB];
-
-    console.log("color:" + r + "," + g + "," + b + "," + a);
-    console.log("mask: " + maskR + "," + maskG + "," + maskB);
 };
 
 Neo.Painter.prototype.isMasked = function (buf8, index) {
