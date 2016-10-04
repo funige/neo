@@ -24,7 +24,6 @@ Neo.Painter.prototype.tempCanvasCtx;
 Neo.Painter.prototype.destCanvas;
 Neo.Painter.prototype.destCanvasCtx;
 
-
 Neo.Painter.prototype.backgroundColor = "#ffffff";
 Neo.Painter.prototype.foregroundColor = "#000000";
 
@@ -46,16 +45,30 @@ Neo.Painter.prototype.isCtrlDown = false;
 Neo.Painter.prototype.isAltDown = false;
 
 Neo.Painter.prototype.onUpdateCanvas;
-Neo.Painter.prototype._roundMask = [];
-Neo.Painter.prototype._toneMask = [];
+Neo.Painter.prototype._roundData = [];
+Neo.Painter.prototype._toneData = [];
 Neo.Painter.prototype.toolStack = [];
+
+Neo.Painter.prototype.maskType = 0;
+Neo.Painter.prototype.maskColor = "#000000";
+Neo.Painter.prototype._currentColor = [];
+Neo.Painter.prototype._currentMask = [];
+
+
+Neo.Painter.DRAWTYPE_NONE = 0;
+Neo.Painter.DRAWTYPE_PEN = 1;
+Neo.Painter.DRAWTYPE_ERASER = 2;
+
+Neo.Painter.MASKTYPE_NONE = 0;
+Neo.Painter.MASKTYPE_NORMAL = 1;
+Neo.Painter.MASKTYPE_REVERSE = 2;
 
 Neo.Painter.prototype.build = function(div, width, height)
 {
     this.container = div;
     this._initCanvas(div, width, height);
-    this._initRoundMask();
-    this._initToneMask();
+    this._initRoundData();
+    this._initToneData();
 
     this.setTool(new Neo.PenTool());
 };
@@ -84,8 +97,9 @@ Neo.Painter.prototype.popTool = function() {
 
 Neo.Painter.prototype.selectTool = function(toolIndex) {
     switch (parseInt(toolIndex)) {
-    case 0: this.setTool(new Neo.PenTool()); break;
-    case 2: this.setTool(new Neo.FillTool()); break;
+    case 1: this.setTool(new Neo.PenTool()); break;
+    case 2: this.setTool(new Neo.EraserTool()); break;
+    case 3: this.setTool(new Neo.FillTool()); break;
 
     default:
         console.log("unknown tool index " + toolIndex);
@@ -142,10 +156,10 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype._initRoundMask = function() {
+Neo.Painter.prototype._initRoundData = function() {
     for (var r = 1; r <= 30; r++) {
-        this._roundMask[r] = new Uint8Array(r * r);
-        var mask = this._roundMask[r];
+        this._roundData[r] = new Uint8Array(r * r);
+        var mask = this._roundData[r];
         var d = Math.floor(r / 2.0);
         var index = 0;
         for (var x = 0; x < r; x++) {
@@ -156,28 +170,28 @@ Neo.Painter.prototype._initRoundMask = function() {
             }
         }
     }
-    this._roundMask[3][0] = 0;
-    this._roundMask[3][2] = 0;
-    this._roundMask[3][6] = 0;
-    this._roundMask[3][8] = 0;
+    this._roundData[3][0] = 0;
+    this._roundData[3][2] = 0;
+    this._roundData[3][6] = 0;
+    this._roundData[3][8] = 0;
 
-    this._roundMask[5][1] = 0;
-    this._roundMask[5][3] = 0;
-    this._roundMask[5][5] = 0;
-    this._roundMask[5][9] = 0;
-    this._roundMask[5][15] = 0;
-    this._roundMask[5][19] = 0;
-    this._roundMask[5][21] = 0;
-    this._roundMask[5][23] = 0;
+    this._roundData[5][1] = 0;
+    this._roundData[5][3] = 0;
+    this._roundData[5][5] = 0;
+    this._roundData[5][9] = 0;
+    this._roundData[5][15] = 0;
+    this._roundData[5][19] = 0;
+    this._roundData[5][21] = 0;
+    this._roundData[5][23] = 0;
 };
 
-Neo.Painter.prototype._initToneMask = function() {
+Neo.Painter.prototype._initToneData = function() {
     var pattern = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
     for (var i = 0; i < 16; i++) {
-        this._toneMask[i] = new Uint8Array(16);
+        this._toneData[i] = new Uint8Array(16);
         for (var j = 0; j < 16; j++) {
-            this._toneMask[i][j] = (i <= pattern[j]) ? 1 : 0;
+            this._toneData[i][j] = (i <= pattern[j]) ? 1 : 0;
         }
     }
 };
@@ -545,43 +559,115 @@ Neo.Painter.prototype.setColor = function(c) {
     var rgb = ("000000" + (c & 0xffffff).toString(16)).substr(-6);
     this.foregroundColor = '#' + rgb;
     document.getElementById("colorTmp").value = this.foregroundColor;
-
-//アルファはセットしない
-//  var a = parseInt(c.toString(16).substr(-8, 2));
-//  this.alpha = a / 255.0;
-//  document.getElementById("alphaTmp").value = this.alpha;
-//  document.getElementById('alpha').innerHTML = this.alpha.toFixed(2);
 };
 
-Neo.Painter.prototype.setPoint = function(buf32, width, x, y) {
+Neo.Painter.prototype.prepareDrawing = function () {
+    var r = parseInt(this.foregroundColor.substr(1, 2), 16);
+    var g = parseInt(this.foregroundColor.substr(3, 2), 16);
+    var b = parseInt(this.foregroundColor.substr(5, 2), 16);
+    var a = Math.floor(this.alpha * 255);
+
+    var maskR = parseInt(this.maskColor.substr(1, 2), 16);
+    var maskG = parseInt(this.maskColor.substr(3, 2), 16);
+    var maskB = parseInt(this.maskColor.substr(5, 2), 16);
+
+    this._currentColor = [r, g, b, a];
+    this._currentMask = [maskR, maskG, maskB];
+
+    console.log("color:" + r + "," + g + "," + b + "," + a);
+    console.log("mask: " + maskR + "," + maskG + "," + maskB);
+};
+
+Neo.Painter.prototype.isMasked = function (buf8, index) {
+    var r = this._currentMask[0];
+    var g = this._currentMask[1];
+    var b = this._currentMask[2];
+
+    switch (this.maskType) {
+    case Neo.Painter.MASKTYPE_NONE:
+        return;
+
+    case Neo.Painter.MASKTYPE_NORMAL:
+        return (buf8[index + 3] != 0 &&
+                buf8[index + 0] == b &&
+                buf8[index + 1] == g &&
+                buf8[index + 2] == r) ? true : false;
+
+    case Neo.Painter.MASKTYPE_REVERSE:
+        return (buf8[index + 3] != 0 &&
+                buf8[index + 0] == b &&
+                buf8[index + 1] == g &&
+                buf8[index + 2] == r) ? false : true;
+    }
+    return false;
+};
+
+Neo.Painter.prototype.drawPoint = function(buf8, width, x, y) {
     var d = this.lineWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
 
-    var mask = this._roundMask[d];
-    var maskIndex = 0;
-    var index = y * width + x;
-    var fillColor = this.getColor();
+    var shape = this._roundData[d];
+    var shapeIndex = 0;
+    var index = (y * width + x) * 4;
+
+    var r = this._currentColor[0];
+    var g = this._currentColor[1];
+    var b = this._currentColor[2];
+    var a = this._currentColor[3];
 
     for (var i = 0; i < d; i++) {
         for (var j = 0; j < d; j++) {
-            if (mask[maskIndex++]) {
-                buf32[index] = fillColor;
+            if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
+                var k = (buf8[index + 3] / 255.0) * (1.0 - (a / 255.0));
+
+                buf8[index + 0] *= k;
+                buf8[index + 1] *= k;
+                buf8[index + 2] *= k;
+                buf8[index + 0] += r * (1.0 - k);
+                buf8[index + 1] += g * (1.0 - k);
+                buf8[index + 2] += b * (1.0 - k);
+                buf8[index + 3] += a / (d * (255.0 - a) / 255.0); //要修正
             }
-            index++;
+            index += 4;
         }
-        index += width - d;
+        index += (width - d) * 4;
     }
 };
 
+Neo.Painter.prototype.erasePoint = function(buf8, width, x, y) {
+    var d = this.lineWidth;
+    var r0 = Math.floor(d / 2);
+    x -= r0;
+    y -= r0;
+
+    var shape = this._roundData[d];
+    var shapeIndex = 0;
+    var index = (y * width + x) * 4;
+    var a = Math.floor(this.alpha * 255);
+
+    for (var i = 0; i < d; i++) {
+        for (var j = 0; j < d; j++) {
+            if (shape[shapeIndex++]) {
+                var k = (buf8[index + 3] / 255.0) * (1.0 - (a / 255.0));
+
+                buf8[index + 3] -= a / (d * (255.0 - a) / 255.0); //要修正
+            }
+            index += 4;
+        }
+        index += (width - d) * 4;
+    }
+};
+
+Neo.Painter.prototype.prevLine = null; // インクだまり対策
 
 Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1) {
-    // http://stackoverflow.com/questions/25277023/complete-solution-for-drawing-1-pixel-line-on-html5-canvas
     x0 = Math.round(x0);
     x1 = Math.round(x1);
     y0 = Math.round(y0);
     y1 = Math.round(y1);
+    var prev = [x0, y0, x1, y1];
 
     var width = Math.abs(x1 - x0);
     var height = Math.abs(y1 - y0);
@@ -601,7 +687,24 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1) {
     var err = (dx > dy ? dx : -dy) / 2;        
 
     while (true) {
-        this.setPoint(buf32, imageData.width, x0 - left , y0 - top);
+        if (this.prevLine == null ||
+            !((this.prevLine[0] == x0 && this.prevLine[1] == y0) ||
+              (this.prevLine[2] == x0 && this.prevLine[3] == y0))) {
+
+            switch (this.tool.drawType) {
+            case Neo.Painter.DRAWTYPE_PEN:
+                this.drawPoint(buf8, imageData.width, x0 - left , y0 - top);
+                break;
+
+            case Neo.Painter.DRAWTYPE_ERASER:
+                this.erasePoint(buf8, imageData.width, x0 - left , y0 - top);
+                break;
+                
+            default:
+                break;
+            }
+        }
+
         if (x0 === x1 && y0 === y1) break;
         var e2 = err;
         if (e2 > -dx) { err -= dy; x0 += sx; }
@@ -610,40 +713,8 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1) {
 
     imageData.data.set(buf8);
     ctx.putImageData(imageData, left, top);
-};
-
-Neo.Painter.prototype.drawLine2 = function(ctx, x0, y0, x1, y1) {
-    // http://stackoverflow.com/questions/25277023/complete-solution-for-drawing-1-pixel-line-on-html5-canvas
-    x0 = Math.round(x0);
-    x1 = Math.round(x1);
-    y0 = Math.round(y0);
-    y1 = Math.round(y1);
-
-    var width = Math.abs(x1 - x0);
-    var height = Math.abs(y1 - y0);
-    var r = Math.ceil(this.lineWidth / 2);
-
-    var left = ((x0 < x1) ? x0 : x1) - r;
-    var top = ((y0 < y1) ? y0 : y1) - r;
-
-    var imageData = ctx.getImageData(left, top, width + r*2, height + r*2);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-
-    var dx = width, sx = x0 < x1 ? 1 : -1;
-    var dy = height, sy = y0 < y1 ? 1 : -1; 
-    var err = (dx > dy ? dx : -dy) / 2;        
-
-    while (true) {
-        this.setPoint(buf32, imageData.width, x0 - left , y0 - top);
-        if (x0 === x1 && y0 === y1) break;
-        var e2 = err;
-        if (e2 > -dx) { err -= dy; x0 += sx; }
-        if (e2 < dy) { err += dx; y0 += sy; }
-    }
-
-    imageData.data.set(buf8);
-    ctx.putImageData(imageData, left, top);
+    
+    this.prevLine = prev;
 };
 
 Neo.Painter.prototype.__drawLine = function(ctx, x0, y0, x1, y1) {

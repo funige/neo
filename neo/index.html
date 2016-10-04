@@ -207,9 +207,9 @@
 <div style="margin:5px;">
 <input id="colorTmp" type="color" onchange="oe.foregroundColor = this.value;"/>
 <select style="font-size:14px;" onchange="console.log(this.value); oe.selectTool(this.value);">
-<option value="0" selected=true>鉛筆
-<option value="1">消しゴム
-<option value="2">塗り潰し
+<option value="1" selected=true>鉛筆
+<option value="2">消しゴム
+<option value="3">塗り潰し
 </select>
 </div>
 
@@ -217,10 +217,8 @@
 ペンの太さ: <span id="lineWidth">1</span>
 <br>
 
-<!--
-<input id="alphaTmp" type="range" value="1" min="0" max="1" step="0.01" onmousemove="oe.alpha = this.value-0; $('#alpha').html(this.value)" />
+<input id="alphaTmp" type="range" value="255" min="1" max="255" step="1" onmousemove="oe.alpha = this.value/255.0; $('#alpha').html(this.value)" />
 透明度: <span id="alpha">1</span>
--->
 <br>
 
 
@@ -234,6 +232,14 @@
 表示<br>
 0<input type="checkbox" checked=true onchange="oe.visible[0] = this.checked; oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight)"/>
 表示<br>
+
+<br>
+マスク(とりあえず黒に固定)
+<select onchange="oe.maskType = this.value-0;">
+<option value="0" selected=true>通常
+<option value="1">マスク
+<option value="2">逆マスク
+</select>
 
 <hr>
 <div>

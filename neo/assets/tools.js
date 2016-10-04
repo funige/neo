@@ -6,6 +6,7 @@ Neo.ToolBase.prototype.startX;
 Neo.ToolBase.prototype.startY;
 Neo.ToolBase.prototype.init = function(oe) {}
 Neo.ToolBase.prototype.kill = function(oe) {}
+Neo.ToolBase.prototype.drawType = Neo.Painter.DRAWTYPE_NONE;
 
 Neo.ToolBase.prototype.downHandler = function(oe) {
 	this.startX = oe.mouseX;
@@ -25,86 +26,6 @@ Neo.ToolBase.prototype.transformForZoom = function(oe) {
 	ctx.translate(-oe.zoomX, -oe.zoomY);
 }
 
-
-/*
--------------------------------------------------------------------------
-	Pen2（しぃペインターの鉛筆）
-    半透明で塗ってもムラにならない奴
--------------------------------------------------------------------------
-*/
-
-Neo.PenTool2 = function() {};
-Neo.PenTool2.prototype = new Neo.ToolBase();
-Neo.PenTool2.prototype.isUpMove = false;
-
-Neo.PenTool2.prototype.downHandler = function(oe) {
-	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-	this.isUpMove = false;
-	var ctx = oe.tempCanvasCtx;
-	ctx.save();
-	ctx.lineWidth = oe.lineWidth;
-	ctx.lineCap = "round";	
-	ctx.fillStyle = oe.foregroundColor;
-
-	oe.drawLine2(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY);
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-	ctx.restore();
-};
-
-Neo.PenTool2.prototype.upHandler = function(oe) {
-	//Register undo first;
-	oe._pushUndo();
-	var ctx = oe.canvasCtx[oe.current];
-	ctx.globalAlpha = oe.alpha;
-	ctx.drawImage(oe.tempCanvas, 0, 0, oe.canvasWidth, oe.canvasHeight);
-	ctx.globalAlpha = 1.0;
-	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
-	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-	this.drawCursor(oe);
-};
-
-Neo.PenTool2.prototype.moveHandler = function(oe) {	
-	var ctx = oe.tempCanvasCtx;
-	ctx.lineWidth = oe.lineWidth;
-	ctx.lineCap = "round";	
-	ctx.strokeStyle = oe.foregroundColor;
-	oe.drawLine2(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY);
-	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-};
-
-Neo.PenTool2.prototype.drawCursor = function(oe) {
-	var mx = oe.mouseX;
-	var my = oe.mouseY;
-	var d = oe.lineWidth;
-	var ctx = oe.destCanvasCtx;
-	ctx.save();
-		this.transformForZoom(oe)
-		ctx.lineWidth = oe.lineWidth;
-		ctx.lineCap = "round";	
-		ctx.strokeStyle = "#000000";
-		ctx.fillStyle = "";
-		ctx.lineWidth = 1/oe.zoom;
-		ctx.globalAlpha = 1;
-		oe.drawEllipse(ctx, mx+1/oe.zoom-d*0.5, my+1/oe.zoom-d*0.5, d, d, true, false);
-		ctx.strokeStyle = "#ffffff";
-		oe.drawEllipse(ctx, mx-d*0.5, my-d*0.5, d, d, true, false);
-	ctx.restore();
-}
-
-Neo.PenTool2.prototype.upMoveHandler = function(oe) {
-	this.isUpMove = true;
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-	this.drawCursor(oe);
-}
-Neo.PenTool2.prototype.rollOverHandler= function(oe) {}
-
-Neo.PenTool2.prototype.rollOutHandler= function(oe) {
-	if(!oe.isMouseDown && !oe.isMouseDownRight){
-		oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
-		oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-	}
-}
-
 /*
 -------------------------------------------------------------------------
 	Pen（鉛筆）
@@ -114,38 +35,30 @@ Neo.PenTool2.prototype.rollOutHandler= function(oe) {
 Neo.PenTool = function() {};
 Neo.PenTool.prototype = new Neo.ToolBase();
 Neo.PenTool.prototype.isUpMove = false;
+Neo.PenTool.prototype.drawType = Neo.Painter.DRAWTYPE_PEN;
 
 Neo.PenTool.prototype.downHandler = function(oe) {
+    oe.prepareDrawing();
 	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 	this.isUpMove = false;
-	var ctx = oe.tempCanvasCtx;
-	ctx.save();
-	ctx.lineWidth = oe.lineWidth;
-	ctx.lineCap = "round";	
-	ctx.fillStyle = oe.foregroundColor;
+	var ctx = oe.canvasCtx[oe.current];
 
 	if (oe.alpha >= 1) oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY);
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-	ctx.restore();
 };
 
 Neo.PenTool.prototype.upHandler = function(oe) {
 	//Register undo first;
 	oe._pushUndo();
-	var ctx = oe.canvasCtx[oe.current];
-	ctx.globalAlpha = oe.alpha;
-	ctx.drawImage(oe.tempCanvas, 0, 0, oe.canvasWidth, oe.canvasHeight);
-	ctx.globalAlpha = 1.0;
 	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 	this.drawCursor(oe);
+
+    oe.prevLine = null;
 };
 
 Neo.PenTool.prototype.moveHandler = function(oe) {	
-	var ctx = oe.tempCanvasCtx;
-	ctx.lineWidth = oe.lineWidth;
-	ctx.lineCap = "round";	
-	ctx.strokeStyle = oe.foregroundColor;
+	var ctx = oe.canvasCtx[oe.current];
 	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY);
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 };
@@ -177,6 +90,77 @@ Neo.PenTool.prototype.upMoveHandler = function(oe) {
 Neo.PenTool.prototype.rollOverHandler= function(oe) {}
 
 Neo.PenTool.prototype.rollOutHandler= function(oe) {
+	if (!oe.isMouseDown && !oe.isMouseDownRight){
+		oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
+		oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+	}
+}
+
+
+/*
+-------------------------------------------------------------------------
+	Eraser（消しペン）
+-------------------------------------------------------------------------
+*/
+
+Neo.EraserTool = function() {};
+Neo.EraserTool.prototype = new Neo.ToolBase();
+Neo.EraserTool.prototype.isUpMove = false;
+Neo.EraserTool.prototype.drawType = Neo.Painter.DRAWTYPE_ERASER;
+
+Neo.EraserTool.prototype.downHandler = function(oe) {
+    oe.prepareDrawing();
+	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+	this.isUpMove = false;
+	var ctx = oe.canvasCtx[oe.current];
+
+	if (oe.alpha >= 1) oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY);
+	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+Neo.EraserTool.prototype.upHandler = function(oe) {
+	//Register undo first;
+	oe._pushUndo();
+	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
+	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+	this.drawCursor(oe);
+
+    oe.prevLine = null;
+};
+
+Neo.EraserTool.prototype.moveHandler = function(oe) {	
+	var ctx = oe.canvasCtx[oe.current];
+	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY);
+	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+};
+
+Neo.EraserTool.prototype.drawCursor = function(oe) {
+    var mx = oe.mouseX;
+    var my = oe.mouseY;
+    var d = oe.lineWidth;
+    var ctx = oe.destCanvasCtx;
+    ctx.save();
+    this.transformForZoom(oe)
+    ctx.lineWidth = oe.lineWidth;
+    ctx.lineCap = "round";	
+    ctx.strokeStyle = "#000000";
+    ctx.fillStyle = "";
+    ctx.lineWidth = 1/oe.zoom;
+    ctx.globalAlpha = 1;
+    oe.drawEllipse(ctx, mx+1/oe.zoom-d*0.5, my+1/oe.zoom-d*0.5, d, d, true, false);
+    ctx.strokeStyle = "#ffffff";
+    oe.drawEllipse(ctx, mx-d*0.5, my-d*0.5, d, d, true, false);
+    ctx.restore();
+}
+
+Neo.EraserTool.prototype.upMoveHandler = function(oe) {
+    this.isUpMove = true;
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    this.drawCursor(oe);
+}
+Neo.EraserTool.prototype.rollOverHandler= function(oe) {}
+
+Neo.EraserTool.prototype.rollOutHandler= function(oe) {
 	if (!oe.isMouseDown && !oe.isMouseDownRight){
 		oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 		oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);

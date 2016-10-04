@@ -3,7 +3,7 @@
 var Neo = function() {
 };
 
-Neo.version = "0.2.1";
+Neo.version = "0.3";
 
 Neo.openURL = function(url) {
     require('electron').shell.openExternal(url);
