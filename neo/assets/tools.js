@@ -38,18 +38,21 @@ Neo.PenTool.prototype.isUpMove = false;
 Neo.PenTool.prototype.drawType = Neo.Painter.DRAWTYPE_PEN;
 
 Neo.PenTool.prototype.downHandler = function(oe) {
+	//Register undo first;
+	oe._pushUndo();
+
     oe.prepareDrawing();
-	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+//	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 	this.isUpMove = false;
 	var ctx = oe.canvasCtx[oe.current];
 
-	if (oe.alpha >= 1) oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY);
+	if (oe.alpha >= 1) {
+        oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, this.drawType);
+    }
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
 
 Neo.PenTool.prototype.upHandler = function(oe) {
-	//Register undo first;
-	oe._pushUndo();
 	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 	this.drawCursor(oe);
@@ -59,26 +62,24 @@ Neo.PenTool.prototype.upHandler = function(oe) {
 
 Neo.PenTool.prototype.moveHandler = function(oe) {	
 	var ctx = oe.canvasCtx[oe.current];
-	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY);
+	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, this.drawType);
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 };
 
 Neo.PenTool.prototype.drawCursor = function(oe) {
+    if (oe.lineWidth <= 8) return;
     var mx = oe.mouseX;
     var my = oe.mouseY;
     var d = oe.lineWidth;
     var ctx = oe.destCanvasCtx;
     ctx.save();
     this.transformForZoom(oe)
-    ctx.lineWidth = oe.lineWidth;
-    ctx.lineCap = "round";	
-    ctx.strokeStyle = "#000000";
-    ctx.fillStyle = "";
-    ctx.lineWidth = 1/oe.zoom;
-    ctx.globalAlpha = 1;
-    oe.drawEllipse(ctx, mx+1/oe.zoom-d*0.5, my+1/oe.zoom-d*0.5, d, d, true, false);
-    ctx.strokeStyle = "#ffffff";
-    oe.drawEllipse(ctx, mx-d*0.5, my-d*0.5, d, d, true, false);
+
+    var x = (mx - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
+    var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
+    var r = d * 0.5 * oe.zoom;
+    oe.drawLine(ctx, x-r, y-r, x+r, y+r, Neo.Painter.DRAWTYPE_XOR);
+
     ctx.restore();
 }
 
@@ -109,19 +110,22 @@ Neo.EraserTool.prototype.isUpMove = false;
 Neo.EraserTool.prototype.drawType = Neo.Painter.DRAWTYPE_ERASER;
 
 Neo.EraserTool.prototype.downHandler = function(oe) {
+	//Register undo first;
+	oe._pushUndo();
+
     oe.prepareDrawing();
-	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+//	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 	this.isUpMove = false;
 	var ctx = oe.canvasCtx[oe.current];
 
-	if (oe.alpha >= 1) oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY);
+	if (oe.alpha >= 1) {
+        oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, this.drawType);
+    }
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
 
 Neo.EraserTool.prototype.upHandler = function(oe) {
-	//Register undo first;
-	oe._pushUndo();
-	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
+//	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 	this.drawCursor(oe);
 
@@ -130,11 +134,13 @@ Neo.EraserTool.prototype.upHandler = function(oe) {
 
 Neo.EraserTool.prototype.moveHandler = function(oe) {	
 	var ctx = oe.canvasCtx[oe.current];
-	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY);
+	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, this.drawType);
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 };
 
 Neo.EraserTool.prototype.drawCursor = function(oe) {
+    if (oe.lineWidth <= 8) return; 
+
     var mx = oe.mouseX;
     var my = oe.mouseY;
     var d = oe.lineWidth;
@@ -218,7 +224,7 @@ Neo.FillTool.prototype.isUpMove = false;
 
 Neo.FillTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+//	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.fill(oe.mouseX, oe.mouseY, oe.canvasCtx[oe.current]);
 };
 
