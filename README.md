@@ -1,5 +1,5 @@
 # PaintBBS NEO
-PaitBBS.jar (お絵かきしぃ掲示板&copy;2000-2004しぃちゃん)互換のお絵描き板をhtml5で作る企画です。  
+お絵描きしぃ掲示板 PaintBBS.jar (&copy;2000-2004しぃちゃん) を無断でhtml5化する企画です。  
 javaアプレットが絶滅する前に、javascriptで書き直しておきたい。
 
 Flashやhtml5のお絵描きサイトはいっぱいあるんだけど、そうじゃないんだ。  

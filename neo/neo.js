@@ -5,8 +5,29 @@ var Neo = function() {};
 Neo.version = "0.3.5";
 
 Neo.painter;
-Neo.config;
 Neo.fullScreen = false;
+
+Neo.config = {
+    width: 300,
+    height: 300,
+
+    colors: [ 
+        "#000000", "#FFFFFF",
+        "#B47575", "#888888",
+        "#FA9696", "#C096C0",
+        "#FFB6FF", "#8080FF",
+        "#25C7C9", "#E7E58D",
+        "#E7962D", "#99CB7B",
+        "#FCECE2", "#F9DDCF"
+    ],
+};
+
+Neo.SLIDERTYPE_NONE = 0;
+Neo.SLIDERTYPE_RED = 1;
+Neo.SLIDERTYPE_GREEN = 2;
+Neo.SLIDERTYPE_BLUE = 3;
+Neo.SLIDERTYPE_ALPHA = 4;
+Neo.SLIDERTYPE_SIZE = 5;
 
 
 Neo.init = function() {
@@ -18,14 +39,13 @@ Neo.init = function() {
 };
 
 Neo.init2 = function() {
-    Neo.config = new Object;
     var pair = location.search.substring(1).split('&');
     for (var i = 0; pair[i]; i++) {
         var tmp = pair[i].split('=');
         Neo.config[tmp[0]] = tmp[1];
     }
-    Neo.config.width = parseInt(Neo.config.width || 300);
-    Neo.config.height = parseInt(Neo.config.height || 300);
+    Neo.config.width = parseInt(Neo.config.width);
+    Neo.config.height = parseInt(Neo.config.height);
 
     Neo.canvas = document.getElementById("canvas");
     Neo.container = document.getElementById("container");
@@ -40,8 +60,7 @@ Neo.init2 = function() {
 
     initComponents();
     initButtons();
-
-    Neo.painter._pushUndo();
+    Neo.container.style.visibility = "visible";
 }
 
 function initComponents() {
@@ -82,6 +101,34 @@ function initButtons() {
     new Neo.Button().init("zoomMinus").onmouseup = function() {
         new Neo.ZoomMinusCommand(Neo.painter).execute();
     };
+    var fill = new Neo.Button().init("fill", {type:'fill'});
+
+    // toolTip
+    var pen = new Neo.PenTip().init("pen", {type:'pen'});
+    var eraser = new Neo.EraserTip().init("eraser", {type:'eraser'});
+    var mask = new Neo.MaskTip().init("mask", {type:'mask'});
+    Neo.toolButtons = [fill, pen, eraser];
+
+    // colorTip
+    for (var i = 1; i <= 14; i++) {
+        new Neo.ColorTip().init("color" + i, {index:i});
+    };
+    
+    // colorSlider
+    Neo.sliders[Neo.SLIDERTYPE_RED] = new Neo.ColorSlider().init(
+        "sliderRed", {type:Neo.SLIDERTYPE_RED});
+    Neo.sliders[Neo.SLIDERTYPE_GREEN] = new Neo.ColorSlider().init(
+        "sliderGreen", {type:Neo.SLIDERTYPE_GREEN});
+    Neo.sliders[Neo.SLIDERTYPE_BLUE] = new Neo.ColorSlider().init(
+        "sliderBlue", {type:Neo.SLIDERTYPE_BLUE});
+    Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new Neo.ColorSlider().init(
+        "sliderAlpha", {type:Neo.SLIDERTYPE_ALPHA});
+
+    // sizeSlider
+//    Neo.sliders[Neo.SLIDERTYPE_SIZE] = new Neo.SizeSlider().init(
+//        "sliderSize", {type:Neo.SLIDERTYPE_SIZE});
+
+    new Neo.LayerControl().init("layerControl");
 };
 
 /*

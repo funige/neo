@@ -1,6 +1,7 @@
 *{
     line-height:18px;
     -webkit-user-select: none;
+    user-select: none;
 }
 
 body{
@@ -12,7 +13,7 @@ body{
     width: 100%;
     height: 100%;
     position: relative;
-    background: #e8efff url("assets/images/bg.png");
+    background: #e8efff url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAKUlEQVQ4y2NgoABcvfH+PxMlBjAwMDCMGjBqwKgBVDKA8eqN9/8pMQAA5qwHVDz/gqkAAAAASUVORK5CYII=");
     border: 1px dotted transparent;
 }
 
@@ -87,18 +88,16 @@ body{
     left: 5px;
 }
 
-#activityIndicator{
-	background-image:url(assets/images/indicator.gif);
-	width:32px;
-	height:32px;
-}
-
 
 /*
 -----------------------
 	Modal Window
 -----------------------
 */
+
+#pageView{
+    background-color: white;
+}
 
 #windowView{
     z-index: 9999;
@@ -109,7 +108,6 @@ body{
     left: 0;
     background-color: white;
 }
-
 
 /*
 -----------------------
@@ -174,7 +172,7 @@ body{
 -----------------------
 */
 
-.button {
+.button,.buttonOff {
     display: inline-block;
     border: 1px solid white;
     height: 19px;
@@ -199,19 +197,41 @@ body{
 
 }
 
-.button:hover {
+.button:hover,.buttonOff:hover {
     border-top: 1px solid #e6ffff;
     border-left: 1px solid #e6ffff;
     box-shadow: 0 0 0 1px black, 0 0 0 2px #efefff;
 }
 
-.button:active,.buttonActive {
+.button:active,.buttonOn {
+    display: inline-block;
+    border: 1px solid white;
+    height: 19px;
+    padding: 3px;
+    height: 16px;
+    font-size: 15px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+    color: #efefff;
+    background-color: #a1b8d8;
+    margin-right: 4px;
+    border-left: 1px solid #a1b8d8;
+    border-top: 1px solid #a1b8d8;
+    border-right: 1px solid rgba(0, 0, 0, 0);
+    border-bottom: 1px solid rgba(0, 0, 0, 0);
+    box-shadow: 0 0 0 1px #a1b8d8, 0 0 0 2px #efefff;
+
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    margin: 1px;
+
     border-top: 1px solid #708097;
     border-left: 1px solid #708097;
     background-color: #708097;
 }
 
-.toolTip {
+.toolTipOff {
     position:relative;
     background-color: #d3d8ff;
     margin: 3px; 
@@ -227,15 +247,29 @@ body{
     box-shadow: 0 0 0 1px #7474ab;
 }
 
-.toolTip:active {
+.toolTipOn {
+    position:relative;
     background-color: #9397b2;
+    margin: 3px; 
+    margin-left: 0;
+    padding: 0;
+
+    width: 46px;
+    height: 18px;
     border-top: 1px solid rgba(0, 0, 0, 0);
     border-left: 1px solid rgba(0, 0, 0, 0);
     border-right: 1px solid #ffffff;
     border-bottom: 1px solid #ffffff;
+    box-shadow: 0 0 0 1px #7474ab;
 }
 
-.toolTip div.label {
+.toolTipOff canvas,.toolTipOn canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.toolTipOff .label,.toolTipOn .label {
     position: absolute;
     bottom: -4px;
     left: 1px;
@@ -247,28 +281,43 @@ body{
 }
 
 .colorTips {
+    position:relative;
+    width: 48px;
+    height: 144px;
+    margin: 0;
     margin-top: 4px; 
-    margin-bottom: -2px; 
 }
 
-.colorTip {
-     display: inline-block;
-     width: 22px;
-     height: 18px;
-     margin-left: 0;
-     margin-right: 4px;
-     background: #efefff;
-     box-shadow: 0 0 0 1px #7474ab;
+.colorTipOff {
+    position: absolute;
+    overflow: hidden;
+    width: 22px;
+    height: 18px;
+    margin: -1px 4px 0px 0px;
+    box-shadow: 0 0 0 1px #7474ab;
 }
 
-.colorTipActive {
-     display: inline-block;
-     width: 22px;
-     height: 18px;
-     margin-left: 3px;
-     margin-right:1px;
-     background: magenta;
-     box-shadow: 0 0 0 1px black;
+.colorTipOff img {
+    left: 0;
+    opacity: 0.5;
+    position: absolute;
+    pointer-events:none;
+}
+
+.colorTipOn {
+    position: absolute;
+    overflow: hidden;
+    width: 22px;
+    height: 18px;
+    margin: -1px 4px 0px 0px;
+    box-shadow: 0 0 0 1px #7474ab;
+}
+
+.colorTipOn img {
+    left: -22px;
+    opacity: 0.5;
+    position: absolute;
+    pointer-events:none;
 }
 
 .colorSlider {
@@ -283,6 +332,7 @@ body{
 
 .colorSlider .label {
     position: absolute;
+    left: 2px;
     bottom: -3px;
     color: #5a5781;
     font-size:12px;
@@ -311,6 +361,7 @@ body{
 
 .sizeSlider .label {
     position: absolute;
+    left: 2px;
     bottom: -3px;
     color: #5a5781;
     font-size:12px;
@@ -344,16 +395,65 @@ body{
     background-color: #d2d8f0;
     box-shadow: 0 0 0 1px #7474ab;
     position: relative;
+    margin-top: 6px;
 }
 
-.layerControler .label {
+.layerControl .bg {
     position: absolute;
-    bottom: -3px;
+    width: 44px;
+    height: 9px;
+    margin: 0;
+    
+    top: 0px;
+    left: 2px;
+    border-bottom: 1px solid #7474ab;
+}
+
+.layerControl .line1 {
+    position: absolute;
+    width: 50px;
+    height:10px;
+    margin: 0;
+    padding: 0;
+
+    top: 0px;
+    left: -1px;
+    background-image: linear-gradient(to top right, transparent, transparent 47%, red 47%, red 53%, transparent 53%, transparent);
+}
+
+.layerControl .line0 {
+    position: absolute;
+    width: 50px;
+    height: 10px;
+    margin: 0;
+    padding: 0;
+
+    top: 10px;
+    left: -1px;
+    background-image: linear-gradient(to top right, transparent, transparent 47%, red 47%, red 53%, transparent 53%, transparent);
+}
+
+.layerControl .label1 {
+    position: absolute;
+    left: 2px;
+    Top: -4px;
     color: #5a5781;
-    font-size:12px;
+    font-size:11px;
     font-weight: 100;
     font-family: 'Arial';
     letter-spacing: 0;
-    vertical-align: middle;
+    vertical-align: baseline;
+}
+
+.layerControl .label0 {
+    position: absolute;
+    left: 2px;
+    Top: 6px;
+    color: #5a5781;
+    font-size:11px;
+    font-weight: 100;
+    font-family: 'Arial';
+    letter-spacing: 0;
+    vertical-align: baseline;
 }
 
