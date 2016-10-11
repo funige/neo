@@ -607,7 +607,8 @@ Neo.Painter.prototype.getColorString = function(c) {
 Neo.Painter.prototype.setColor = function(c) {
     if (typeof c != "string") c = this.getColorString(c);
     this.foregroundColor = c;
-    document.getElementById("colorTmp").value = this.foregroundColor;
+
+    Neo.updateUIColor();
 };
 
 Neo.Painter.prototype.prepareDrawing = function () {

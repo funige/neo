@@ -2,7 +2,7 @@
 
 var Neo = function() {};
 
-Neo.version = "0.3.5";
+Neo.version = "0.4.0";
 
 Neo.painter;
 Neo.fullScreen = false;
@@ -101,13 +101,15 @@ function initButtons() {
     new Neo.Button().init("zoomMinus").onmouseup = function() {
         new Neo.ZoomMinusCommand(Neo.painter).execute();
     };
-    var fill = new Neo.Button().init("fill", {type:'fill'});
+
+    Neo.fillButton = new Neo.Button().init("fill", {type:'fill'});
 
     // toolTip
-    var pen = new Neo.PenTip().init("pen", {type:'pen'});
-    var eraser = new Neo.EraserTip().init("eraser", {type:'eraser'});
-    var mask = new Neo.MaskTip().init("mask", {type:'mask'});
-    Neo.toolButtons = [fill, pen, eraser];
+    Neo.penTip = new Neo.PenTip().init("pen", {type:'pen'});
+    Neo.eraserTip = new Neo.EraserTip().init("eraser", {type:'eraser'});
+    Neo.maskTip = new Neo.MaskTip().init("mask", {type:'mask'});
+
+    Neo.toolButtons = [Neo.fillButton, Neo.penTip, Neo.eraserTip];
 
     // colorTip
     for (var i = 1; i <= 14; i++) {
@@ -125,10 +127,34 @@ function initButtons() {
         "sliderAlpha", {type:Neo.SLIDERTYPE_ALPHA});
 
     // sizeSlider
-//    Neo.sliders[Neo.SLIDERTYPE_SIZE] = new Neo.SizeSlider().init(
-//        "sliderSize", {type:Neo.SLIDERTYPE_SIZE});
+    Neo.sliders[Neo.SLIDERTYPE_SIZE] = new Neo.SizeSlider().init(
+        "sliderSize", {type:Neo.SLIDERTYPE_SIZE});
 
     new Neo.LayerControl().init("layerControl");
+};
+
+/*
+-----------------------------------------------------------------------
+色が変わった時の対応
+-----------------------------------------------------------------------
+*/
+
+Neo.updateUIColor = function(updateSlider, updateColorTip) {
+    var color = Neo.painter.foregroundColor;
+
+    Neo.sliders[Neo.SLIDERTYPE_SIZE].update();
+    Neo.penTip.update();
+    
+    if (updateSlider) {
+        Neo.sliders[Neo.SLIDERTYPE_RED].update();
+        Neo.sliders[Neo.SLIDERTYPE_GREEN].update();
+        Neo.sliders[Neo.SLIDERTYPE_BLUE].update();
+    }
+
+    if (updateColorTip) {
+        var colorTip = Neo.ColorTip.getCurrent();
+        if (colorTip) colorTip.setColor(color);
+    }
 };
 
 /*

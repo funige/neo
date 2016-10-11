@@ -82,13 +82,9 @@
     <div id="sliderGreen"></div>
     <div id="sliderBlue"></div>
     <div id="sliderAlpha"></div>
+    <div id="sliderSize"></div>
 
-    <div id="sliderWidth" class="sizeSlider">
-        <div class="slider" style="height: 12px;"></div>
-        <div class="label">9px</div>
-    </div>
-
-    <div class="reserveControl" style="margin-top:4px; visibility:hidden;">
+    <div class="reserveControl" style="margin-top:4px; display: none;">
     </div>
     <div id="layerControl" style="margin-top:6px;"></div>
     
@@ -96,53 +92,8 @@
     </div>
 </div>
 
-<br>
 
-<!-- 仮コントロール -->
-<div style="margin:5px;">
-<input id="colorTmp" type="color" onchange="Neo.painter.foregroundColor = this.value;"/>
-<select style="font-size:14px;" onchange="console.log(this.value); Neo.painter.selectTool(this.value);">
-<option value="1" selected=true>鉛筆
-<option value="2">消しゴム
-<option value="3">塗り潰し
-</select>
-</div>
-
-
-<input id="widthTmp" type="range" value="1" min="1" max="30" step="1" onmousemove="Neo.painter.lineWidth = this.value-0; $('#lineWidth').html(this.value);" />
-ペンの太さ: <span id="lineWidth">1</span>
-<br>
-
-<input id="alphaTmp" type="range" value="255" min="1" max="255" step="1" onmousemove="Neo.painter.alpha = this.value/255.0; $('#alpha').html(this.value)" />
-透明度: <span id="alpha">255</span>
-<br>
-
-
-レイヤー
-<select onchange="Neo.painter.current = this.value-0;">
-<option>1
-<option selected=true>0
-</select>
-<br>
-1<input type="checkbox" checked=true onchange="Neo.painter.visible[1] = this.checked; Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight)"/>
-表示<br>
-0<input type="checkbox" checked=true onchange="Neo.painter.visible[0] = this.checked; Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight)"/>
-表示<br>
-
-<br>
-マスク(とりあえず黒に固定)
-<select onchange="Neo.painter.maskType = this.value-0;">
-<option value="0" selected=true>通常
-<option value="1">マスク
-<option value="2">逆マスク
-</select>
-
-<hr>
-<div>
-    <input type="button" value="全消し" onclick="Neo.painter.clearCanvas(true);"/>
-</div>
-
-<div style="clear:both; padding-top:20px;">
+<div style="clear:both; padding-top:20px; margin: auto;">
     <select id="target" name="target">
         <option value="jun.2chan.net/oe">お絵sql</option>
         <option value="zip.2chan.net/p">お絵かき</option>

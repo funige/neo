@@ -78,7 +78,6 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.name = name;
 
     this.selected = (this.name == "color1") ? true : false;
-    this.color = Neo.config.colors[params.index - 1];
     this.isMouseDown = false;
 
     var ref = this;
@@ -93,10 +92,13 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.element.style.left = (index % 2) ? "0px" : "26px";
     this.element.style.top = Math.floor(index / 2) * 21 + "px";
 
-    // base64 colortip.png
+    // base64 ColorTip.png
     this.element.innerHTML = "<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />"
 
-    this.element.style.backgroundColor = this.color;
+    this.setColor(Neo.config.colors[params.index - 1]);
+//  this.color = Neo.config.colors[params.index - 1];
+//  this.element.style.backgroundColor = this.color;
+
     this.setSelected(this.selected);
     Neo.colorTips.push(this);
 };
@@ -109,6 +111,7 @@ Neo.ColorTip.prototype._mouseDownHandler = function(e) {
             colorTip.setSelected(this == colorTip) ? true : false;
         }
         Neo.painter.setColor(this.color);
+        Neo.updateUIColor(true, false);
     }
 
     if (this.onmousedown) this.onmousedown(this);
@@ -138,6 +141,18 @@ Neo.ColorTip.prototype.setSelected = function(selected) {
     this.selected = selected;
 };
 
+Neo.ColorTip.prototype.setColor = function(color) {
+    this.color = color;
+    this.element.style.backgroundColor = color;
+};
+
+Neo.ColorTip.getCurrent = function() {
+    for (var i = 0; i < Neo.colorTips.length; i++) {
+        var colorTip = Neo.colorTips[i];
+        if (colorTip.selected) return colorTip;
+    }
+    return null;
+};
 
 /*
 -------------------------------------------------------------------------
@@ -219,6 +234,8 @@ Neo.ToolTip.prototype.draw = function(c) {};
 -------------------------------------------------------------------------
 */
 
+Neo.penTip;
+
 Neo.PenTip = function() {};
 Neo.PenTip.prototype = new Neo.ToolTip();
 
@@ -264,11 +281,11 @@ Neo.PenTip.prototype.update = function() {
 };
 
 Neo.PenTip.prototype.draw = function(c) {
-    if (typeof c == "string") c = Neo.painter.getColor(c);
+    if (typeof c != "string") c = Neo.painter.getColorString(c);
     var ctx = this.canvas.getContext("2d");
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     ctx.fillStyle = c;
-    ctx.fillRect(2, 3, 33, 1);
+    ctx.fillRect(2, 3, 33, 1.2);
 };
 
 /*
@@ -276,6 +293,8 @@ Neo.PenTip.prototype.draw = function(c) {
 	EraserTip
 -------------------------------------------------------------------------
 */
+
+Neo.eraserTip;
 
 Neo.EraserTip = function() {};
 Neo.EraserTip.prototype = new Neo.ToolTip();
@@ -339,6 +358,8 @@ Neo.EraserTip.prototype.draw = function() {
 -------------------------------------------------------------------------
 */
 
+Neo.maskTip;
+
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
@@ -395,21 +416,20 @@ Neo.ColorSlider.prototype.init = function(name, params) {
     this.element = document.getElementById(name);
     this.params = params || {};
     this.name = name;
-
     this.isMouseDown = false;
+    this.value = 0;
+    this.type = this.params.type;
 
     this.element.className = "colorSlider";
     this.element.innerHTML = "<div class='slider'></div><div class='label'></div>"; 
-   this.slider = this.element.getElementsByClassName('slider')[0];
+    this.slider = this.element.getElementsByClassName('slider')[0];
     this.label = this.element.getElementsByClassName('label')[0];
 
     this.element['data-slider'] = params.type;
     this.slider['data-slider'] = params.type;
     this.label['data-slider'] = params.type;
 
-    this.slider.style.width = "22px";
-
-    switch (params.type) {
+    switch (this.type) {
     case Neo.SLIDERTYPE_RED: 
         this.prefix = "R";
         this.slider.style.backgroundColor = "#fa9696"; 
@@ -425,22 +445,72 @@ Neo.ColorSlider.prototype.init = function(name, params) {
     case Neo.SLIDERTYPE_ALPHA: 
         this.prefix = "A";
         this.slider.style.backgroundColor = "#aaaaaa"; 
+        this.value = 255;
         break;
     }
     this.label.innerHTML = this.prefix + "99";
+
+    this.update();
     return this;
 };
 
 Neo.ColorSlider.prototype.downHandler = function(x, y) {
-    console.log("down:" + x);
+    this.slide(x, y);
 };
 
 Neo.ColorSlider.prototype.moveHandler = function(x, y) {
-    console.log("move:" + x);
+    this.slide(x, y);
 };
 
 Neo.ColorSlider.prototype.upHandler = function(x, y) {
-    console.log("up:" + x);
+};
+
+Neo.ColorSlider.prototype.slide = function(x, y) {
+    var value;
+    if (x >= 0 && x <= 49 && y >= 0 && y <= 15) {
+        value = (x - 0.5) * 255.0 / 48.0;
+        value = Math.round(value / 5) * 5;
+
+        this.value0 = value;
+        this.x0 = x;
+
+    } else {
+        var d = (x - this.x0) / 3.0;
+        value = this.value0 + d; 
+    }
+    var min = (this.type == Neo.SLIDERTYPE_ALPHA) ? 1 : 0;
+    this.value = Math.max(Math.min(255, value), min);
+
+    if (this.type == Neo.SLIDERTYPE_ALPHA) {
+        Neo.painter.alpha = this.value / 255.0;
+        this.update();
+
+    } else {
+        var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
+        var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
+        var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
+
+        Neo.painter.setColor(r<<16 | g<<8 | b);
+        Neo.updateUIColor(true, true);
+    }
+};
+
+Neo.ColorSlider.prototype.update = function() {
+    var color = Neo.painter.getColor();
+    var alpha = Neo.painter.alpha * 255;
+
+    switch (this.type) {
+    case Neo.SLIDERTYPE_RED:   this.value = (color & 0x0000ff); break;
+    case Neo.SLIDERTYPE_GREEN: this.value = (color & 0x00ff00) >> 8; break;
+    case Neo.SLIDERTYPE_BLUE:  this.value = (color & 0xff0000) >> 16; break;
+    case Neo.SLIDERTYPE_ALPHA: this.value = alpha; break;
+    }
+
+    var width = this.value * 49.0 / 255.0;
+    width = Math.max(Math.min(48, width), 1);
+
+    this.slider.style.width = width.toFixed(2) + "px";
+    this.label.innerHTML = this.prefix + this.value.toFixed(0);
 };
 
 /*
@@ -450,8 +520,66 @@ Neo.ColorSlider.prototype.upHandler = function(x, y) {
 */
 
 Neo.SizeSlider = function() {};
-Neo.SizeSlider.init = function(element) {
-  
+
+Neo.SizeSlider.prototype.init = function(name, params) {
+    this.element = document.getElementById(name);
+    this.params = params || {};
+    this.name = name;
+    this.isMouseDown = false;
+    this.value = 1;
+
+    this.element.className = "sizeSlider";
+    this.element.innerHTML = "<div class='slider'></div><div class='label'></div>"; 
+    this.slider = this.element.getElementsByClassName('slider')[0];
+    this.label = this.element.getElementsByClassName('label')[0];
+
+    this.element['data-slider'] = params.type;
+    this.slider['data-slider'] = params.type;
+    this.label['data-slider'] = params.type;
+
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+    this.update();
+    return this;
+};
+
+Neo.SizeSlider.prototype.downHandler = function(x, y) {
+    this.slide(x, y);
+};
+
+Neo.SizeSlider.prototype.moveHandler = function(x, y) {
+    this.slide(x, y);
+};
+
+Neo.SizeSlider.prototype.upHandler = function(x, y) {
+};
+
+Neo.SizeSlider.prototype.slide = function(x, y) {
+    var value;
+    if (x >= 0 && x <= 49 && y >= 0 && y <= 34) {
+        value = (y - 0.5) * 30.0 / 33.0;
+        value = Math.round(value);
+
+        this.value0 = value;
+        this.y0 = y;
+
+    } else {
+        var d = (y - this.y0) / 7.0;
+        value = this.value0 + d; 
+    }
+
+    this.value = Math.max(Math.min(30, Math.round(value)), 1);
+
+    Neo.painter.lineWidth = this.value;
+    this.update();
+};
+
+Neo.SizeSlider.prototype.update = function() {
+    var height = this.value * 34.0 / 30.0;
+    height = Math.max(Math.min(34, height), 1);
+
+    this.slider.style.height = height.toFixed(2) + "px";
+    this.label.innerHTML = this.value + "px";
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
 };
 
 /*

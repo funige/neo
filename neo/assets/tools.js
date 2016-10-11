@@ -138,23 +138,19 @@ Neo.EraserTool.prototype.moveHandler = function(oe) {
 };
 
 Neo.EraserTool.prototype.drawCursor = function(oe) {
-    if (oe.lineWidth <= 8) return; 
-
+    if (oe.lineWidth <= 8) return;
     var mx = oe.mouseX;
     var my = oe.mouseY;
     var d = oe.lineWidth;
     var ctx = oe.destCanvasCtx;
     ctx.save();
     this.transformForZoom(oe)
-    ctx.lineWidth = oe.lineWidth;
-    ctx.lineCap = "round";	
-    ctx.strokeStyle = "#000000";
-    ctx.fillStyle = "";
-    ctx.lineWidth = 1/oe.zoom;
-    ctx.globalAlpha = 1;
-    oe.drawEllipse(ctx, mx+1/oe.zoom-d*0.5, my+1/oe.zoom-d*0.5, d, d, true, false);
-    ctx.strokeStyle = "#ffffff";
-    oe.drawEllipse(ctx, mx-d*0.5, my-d*0.5, d, d, true, false);
+
+    var x = (mx - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
+    var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
+    var r = d * 0.5 * oe.zoom;
+    oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR2);
+
     ctx.restore();
 }
 
