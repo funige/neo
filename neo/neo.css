@@ -1,20 +1,16 @@
-*{
+.NEO {
+    margin:0;
     line-height:18px;
     -webkit-user-select: none;
     user-select: none;
 }
 
-*:active,
-*:hover {
-  cursor: pointer;
+.NEO *:active,
+.NEO *:hover {
+  cursor: default;
 }
 
-body{
-    margin:0;
-    background-color: #ffffee;
-}
-
-#container{
+.NEO #container{
     width: 100%;
     height: 100%;
     position: relative;
@@ -24,14 +20,14 @@ body{
     background: #e8efff url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAKUlEQVQ4y2NgoABcvfH+PxMlBjAwMDCMGjBqwKgBVDKA8eqN9/8pMQAA5qwHVDz/gqkAAAAASUVORK5CYII=");
 }
 
-#center{
+.NEO #center{
     display: table;
     position: relative;
     height: 100%;
     margin: auto;
 }
 
-#toolsWrapper{
+.NEO #toolsWrapper{
     width: 52px;
     height: 100%; /* ここはうまく書けなかったので手動でcontainerの高さに合わせて！ */
     display: table;
@@ -40,42 +36,41 @@ body{
     right: -3px;
 }
 
-#tools{
+.NEO #tools{
     width: 52px;
     display: table-cell;
     vertical-align: middle;
     position: relative;
 }
 
-#painterContainer{
+.NEO #painterContainer{
     display:table-cell;
     vertical-align: middle;
     position: relative;
 }
 
-#painterWrapper{
+.NEO #painterWrapper{
     padding: 0 55px 0 0;
     position: relative;
 
 }
 
-#upper {
+.NEO #upper {
     height:30px;
     padding-right: 20px;
     text-align:right;
 }
 
-#lower {
+.NEO #lower {
     height:30px;
 }
 
-#painter {
+.NEO #painter {
     position: relative;
     padding: 20px 20px 20px 20px;
-//  background-color: #9ac;
 }
 
-#canvas {
+.NEO #canvas {
     position: relative;
     width: 300px;
     height: 300px;
@@ -83,13 +78,13 @@ body{
     border: 1px solid #efefff;
 }
 
-#headerButtons {
+.NEO #headerButtons {
     position: absolute;
     top: 5px;
     left: 5px;
 }
 
-#footerButtons {
+.NEO #footerButtons {
     position: absolute;
     bottom: 5px;
     left: 5px;
@@ -102,11 +97,11 @@ body{
 -----------------------
 */
 
-#pageView{
+.NEO #pageView{
     background-color: white;
 }
 
-#windowView{
+.NEO #windowView{
     z-index: 9999;
     position: fixed;
     width: 100%;
@@ -122,21 +117,21 @@ body{
 -----------------------
 */
 
-#zoomMinus {
+.NEO #zoomMinus {
     padding: 0;
     margin: 0;
     width:16px;
     height:16px;
 }
 
-#zoomPlus {
+.NEO #zoomPlus {
     padding: 0;
     margin: 0;
     width:16px;
     height:16px;
 }
 
-#zoomMinusWrapper {
+.NEO #zoomMinusWrapper {
     position: absolute;
     right: -20px;
     bottom: -20px;
@@ -146,7 +141,7 @@ body{
     color: white;
 }
 
-#zoomPlusWrapper {
+.NEO #zoomPlusWrapper {
     position: absolute;
     left: -20px;
     bottom: -20px;
@@ -157,7 +152,7 @@ body{
     color: white;
 }
 
-#scrollH {
+.NEO #scrollH {
     position: absolute;
     bottom: -20px;
     width: 100%;
@@ -165,7 +160,7 @@ body{
     background-color: #eee;
 }
 
-#scrollV {
+.NEO #scrollV {
     position: absolute;
     right: -20px;
     width: 20px;
@@ -179,7 +174,8 @@ body{
 -----------------------
 */
 
-.button,.buttonOff {
+.NEO .button,
+.NEO .buttonOff {
     display: inline-block;
     border: 1px solid white;
     height: 19px;
@@ -204,13 +200,15 @@ body{
 
 }
 
-.button:hover,.buttonOff:hover {
+.NEO .button:hover,
+.NEO .buttonOff:hover {
     border-top: 1px solid #e6ffff;
     border-left: 1px solid #e6ffff;
     box-shadow: 0 0 0 1px black, 0 0 0 2px #efefff;
 }
 
-.button:active,.buttonOn {
+.NEO .button:active,
+.NEO .buttonOn {
     display: inline-block;
     border: 1px solid white;
     height: 19px;
@@ -238,7 +236,7 @@ body{
     background-color: #708097;
 }
 
-.toolTipOff {
+.NEO .toolTipOff {
     position:relative;
     background-color: #d3d8ff;
     margin: 3px; 
@@ -254,7 +252,7 @@ body{
     box-shadow: 0 0 0 1px #7474ab;
 }
 
-.toolTipOn {
+.NEO .toolTipOn {
     position:relative;
     background-color: #9397b2;
     margin: 3px; 
@@ -270,13 +268,15 @@ body{
     box-shadow: 0 0 0 1px #7474ab;
 }
 
-.toolTipOff canvas,.toolTipOn canvas {
+.NEO .toolTipOff canvas,
+.NEO .toolTipOn canvas {
     position: absolute;
     top: 0;
     left: 0;
 }
 
-.toolTipOff .label,.toolTipOn .label {
+.NEO .toolTipOff .label,
+.NEO .toolTipOn .label {
     position: absolute;
     bottom: -4px;
     left: 1px;
@@ -287,7 +287,7 @@ body{
     letter-spacing: -1px;
 }
 
-.colorTips {
+.NEO .colorTips {
     position:relative;
     width: 48px;
     height: 144px;
@@ -295,7 +295,7 @@ body{
     margin-top: 4px; 
 }
 
-.colorTipOff {
+.NEO .colorTipOff {
     position: absolute;
     overflow: hidden;
     width: 22px;
@@ -304,14 +304,14 @@ body{
     box-shadow: 0 0 0 1px #7474ab;
 }
 
-.colorTipOff img {
+.NEO .colorTipOff img {
     left: 0;
     opacity: 0.5;
     position: absolute;
     pointer-events:none;
 }
 
-.colorTipOn {
+.NEO .colorTipOn {
     position: absolute;
     overflow: hidden;
     width: 22px;
@@ -320,14 +320,14 @@ body{
     box-shadow: 0 0 0 1px #7474ab;
 }
 
-.colorTipOn img {
+.NEO .colorTipOn img {
     left: -22px;
     opacity: 0.5;
     position: absolute;
     pointer-events:none;
 }
 
-.colorSlider {
+.NEO .colorSlider {
      background-color: #d2d8f0;
      width: 48px;
      height:13px;
@@ -337,7 +337,7 @@ body{
      margin-left: 0;
 }
 
-.colorSlider .label {
+.NEO .colorSlider .label {
     pointer-events: none;
     position: absolute;
     left: 2px;
@@ -350,7 +350,7 @@ body{
     vertical-align: middle;
 }
 
-.colorSlider .slider {
+.NEO .colorSlider .slider {
     position: absolute;
     height: 100%;
     left: 0px;
@@ -359,7 +359,7 @@ body{
     box-shadow: -1px 0 0 0px rgba(0, 0, 0, 0.3) inset;
 }
 
-.sizeSlider {
+.NEO .sizeSlider {
      background-color: #d2d8f0;
      width: 48px;
      height:33px;
@@ -367,7 +367,7 @@ body{
      position: relative;
 }
 
-.sizeSlider .label {
+.NEO .sizeSlider .label {
     pointer-events: none;
     position: absolute;
     left: 2px;
@@ -380,7 +380,7 @@ body{
     vertical-align: middle;
 }
 
-.sizeSlider .slider {
+.NEO .sizeSlider .slider {
     position: absolute;
     width: 100%;
     top: 0px;
@@ -389,7 +389,7 @@ body{
     box-shadow: 0 -1px 0 0px rgba(0, 0, 0, 0.3) inset;
 }
 
-.reserveControl {
+.NEO .reserveControl {
     width: 48px;
     height: 13px;
 
@@ -398,7 +398,7 @@ body{
     position: relative;
 }
 
-.layerControl {
+.NEO .layerControl {
     width: 48px;
     height: 20px;
     background-color: #d2d8f0;
@@ -407,7 +407,7 @@ body{
     margin-top: 6px;
 }
 
-.layerControl .bg {
+.NEO .layerControl .bg {
     position: absolute;
     width: 44px;
     height: 9px;
@@ -418,7 +418,7 @@ body{
     border-bottom: 1px solid #7474ab;
 }
 
-.layerControl .line1 {
+.NEO .layerControl .line1 {
     position: absolute;
     width: 50px;
     height:10px;
@@ -430,7 +430,7 @@ body{
     background-image: linear-gradient(to top right, transparent, transparent 47%, red 47%, red 53%, transparent 53%, transparent);
 }
 
-.layerControl .line0 {
+.NEO .layerControl .line0 {
     position: absolute;
     width: 50px;
     height: 10px;
@@ -442,7 +442,7 @@ body{
     background-image: linear-gradient(to top right, transparent, transparent 47%, red 47%, red 53%, transparent 53%, transparent);
 }
 
-.layerControl .label1 {
+.NEO .layerControl .label1 {
     position: absolute;
     left: 2px;
     Top: -4px;
@@ -454,7 +454,7 @@ body{
     vertical-align: baseline;
 }
 
-.layerControl .label0 {
+.NEO .layerControl .label0 {
     position: absolute;
     left: 2px;
     Top: 6px;

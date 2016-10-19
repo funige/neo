@@ -2,7 +2,7 @@
 
 var Neo = function() {};
 
-Neo.version = "0.4.0";
+Neo.version = "0.4.1";
 
 Neo.painter;
 Neo.fullScreen = false;
@@ -31,6 +31,7 @@ Neo.SLIDERTYPE_SIZE = 5;
 
 
 Neo.init = function() {
+    Neo.createContainer();
     sssl(["assets/jquery-1.4.2.min.js",
           "assets/painter.js",
           "assets/tools.js",
@@ -58,14 +59,14 @@ Neo.init2 = function() {
 
     Neo.resizeCanvas();
 
-    initComponents();
-    initButtons();
+    Neo.initComponents();
+    Neo.initButtons();
     Neo.container.style.visibility = "visible";
 }
 
-function initComponents() {
-    var toolSet = document.getElementById("toolSet");
-    document.getElementById("tools").appendChild(toolSet);
+Neo.initComponents = function() {
+//  var toolSet = document.getElementById("toolSet");
+//  document.getElementById("tools").appendChild(toolSet);
     document.getElementById("copyright").innerHTML += "v" + Neo.version;
 
     //お絵描き中はアプレットのborderを選択状態にする
@@ -77,9 +78,13 @@ function initComponents() {
     document.addEventListener("mousedown", function(e) {
         container.style.borderColor = 'transparent';
     }, false);
+
+    //画面外の何もないところををクリックして描画されてしまうのをちょっと防ぐ
+    document.getElementById("toolSet")['data-ui'] = true;
+    document.getElementById("toolPad")['data-ui'] = true;
 }
 
-function initButtons() {
+Neo.initButtons = function() {
     new Neo.Button().init("undo").onmouseup = function() {
         new Neo.UndoCommand(Neo.painter).execute();
     };
@@ -107,9 +112,10 @@ function initButtons() {
     // toolTip
     Neo.penTip = new Neo.PenTip().init("pen", {type:'pen'});
     Neo.eraserTip = new Neo.EraserTip().init("eraser", {type:'eraser'});
+    Neo.copyTip = new Neo.CopyTip().init("copy", {type:'copy'});
     Neo.maskTip = new Neo.MaskTip().init("mask", {type:'mask'});
 
-    Neo.toolButtons = [Neo.fillButton, Neo.penTip, Neo.eraserTip];
+    Neo.toolButtons = [Neo.fillButton, Neo.penTip, Neo.eraserTip, Neo.copyTip];
 
     // colorTip
     for (var i = 1; i <= 14; i++) {
@@ -315,4 +321,91 @@ Neo.submit = function(board, blob) {
 		});
 	};
 })();
+
+/*
+-----------------------------------------------------------------------
+DOMツリーの作成
+-----------------------------------------------------------------------
+*/
+
+Neo.createContainer = function(div) {
+    if (!div) div = document.getElementsByTagName("body")[0];
+    var neo = document.createElement("div");
+    neo.className = "NEO";
+    neo.innerHTML = (function() {/*
+
+<div id="pageView" style="width:450px; height:470px; margin:auto;">
+    <div id="container" style="visibility:hidden;">
+        <div id="center">
+            <div id="painterContainer">
+                <div id="painterWrapper">
+                    <div id="upper">
+                        <div id="redo">やり直し</div>
+                        <div id="undo">元に戻す</div>
+                        <div id="fill">塗り潰し</div>
+                   </div>
+                    <div id="painter">
+                        <div id="canvas">
+                            <div id="scrollH" data-ui=true></div>
+                            <div id="scrollV" data-ui=true></div>
+                            <div id="zoomPlusWrapper">
+                                <div id="zoomPlus">+</div>
+                            </div>
+                            <div id="zoomMinusWrapper">
+                                <div id="zoomMinus">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="lower">
+                    </div>
+                </div>
+                <div id="toolsWrapper">
+                    <div id="tools">
+                        <div id="toolSet">
+                            <div id="pen" class="toolTip"><div class="label">鉛筆</div></div>
+                            <div id="eraser" class="toolTip"><div class="label">消しペン</div></div>
+                            <div id="copy" class="toolTip"><div class="label">コピー</div></div>
+                            <div id="mask" class="toolTip"><div class="label">マスク</div></div>
+
+                            <div class="colorTips">
+                                <div id="color2"></div><div id="color1"></div><br>
+                                <div id="color4"></div><div id="color3"></div><br>
+                                <div id="color6"></div><div id="color5"></div><br>
+                                <div id="color8"></div><div id="color7"></div><br>
+                                <div id="color10"></div><div id="color9"></div><br>
+                                <div id="color12"></div><div id="color11"></div><br>
+                                <div id="color14"></div><div id="color13"></div>
+                            </div>
+
+                            <div id="sliderRed"></div>
+                            <div id="sliderGreen"></div>
+                            <div id="sliderBlue"></div>
+                            <div id="sliderAlpha"></div>
+                            <div id="sliderSize"></div>
+
+                            <div class="reserveControl" style="margin-top:4px; display: none;"></div>
+                            <div id="layerControl" style="margin-top:6px;"></div>
+    
+                            <div id="toolPad" style="height:20px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="headerButtons">
+            <div id="window">窓</div>
+        </div>
+        <div id="footerButtons">
+            <div id="submit">投稿</div>
+            <div id="copyright">(C)しいちゃん PaintBBS NEO</div>
+        </div>
+    </div>
+</div>
+
+<div id="windowView" style="display: none;">
+</div>
+
+*/}).toString().match(/\/\*([^]*)\*\//)[1];
+    div.appendChild(neo);
+};
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html height:100%;>
 <head>
     <title>PaintBBS NEO</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
@@ -9,89 +9,7 @@
 
 </head>
 
-<body onLoad = "Neo.init();">
-
-<div id="pageView" style="width:450px; height:470px; margin:auto;">
-    <div id="container" style="visibility:hidden;">
-        <div id="center">
-            <div id="painterContainer">
-                <div id="painterWrapper">
-                    <div id="upper">
-                        <div id="redo">やり直し</div>
-                        <div id="undo">元に戻す</div>
-                        <div id="fill">塗り潰し</div>
-                   </div>
-                    <div id="painter">
-                        <div id="canvas">
-                            <div id="scrollH" data-ui=true></div>
-                            <div id="scrollV" data-ui=true></div>
-                            <div id="zoomPlusWrapper">
-                                <div id="zoomPlus">+</div>
-                            </div>
-                            <div id="zoomMinusWrapper">
-                                <div id="zoomMinus">-</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="lower">
-                    </div>
-                </div>
-                <div id="toolsWrapper">
-                    <div id="tools">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="headerButtons">
-            <div id="window">窓</div>
-        </div>
-        <div id="footerButtons">
-            <div id="submit">投稿</div>
-            <div id="copyright">(C)しいちゃん PaintBBS NEO</div>
-        </div>
-    </div>
-</div>
-
-<div id="windowView" style="display: none;">
-</div>
-
-<!-- コントロール -->
-<br>
-<div id="toolSet">
-    <div id="pen" class="toolTip"><div class="label">鉛筆</div></div>
-    <div id="eraser" class="toolTip"><div class="label">消しペン</div></div>
-    <div id="mask" class="toolTip"><div class="label">マスク</div></div>
-
-<!--
-  <div class="colorTip">
-        <img src="assets/images/topleft-white.png" style="opacity:0.9">
-   </div>    
- -->
-    
-    <div class="colorTips">
-        <div id="color2"></div><div id="color1"></div><br>
-        <div id="color4"></div><div id="color3"></div><br>
-        <div id="color6"></div><div id="color5"></div><br>
-        <div id="color8"></div><div id="color7"></div><br>
-        <div id="color10"></div><div id="color9"></div><br>
-        <div id="color12"></div><div id="color11"></div><br>
-        <div id="color14"></div><div id="color13"></div>
-    </div>
-
-    <div id="sliderRed"></div>
-    <div id="sliderGreen"></div>
-    <div id="sliderBlue"></div>
-    <div id="sliderAlpha"></div>
-    <div id="sliderSize"></div>
-
-    <div class="reserveControl" style="margin-top:4px; display: none;">
-    </div>
-    <div id="layerControl" style="margin-top:6px;"></div>
-    
-    <div style="height:20px;">
-    </div>
-</div>
-
+<body style="background-color:#ffffee;" onLoad = "Neo.init();">
 
 <div style="clear:both; padding-top:20px; margin: auto;">
     <select id="target" name="target">
@@ -100,11 +18,9 @@
         <option value="nov.2chan.net/q">落書き</option>
         <option value="cgi.2chan.net/u">落書き裏</option>
     </select>
-    <input id="submit" type="button" value="送信" 
+    <input id="post" type="button" value="送信" 
            onclick="Neo.painter.submit(document.getElementById('target').value);">
 </div>
-
-
 </body>
 </html>
 

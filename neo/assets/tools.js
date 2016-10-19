@@ -24,7 +24,7 @@ Neo.ToolBase.prototype.transformForZoom = function(oe) {
 	ctx.translate(oe.canvasWidth * 0.5, oe.canvasHeight * 0.5);
 	ctx.scale(oe.zoom, oe.zoom);
 	ctx.translate(-oe.zoomX, -oe.zoomY);
-}
+};
 
 /*
 -------------------------------------------------------------------------
@@ -78,7 +78,7 @@ Neo.PenTool.prototype.drawCursor = function(oe) {
     var x = (mx - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
     var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
-    oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR);
+    oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR_PEN);
 
     ctx.restore();
 }
@@ -144,12 +144,12 @@ Neo.EraserTool.prototype.drawCursor = function(oe) {
     var d = oe.lineWidth;
     var ctx = oe.destCanvasCtx;
     ctx.save();
-    this.transformForZoom(oe)
+    this.transformForZoom(oe);
 
     var x = (mx - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
     var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
-    oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR2);
+    oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR_ERASER);
 
     ctx.restore();
 }
@@ -278,7 +278,7 @@ Neo.FillTool.prototype.rollOverHandler= function(oe) {}
 
 /*
 -------------------------------------------------------------------------
-	EraseAll（塗り潰し）
+	EraseAll（全消し）
 -------------------------------------------------------------------------
 */
 
@@ -304,6 +304,125 @@ Neo.EraseAllTool.prototype.rollOutHandler= function(oe) {};
 Neo.EraseAllTool.prototype.upMoveHandler = function(oe) {};
 Neo.EraseAllTool.prototype.rollOverHandler= function(oe) {};
 
+
+/*
+-------------------------------------------------------------------------
+	RectEffect（矩型エフェックト）
+-------------------------------------------------------------------------
+*/
+
+Neo.RectEffectTool = function() {};
+Neo.RectEffectTool.prototype = new Neo.ToolBase();
+Neo.RectEffectTool.prototype.isUpMove = false;
+
+Neo.RectEffectTool.prototype.downHandler = function(oe) {
+    this.isUpMove = false;
+
+    this.startX = this.endX = oe.mouseX;
+    this.startY = this.endY = oe.mouseY;
+};
+
+Neo.RectEffectTool.prototype.upHandler = function(oe) {
+    this.isUpMove = true;
+
+    var x = (this.startX < this.endX) ? this.startX : this.endX;
+    var y = (this.startY < this.endY) ? this.startY : this.endY;
+    var width = Math.abs(this.startX - this.endX);
+    var height = Math.abs(this.startY - this.endY);
+    var ctx = oe.canvasCtx[oe.current];
+
+    if (width > 0 && height > 0) {
+        oe._pushUndo();
+
+        this.doEffect(oe, x, y, width, height);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }
+};
+
+Neo.RectEffectTool.prototype.moveHandler = function(oe) {
+    this.endX = oe.mouseX;
+    this.endY = oe.mouseY;
+
+	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+	this.drawCursor(oe);
+};
+
+Neo.RectEffectTool.prototype.rollOutHandler= function(oe) {};
+Neo.RectEffectTool.prototype.upMoveHandler = function(oe) {};
+Neo.RectEffectTool.prototype.rollOverHandler= function(oe) {};
+
+Neo.RectEffectTool.prototype.drawCursor = function(oe) {
+    var ctx = oe.destCanvasCtx;
+
+    ctx.save();
+    this.transformForZoom(oe);
+
+    var start = oe.getDestCanvasMousePosition(this.startX, this.startY, true);
+    var end = oe.getDestCanvasMousePosition(this.endX, this.endY, true);
+
+    var x = (start.x < end.x) ? start.x : end.x;
+    var y = (start.y < end.y) ? start.y : end.y;
+    var width = Math.abs(start.x - end.x);
+    var height = Math.abs(start.y - end.y);
+    oe.drawXORRect(ctx, x, y, width, height);
+    ctx.restore();
+};
+
+/*
+-------------------------------------------------------------------------
+	EraseRect（消し四角）
+-------------------------------------------------------------------------
+*/
+
+Neo.EraseRectTool = function() {};
+Neo.EraseRectTool.prototype = new Neo.RectEffectTool();
+Neo.EraseRectTool.prototype.isUpMove = false;
+Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+};
+
+/*
+-------------------------------------------------------------------------
+	FlipH（左右反転）
+-------------------------------------------------------------------------
+*/
+
+Neo.FlipHTool = function() {};
+Neo.FlipHTool.prototype = new Neo.RectEffectTool();
+Neo.FlipHTool.prototype.isUpMove = false;
+Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.flipH(ctx, x, y, width, height);
+};
+
+/*
+-------------------------------------------------------------------------
+	FlipV（上下反転）
+-------------------------------------------------------------------------
+*/
+
+Neo.FlipVTool = function() {};
+Neo.FlipVTool.prototype = new Neo.RectEffectTool();
+Neo.FlipVTool.prototype.isUpMove = false;
+Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.flipV(ctx, x, y, width, height);
+};
+
+/*
+-------------------------------------------------------------------------
+	Merge（レイヤー結合）
+-------------------------------------------------------------------------
+*/
+
+Neo.MergeTool = function() {};
+Neo.MergeTool.prototype = new Neo.RectEffectTool();
+Neo.MergeTool.prototype.isUpMove = false;
+Neo.MergeTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.merge(ctx, x, y, width, height);
+};
 
 /*
 -------------------------------------------------------------------------
