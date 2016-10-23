@@ -239,9 +239,10 @@
 .NEO .toolTipOff {
     position:relative;
     background-color: #d3d8ff;
-    margin: 3px; 
-    margin-left: 0;
     padding: 0;
+    margin: 0;
+    margin-top: 3px;
+    margin-bottom: 3px;
 
     width: 46px;
     height: 18px;
@@ -255,9 +256,10 @@
 .NEO .toolTipOn {
     position:relative;
     background-color: #9397b2;
-    margin: 3px; 
-    margin-left: 0;
     padding: 0;
+    margin: 0;
+    margin-top: 3px;
+    margin-bottom: 3px;
 
     width: 46px;
     height: 18px;
@@ -291,8 +293,10 @@
     position:relative;
     width: 48px;
     height: 144px;
+    padding: 0;
     margin: 0;
-    margin-top: 4px; 
+    margin-top: 4px;
+    margin-left: 0px;
 }
 
 .NEO .colorTipOff {
@@ -301,6 +305,7 @@
     width: 22px;
     height: 18px;
     margin: -1px 4px 0px 0px;
+    padding: 0;
     box-shadow: 0 0 0 1px #7474ab;
 }
 
@@ -317,6 +322,7 @@
     width: 22px;
     height: 18px;
     margin: -1px 4px 0px 0px;
+    padding: 0;
     box-shadow: 0 0 0 1px #7474ab;
 }
 
@@ -333,8 +339,7 @@
      height:13px;
      box-shadow: 0 0 0 1px #7474ab;
      position: relative;
-     margin: 3px;
-     margin-left: 0;
+     margin-top: 3px;
 }
 
 .NEO .colorSlider .label {
@@ -360,11 +365,12 @@
 }
 
 .NEO .sizeSlider {
-     background-color: #d2d8f0;
-     width: 48px;
-     height:33px;
-     box-shadow: 0 0 0 1px #7474ab;
-     position: relative;
+    background-color: #d2d8f0;
+    width: 48px;
+    height:33px;
+    box-shadow: 0 0 0 1px #7474ab;
+    position: relative;
+    margin-top: 3px;
 }
 
 .NEO .sizeSlider .label {

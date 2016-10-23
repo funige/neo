@@ -85,7 +85,9 @@ Neo.WindowCommand.prototype.execute = function() {
 Neo.SubmitCommand = function(data) {this.data = data};
 Neo.SubmitCommand.prototype = new Neo.CommandBase();
 Neo.SubmitCommand.prototype.execute = function() {
-    this.data.submit(document.getElementById('target').value);
+    var board = location.href.replace(/[^/]*$/, '');
+    console.log("submit: " + board);
+    this.data.submit(board);
 };
 
 Neo.CopyrightCommand = function(data) {this.data = data};

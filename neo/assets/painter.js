@@ -355,6 +355,8 @@ Neo.Painter.prototype._updateMousePosition = function(e) {
 
     this.rawMouseX = e.clientX;
     this.rawMouseY = e.clientY;
+    this.clipMouseX = Math.max(Math.min(this.canvasWidth, this.mouseX), 0);
+    this.clipMouseY = Math.max(Math.min(this.canvasHeight, this.mouseY), 0);
 };
 
 Neo.Painter.prototype._beforeUnloadHandler = function(e) {
@@ -745,7 +747,7 @@ Neo.Painter.prototype.drawEraserPoint = function(buf8, width, x, y) {
 
     for (var i = 0; i < d; i++) {
         for (var j = 0; j < d; j++) {
-            if (shape[shapeIndex++]) {
+            if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
                 var k = (buf8[index + 3] / 255.0) * (1.0 - (a / 255.0));
 
                 buf8[index + 3] -= a / (d * (255.0 - a) / 255.0); //要修正

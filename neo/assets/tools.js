@@ -318,8 +318,8 @@ Neo.RectEffectTool.prototype.isUpMove = false;
 Neo.RectEffectTool.prototype.downHandler = function(oe) {
     this.isUpMove = false;
 
-    this.startX = this.endX = oe.mouseX;
-    this.startY = this.endY = oe.mouseY;
+    this.startX = this.endX = oe.clipMouseX;
+    this.startY = this.endY = oe.clipMouseY;
 };
 
 Neo.RectEffectTool.prototype.upHandler = function(oe) {
@@ -334,14 +334,15 @@ Neo.RectEffectTool.prototype.upHandler = function(oe) {
     if (width > 0 && height > 0) {
         oe._pushUndo();
 
+        console.log(x + "," + y + "," + width + "," + height);
         this.doEffect(oe, x, y, width, height);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
 };
 
 Neo.RectEffectTool.prototype.moveHandler = function(oe) {
-    this.endX = oe.mouseX;
-    this.endY = oe.mouseY;
+    this.endX = oe.clipMouseX;
+    this.endY = oe.clipMouseY;
 
 	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
 	this.drawCursor(oe);

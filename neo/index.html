@@ -1,26 +1,97 @@
 <!DOCTYPE html>
-<html height:100%;>
+<html>
 <head>
-    <title>PaintBBS NEO</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<title>PaintBBS NEO</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
-    <link rel="stylesheet" type="text/css" media="all" href="neo.css" />
-    <script src="neo.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="index.css" />
 
 </head>
 
-<body style="background-color:#ffffee;" onLoad = "Neo.init();">
+<body>
 
-<div style="clear:both; padding-top:20px; margin: auto;">
-    <select id="target" name="target">
-        <option value="jun.2chan.net/oe">お絵sql</option>
-        <option value="zip.2chan.net/p">お絵かき</option>
-        <option value="nov.2chan.net/q">落書き</option>
-        <option value="cgi.2chan.net/u">落書き裏</option>
-    </select>
-    <input id="post" type="button" value="送信" 
-           onclick="Neo.painter.submit(document.getElementById('target').value);">
+<div id="header" style="height:24px;">
+    <div id="back" class="buttonDisabled" style="left:2px;" onclick='back();'>
+        <span class="genericon genericon-previous"></span></div>
+    <div id="forward" class="buttonDisabled" style="left:34px;" onclick='forward();'>
+        <span class="genericon genericon-next"></span></div>
+    <div id="edit" class="buttonDisabled" style="right:0;">
+        <span class="genericon genericon-edit"></span></div>
+
+    <div style="text-align:center; margin-top: 2px;">
+        <select id="target" name="target">
+            <option value="jun.2chan.net/oe">ふたば☆ちゃんねる - お絵sql</option>
+            <option value="zip.2chan.net/p">ふたば☆ちゃんねる - お絵かき</option>
+            <option value="nov.2chan.net/q">ふたば☆ちゃんねる - 落書き</option>
+            <option value="cgi.2chan.net/u">ふたば☆ちゃんねる - 落書き裏</option>
+        </select>
+        <input id="post" type="button" value="開く" 
+               onclick="load(document.getElementById('target').value);">
+        <!--onclick="Neo.painter.submit(document.getElementById('target').value);"-->
+    </div>
 </div>
+
+<webview id="webview" src="http://jun.2chan.net/oe/" preload="./dist/scripts.js" autosize=on></webview>
+
+<script>
+    var {shell} = require('electron');
+    var webview = document.getElementById("webview");
+    var ipc = require('electron').ipcMain;
+
+    var load = function(url) {
+        webview.loadURL("http://" + url);
+    };
+
+    var back = function() {
+        if (webview.canGoBack()) webview.goBack();
+    };
+
+    var forward = function() {
+        if (webview.canGoForward()) webview.goForward();
+    };
+
+    var updateUI = function() {
+        var canGoBack = (webview.canGoBack());
+        var canGoForward = (webview.canGoForward());
+        var backButton = document.getElementById("back");
+        var forwardButton = document.getElementById("forward");
+        backButton.className = (canGoBack) ? "button" : "buttonDisabled";
+        forwardButton.className = (canGoForward) ? "button" : "buttonDisabled";
+    };
+
+    var insertCSS = function() {
+        var fs = require('fs');
+        fs.readFile(__dirname + '/neo.css', 'utf-8', function(error, data) {
+            if (!error) {
+                webview.insertCSS(data);
+            };
+        });
+    };
+
+    webview.addEventListener("new-window", function(e) {
+        shell.openExternal(e.url);
+    });
+
+    webview.addEventListener("ipc-message", function(e) {
+        switch (e.channel) {
+        case "neo-status":
+            document.getElementById("edit").className = "buttonDisabled on";
+            break;      
+        }
+    });
+
+    webview.addEventListener("dom-ready", function(e) {
+        updateUI();
+        insertCSS();
+        document.getElementById("edit").className = "buttonDisabled";
+
+        setTimeout(function() {
+           webview.executeJavaScript("document.neo.start();");
+        }, 500);
+   });
+
+</script>
+
 </body>
 </html>
 

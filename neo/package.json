@@ -1,11 +1,16 @@
 {
   "name": "neo",
-  "version": "0.4.1",
+  "version": "0.4.5",
   "main": "main.js",
   "scripts": {
-      "hello": "echo 'hello'"
+    "hello": "echo 'hello'"
   },
   "dependencies": {
     "request": "^2.75.0"
+  },
+  "devDependencies": {
+    "gulp-concat": "^2.6.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.0.0"
   }
 }
