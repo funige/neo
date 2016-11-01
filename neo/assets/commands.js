@@ -18,11 +18,6 @@ Neo.ZoomPlusCommand.prototype.execute = function() {
         this.data.setZoom(this.data.zoom + 1);
     }
     Neo.resizeCanvas();
-
-//    this.data.destWidth = Neo.canvas.clientWidth;
-//    this.data.destHeight = Neo.canvas.clientHeight;
-//    this.data.destCanvas.style.width = this.data.destWidth;
-//    this.data.destCanvas.style.height = this.data.destHeight;
     Neo.painter.updateDestCanvas();
 };
 
@@ -33,11 +28,6 @@ Neo.ZoomMinusCommand.prototype.execute = function() {
         this.data.setZoom(this.data.zoom - 1);
     }
     Neo.resizeCanvas();
-
-//    this.data.destWidth = Neo.canvas.clientWidth;
-//    this.data.destHeight = Neo.canvas.clientHeight;
-//    this.data.destCanvas.style.width = this.data.destWidth;
-//    this.data.destCanvas.style.height = this.data.destHeight;
     Neo.painter.updateDestCanvas();
 };
 

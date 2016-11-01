@@ -20,7 +20,6 @@ Neo.Button.prototype.init = function(name, params) {
 	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
 	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
     this.element.className = (!this.params.type == 'fill') ? "button" : "buttonOff";
-    this.element['data-ui'] = true;
 
     return this;
 };
@@ -86,7 +85,6 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
     this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
     this.element.className = "colorTipOff";
-    this.element['data-ui'] = true;
 
     var index = parseInt(this.name.slice(5)) - 1;
     this.element.style.left = (index % 2) ? "0px" : "26px";
@@ -105,14 +103,15 @@ Neo.ColorTip.prototype.init = function(name, params) {
 
 Neo.ColorTip.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
-    if (this.selected == false) {
-        for (var i = 0; i < Neo.colorTips.length; i++) {
-            var colorTip = Neo.colorTips[i];
-            colorTip.setSelected(this == colorTip) ? true : false;
+    for (var i = 0; i < Neo.colorTips.length; i++) {
+        var colorTip = Neo.colorTips[i];
+        if (this == colorTip && e.shiftKey) {
+            this.setColor(Neo.config.colors[this.params.index - 1]);
         }
-        Neo.painter.setColor(this.color);
-        Neo.updateUIColor(true, false);
+        colorTip.setSelected(this == colorTip) ? true : false;
     }
+    Neo.painter.setColor(this.color);
+    Neo.updateUIColor(true, false);
 
     if (this.onmousedown) this.onmousedown(this);
 };
@@ -185,9 +184,6 @@ Neo.ToolTip.prototype.init = function(name, params) {
     this.element.innerHTML = "<canvas width=46 height=18></canvas><div class='label'></div>";
     this.canvas = this.element.getElementsByTagName('canvas')[0];
     this.label = this.element.getElementsByTagName('div')[0];
-    this.element['data-ui'] = true;
-    this.canvas['data-ui'] = true;
-    this.label['data-ui'] = true;
 
     this.update();
     return this;
@@ -654,19 +650,13 @@ Neo.LayerControl.prototype.init = function(name, params) {
     var ref = this;
     this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
     this.element.className = "layerControl";
-    this.element.innerHTML = "<div class='bg' data-ui=true></div><div class='label0' data-ui=true>Layer0</div><div class='label1' data-ui=true>Layer1</div><div class='line1' data-ui=true></div><div class='line0' data-ui=true></div>";
+    this.element.innerHTML = "<div class='bg'></div><div class='label0'>Layer0</div><div class='label1'>Layer1</div><div class='line1'></div><div class='line0'></div>";
 
     this.bg = this.element.getElementsByClassName('bg')[0];
     this.label0 = this.element.getElementsByClassName('label0')[0];
     this.label1 = this.element.getElementsByClassName('label1')[0];
     this.line0 = this.element.getElementsByClassName('line0')[0];
     this.line1 = this.element.getElementsByClassName('line1')[0];
-
-    this.bg['data-ui'] = true;
-    this.label0['data-ui'] = true;
-    this.label1['data-ui'] = true;
-    this.line0['data-ui'] = true;
-    this.line1['data-ui'] = true;
 
     this.line0.style.display = "none";
     this.line1.style.display = "none";
@@ -715,8 +705,38 @@ Neo.ReserveControl.init = function(element) {
 -------------------------------------------------------------------------
 */
 
-Neo.ScrollBarButton = function() {};
-Neo.ScrollBarButton.init = function(element) {
+Neo.scrollH;
+Neo.scrollV;
 
+Neo.ScrollBarButton = function() {};
+Neo.ScrollBarButton.prototype.init = function(name, params) {
+    this.element = document.getElementById(name);
+    this.params = params || {};
+    this.name = name;
+
+    this.element.innerHTML = "<div></div>";
+    this.barButton = this.element.getElementsByTagName("div")[0];
+    this.element['data-bar'] = true;
+    this.barButton['data-bar'] = true;
+
+    if (name == "scrollH") Neo.scrollH = this;
+    if (name == "scrollV") Neo.scrollV = this;
+    return this;
 };
 
+Neo.ScrollBarButton.prototype.update = function(oe) {
+    if (this.name == "scrollH") {
+        var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
+        var barWidth = oe.destCanvas.width * a;
+        var barX = (oe.scrollBarX) * (oe.destCanvas.width - barWidth - 2);
+        this.barButton.style.width = (Math.ceil(barWidth) - 4) + "px";
+        this.barButton.style.left = (Math.ceil(barX) + 2) + "px";
+
+    } else {
+        var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
+        var barHeight = oe.destCanvas.height * a;
+        var barY = (oe.scrollBarY) * (oe.destCanvas.height - barHeight - 2);
+        this.barButton.style.height = (Math.ceil(barHeight) - 4) + "px";
+        this.barButton.style.top = (Math.ceil(barY) + 2) + "px";
+    }
+};

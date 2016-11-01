@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 
-var jsFiles = ["neo.js", 
+var jsFiles = ["assets/container.js",
                "assets/painter.js",
                "assets/tools.js",
                "assets/commands.js",
@@ -10,7 +10,7 @@ var jsDest = "dist";
 
 gulp.task('scripts', function() {
     return gulp.src(jsFiles)
-            .pipe(concat('scripts.js'))
+            .pipe(concat('neo.js'))
             .pipe(gulp.dest(jsDest));
 });
 

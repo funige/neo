@@ -6,14 +6,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.4.5";
+Neo.version = "0.5.0";
 
 Neo.painter;
 Neo.fullScreen = false;
 
 Neo.config = {
-    width: 300,
-    height: 300,
+    image_width: 300,
+    image_height: 300,
+   
+    color_bk: "#ccccff",
 
     colors: [ 
         "#000000", "#FFFFFF",
@@ -63,6 +65,7 @@ Neo.init2 = function() {
     Neo.canvas.oncontextmenu = function() {return false;};
 //  Neo.painter.onUpdateCanvas = null;
 
+    Neo.initSkin();
     Neo.initComponents();
     Neo.initButtons();
 
@@ -71,8 +74,11 @@ Neo.init2 = function() {
 //  Neo.container.style.visibility = "visible";
 }
 
+var hage = "hage";
+
 Neo.initConfig = function(applet) {
     if (applet) {
+        var name = applet.attributes.name.value || "neo";
         var appletWidth = applet.attributes.width;
         var appletHeight = applet.attributes.height;
         if (appletWidth) Neo.config.applet_width = parseInt(appletWidth.value);
@@ -81,12 +87,20 @@ Neo.initConfig = function(applet) {
         var params = applet.getElementsByTagName('param');
         for (var i = 0; i < params.length; i++) {
             var p = params[i];
+            Neo.config[p.name] = p.value;
+
             if (p.name == "image_width") Neo.config.width = parseInt(p.value);
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
-            if (p.name == "url_save") Neo.config.url_save = p.value;
-            if (p.name == "url_exit") Neo.config.url_exit = p.value;
-            if (p.name == "send_header") Neo.config.send_header = p.value;
         }
+        applet.outerHTML = "";
+        document[name] = Neo;
+    }
+};
+
+Neo.initSkin = function() {
+    var sheet = document.styleSheets[0];
+    if (Neo.config.color_bk) {
+        sheet.addRule(".NEO #container", "background-color: " + Neo.config.color_bk);
     }
 };
 
@@ -103,9 +117,9 @@ Neo.initComponents = function() {
         container.style.borderColor = 'transparent';
     }, false);
 
-    //画面外の何もないところををクリックして描画されてしまうのをちょっと防ぐ
-    document.getElementById("toolSet")['data-ui'] = true;
-    document.getElementById("toolPad")['data-ui'] = true;
+    // 埋め込み先のページの他の要素は選択不可にしておく
+    document.styleSheets[0].addRule("*", "user-select:none;");
+    document.styleSheets[0].addRule("*", "-webkit-user-select:none;");
 }
 
 Neo.initButtons = function() {
@@ -161,6 +175,8 @@ Neo.initButtons = function() {
         "sliderSize", {type:Neo.SLIDERTYPE_SIZE});
 
     new Neo.LayerControl().init("layerControl");
+    new Neo.ScrollBarButton().init("scrollH");
+    new Neo.ScrollBarButton().init("scrollV");
 };
 
 Neo.start = function() {
@@ -286,6 +302,27 @@ Neo.submit = function(board, blob) {
 
 /*
 -----------------------------------------------------------------------
+LiveConnect
+-----------------------------------------------------------------------
+*/
+
+Neo.getColors = function() {
+    console.log("getColors");
+    return Neo.config.colors.join('\n');
+};
+
+Neo.setColors = function(colors) {
+    console.log("setColors");
+    var array = colors.split('\n');
+    for (var i = 0; i < 14; i++) {
+        var color = array[i];
+        Neo.config.colors[i] = color;
+        Neo.colorTips[i].setColor(color);
+    }
+};
+
+/*
+-----------------------------------------------------------------------
 DOMツリーの作成
 -----------------------------------------------------------------------
 */
@@ -310,8 +347,8 @@ Neo.createContainer = function(applet) {
                    </div>
                     <div id="painter">
                         <div id="canvas">
-                            <div id="scrollH" data-ui=true></div>
-                            <div id="scrollV" data-ui=true></div>
+                            <div id="scrollH"></div>
+                            <div id="scrollV"></div>
                             <div id="zoomPlusWrapper">
                                 <div id="zoomPlus">+</div>
                             </div>
@@ -375,7 +412,6 @@ Neo.createContainer = function(applet) {
     parent.appendChild(neo);
     parent.insertBefore(neo, applet);
 
-    applet.style.display = "none";
-//  document.getElementById("container").style.visibility = "visible";
+//  applet.style.display = "none";
 };
 

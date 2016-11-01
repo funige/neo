@@ -178,13 +178,14 @@ Neo.EraserTool.prototype.rollOutHandler= function(oe) {
 Neo.HandTool = function() {};
 Neo.HandTool.prototype = new Neo.ToolBase();
 Neo.HandTool.prototype.isUpMove = false;
+Neo.HandTool.prototype.reverse = false;
 
 Neo.HandTool.prototype.downHandler = function(oe) {
 	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
 	this.isDrag = true;
-	this.startX = oe.mouseX;
-	this.startY = oe.mouseY;
+	this.startX = oe.rawMouseX;
+	this.startY = oe.rawMouseY;
 };
 
 Neo.HandTool.prototype.upHandler = function(oe) {
@@ -194,11 +195,28 @@ Neo.HandTool.prototype.upHandler = function(oe) {
 
 Neo.HandTool.prototype.moveHandler = function(oe) {	
     if (this.isDrag) {
-        var zoomX = oe.zoomX;
-        var zoomY = oe.zoomY;
-        var dx = this.startX - oe.mouseX;
-        var dy = this.startY - oe.mouseY;
-        oe.setZoomPosition(zoomX + dx, zoomY + dy);
+        var dx = this.startX - oe.rawMouseX;
+        var dy = this.startY - oe.rawMouseY;
+
+        var ax = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
+        var ay = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
+        var barWidth = oe.destCanvas.width * ax;
+        var barHeight = oe.destCanvas.height * ay;
+        var scrollWidthInScreen = oe.destCanvas.width - barWidth - 2;
+        var scrollHeightInScreen = oe.destCanvas.height - barHeight - 2;
+
+        dx *= oe.scrollWidth / scrollWidthInScreen;
+        dy *= oe.scrollHeight / scrollHeightInScreen;
+
+        if (this.reverse) {
+            dx *= -1;
+            dy *= -1;
+        }
+
+        oe.setZoomPosition(oe.zoomX - dx, oe.zoomY - dy);
+
+        this.startX = oe.rawMouseX;
+        this.startY = oe.rawMouseY;
     }
 };
 
