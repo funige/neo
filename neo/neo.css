@@ -439,6 +439,14 @@
     position: relative;
 }
 
+.NEO .reserveControl .reserve {
+     position: absolute;
+     width: 11px;
+     height: 8px;
+     border: 1px solid #7474ab;
+     background-color: white;
+}
+
 .NEO .layerControl {
     width: 48px;
     height: 20px;

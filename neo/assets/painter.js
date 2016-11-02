@@ -19,7 +19,8 @@ Neo.Painter.prototype.current = 0;
 //Temp Canvas Info
 Neo.Painter.prototype.tempCanvas;
 Neo.Painter.prototype.tempCanvasCtx;
-Neo.Painter.prototype.clipboard;
+Neo.Painter.prototype.tempX = 0;
+Neo.Painter.prototype.tempY = 0;
 
 //Destination Canvas for display
 Neo.Painter.prototype.destCanvas;
@@ -56,7 +57,6 @@ Neo.Painter.prototype.maskColor = "#000000";
 Neo.Painter.prototype._currentColor = [];
 Neo.Painter.prototype._currentMask = [];
 
-
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
 Neo.Painter.LINETYPE_ERASER = 2;
@@ -71,14 +71,17 @@ Neo.Painter.MASKTYPE_REVERSE = 2;
 Neo.Painter.TOOLTYPE_NONE = 0;
 Neo.Painter.TOOLTYPE_PEN = 1;
 Neo.Painter.TOOLTYPE_ERASER = 2;
-Neo.Painter.TOOLTYPE_FILL = 3;
-Neo.Painter.TOOLTYPE_MASK = 4;
-Neo.Painter.TOOLTYPE_ERASEALL = 5;
-Neo.Painter.TOOLTYPE_ERASERECT = 6;
-Neo.Painter.TOOLTYPE_COPY = 7;
-Neo.Painter.TOOLTYPE_MERGE = 8;
-Neo.Painter.TOOLTYPE_FLIP_H = 9;
-Neo.Painter.TOOLTYPE_FLIP_V = 10;
+Neo.Painter.TOOLTYPE_HAND = 3;
+Neo.Painter.TOOLTYPE_SLIDER = 4;
+Neo.Painter.TOOLTYPE_FILL = 5;
+Neo.Painter.TOOLTYPE_MASK = 6;
+Neo.Painter.TOOLTYPE_ERASEALL = 7;
+Neo.Painter.TOOLTYPE_ERASERECT = 8;
+Neo.Painter.TOOLTYPE_COPY = 9;
+Neo.Painter.TOOLTYPE_PASTE = 10;
+Neo.Painter.TOOLTYPE_MERGE = 11;
+Neo.Painter.TOOLTYPE_FLIP_H = 12;
+Neo.Painter.TOOLTYPE_FLIP_V = 13;
 
 
 Neo.Painter.prototype.build = function(div, width, height)
@@ -94,11 +97,14 @@ Neo.Painter.prototype.build = function(div, width, height)
 };
 
 Neo.Painter.prototype.setTool = function(tool) {
+    if (this.tool && this.tool.saveStates) this.tool.saveStates();
+
     if (this.tool && this.tool.kill) {
         this.tool.kill();
     }
     this.tool = tool;
     tool.init();
+    if (this.tool && this.tool.loadStates) this.tool.loadStates();
 };
 
 Neo.Painter.prototype.pushTool = function(tool) {
@@ -119,14 +125,16 @@ Neo.Painter.prototype.setToolByType = function(toolType) {
     switch (parseInt(toolType)) {
     case Neo.Painter.TOOLTYPE_PEN:       this.setTool(new Neo.PenTool()); break;
     case Neo.Painter.TOOLTYPE_ERASER:    this.setTool(new Neo.EraserTool()); break;
+    case Neo.Painter.TOOLTYPE_HAND:      this.setTool(new Neo.HandTool()); break;
     case Neo.Painter.TOOLTYPE_FILL:      this.setTool(new Neo.FillTool()); break;
     case Neo.Painter.TOOLTYPE_ERASEALL:  this.setTool(new Neo.EraseAllTool()); break;
     case Neo.Painter.TOOLTYPE_ERASERECT: this.setTool(new Neo.EraseRectTool()); break;
 
-    case Neo.Painter.TOOLTYPE_COPY: this.setTool(new Neo.CopyTool()); break;
-    case Neo.Painter.TOOLTYPE_MERGE: this.setTool(new Neo.MergeTool()); break;
-    case Neo.Painter.TOOLTYPE_FLIP_H: this.setTool(new Neo.FlipHTool()); break;
-    case Neo.Painter.TOOLTYPE_FLIP_V: this.setTool(new Neo.FlipVTool()); break;
+    case Neo.Painter.TOOLTYPE_COPY:      this.setTool(new Neo.CopyTool()); break;
+    case Neo.Painter.TOOLTYPE_PASTE:     this.setTool(new Neo.PasteTool()); break;
+    case Neo.Painter.TOOLTYPE_MERGE:     this.setTool(new Neo.MergeTool()); break;
+    case Neo.Painter.TOOLTYPE_FLIP_H:    this.setTool(new Neo.FlipHTool()); break;
+    case Neo.Painter.TOOLTYPE_FLIP_V:    this.setTool(new Neo.FlipVTool()); break;
 
     default:
         console.log("unknown toolType " + toolType);
@@ -291,11 +299,22 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
-	if (e.button == 2 || e.ctrlKey || e.altKey) {
-		this.isMouseDownRight = true;
-	} else {
-		this.isMouseDown = true;
-	}	
+    if (e.button == 2) {
+        this.isMouseDownRight = true;
+
+    } else {
+        if (!e.shiftKey && e.ctrlKey && e.altKey) {
+            console.log("sizetool");
+            this.isMouseDown = true;
+
+        } else {
+            if (e.ctrlKey || e.altKey) {
+                this.isMouseDownRight = true;
+            } else {
+                this.isMouseDown = true;
+            }
+        }
+    }
 	
 	this._updateMousePosition(e);
 	this.prevMouseX = this.mouseX;
@@ -321,6 +340,11 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
     } else if (e.target['data-slider']) {
         this.pushTool(new Neo.SliderTool());
         this.tool.target = e.target;
+
+    } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
+        this.pushTool(new Neo.SliderTool());
+        this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
+        this.tool.alt = true;
 
     } else if (this.isWidget(e.target)) {
         this.isMouseDown = false;
@@ -626,10 +650,10 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
                                      x, y, width, height);
     }
 	if (useTemp) {
-		this.destCanvasCtx.globalAlpha = this.alpha;
+		this.destCanvasCtx.globalAlpha = 1.0; //this.alpha;
 		this.destCanvasCtx.drawImage(this.tempCanvas, 
                                      x, y, width, height, 
-                                     x, y, width, height);
+                                     x + this.tempX, y + this.tempY, width, height);
 	}
 	this.destCanvasCtx.restore();
 	
@@ -1166,6 +1190,26 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     ctx.putImageData(imageData, 0, 0);
 
 	this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+};
+
+Neo.Painter.prototype.copy = function(x, y, width, height) {
+    this.tempX = 0;
+    this.tempY = 0;
+	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.tempCanvasCtx.drawImage(this.canvas[this.current],
+                                 x, y, width, height,
+                                 x, y, width, height);
+};
+
+Neo.Painter.prototype.paste = function(x, y, width, height) {
+    this.canvasCtx[this.current].clearRect(x + this.tempX, y + this.tempY, width, height);
+    this.canvasCtx[this.current].drawImage(this.tempCanvas,
+                                 x, y, width, height,
+                                 x + this.tempX, y + this.tempY, width, height);
+
+    this.tempX = 0;
+    this.tempY = 0;
+	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
 Neo.Painter.prototype.getDestCanvasMousePosition = function(mx, my, isClip) {

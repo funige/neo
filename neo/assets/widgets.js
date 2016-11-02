@@ -34,7 +34,7 @@ Neo.Button.prototype._mouseUpHandler = function(e) {
 
         if ((this.params.type == "fill") && (this.selected == false)) {
             for (var i = 0; i < Neo.toolButtons.length; i++) {
-                var toolTip = Neo.toolButtons[i]
+                var toolTip = Neo.toolButtons[i];
                 toolTip.setSelected((this.selected) ? false : true);
             }
             Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -60,6 +60,9 @@ Neo.Button.prototype.setSelected = function(selected) {
         this.element.className = "buttonOff";
     }
     this.selected = selected;
+};
+
+Neo.Button.prototype.update = function() {
 };
 
 /*
@@ -363,8 +366,9 @@ Neo.copyTip;
 Neo.CopyTip = function() {};
 Neo.CopyTip.prototype = new Neo.ToolTip();
 
-Neo.CopyTip.toolStrings = ["ﾚｲﾔ結合", "左右反転", "上下反転"];
-Neo.CopyTip.tools = [Neo.Painter.TOOLTYPE_MERGE,
+Neo.CopyTip.toolStrings = ["コピー", "ﾚｲﾔ結合", "左右反転", "上下反転"];
+Neo.CopyTip.tools = [Neo.Painter.TOOLTYPE_COPY,
+                     Neo.Painter.TOOLTYPE_MERGE,
                      Neo.Painter.TOOLTYPE_FLIP_H,
                      Neo.Painter.TOOLTYPE_FLIP_V];
 
@@ -595,6 +599,8 @@ Neo.SizeSlider.prototype.init = function(name, params) {
 };
 
 Neo.SizeSlider.prototype.downHandler = function(x, y) {
+    this.value0 = this.value;
+    this.y0 = y;
     this.slide(x, y);
 };
 
@@ -607,25 +613,34 @@ Neo.SizeSlider.prototype.upHandler = function(x, y) {
 
 Neo.SizeSlider.prototype.slide = function(x, y) {
     var value;
-    if (x >= 0 && x <= 49 && y >= 0 && y <= 34) {
-        value = (y - 0.5) * 30.0 / 33.0;
-        value = Math.round(value);
+    if (!Neo.painter.tool.alt) {
+        if (x >= 0 && x <= 49 && y >= 0 && y <= 34) {
+            value = (y - 0.5) * 30.0 / 33.0;
+            value = Math.round(value);
+            
+            this.value0 = value;
+            this.y0 = y;
 
-        this.value0 = value;
-        this.y0 = y;
-
+        } else {
+            var d = (y - this.y0) / 7.0;
+            value = this.value0 + d; 
+        }
     } else {
-        var d = (y - this.y0) / 7.0;
+        // Ctrl+Alt+ドラッグでサイズ変更するとき
+        var d = y - this.y0;
         value = this.value0 + d; 
     }
+    this.setSize(value);
+};
 
-    this.value = Math.max(Math.min(30, Math.round(value)), 1);
-
-    Neo.painter.lineWidth = this.value;
+Neo.SizeSlider.prototype.setSize = function(value) {
+    Neo.painter.lineWidth = Math.max(Math.min(30, Math.round(value)), 1);
     this.update();
 };
 
 Neo.SizeSlider.prototype.update = function() {
+    this.value = Neo.painter.lineWidth;
+
     var height = this.value * 34.0 / 30.0;
     height = Math.max(Math.min(34, height), 1);
 
@@ -675,7 +690,7 @@ Neo.LayerControl.prototype._mouseDownHandler = function(e) {
         var current = Neo.painter.current;
         Neo.painter.current = (current) ? 0 : 1
     }
-    Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight);
+//  Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight);
     this.update();
 
     if (this.onmousedown) this.onmousedown(this);
@@ -693,10 +708,60 @@ Neo.LayerControl.prototype.update = function() {
 	ReserveControl
 -------------------------------------------------------------------------
 */
+Neo.reserveControls = [];
 
 Neo.ReserveControl = function() {};
-Neo.ReserveControl.init = function(element) {
+Neo.ReserveControl.prototype.init = function(name, params) {
+    this.element = document.getElementById(name);
+    this.params = params || {};
+    this.name = name;
+
+    var ref = this;
+    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+    this.element.className = "reserve";
+
+    var index = parseInt(this.name.slice(7)) - 1;
+    this.element.style.top = "1px";
+    this.element.style.left = (index * 15 + 2) + "px";
+
+    this.reserve = Neo.clone(Neo.config.reserves[index]);
+    this.update();
+
+    Neo.reserveControls.push(this);
+    return this;
+};
   
+Neo.ReserveControl.prototype._mouseDownHandler = function(e) {
+    if (e.button == 2 || e.ctrlKey || e.altKey) {
+        this.save();
+    } else {
+        this.load();
+    }
+    this.update();
+};
+
+Neo.ReserveControl.prototype.load = function() {
+    Neo.painter.foregroundColor = this.reserve.color;
+    Neo.painter.lineWidth = this.reserve.size;
+    Neo.painter.alpha = this.reserve.alpha;
+    Neo.painter.setToolByType(this.reserve.tool)
+    Neo.updateUI();
+};
+
+Neo.ReserveControl.prototype.save = function() {
+    console.log("save " + Neo.painter.foregroundColor);
+
+    this.reserve.color = Neo.painter.foregroundColor;
+    this.reserve.size = Neo.painter.lineWidth;
+    this.reserve.alpha = Neo.painter.alpha;
+    this.reserve.tool = Neo.painter.tool.getType();
+    this.element.style.backgroundColor = this.reserve.color;
+    this.update();
+    Neo.updateUI();
+};
+
+Neo.ReserveControl.prototype.update = function() {
+    this.element.style.backgroundColor = this.reserve.color;
 };
 
 /*

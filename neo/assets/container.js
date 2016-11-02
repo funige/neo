@@ -25,15 +25,17 @@ Neo.config = {
         "#25C7C9", "#E7E58D",
         "#E7962D", "#99CB7B",
         "#FCECE2", "#F9DDCF"
-    ],
+    ]
 };
 
-Neo.SLIDERTYPE_NONE = 0;
-Neo.SLIDERTYPE_RED = 1;
-Neo.SLIDERTYPE_GREEN = 2;
-Neo.SLIDERTYPE_BLUE = 3;
-Neo.SLIDERTYPE_ALPHA = 4;
-Neo.SLIDERTYPE_SIZE = 5;
+Neo.reservePen = {};
+Neo.reserveEraser = {};
+
+Neo.SLIDERTYPE_RED = 0;
+Neo.SLIDERTYPE_GREEN = 1;
+Neo.SLIDERTYPE_BLUE = 2;
+Neo.SLIDERTYPE_ALPHA = 3;
+Neo.SLIDERTYPE_SIZE = 4;
 
 document.neo = Neo;
 
@@ -74,8 +76,6 @@ Neo.init2 = function() {
 //  Neo.container.style.visibility = "visible";
 }
 
-var hage = "hage";
-
 Neo.initConfig = function(applet) {
     if (applet) {
         var name = applet.attributes.name.value || "neo";
@@ -95,6 +95,15 @@ Neo.initConfig = function(applet) {
         applet.outerHTML = "";
         document[name] = Neo;
     }
+
+    Neo.config.reserves = [
+        { size:1, color:"#000000", alpha:1.0, tool:Neo.Painter.TOOLTYPE_PEN },
+        { size:5, color:"#FFFFFF", alpha:1.0, tool:Neo.Painter.TOOLTYPE_ERASER },
+        { size:10, color:"#FFFFFF", alpha:1.0, tool:Neo.Painter.TOOLTYPE_ERASER },
+    ];
+
+    Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
+    Neo.reserveEraser = Neo.clone(Neo.config.reserves[1]);
 };
 
 Neo.initSkin = function() {
@@ -174,6 +183,11 @@ Neo.initButtons = function() {
     Neo.sliders[Neo.SLIDERTYPE_SIZE] = new Neo.SizeSlider().init(
         "sliderSize", {type:Neo.SLIDERTYPE_SIZE});
 
+    // reserveControl
+    for (var i = 1; i <= 3; i++) {
+        new Neo.ReserveControl().init("reserve" + i, {index:i});    
+    };
+
     new Neo.LayerControl().init("layerControl");
     new Neo.ScrollBarButton().init("scrollH");
     new Neo.ScrollBarButton().init("scrollV");
@@ -191,25 +205,39 @@ Neo.start = function() {
 
 /*
 -----------------------------------------------------------------------
-色が変わった時の対応
+UIの更新
 -----------------------------------------------------------------------
 */
 
-Neo.updateUIColor = function(updateSlider, updateColorTip) {
-    var color = Neo.painter.foregroundColor;
-
-    Neo.sliders[Neo.SLIDERTYPE_SIZE].update();
-    Neo.penTip.update();
-    
-    if (updateSlider) {
-        Neo.sliders[Neo.SLIDERTYPE_RED].update();
-        Neo.sliders[Neo.SLIDERTYPE_GREEN].update();
-        Neo.sliders[Neo.SLIDERTYPE_BLUE].update();
+Neo.updateUI = function() {
+    var current = Neo.painter.tool.getToolButton();
+    for (var i = 0; i < Neo.toolButtons.length; i++) {
+        var toolTip = Neo.toolButtons[i];
+        toolTip.setSelected((current == toolTip) ? true : false);
     }
 
+    Neo.updateUIColor(true, false);
+}
+
+Neo.updateUIColor = function(updateSlider, updateColorTip) {
+    for (var i = 0; i < Neo.toolButtons.length; i++) {
+        var toolTip = Neo.toolButtons[i];
+        toolTip.update();
+    }
+
+    if (updateSlider) {
+        for (var i = 0; i < Neo.sliders.length; i++) {
+            var slider = Neo.sliders[i];
+            slider.update();
+        }
+    }
+
+    // パレットを変更するとき
     if (updateColorTip) {
         var colorTip = Neo.ColorTip.getCurrent();
-        if (colorTip) colorTip.setColor(color);
+        if (colorTip) {
+            colorTip.setColor(Neo.painter.foregroundColor);
+        }
     }
 };
 
@@ -263,6 +291,14 @@ Neo.resizeCanvas = function() {
 投稿
 -----------------------------------------------------------------------
 */
+
+Neo.clone = function(src) {
+    var dst = {};
+    for (var k in src) {
+        dst[k] = src[k];
+    }
+    return dst;
+};
 
 Neo.getSizeString = function(len) {
     var result = String(len);
@@ -384,7 +420,11 @@ Neo.createContainer = function(applet) {
                             <div id="sliderAlpha"></div>
                             <div id="sliderSize"></div>
 
-                            <div class="reserveControl" style="margin-top:4px; display: none;"></div>
+                            <div class="reserveControl" style="margin-top:4px;">
+                                <div id="reserve1"></div>
+                                <div id="reserve2"></div>
+                                <div id="reserve3"></div>
+                            </div>
                             <div id="layerControl" style="margin-top:6px;"></div>
 
                             <div id="toolPad" style="height:20px;"></div>
