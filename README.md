@@ -29,7 +29,7 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 - キーボードショートカットを一部実装
 - コピーツールのテスト  
 - 保管ペンのテスト
-![ver0.5](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161103/20161103013321.png?1478104440)
+![ver0.5](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161103/20161103013321.png?1478104440)  
 だいぶ飽きてきましたが  
 年末までには何とかver1.0にしたいと思います
 
