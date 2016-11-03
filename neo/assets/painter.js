@@ -337,7 +337,7 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         this.pushTool(new Neo.HandTool());
         this.tool.reverse = true;
 
-    } else if (e.target['data-slider']) {
+    } else if (e.target['data-slider'] != undefined) {
         this.pushTool(new Neo.SliderTool());
         this.tool.target = e.target;
 
