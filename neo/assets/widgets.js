@@ -690,7 +690,10 @@ Neo.LayerControl.prototype._mouseDownHandler = function(e) {
         var current = Neo.painter.current;
         Neo.painter.current = (current) ? 0 : 1
     }
-//  Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight);
+    Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight);
+    if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
+        Neo.painter.tool.drawCursor(Neo.painter);
+    }
     this.update();
 
     if (this.onmousedown) this.onmousedown(this);

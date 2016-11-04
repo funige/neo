@@ -599,8 +599,8 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
   var start = oe.getDestCanvasMousePosition(this.x, this.y, true);
     var end = oe.getDestCanvasMousePosition(this.x + this.width, this.y + this.height, true);
 
-    var x = start.x + oe.tempX;
-    var y = start.y + oe.tempY;
+    var x = start.x + oe.tempX * oe.zoom;
+    var y = start.y + oe.tempY * oe.zoom;
   var width = Math.abs(start.x - end.x);
   var height = Math.abs(start.y - end.y);
     oe.drawXORRect(ctx, x, y, width, height);

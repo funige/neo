@@ -191,7 +191,7 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
     container.onmouseup = function(e) {ref._mouseUpHandler(e)};
     container.onmouseover = function(e) {ref._rollOverHandler(e)};
-    document.onmouseout = function(e) {ref._rollOutHandler(e)};
+    container.onmouseout = function(e) {ref._rollOutHandler(e)};
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
@@ -682,7 +682,7 @@ Neo.Painter.prototype.setColor = function(c) {
     if (typeof c != "string") c = this.getColorString(c);
     this.foregroundColor = c;
 
-    Neo.updateUIColor();
+    Neo.updateUI();
 };
 
 Neo.Painter.prototype.prepareDrawing = function () {

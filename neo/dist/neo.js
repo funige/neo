@@ -649,7 +649,7 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
     container.onmouseup = function(e) {ref._mouseUpHandler(e)};
     container.onmouseover = function(e) {ref._rollOverHandler(e)};
-    document.onmouseout = function(e) {ref._rollOutHandler(e)};
+    container.onmouseout = function(e) {ref._rollOutHandler(e)};
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
@@ -1140,7 +1140,7 @@ Neo.Painter.prototype.setColor = function(c) {
     if (typeof c != "string") c = this.getColorString(c);
     this.foregroundColor = c;
 
-    Neo.updateUIColor();
+    Neo.updateUI();
 };
 
 Neo.Painter.prototype.prepareDrawing = function () {
@@ -2299,8 +2299,8 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
   var start = oe.getDestCanvasMousePosition(this.x, this.y, true);
     var end = oe.getDestCanvasMousePosition(this.x + this.width, this.y + this.height, true);
 
-    var x = start.x + oe.tempX;
-    var y = start.y + oe.tempY;
+    var x = start.x + oe.tempX * oe.zoom;
+    var y = start.y + oe.tempY * oe.zoom;
   var width = Math.abs(start.x - end.x);
   var height = Math.abs(start.y - end.y);
     oe.drawXORRect(ctx, x, y, width, height);
@@ -3117,7 +3117,10 @@ Neo.LayerControl.prototype._mouseDownHandler = function(e) {
         var current = Neo.painter.current;
         Neo.painter.current = (current) ? 0 : 1
     }
-//  Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight);
+    Neo.painter.updateDestCanvas(0, 0, Neo.painter.canvasWidth, Neo.painter.canvasHeight);
+    if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
+        Neo.painter.tool.drawCursor(Neo.painter);
+    }
     this.update();
 
     if (this.onmousedown) this.onmousedown(this);
