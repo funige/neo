@@ -7,9 +7,7 @@ let win;
 
 function createWindow() {
     win = new BrowserWindow({
-//      width: 1000, height: 750,
         "width": 1400, "height": 750,
-//      "node-integration": false,
         "node-integration": true,
     });
     win.loadURL('file://' + __dirname + '/index.html');

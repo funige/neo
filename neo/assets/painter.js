@@ -53,6 +53,7 @@ Neo.Painter.prototype._toneData = [];
 Neo.Painter.prototype.toolStack = [];
 
 Neo.Painter.prototype.maskType = 0;
+Neo.Painter.prototype.methodType = 0;
 Neo.Painter.prototype.maskColor = "#000000";
 Neo.Painter.prototype._currentColor = [];
 Neo.Painter.prototype._currentMask = [];
@@ -67,6 +68,12 @@ Neo.Painter.LINETYPE_XOR_ERASER = 4;
 Neo.Painter.MASKTYPE_NONE = 0;
 Neo.Painter.MASKTYPE_NORMAL = 1;
 Neo.Painter.MASKTYPE_REVERSE = 2;
+Neo.Painter.MASKTYPE_ADD = 3;
+Neo.Painter.MASKTYPE_SUB = 4;
+
+Neo.Painter.METHODTYPE_NONE = 0;
+Neo.Painter.METHODTYPE_LINE = 1;
+Neo.Painter.METHODTYPE_BEZIER = 2;
 
 Neo.Painter.TOOLTYPE_NONE = 0;
 Neo.Painter.TOOLTYPE_PEN = 1;
@@ -83,6 +90,18 @@ Neo.Painter.TOOLTYPE_MERGE = 11;
 Neo.Painter.TOOLTYPE_FLIP_H = 12;
 Neo.Painter.TOOLTYPE_FLIP_V = 13;
 
+Neo.Painter.TOOLTYPE_BRUSH = 14;
+Neo.Painter.TOOLTYPE_TEXT = 15;
+Neo.Painter.TOOLTYPE_TONE = 16;
+Neo.Painter.TOOLTYPE_BLUR = 17;
+Neo.Painter.TOOLTYPE_DODGE = 18;
+Neo.Painter.TOOLTYPE_BURN = 19;
+Neo.Painter.TOOLTYPE_RECT = 20;
+Neo.Painter.TOOLTYPE_RECTFILL = 21;
+Neo.Painter.TOOLTYPE_ELLIPSE = 22;
+Neo.Painter.TOOLTYPE_ELLIPSEFILL = 23;
+Neo.Painter.TOOLTYPE_BLURRECT = 24;
+Neo.Painter.TOOLTYPE_TURN = 25;
 
 Neo.Painter.prototype.build = function(div, width, height)
 {
@@ -123,18 +142,32 @@ Neo.Painter.prototype.popTool = function() {
 
 Neo.Painter.prototype.setToolByType = function(toolType) {
     switch (parseInt(toolType)) {
-    case Neo.Painter.TOOLTYPE_PEN:       this.setTool(new Neo.PenTool()); break;
-    case Neo.Painter.TOOLTYPE_ERASER:    this.setTool(new Neo.EraserTool()); break;
-    case Neo.Painter.TOOLTYPE_HAND:      this.setTool(new Neo.HandTool()); break;
-    case Neo.Painter.TOOLTYPE_FILL:      this.setTool(new Neo.FillTool()); break;
-    case Neo.Painter.TOOLTYPE_ERASEALL:  this.setTool(new Neo.EraseAllTool()); break;
-    case Neo.Painter.TOOLTYPE_ERASERECT: this.setTool(new Neo.EraseRectTool()); break;
+    case Neo.Painter.TOOLTYPE_PEN:        this.setTool(new Neo.PenTool()); break;
+    case Neo.Painter.TOOLTYPE_ERASER:     this.setTool(new Neo.EraserTool()); break;
+    case Neo.Painter.TOOLTYPE_HAND:       this.setTool(new Neo.HandTool()); break;
+    case Neo.Painter.TOOLTYPE_FILL:       this.setTool(new Neo.FillTool()); break;
+    case Neo.Painter.TOOLTYPE_ERASEALL:   this.setTool(new Neo.EraseAllTool()); break;
+    case Neo.Painter.TOOLTYPE_ERASERECT:  this.setTool(new Neo.EraseRectTool()); break;
 
-    case Neo.Painter.TOOLTYPE_COPY:      this.setTool(new Neo.CopyTool()); break;
-    case Neo.Painter.TOOLTYPE_PASTE:     this.setTool(new Neo.PasteTool()); break;
-    case Neo.Painter.TOOLTYPE_MERGE:     this.setTool(new Neo.MergeTool()); break;
-    case Neo.Painter.TOOLTYPE_FLIP_H:    this.setTool(new Neo.FlipHTool()); break;
-    case Neo.Painter.TOOLTYPE_FLIP_V:    this.setTool(new Neo.FlipVTool()); break;
+    case Neo.Painter.TOOLTYPE_COPY:       this.setTool(new Neo.CopyTool()); break;
+    case Neo.Painter.TOOLTYPE_PASTE:      this.setTool(new Neo.PasteTool()); break;
+    case Neo.Painter.TOOLTYPE_MERGE:      this.setTool(new Neo.MergeTool()); break;
+    case Neo.Painter.TOOLTYPE_FLIP_H:     this.setTool(new Neo.FlipHTool()); break;
+    case Neo.Painter.TOOLTYPE_FLIP_V:     this.setTool(new Neo.FlipVTool()); break;
+
+    case Neo.Painter.TOOLTYPE_BRUSH:      this.setTool(new Neo.BrushTool()); break;
+    case Neo.Painter.TOOLTYPE_TEXT:       this.setTool(new Neo.TextTool()); break;
+    case Neo.Painter.TOOLTYPE_TONE:       this.setTool(new Neo.ToneTool()); break;
+    case Neo.Painter.TOOLTYPE_BLUR:       this.setTool(new Neo.BlurTool()); break;
+    case Neo.Painter.TOOLTYPE_DODGE:      this.setTool(new Neo.DodgeTool()); break;
+    case Neo.Painter.TOOLTYPE_BURN:       this.setTool(new Neo.BurnTool()); break;
+
+    case Neo.Painter.TOOLTYPE_RECT:       this.setTool(new Neo.RectTool()); break;
+    case Neo.Painter.TOOLTYPE_RECTFILL:   this.setTool(new Neo.RectFillTool()); break;
+    case Neo.Painter.TOOLTYPE_ELLIPSE:    this.setTool(new Neo.EllipseTool()); break;
+    case Neo.Painter.TOOLTYPE_ELLIPSEFILL:this.setTool(new Neo.EllipseFillTool()); break;
+    case Neo.Painter.TOOLTYPE_BLURRECT:   this.setTool(new Neo.BlurRectTool()); break;
+    case Neo.Painter.TOOLTYPE_TURN:       this.setTool(new Neo.TurnTool()); break;
 
     default:
         console.log("unknown toolType " + toolType);
@@ -723,26 +756,29 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
     return false;
 };
 
-Neo.Painter.prototype.drawPoint = function(buf8, width, x, y, type) {
+Neo.Painter.prototype.drawPoint = function(buf8, bufWidth, x, y, type) {
     switch (type) {
     case Neo.Painter.LINETYPE_PEN:
-        this.drawPenPoint(buf8, width, x, y);
+        this.drawPenPoint(buf8, bufWidth, x, y);
         break;
 
     case Neo.Painter.LINETYPE_ERASER:
-        this.drawEraserPoint(buf8, width, x, y);
+        this.drawEraserPoint(buf8, bufWidth, x, y);
         break;
                 
     case Neo.Painter.LINETYPE_XOR:
-        this.drawXORPixel(buf8, width, x, y, 0xff, 0xff, 0xff);
+        this.drawXORPixel(buf8, bufWidth, x, y, 0xff, 0xff, 0xff);
+//      this.xorPixel(buf32, bufWidth, x, y);
         break;
 
     case Neo.Painter.LINETYPE_XOR_PEN:
-        this.drawXORPixel(buf8, width, x, y, 0x7f, 0xff, 0xff);
+        this.drawXORPixel(buf8, bufWidth, x, y, 0x7f, 0xff, 0xff);
+//      this.xorPixel(buf32, bufWidth, x, y); //, x, y, 0xffff7f);
         break;
 
     case Neo.Painter.LINETYPE_XOR_ERASER:
-        this.drawXORPixel(buf8, width, x, y, 0xff, 0, 0);
+        this.drawXORPixel(buf8, bufWidth, x, y, 0xff, 0, 0);
+//      this.xorPixel(buf32, bufWidth, x, y, 0x0000ff);
         break;
 
     default:
@@ -815,6 +851,12 @@ Neo.Painter.prototype.drawEraserPoint = function(buf8, width, x, y) {
     }
 };
 
+Neo.Painter.prototype.xorPixel = function(buf32, bufWidth, x, y, mask) {
+    var index = y * bufWidth + x;
+    if (!mask) mask = 0xffffff;
+    buf32[index] ^= mask;
+};
+
 Neo.Painter.prototype.drawXORPixel = function(buf8, width, x, y, r, g, b) {
     var index = (y * width + x) * 4;
     buf8[index + 0] ^= r;
@@ -876,16 +918,17 @@ Neo.Painter.prototype.drawCircle = function(ctx, x, y, r, type) {
     var imageData = ctx.getImageData(left, top, r*2+2, r*2+2);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var width = imageData.width;
 
     var x0 = -r;
     var y0 = 0;
     var err = 2-2*r;
 
     do {
-        this.drawPoint(buf8, imageData.width, x-x0-left, y+y0-top, type);
-        this.drawPoint(buf8, imageData.width, x-y0-left, y-x0-top, type);
-        this.drawPoint(buf8, imageData.width, x+x0-left, y-y0-top, type);
-        this.drawPoint(buf8, imageData.width, x+y0-left, y+x0-top, type);
+        this.drawPoint(buf8, width, x-x0-left, y+y0-top, type);
+        this.drawPoint(buf8, width, x-y0-left, y-x0-top, type);
+        this.drawPoint(buf8, width, x+x0-left, y-y0-top, type);
+        this.drawPoint(buf8, width, x+y0-left, y+x0-top, type);
         r = err;
         if (r <= y0) err += ++y0*2+1;
         if (r > x0 || err > y0) err += ++x0*2+1;
@@ -894,6 +937,17 @@ Neo.Painter.prototype.drawCircle = function(ctx, x, y, r, type) {
  
     imageData.data.set(buf8);
     ctx.putImageData(imageData, left, top);
+};
+
+Neo.Painter.prototype.xorRect = function(buf32, bufWidth, x, y, width, height) {
+    var index = y * bufWidth + x;
+    for (var j = 0; j < height; j++) {
+        for (var i = 0; i < width; i++) {
+            buf32[index] ^= 0xffffff;
+            index++;
+        }
+        index += width - bufWidth;
+    }
 };
 
 Neo.Painter.prototype.drawXORRect = function(ctx, x, y, width, height, isFill) {
@@ -908,29 +962,87 @@ Neo.Painter.prototype.drawXORRect = function(ctx, x, y, width, height, isFill) {
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     var index = 0;
 
-    for (var i = 0; i < width; i++) { //top
-        buf32[index] = buf32[index] ^=0xffffff;
-        index++;
-    }
-    if (height > 1) {
-        index = width;
-        for (var i = 1; i < height; i++) { //left
+    if (isFill) {
+        this.xorRect(buf32, width, 0, 0, width, height);
+
+    } else {
+        for (var i = 0; i < width; i++) { //top
             buf32[index] = buf32[index] ^=0xffffff;
-            index += width;
+            index++;
         }
-        if (width > 1) {
-            index = width * 2 - 1;
-            for (var i = 1; i < height - 1; i++) { //right
+        if (height > 1) {
+            index = width;
+            for (var i = 1; i < height; i++) { //left
                 buf32[index] = buf32[index] ^=0xffffff;
                 index += width;
             }
-            index = width * (height - 1) + 1;
-            for (var i = 1; i < width; i++) { // bottom
-                buf32[index] = buf32[index] ^=0xffffff;
-                index++;
+            if (width > 1) {
+                index = width * 2 - 1;
+                for (var i = 1; i < height - 1; i++) { //right
+                    buf32[index] = buf32[index] ^=0xffffff;
+                    index += width;
+                }
+                index = width * (height - 1) + 1;
+                for (var i = 1; i < width; i++) { // bottom
+                    buf32[index] = buf32[index] ^=0xffffff;
+                    index++;
+                }
             }
         }
     }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, x, y);
+};
+
+Neo.Painter.prototype.drawXOREllipse = function(ctx, x, y, width, height, isFill) {
+    var x0 = Math.round(x);
+    var y0 = Math.round(y);
+    width = Math.round(width);
+    height = Math.round(height);
+    if (width == 0 || height == 0) return;
+
+    var imageData = ctx.getImageData(x0, y0, width, height);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+
+    var a = width-1, b = height-1, b1 = b&1; /* values of diameter */
+    var dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+    var err = dx+dy+b1*a*a, e2; /* error of 1.step */
+    var x1 = x0+a;
+    var y1 = y0+b;
+
+    if (x0 > x1) { x0 = x1; x1 += a; }
+    if (y0 > y1) y0 = y1;
+    y0 += Math.floor((b+1)/2); y1 = y0-b1;   /* starting pixel */
+    a *= 8*a; b1 = 8*b*b;
+    var ymin = y0 - 1;
+
+    do {
+        if (isFill) {
+            if (ymin < y0) {
+                this.xorRect(buf32, width, x0-x, y0 - y, x1 - x0, 1);
+                if (y0 != y1) {
+                    this.xorRect(buf32, width, x0-x, y1 - y, x1 - x0, 1);
+                }
+                ymin = y0;
+            }
+        } else {
+            this.xorPixel(buf32, width, x1-x, y0-y);
+            if (x0 != x1) {
+                this.xorPixel(buf32, width, x0-x, y0-y);
+            }
+            if (y0 != y1) {
+                this.xorPixel(buf32, width, x0-x, y1-y);
+                if (x0 != x1) {
+                    this.xorPixel(buf32, width, x1-x, y1-y);
+                }
+            }
+        }
+        e2 = 2*err;
+        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */ 
+        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
+    } while (x0 <= x1);
+
     imageData.data.set(buf8);
     ctx.putImageData(imageData, x, y);
 };

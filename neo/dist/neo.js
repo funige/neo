@@ -6,14 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.5.0";
+Neo.version = "0.6.0";
 
 Neo.painter;
 Neo.fullScreen = false;
 
 Neo.config = {
-    image_width: 300,
-    image_height: 300,
+    width: 300,
+    height: 300,
    
     color_bk: "#ccccff",
 
@@ -88,10 +88,11 @@ Neo.initConfig = function(applet) {
         for (var i = 0; i < params.length; i++) {
             var p = params[i];
             Neo.config[p.name] = p.value;
-
-            if (p.name == "image_width") Neo.config.width = parseInt(p.value);
-            if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
+
+        var e = document.getElementById("container");
+        Neo.config.inherit_color = Neo.getInheritColor(e);
+
         applet.outerHTML = "";
         document[name] = Neo;
     }
@@ -108,27 +109,47 @@ Neo.initConfig = function(applet) {
 
 Neo.initSkin = function() {
     var sheet = document.styleSheets[0];
+    if (!sheet) return;
+
     if (Neo.config.color_bk) {
         sheet.addRule(".NEO #container", "background-color: " + Neo.config.color_bk);
     }
+    Neo.styleSheet = sheet;
+};
+
+Neo.getInheritColor = function(e) {
+    var result = "#000000";
+    while (e && e.style) {
+        if (e.style.color != "") { 
+            result = e.style.color; 
+            break;
+        }
+        if (e.attributes["text"]) {
+            result = e.attributes["text"].value; 
+            break;
+        }
+        e = e.parentNode;
+    }
+    return result;
 };
 
 Neo.initComponents = function() {
     document.getElementById("copyright").innerHTML += "v" + Neo.version;
 
-    //お絵描き中はアプレットのborderを選択状態にする
+    //アプレットのborderの動作をエミュレート
     var container = document.getElementById("container");
     container.addEventListener("mousedown", function(e) {
-        container.style.borderColor = '#800000';
+        container.style.borderColor = Neo.config.inherit_color;
         e.stopPropagation();
     }, false);
     document.addEventListener("mousedown", function(e) {
         container.style.borderColor = 'transparent';
     }, false);
 
-    // 埋め込み先のページの他の要素は選択不可にしておく
-    document.styleSheets[0].addRule("*", "user-select:none;");
-    document.styleSheets[0].addRule("*", "-webkit-user-select:none;");
+    if (Neo.styleSheet) {
+        Neo.styleSheet.addRule("*", "user-select:none;");
+        Neo.styleSheet.addRule("*", "-webkit-user-select:none;");
+    }
 }
 
 Neo.initButtons = function() {
@@ -157,12 +178,21 @@ Neo.initButtons = function() {
     Neo.fillButton = new Neo.Button().init("fill", {type:'fill'});
 
     // toolTip
-    Neo.penTip = new Neo.PenTip().init("pen", {type:'pen'});
-    Neo.eraserTip = new Neo.EraserTip().init("eraser", {type:'eraser'});
-    Neo.copyTip = new Neo.CopyTip().init("copy", {type:'copy'});
-    Neo.maskTip = new Neo.MaskTip().init("mask", {type:'mask'});
+    Neo.penTip = new Neo.PenTip().init("pen");
+    Neo.pen2Tip = new Neo.Pen2Tip().init("pen2");
+    Neo.drawTip = new Neo.DrawTip().init("draw");
+    Neo.draw2Tip = new Neo.Draw2Tip().init("draw2");
+    Neo.eraserTip = new Neo.EraserTip().init("eraser");
+    Neo.methodTip = new Neo.MethodTip().init("method");
+    Neo.maskTip = new Neo.MaskTip().init("mask");
 
-    Neo.toolButtons = [Neo.fillButton, Neo.penTip, Neo.eraserTip, Neo.copyTip];
+    Neo.toolButtons = [Neo.fillButton, 
+                       Neo.penTip, 
+                       Neo.pen2Tip, 
+                       Neo.drawTip,
+                       Neo.draw2Tip,
+                       Neo.methodTip,
+                       Neo.eraserTip];
 
     // colorTip
     for (var i = 1; i <= 14; i++) {
@@ -314,8 +344,7 @@ Neo.openURL = function(url) {
 
 Neo.submit = function(board, blob) {
     var url = board + Neo.config.url_save;
-    var header = new Blob();
-
+    var header = new Blob([Neo.config.send_header || ""]);
     var headerLength = this.getSizeString(header.size);
     var imgLength = this.getSizeString(blob.size);
     var body = new Blob(['P', // PaintBBS
@@ -399,10 +428,13 @@ Neo.createContainer = function(applet) {
                 <div id="toolsWrapper">
                     <div id="tools">
                         <div id="toolSet">
-                            <div id="pen" class="toolTip"><div class="label">鉛筆</div></div>
-                            <div id="eraser" class="toolTip"><div class="label">消しペン</div></div>
-                            <div id="copy" class="toolTip"><div class="label">コピー</div></div>
-                            <div id="mask" class="toolTip"><div class="label">マスク</div></div>
+                            <div id="pen"></div>
+                            <div id="pen2"></div>
+                            <div id="draw"></div>
+                            <div id="draw2"></div>
+                            <div id="eraser"></div>
+                            <div id="method"></div>
+                            <div id="mask"></div>
 
                             <div class="colorTips">
                                 <div id="color2"></div><div id="color1"></div><br>
@@ -511,6 +543,7 @@ Neo.Painter.prototype._toneData = [];
 Neo.Painter.prototype.toolStack = [];
 
 Neo.Painter.prototype.maskType = 0;
+Neo.Painter.prototype.methodType = 0;
 Neo.Painter.prototype.maskColor = "#000000";
 Neo.Painter.prototype._currentColor = [];
 Neo.Painter.prototype._currentMask = [];
@@ -525,6 +558,12 @@ Neo.Painter.LINETYPE_XOR_ERASER = 4;
 Neo.Painter.MASKTYPE_NONE = 0;
 Neo.Painter.MASKTYPE_NORMAL = 1;
 Neo.Painter.MASKTYPE_REVERSE = 2;
+Neo.Painter.MASKTYPE_ADD = 3;
+Neo.Painter.MASKTYPE_SUB = 4;
+
+Neo.Painter.METHODTYPE_NONE = 0;
+Neo.Painter.METHODTYPE_LINE = 1;
+Neo.Painter.METHODTYPE_BEZIER = 2;
 
 Neo.Painter.TOOLTYPE_NONE = 0;
 Neo.Painter.TOOLTYPE_PEN = 1;
@@ -541,6 +580,18 @@ Neo.Painter.TOOLTYPE_MERGE = 11;
 Neo.Painter.TOOLTYPE_FLIP_H = 12;
 Neo.Painter.TOOLTYPE_FLIP_V = 13;
 
+Neo.Painter.TOOLTYPE_BRUSH = 14;
+Neo.Painter.TOOLTYPE_TEXT = 15;
+Neo.Painter.TOOLTYPE_TONE = 16;
+Neo.Painter.TOOLTYPE_BLUR = 17;
+Neo.Painter.TOOLTYPE_DODGE = 18;
+Neo.Painter.TOOLTYPE_BURN = 19;
+Neo.Painter.TOOLTYPE_RECT = 20;
+Neo.Painter.TOOLTYPE_RECTFILL = 21;
+Neo.Painter.TOOLTYPE_ELLIPSE = 22;
+Neo.Painter.TOOLTYPE_ELLIPSEFILL = 23;
+Neo.Painter.TOOLTYPE_BLURRECT = 24;
+Neo.Painter.TOOLTYPE_TURN = 25;
 
 Neo.Painter.prototype.build = function(div, width, height)
 {
@@ -581,18 +632,32 @@ Neo.Painter.prototype.popTool = function() {
 
 Neo.Painter.prototype.setToolByType = function(toolType) {
     switch (parseInt(toolType)) {
-    case Neo.Painter.TOOLTYPE_PEN:       this.setTool(new Neo.PenTool()); break;
-    case Neo.Painter.TOOLTYPE_ERASER:    this.setTool(new Neo.EraserTool()); break;
-    case Neo.Painter.TOOLTYPE_HAND:      this.setTool(new Neo.HandTool()); break;
-    case Neo.Painter.TOOLTYPE_FILL:      this.setTool(new Neo.FillTool()); break;
-    case Neo.Painter.TOOLTYPE_ERASEALL:  this.setTool(new Neo.EraseAllTool()); break;
-    case Neo.Painter.TOOLTYPE_ERASERECT: this.setTool(new Neo.EraseRectTool()); break;
+    case Neo.Painter.TOOLTYPE_PEN:        this.setTool(new Neo.PenTool()); break;
+    case Neo.Painter.TOOLTYPE_ERASER:     this.setTool(new Neo.EraserTool()); break;
+    case Neo.Painter.TOOLTYPE_HAND:       this.setTool(new Neo.HandTool()); break;
+    case Neo.Painter.TOOLTYPE_FILL:       this.setTool(new Neo.FillTool()); break;
+    case Neo.Painter.TOOLTYPE_ERASEALL:   this.setTool(new Neo.EraseAllTool()); break;
+    case Neo.Painter.TOOLTYPE_ERASERECT:  this.setTool(new Neo.EraseRectTool()); break;
 
-    case Neo.Painter.TOOLTYPE_COPY:      this.setTool(new Neo.CopyTool()); break;
-    case Neo.Painter.TOOLTYPE_PASTE:     this.setTool(new Neo.PasteTool()); break;
-    case Neo.Painter.TOOLTYPE_MERGE:     this.setTool(new Neo.MergeTool()); break;
-    case Neo.Painter.TOOLTYPE_FLIP_H:    this.setTool(new Neo.FlipHTool()); break;
-    case Neo.Painter.TOOLTYPE_FLIP_V:    this.setTool(new Neo.FlipVTool()); break;
+    case Neo.Painter.TOOLTYPE_COPY:       this.setTool(new Neo.CopyTool()); break;
+    case Neo.Painter.TOOLTYPE_PASTE:      this.setTool(new Neo.PasteTool()); break;
+    case Neo.Painter.TOOLTYPE_MERGE:      this.setTool(new Neo.MergeTool()); break;
+    case Neo.Painter.TOOLTYPE_FLIP_H:     this.setTool(new Neo.FlipHTool()); break;
+    case Neo.Painter.TOOLTYPE_FLIP_V:     this.setTool(new Neo.FlipVTool()); break;
+
+    case Neo.Painter.TOOLTYPE_BRUSH:      this.setTool(new Neo.BrushTool()); break;
+    case Neo.Painter.TOOLTYPE_TEXT:       this.setTool(new Neo.TextTool()); break;
+    case Neo.Painter.TOOLTYPE_TONE:       this.setTool(new Neo.ToneTool()); break;
+    case Neo.Painter.TOOLTYPE_BLUR:       this.setTool(new Neo.BlurTool()); break;
+    case Neo.Painter.TOOLTYPE_DODGE:      this.setTool(new Neo.DodgeTool()); break;
+    case Neo.Painter.TOOLTYPE_BURN:       this.setTool(new Neo.BurnTool()); break;
+
+    case Neo.Painter.TOOLTYPE_RECT:       this.setTool(new Neo.RectTool()); break;
+    case Neo.Painter.TOOLTYPE_RECTFILL:   this.setTool(new Neo.RectFillTool()); break;
+    case Neo.Painter.TOOLTYPE_ELLIPSE:    this.setTool(new Neo.EllipseTool()); break;
+    case Neo.Painter.TOOLTYPE_ELLIPSEFILL:this.setTool(new Neo.EllipseFillTool()); break;
+    case Neo.Painter.TOOLTYPE_BLURRECT:   this.setTool(new Neo.BlurRectTool()); break;
+    case Neo.Painter.TOOLTYPE_TURN:       this.setTool(new Neo.TurnTool()); break;
 
     default:
         console.log("unknown toolType " + toolType);
@@ -1181,26 +1246,29 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
     return false;
 };
 
-Neo.Painter.prototype.drawPoint = function(buf8, width, x, y, type) {
+Neo.Painter.prototype.drawPoint = function(buf8, bufWidth, x, y, type) {
     switch (type) {
     case Neo.Painter.LINETYPE_PEN:
-        this.drawPenPoint(buf8, width, x, y);
+        this.drawPenPoint(buf8, bufWidth, x, y);
         break;
 
     case Neo.Painter.LINETYPE_ERASER:
-        this.drawEraserPoint(buf8, width, x, y);
+        this.drawEraserPoint(buf8, bufWidth, x, y);
         break;
                 
     case Neo.Painter.LINETYPE_XOR:
-        this.drawXORPixel(buf8, width, x, y, 0xff, 0xff, 0xff);
+        this.drawXORPixel(buf8, bufWidth, x, y, 0xff, 0xff, 0xff);
+//      this.xorPixel(buf32, bufWidth, x, y);
         break;
 
     case Neo.Painter.LINETYPE_XOR_PEN:
-        this.drawXORPixel(buf8, width, x, y, 0x7f, 0xff, 0xff);
+        this.drawXORPixel(buf8, bufWidth, x, y, 0x7f, 0xff, 0xff);
+//      this.xorPixel(buf32, bufWidth, x, y); //, x, y, 0xffff7f);
         break;
 
     case Neo.Painter.LINETYPE_XOR_ERASER:
-        this.drawXORPixel(buf8, width, x, y, 0xff, 0, 0);
+        this.drawXORPixel(buf8, bufWidth, x, y, 0xff, 0, 0);
+//      this.xorPixel(buf32, bufWidth, x, y, 0x0000ff);
         break;
 
     default:
@@ -1273,6 +1341,12 @@ Neo.Painter.prototype.drawEraserPoint = function(buf8, width, x, y) {
     }
 };
 
+Neo.Painter.prototype.xorPixel = function(buf32, bufWidth, x, y, mask) {
+    var index = y * bufWidth + x;
+    if (!mask) mask = 0xffffff;
+    buf32[index] ^= mask;
+};
+
 Neo.Painter.prototype.drawXORPixel = function(buf8, width, x, y, r, g, b) {
     var index = (y * width + x) * 4;
     buf8[index + 0] ^= r;
@@ -1334,16 +1408,17 @@ Neo.Painter.prototype.drawCircle = function(ctx, x, y, r, type) {
     var imageData = ctx.getImageData(left, top, r*2+2, r*2+2);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var width = imageData.width;
 
     var x0 = -r;
     var y0 = 0;
     var err = 2-2*r;
 
     do {
-        this.drawPoint(buf8, imageData.width, x-x0-left, y+y0-top, type);
-        this.drawPoint(buf8, imageData.width, x-y0-left, y-x0-top, type);
-        this.drawPoint(buf8, imageData.width, x+x0-left, y-y0-top, type);
-        this.drawPoint(buf8, imageData.width, x+y0-left, y+x0-top, type);
+        this.drawPoint(buf8, width, x-x0-left, y+y0-top, type);
+        this.drawPoint(buf8, width, x-y0-left, y-x0-top, type);
+        this.drawPoint(buf8, width, x+x0-left, y-y0-top, type);
+        this.drawPoint(buf8, width, x+y0-left, y+x0-top, type);
         r = err;
         if (r <= y0) err += ++y0*2+1;
         if (r > x0 || err > y0) err += ++x0*2+1;
@@ -1352,6 +1427,17 @@ Neo.Painter.prototype.drawCircle = function(ctx, x, y, r, type) {
  
     imageData.data.set(buf8);
     ctx.putImageData(imageData, left, top);
+};
+
+Neo.Painter.prototype.xorRect = function(buf32, bufWidth, x, y, width, height) {
+    var index = y * bufWidth + x;
+    for (var j = 0; j < height; j++) {
+        for (var i = 0; i < width; i++) {
+            buf32[index] ^= 0xffffff;
+            index++;
+        }
+        index += width - bufWidth;
+    }
 };
 
 Neo.Painter.prototype.drawXORRect = function(ctx, x, y, width, height, isFill) {
@@ -1366,29 +1452,87 @@ Neo.Painter.prototype.drawXORRect = function(ctx, x, y, width, height, isFill) {
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     var index = 0;
 
-    for (var i = 0; i < width; i++) { //top
-        buf32[index] = buf32[index] ^=0xffffff;
-        index++;
-    }
-    if (height > 1) {
-        index = width;
-        for (var i = 1; i < height; i++) { //left
+    if (isFill) {
+        this.xorRect(buf32, width, 0, 0, width, height);
+
+    } else {
+        for (var i = 0; i < width; i++) { //top
             buf32[index] = buf32[index] ^=0xffffff;
-            index += width;
+            index++;
         }
-        if (width > 1) {
-            index = width * 2 - 1;
-            for (var i = 1; i < height - 1; i++) { //right
+        if (height > 1) {
+            index = width;
+            for (var i = 1; i < height; i++) { //left
                 buf32[index] = buf32[index] ^=0xffffff;
                 index += width;
             }
-            index = width * (height - 1) + 1;
-            for (var i = 1; i < width; i++) { // bottom
-                buf32[index] = buf32[index] ^=0xffffff;
-                index++;
+            if (width > 1) {
+                index = width * 2 - 1;
+                for (var i = 1; i < height - 1; i++) { //right
+                    buf32[index] = buf32[index] ^=0xffffff;
+                    index += width;
+                }
+                index = width * (height - 1) + 1;
+                for (var i = 1; i < width; i++) { // bottom
+                    buf32[index] = buf32[index] ^=0xffffff;
+                    index++;
+                }
             }
         }
     }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, x, y);
+};
+
+Neo.Painter.prototype.drawXOREllipse = function(ctx, x, y, width, height, isFill) {
+    var x0 = Math.round(x);
+    var y0 = Math.round(y);
+    width = Math.round(width);
+    height = Math.round(height);
+    if (width == 0 || height == 0) return;
+
+    var imageData = ctx.getImageData(x0, y0, width, height);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+
+    var a = width-1, b = height-1, b1 = b&1; /* values of diameter */
+    var dx = 4*(1-a)*b*b, dy = 4*(b1+1)*a*a; /* error increment */
+    var err = dx+dy+b1*a*a, e2; /* error of 1.step */
+    var x1 = x0+a;
+    var y1 = y0+b;
+
+    if (x0 > x1) { x0 = x1; x1 += a; }
+    if (y0 > y1) y0 = y1;
+    y0 += Math.floor((b+1)/2); y1 = y0-b1;   /* starting pixel */
+    a *= 8*a; b1 = 8*b*b;
+    var ymin = y0 - 1;
+
+    do {
+        if (isFill) {
+            if (ymin < y0) {
+                this.xorRect(buf32, width, x0-x, y0 - y, x1 - x0, 1);
+                if (y0 != y1) {
+                    this.xorRect(buf32, width, x0-x, y1 - y, x1 - x0, 1);
+                }
+                ymin = y0;
+            }
+        } else {
+            this.xorPixel(buf32, width, x1-x, y0-y);
+            if (x0 != x1) {
+                this.xorPixel(buf32, width, x0-x, y0-y);
+            }
+            if (y0 != y1) {
+                this.xorPixel(buf32, width, x0-x, y1-y);
+                if (x0 != x1) {
+                    this.xorPixel(buf32, width, x1-x, y1-y);
+                }
+            }
+        }
+        e2 = 2*err;
+        if (e2 <= dy) { y0++; y1--; err += dy += a; }  /* y step */ 
+        if (e2 >= dx || 2*err > dy) { x0++; x1--; err += dx += b1; } /* x step */
+    } while (x0 <= x1);
+
     imageData.data.set(buf8);
     ctx.putImageData(imageData, x, y);
 };
@@ -1733,18 +1877,34 @@ Neo.ToolBase.prototype.getType = function() {
 Neo.ToolBase.prototype.getToolButton = function() {
     switch (this.type) {
     case Neo.Painter.TOOLTYPE_PEN:
+    case Neo.Painter.TOOLTYPE_BRUSH:
+    case Neo.Painter.TOOLTYPE_TEXT:
         return Neo.penTip;
 
-    case Neo.Painter.TOOLTYPE_ERASER:
-    case Neo.Painter.TOOLTYPE_ERASERALL:
-    case Neo.Painter.TOOLTYPE_ERASERRECT:
-        return Neo.eraserTip;
+    case Neo.Painter.TOOLTYPE_TONE:
+    case Neo.Painter.TOOLTYPE_BLUR:
+    case Neo.Painter.TOOLTYPE_DODGE:
+    case Neo.Painter.TOOLTYPE_BURN:
+        return Neo.penTip;
+
+    case Neo.Painter.TOOLTYPE_RECT:
+    case Neo.Painter.TOOLTYPE_RECTFILL:
+    case Neo.Painter.TOOLTYPE_ELLIPSE:
+    case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+        return Neo.drawTip;
 
     case Neo.Painter.TOOLTYPE_COPY:
     case Neo.Painter.TOOLTYPE_MERGE:
     case Neo.Painter.TOOLTYPE_FLIP_H:
     case Neo.Painter.TOOLTYPE_FLIP_V:
-        return Neo.copyTip;
+    case Neo.Painter.TOOLTYPE_BLURRECT:
+    case Neo.Painter.TOOLTYPE_TURN:
+        return Neo.draw2Tip;
+
+    case Neo.Painter.TOOLTYPE_ERASER:
+    case Neo.Painter.TOOLTYPE_ERASERALL:
+    case Neo.Painter.TOOLTYPE_ERASERRECT:
+        return Neo.eraserTip;
 
     case Neo.Painter.TOOLTYPE_FILL:
         return Neo.fillButton;
@@ -1785,7 +1945,7 @@ Neo.ToolBase.prototype.saveStates = function() {
         reserve.size = Neo.painter.lineWidth;
 //      reserve.alpha = Neo.painter.alpha;
 //      reserve.color = Neo.painter.foregroundColor;
-        Neo.updateUI();
+//      Neo.updateUI();
     }
 };
 
@@ -1843,6 +2003,7 @@ Neo.PenTool.prototype.drawCursor = function(oe) {
     var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
     oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR_PEN);
+//  oe.drawXOREllipse(ctx, x, y, 50, 50); //, Neo.Painter.LINETYPE_XOR_PEN);
 
     ctx.restore();
 }
@@ -2162,7 +2323,13 @@ Neo.RectBaseTool.prototype.drawCursor = function(oe) {
     var y = (start.y < end.y) ? start.y : end.y;
     var width = Math.abs(start.x - end.x);
     var height = Math.abs(start.y - end.y);
-    oe.drawXORRect(ctx, x, y, width, height);
+
+    if (this.isEllipse) {
+        oe.drawXOREllipse(ctx, x, y, width, height, this.isFill);
+
+    } else {
+        oe.drawXORRect(ctx, x, y, width, height, this.isFill);
+    }
     ctx.restore();
 };
 
@@ -2305,6 +2472,75 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
   var height = Math.abs(start.y - end.y);
     oe.drawXORRect(ctx, x, y, width, height);
     ctx.restore();
+};
+
+/*
+-------------------------------------------------------------------------
+	Rect（線四角）
+-------------------------------------------------------------------------
+*/
+
+Neo.RectTool = function() {};
+Neo.RectTool.prototype = new Neo.RectBaseTool();
+Neo.RectTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.RectTool.prototype.isUpMove = false;
+
+Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+/*
+-------------------------------------------------------------------------
+	RectFill（四角）
+-------------------------------------------------------------------------
+*/
+
+Neo.RectFillTool = function() {};
+Neo.RectFillTool.prototype = new Neo.RectBaseTool();
+Neo.RectFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.RectFillTool.prototype.isUpMove = false;
+Neo.RectFillTool.prototype.isFill = true;
+Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+/*
+-------------------------------------------------------------------------
+	Ellipse（線楕円）
+-------------------------------------------------------------------------
+*/
+
+Neo.EllipseTool = function() {};
+Neo.EllipseTool.prototype = new Neo.RectBaseTool();
+Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.EllipseTool.prototype.isUpMove = false;
+Neo.EllipseTool.prototype.isEllipse = true;
+Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+/*
+-------------------------------------------------------------------------
+	EllipseFill（楕円）
+-------------------------------------------------------------------------
+*/
+
+Neo.EllipseFillTool = function() {};
+Neo.EllipseFillTool.prototype = new Neo.RectBaseTool();
+Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.EllipseFillTool.prototype.isUpMove = false;
+Neo.EllipseFillTool.prototype.isEllipse = true;
+Neo.EllipseFillTool.prototype.isFill = true;
+Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
 
 /*
@@ -2597,6 +2833,7 @@ Neo.ToolTip = function() {};
 Neo.ToolTip.prototype.init = function(name, params) {
     this.element = document.getElementById(name);
     this.params = params || {};
+    this.params.type = this.element.id;
     this.name = name;
     this.mode = 0;
     
@@ -2608,7 +2845,7 @@ Neo.ToolTip.prototype.init = function(name, params) {
     this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
     this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
 
-    this.selected = (params.type == "pen") ? true : false;
+    this.selected = (this.params.type == "pen") ? true : false;
     this.setSelected(this.selected);
 
     this.element.innerHTML = "<canvas width=46 height=18></canvas><div class='label'></div>";
@@ -2621,6 +2858,28 @@ Neo.ToolTip.prototype.init = function(name, params) {
 
 Neo.ToolTip.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
+
+    if (this.isTool) {
+        if (this.selected == false) {
+            for (var i = 0; i < Neo.toolButtons.length; i++) {
+                var toolTip = Neo.toolButtons[i];
+                toolTip.setSelected((this == toolTip) ? true : false);
+            }
+
+        } else {
+            var length = this.toolStrings.length;
+            if (e.button == 2 || e.ctrlKey || e.altKey) {
+                this.mode--;
+                if (this.mode < 0) this.mode = length - 1;
+            } else {
+                this.mode++;
+                if (this.mode >= length) this.mode = 0;
+            }
+        }
+        Neo.painter.setToolByType(this.tools[this.mode]);
+        this.update();
+    }
+
     if (this.onmousedown) this.onmousedown(this);
 };
 
@@ -2665,48 +2924,59 @@ Neo.penTip;
 Neo.PenTip = function() {};
 Neo.PenTip.prototype = new Neo.ToolTip();
 
-Neo.PenTip.toolStrings = ["鉛筆"];
+Neo.PenTip.prototype.toolStrings = ["鉛筆", "水彩", "ﾃｷｽﾄ"]; 
+Neo.PenTip.prototype.tools = [Neo.Painter.TOOLTYPE_PEN,
+                              Neo.Painter.TOOLTYPE_BRUSH,
+                              Neo.Painter.TOOLTYPE_TEXT];
 
 Neo.PenTip.prototype.init  = function(name, params) {
-    this.toolType = Neo.Painter.TOOLTYPE_PEN;
-
+    this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
 };
 
-Neo.PenTip.prototype._mouseDownHandler = function(e) {
-    this.isMouseDown = true;
-
-    if (this.selected == false) {
-        for (var i = 0; i < Neo.toolButtons.length; i++) {
-            var toolTip = Neo.toolButtons[i]
-            toolTip.setSelected(this == toolTip) ? true : false;
-        }
-
-    } else {
-        /*
-        var length = Neo.PenTip.toolStrings.length;
-        if (e.button == 2 || e.ctrlKey || e.altKey) {
-            this.mode--;
-            if (this.mode < 0) this.mode = length - 1;
-        } else {
-            this.mode++;
-            if (this.mode >= length) this.mode = 0;
-        }
-        */
-    }
-    Neo.painter.setToolByType(this.toolType);
-    this.update();
-    
-    if (this.onmousedown) this.onmousedown(this);
-};
-
 Neo.PenTip.prototype.update = function() {
     this.draw(Neo.painter.foregroundColor);
-    this.label.innerHTML = Neo.PenTip.toolStrings[this.mode];
+    this.label.innerHTML = this.toolStrings[this.mode];
 };
 
 Neo.PenTip.prototype.draw = function(c) {
+    if (typeof c != "string") c = Neo.painter.getColorString(c);
+    var ctx = this.canvas.getContext("2d");
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.fillStyle = c;
+    ctx.fillRect(2, 3, 33, 1.2);
+};
+
+/*
+-------------------------------------------------------------------------
+	Pen2Tip
+-------------------------------------------------------------------------
+*/
+
+Neo.pen2Tip;
+
+Neo.Pen2Tip = function() {};
+Neo.Pen2Tip.prototype = new Neo.ToolTip();
+
+Neo.Pen2Tip.prototype.toolStrings = ["トーン", "ぼかし", "覆い焼き", "焼き込み"]; 
+Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE,
+                               Neo.Painter.TOOLTYPE_BLUR,
+                               Neo.Painter.TOOLTYPE_DODGE,
+                               Neo.Painter.TOOLTYPE_BURN];
+
+Neo.Pen2Tip.prototype.init  = function(name, params) {
+    this.isTool = true;
+    Neo.ToolTip.prototype.init.call(this, name, params);
+    return this;
+};
+
+Neo.Pen2Tip.prototype.update = function() {
+    this.draw(Neo.painter.foregroundColor);
+    this.label.innerHTML = this.toolStrings[this.mode];
+};
+
+Neo.Pen2Tip.prototype.draw = function(c) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
     var ctx = this.canvas.getContext("2d");
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -2725,40 +2995,16 @@ Neo.eraserTip;
 Neo.EraserTip = function() {};
 Neo.EraserTip.prototype = new Neo.ToolTip();
 
-Neo.EraserTip.toolStrings = ["消しペン", "消し四角", "全消し"];
-Neo.EraserTip.tools = [Neo.Painter.TOOLTYPE_ERASER, 
-                       Neo.Painter.TOOLTYPE_ERASERECT,
-                       Neo.Painter.TOOLTYPE_ERASEALL];
+Neo.EraserTip.prototype.toolStrings = ["消しペン", "消し四角", "全消し"];
+Neo.EraserTip.prototype.tools = [Neo.Painter.TOOLTYPE_ERASER, 
+                                 Neo.Painter.TOOLTYPE_ERASERECT,
+                                 Neo.Painter.TOOLTYPE_ERASEALL];
 
 Neo.EraserTip.prototype.init  = function(name, params) {
     this.drawOnce = false;
-
+    this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
-};
-
-Neo.EraserTip.prototype._mouseDownHandler = function(e) {
-    this.isMouseDown = true;
-    if (this.selected == false) {
-        for (var i = 0; i < Neo.toolButtons.length; i++) {
-            var toolTip = Neo.toolButtons[i];
-            toolTip.setSelected(this == toolTip) ? true : false;
-        }
-
-    } else {
-        var length = Neo.EraserTip.toolStrings.length;
-        if (e.button == 2 || e.ctrlKey || e.altKey) {
-            this.mode--;
-            if (this.mode < 0) this.mode = length - 1;
-        } else {
-            this.mode++;
-            if (this.mode >= length) this.mode = 0;
-        }
-    }
-    Neo.painter.setToolByType(Neo.EraserTip.tools[this.mode]);
-    this.update();
-    
-    if (this.onmousedown) this.onmousedown(this);
 };
 
 Neo.EraserTip.prototype.update = function() {
@@ -2766,7 +3012,7 @@ Neo.EraserTip.prototype.update = function() {
         this.draw();
         this.drawOnce = true;
     }
-    this.label.innerHTML = Neo.EraserTip.toolStrings[this.mode];
+    this.label.innerHTML = this.toolStrings[this.mode];
 };
 
 Neo.EraserTip.prototype.draw = function() {
@@ -2784,55 +3030,62 @@ Neo.EraserTip.prototype.draw = function() {
 
 /*
 -------------------------------------------------------------------------
-	CopyTip
+	DrawTip
 -------------------------------------------------------------------------
 */
 
-Neo.copyTip;
+Neo.drawTip;
 
-Neo.CopyTip = function() {};
-Neo.CopyTip.prototype = new Neo.ToolTip();
+Neo.DrawTip = function() {};
+Neo.DrawTip.prototype = new Neo.ToolTip();
 
-Neo.CopyTip.toolStrings = ["コピー", "ﾚｲﾔ結合", "左右反転", "上下反転"];
-Neo.CopyTip.tools = [Neo.Painter.TOOLTYPE_COPY,
-                     Neo.Painter.TOOLTYPE_MERGE,
-                     Neo.Painter.TOOLTYPE_FLIP_H,
-                     Neo.Painter.TOOLTYPE_FLIP_V];
+Neo.DrawTip.prototype.toolStrings = ["四角", "線四角", "楕円", "線楕円"];
+Neo.DrawTip.prototype.tools = [Neo.Painter.TOOLTYPE_RECTFILL,
+                               Neo.Painter.TOOLTYPE_RECT,
+                               Neo.Painter.TOOLTYPE_ELLIPSEFILL,
+                               Neo.Painter.TOOLTYPE_ELLIPSE];
 
-Neo.CopyTip.prototype.init = function(name, params) {
+Neo.DrawTip.prototype.init = function(name, params) {
+    this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
 };
 
-Neo.CopyTip.prototype._mouseDownHandler = function(e) {
-    this.isMouseDown = true;
-    if (this.selected == false) {
-        for (var i = 0; i < Neo.toolButtons.length; i++) {
-            var toolTip = Neo.toolButtons[i];
-            toolTip.setSelected(this == toolTip) ? true : false;
-        }
-    } else {
-        var length = Neo.CopyTip.toolStrings.length;
-        if (e.button == 2 || e.ctrlKey || e.altKey) {
-            this.mode--;
-            if (this.mode < 0) this.mode = length - 1;
-        } else {
-            this.mode++;
-            if (this.mode >= length) this.mode = 0;
-        }
-    }
-    Neo.painter.setToolByType(Neo.CopyTip.tools[this.mode]);
-    this.update();
-
-    if (this.onmousedown) this.onmousedown(this);
+Neo.DrawTip.prototype.update = function() {
+    this.label.innerHTML = this.toolStrings[this.mode];
 };
 
-
-Neo.CopyTip.prototype.update = function() {
-    this.label.innerHTML = Neo.CopyTip.toolStrings[this.mode];
+Neo.DrawTip.prototype.draw = function() {
 };
 
-Neo.CopyTip.prototype.draw = function() {
+/*
+-------------------------------------------------------------------------
+	Draw2Tip
+-------------------------------------------------------------------------
+*/
+
+Neo.draw2Tip;
+
+Neo.Draw2Tip = function() {};
+Neo.Draw2Tip.prototype = new Neo.ToolTip();
+
+Neo.Draw2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", "左右反転", "上下反転"];
+Neo.Draw2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
+                               Neo.Painter.TOOLTYPE_MERGE,
+                               Neo.Painter.TOOLTYPE_FLIP_H,
+                               Neo.Painter.TOOLTYPE_FLIP_V];
+
+Neo.Draw2Tip.prototype.init = function(name, params) {
+    this.isTool = true;
+    Neo.ToolTip.prototype.init.call(this, name, params);
+    return this;
+};
+
+Neo.Draw2Tip.prototype.update = function() {
+    this.label.innerHTML = this.toolStrings[this.mode];
+};
+
+Neo.Draw2Tip.prototype.draw = function() {
 };
 
 /*
@@ -2846,7 +3099,7 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.toolStrings = ["通常", "マスク", "逆マスク"];
+Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク"];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;
@@ -2861,7 +3114,7 @@ Neo.MaskTip.prototype._mouseDownHandler = function(e) {
         Neo.painter.maskColor = Neo.painter.foregroundColor;
 
     } else {
-        var length = Neo.MaskTip.toolStrings.length;
+        var length = this.toolStrings.length;
         this.mode++;
         if (this.mode >= length) this.mode = 0;
         Neo.painter.maskType = this.mode;
@@ -2873,10 +3126,60 @@ Neo.MaskTip.prototype._mouseDownHandler = function(e) {
 
 Neo.MaskTip.prototype.update = function() {
     this.draw(Neo.painter.maskColor);
-    this.label.innerHTML = Neo.MaskTip.toolStrings[this.mode];
+    this.label.innerHTML = this.toolStrings[this.mode];
 };
 
 Neo.MaskTip.prototype.draw = function(c) {
+    if (typeof c != "string") c = Neo.painter.getColorString(c);
+
+    var ctx = this.canvas.getContext("2d");
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.fillStyle = c;
+    ctx.fillRect(1, 1, 43, 9);
+};
+
+/*
+-------------------------------------------------------------------------
+	MethodTip
+-------------------------------------------------------------------------
+*/
+
+Neo.methodTip;
+
+Neo.MethodTip = function() {};
+Neo.MethodTip.prototype = new Neo.ToolTip();
+
+Neo.MethodTip.prototype.toolStrings = ["手書き", "直線", "BZ曲線"];
+
+Neo.MethodTip.prototype.init = function(name, params) {
+    this.fixed = true;
+    Neo.ToolTip.prototype.init.call(this, name, params);
+    return this;
+};
+
+Neo.MethodTip.prototype._mouseDownHandler = function(e) {
+    this.isMouseDown = true;
+
+    if (e.button == 2 || e.ctrlKey || e.altKey) {
+//      Neo.painter.maskColor = Neo.painter.foregroundColor;
+
+    } else {
+        var length = this.toolStrings.length;
+        this.mode++;
+        if (this.mode >= length) this.mode = 0;
+        Neo.painter.methodType = this.mode;
+    }
+    this.update();
+
+    if (this.onmousedown) this.onmousedown(this);
+}
+
+Neo.MethodTip.prototype.update = function() {
+    this.draw(Neo.painter.maskColor);
+    this.label.innerHTML = this.toolStrings[this.mode];
+};
+
+Neo.MethodTip.prototype.draw = function(c) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
 
     var ctx = this.canvas.getContext("2d");
@@ -3179,8 +3482,6 @@ Neo.ReserveControl.prototype.load = function() {
 };
 
 Neo.ReserveControl.prototype.save = function() {
-    console.log("save " + Neo.painter.foregroundColor);
-
     this.reserve.color = Neo.painter.foregroundColor;
     this.reserve.size = Neo.painter.lineWidth;
     this.reserve.alpha = Neo.painter.alpha;

@@ -33,18 +33,34 @@ Neo.ToolBase.prototype.getType = function() {
 Neo.ToolBase.prototype.getToolButton = function() {
     switch (this.type) {
     case Neo.Painter.TOOLTYPE_PEN:
+    case Neo.Painter.TOOLTYPE_BRUSH:
+    case Neo.Painter.TOOLTYPE_TEXT:
         return Neo.penTip;
 
-    case Neo.Painter.TOOLTYPE_ERASER:
-    case Neo.Painter.TOOLTYPE_ERASERALL:
-    case Neo.Painter.TOOLTYPE_ERASERRECT:
-        return Neo.eraserTip;
+    case Neo.Painter.TOOLTYPE_TONE:
+    case Neo.Painter.TOOLTYPE_BLUR:
+    case Neo.Painter.TOOLTYPE_DODGE:
+    case Neo.Painter.TOOLTYPE_BURN:
+        return Neo.penTip;
+
+    case Neo.Painter.TOOLTYPE_RECT:
+    case Neo.Painter.TOOLTYPE_RECTFILL:
+    case Neo.Painter.TOOLTYPE_ELLIPSE:
+    case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+        return Neo.drawTip;
 
     case Neo.Painter.TOOLTYPE_COPY:
     case Neo.Painter.TOOLTYPE_MERGE:
     case Neo.Painter.TOOLTYPE_FLIP_H:
     case Neo.Painter.TOOLTYPE_FLIP_V:
-        return Neo.copyTip;
+    case Neo.Painter.TOOLTYPE_BLURRECT:
+    case Neo.Painter.TOOLTYPE_TURN:
+        return Neo.draw2Tip;
+
+    case Neo.Painter.TOOLTYPE_ERASER:
+    case Neo.Painter.TOOLTYPE_ERASERALL:
+    case Neo.Painter.TOOLTYPE_ERASERRECT:
+        return Neo.eraserTip;
 
     case Neo.Painter.TOOLTYPE_FILL:
         return Neo.fillButton;
@@ -85,7 +101,7 @@ Neo.ToolBase.prototype.saveStates = function() {
         reserve.size = Neo.painter.lineWidth;
 //      reserve.alpha = Neo.painter.alpha;
 //      reserve.color = Neo.painter.foregroundColor;
-        Neo.updateUI();
+//      Neo.updateUI();
     }
 };
 
@@ -143,6 +159,7 @@ Neo.PenTool.prototype.drawCursor = function(oe) {
     var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
     oe.drawCircle(ctx, x, y, r, Neo.Painter.LINETYPE_XOR_PEN);
+//  oe.drawXOREllipse(ctx, x, y, 50, 50); //, Neo.Painter.LINETYPE_XOR_PEN);
 
     ctx.restore();
 }
@@ -462,7 +479,13 @@ Neo.RectBaseTool.prototype.drawCursor = function(oe) {
     var y = (start.y < end.y) ? start.y : end.y;
     var width = Math.abs(start.x - end.x);
     var height = Math.abs(start.y - end.y);
-    oe.drawXORRect(ctx, x, y, width, height);
+
+    if (this.isEllipse) {
+        oe.drawXOREllipse(ctx, x, y, width, height, this.isFill);
+
+    } else {
+        oe.drawXORRect(ctx, x, y, width, height, this.isFill);
+    }
     ctx.restore();
 };
 
@@ -605,6 +628,75 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
   var height = Math.abs(start.y - end.y);
     oe.drawXORRect(ctx, x, y, width, height);
     ctx.restore();
+};
+
+/*
+-------------------------------------------------------------------------
+	Rect（線四角）
+-------------------------------------------------------------------------
+*/
+
+Neo.RectTool = function() {};
+Neo.RectTool.prototype = new Neo.RectBaseTool();
+Neo.RectTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.RectTool.prototype.isUpMove = false;
+
+Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+/*
+-------------------------------------------------------------------------
+	RectFill（四角）
+-------------------------------------------------------------------------
+*/
+
+Neo.RectFillTool = function() {};
+Neo.RectFillTool.prototype = new Neo.RectBaseTool();
+Neo.RectFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.RectFillTool.prototype.isUpMove = false;
+Neo.RectFillTool.prototype.isFill = true;
+Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+/*
+-------------------------------------------------------------------------
+	Ellipse（線楕円）
+-------------------------------------------------------------------------
+*/
+
+Neo.EllipseTool = function() {};
+Neo.EllipseTool.prototype = new Neo.RectBaseTool();
+Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.EllipseTool.prototype.isUpMove = false;
+Neo.EllipseTool.prototype.isEllipse = true;
+Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+};
+
+/*
+-------------------------------------------------------------------------
+	EllipseFill（楕円）
+-------------------------------------------------------------------------
+*/
+
+Neo.EllipseFillTool = function() {};
+Neo.EllipseFillTool.prototype = new Neo.RectBaseTool();
+Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
+Neo.EllipseFillTool.prototype.isUpMove = false;
+Neo.EllipseFillTool.prototype.isEllipse = true;
+Neo.EllipseFillTool.prototype.isFill = true;
+Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
+    var ctx = oe.canvasCtx[oe.current];
+    oe.eraseRect(ctx, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
 
 /*

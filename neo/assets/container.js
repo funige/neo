@@ -6,14 +6,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.5.0";
+Neo.version = "0.6.0";
 
 Neo.painter;
 Neo.fullScreen = false;
 
 Neo.config = {
-    image_width: 300,
-    image_height: 300,
+    width: 300,
+    height: 300,
    
     color_bk: "#ccccff",
 
@@ -88,10 +88,11 @@ Neo.initConfig = function(applet) {
         for (var i = 0; i < params.length; i++) {
             var p = params[i];
             Neo.config[p.name] = p.value;
-
-            if (p.name == "image_width") Neo.config.width = parseInt(p.value);
-            if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
+
+        var e = document.getElementById("container");
+        Neo.config.inherit_color = Neo.getInheritColor(e);
+
         applet.outerHTML = "";
         document[name] = Neo;
     }
@@ -108,27 +109,47 @@ Neo.initConfig = function(applet) {
 
 Neo.initSkin = function() {
     var sheet = document.styleSheets[0];
+    if (!sheet) return;
+
     if (Neo.config.color_bk) {
         sheet.addRule(".NEO #container", "background-color: " + Neo.config.color_bk);
     }
+    Neo.styleSheet = sheet;
+};
+
+Neo.getInheritColor = function(e) {
+    var result = "#000000";
+    while (e && e.style) {
+        if (e.style.color != "") { 
+            result = e.style.color; 
+            break;
+        }
+        if (e.attributes["text"]) {
+            result = e.attributes["text"].value; 
+            break;
+        }
+        e = e.parentNode;
+    }
+    return result;
 };
 
 Neo.initComponents = function() {
     document.getElementById("copyright").innerHTML += "v" + Neo.version;
 
-    //お絵描き中はアプレットのborderを選択状態にする
+    //アプレットのborderの動作をエミュレート
     var container = document.getElementById("container");
     container.addEventListener("mousedown", function(e) {
-        container.style.borderColor = '#800000';
+        container.style.borderColor = Neo.config.inherit_color;
         e.stopPropagation();
     }, false);
     document.addEventListener("mousedown", function(e) {
         container.style.borderColor = 'transparent';
     }, false);
 
-    // 埋め込み先のページの他の要素は選択不可にしておく
-    document.styleSheets[0].addRule("*", "user-select:none;");
-    document.styleSheets[0].addRule("*", "-webkit-user-select:none;");
+    if (Neo.styleSheet) {
+        Neo.styleSheet.addRule("*", "user-select:none;");
+        Neo.styleSheet.addRule("*", "-webkit-user-select:none;");
+    }
 }
 
 Neo.initButtons = function() {
@@ -157,12 +178,21 @@ Neo.initButtons = function() {
     Neo.fillButton = new Neo.Button().init("fill", {type:'fill'});
 
     // toolTip
-    Neo.penTip = new Neo.PenTip().init("pen", {type:'pen'});
-    Neo.eraserTip = new Neo.EraserTip().init("eraser", {type:'eraser'});
-    Neo.copyTip = new Neo.CopyTip().init("copy", {type:'copy'});
-    Neo.maskTip = new Neo.MaskTip().init("mask", {type:'mask'});
+    Neo.penTip = new Neo.PenTip().init("pen");
+    Neo.pen2Tip = new Neo.Pen2Tip().init("pen2");
+    Neo.drawTip = new Neo.DrawTip().init("draw");
+    Neo.draw2Tip = new Neo.Draw2Tip().init("draw2");
+    Neo.eraserTip = new Neo.EraserTip().init("eraser");
+    Neo.methodTip = new Neo.MethodTip().init("method");
+    Neo.maskTip = new Neo.MaskTip().init("mask");
 
-    Neo.toolButtons = [Neo.fillButton, Neo.penTip, Neo.eraserTip, Neo.copyTip];
+    Neo.toolButtons = [Neo.fillButton, 
+                       Neo.penTip, 
+                       Neo.pen2Tip, 
+                       Neo.drawTip,
+                       Neo.draw2Tip,
+                       Neo.methodTip,
+                       Neo.eraserTip];
 
     // colorTip
     for (var i = 1; i <= 14; i++) {
@@ -314,8 +344,7 @@ Neo.openURL = function(url) {
 
 Neo.submit = function(board, blob) {
     var url = board + Neo.config.url_save;
-    var header = new Blob();
-
+    var header = new Blob([Neo.config.send_header || ""]);
     var headerLength = this.getSizeString(header.size);
     var imgLength = this.getSizeString(blob.size);
     var body = new Blob(['P', // PaintBBS
@@ -399,10 +428,13 @@ Neo.createContainer = function(applet) {
                 <div id="toolsWrapper">
                     <div id="tools">
                         <div id="toolSet">
-                            <div id="pen" class="toolTip"><div class="label">鉛筆</div></div>
-                            <div id="eraser" class="toolTip"><div class="label">消しペン</div></div>
-                            <div id="copy" class="toolTip"><div class="label">コピー</div></div>
-                            <div id="mask" class="toolTip"><div class="label">マスク</div></div>
+                            <div id="pen"></div>
+                            <div id="pen2"></div>
+                            <div id="draw"></div>
+                            <div id="draw2"></div>
+                            <div id="eraser"></div>
+                            <div id="method"></div>
+                            <div id="mask"></div>
 
                             <div class="colorTips">
                                 <div id="color2"></div><div id="color1"></div><br>
