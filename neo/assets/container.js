@@ -180,18 +180,18 @@ Neo.initButtons = function() {
     // toolTip
     Neo.penTip = new Neo.PenTip().init("pen");
     Neo.pen2Tip = new Neo.Pen2Tip().init("pen2");
-    Neo.drawTip = new Neo.DrawTip().init("draw");
-    Neo.draw2Tip = new Neo.Draw2Tip().init("draw2");
+    Neo.effectTip = new Neo.EffectTip().init("effect");
+    Neo.effect2Tip = new Neo.Effect2Tip().init("effect2");
     Neo.eraserTip = new Neo.EraserTip().init("eraser");
-    Neo.methodTip = new Neo.MethodTip().init("method");
+    Neo.drawTip = new Neo.DrawTip().init("draw");
     Neo.maskTip = new Neo.MaskTip().init("mask");
 
     Neo.toolButtons = [Neo.fillButton, 
                        Neo.penTip, 
                        Neo.pen2Tip, 
+                       Neo.effectTip,
+                       Neo.effect2Tip,
                        Neo.drawTip,
-                       Neo.draw2Tip,
-                       Neo.methodTip,
                        Neo.eraserTip];
 
     // colorTip
@@ -430,10 +430,10 @@ Neo.createContainer = function(applet) {
                         <div id="toolSet">
                             <div id="pen"></div>
                             <div id="pen2"></div>
-                            <div id="draw"></div>
-                            <div id="draw2"></div>
+                            <div id="effect"></div>
+                            <div id="effect2"></div>
                             <div id="eraser"></div>
-                            <div id="method"></div>
+                            <div id="draw"></div>
                             <div id="mask"></div>
 
                             <div class="colorTips">

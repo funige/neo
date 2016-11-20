@@ -122,6 +122,7 @@
     margin: 0;
     width:16px;
     height:16px;
+    margin-left:1px;
 }
 
 .NEO #zoomPlus {
