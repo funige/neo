@@ -167,6 +167,8 @@ Neo.toolButtons = [];
 
 Neo.ToolTip = function() {};
 
+Neo.ToolTip.prototype.prevMode = -1;
+
 Neo.ToolTip.prototype.init = function(name, params) {
     this.element = document.getElementById(name);
     this.params = params || {};
@@ -247,8 +249,65 @@ Neo.ToolTip.prototype.setSelected = function(selected) {
 };
 
 Neo.ToolTip.prototype.update = function() {};
-Neo.ToolTip.prototype.draw = function(c) {};
 
+Neo.ToolTip.prototype.draw = function(c) {
+    if (this.hasTintImage) {
+        if (typeof c != "string") c = Neo.painter.getColorString(c);
+        var ctx = this.canvas.getContext("2d");
+        
+        if (this.prevMode != this.mode) {
+            this.prevMode = this.mode;
+
+            var img = new Image();
+            img.src = this.toolIcons[this.mode];
+            img.onload = function() {
+                var ref = this;
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.drawTintImage(ctx, img, c, 0, 0);
+            }.bind(this);
+
+        } else {
+            this.tintImage(ctx, c);
+        }
+    }
+};
+
+Neo.ToolTip.prototype.drawTintImage = function(ctx, img, c, x, y) {
+    ctx.drawImage(img, x, y);
+    this.tintImage(ctx, c);
+};
+
+Neo.ToolTip.prototype.tintImage = function(ctx, c) {
+    c = (Neo.painter.getColor(c) & 0xffffff);
+    
+    var imageData = ctx.getImageData(0, 0, 46, 18);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+
+    for (var i = 0; i < buf32.length; i++) {
+        var a = buf32[i] & 0xff000000;
+        if (a) {
+            buf32[i] = buf32[i] & a | c;
+        }
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+
+};
+
+Neo.ToolTip.bezier = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
+Neo.ToolTip.blur = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAASUlEQVRIx+3VMQ4AIAgEQeD/f8bWWBnJYUh2SgtgK82G8/MhzVKwxOtTLgIUx6tDout4laiPIICA0Qj4bXxAy0+8LZP9yACAJwsqkggS55eiZgAAAABJRU5ErkJggg==";
+Neo.ToolTip.brush = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQUlEQVRIx2NgGOKAEcb4z8CweRA4xpdUPSxofJ8BdP8WcjQxDaCDqQLQY4CsUBgFo2AUjIJRMApGwSgYBaNgZAIA0CoDwDbZu8oAAAAASUVORK5CYII=";
+Neo.ToolTip.burn = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPklEQVRIx+3PMRIAMAQAQbzM0/0sKZPeiDG57TQ4keH0Htx9VR+MCM1vOezl8xUsv4IAAkYjoBsB3QgAgL9tYXgF19rh9yoAAAAASUVORK5CYII=";
+Neo.ToolTip.dodge = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPklEQVRIx+3PMRIAMAQAQbzM0/0sKZPeiDG57TQ4keH0HiJiVR90d81vOezl8xUsv4IAAkYjoBsB3QgAgL9tIyQHV/nXwScAAAAASUVORK5CYII=";
+Neo.ToolTip.ellipse = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAATklEQVRIx+2VMQ4AIAgD6/8fjbOJi1LFmt4OPQ0KIE7LNgggCBLbHkuFM9lM+Om+QwDjpksyb4tT86vlvzgEbYxefQPyv5D8HjDGGGOk6b3jJ+lYubd8AAAAAElFTkSuQmCC";
+Neo.ToolTip.ellipsefill = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAVUlEQVRIx+2VURIAEAgFc/9D5waSHpV5+43ZHRMizRnRA1REARLHHq6NCFl01Nail+LeEDMgU34nYhlQQd6K+PsGKkSEZyArBPoK3Y6K/AOEEEJIayZHbhIKjkZrFwAAAABJRU5ErkJggg==";
+Neo.ToolTip.eraser = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABQElEQVRIx+1WQY7CMAwcI37Cad+yXOgH4Gu8gAt9CtrDirfMHjZJbbcktVSpQnROSeMkY3vsFHhzSG3xfLpz/JVmG0mIqDkIMcc6+7Kejx6fdb0dq7w09rVFkrjejrMOunQ9vg7f/5QEIAd6E1Eo38WF8fF7n8sdALCrLerIzoFI4sI0Vtv1SYZ8CVbeF7tzF7JugIkVkxOauc6CIe8842S+XmMfsq7TN9LRTngZmTmVD4SrnzYaGYhFoxCWgajXuMjYGTuJ3dlwIBIN3U0cUVqLXCs5E7YeVsvAYJul5HWeLUhL3EpstQwooqoOTEHDOebpMn7ngkUsg3RotU8X1MkuVDrYohkIupC0YArX6T+PfX3kcbQLNV/iCKi6EB3xqXdAZ0JKthZ8B0QEl673NIEX/0I/z36Rf6ENGzZ8EP4A8Lp+9e9VWC4AAAAASUVORK5CYII=";
+Neo.ToolTip.freehand = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAdUlEQVRIx+2WUQrAMAhD3dj9r+y+VoSyLhYDynzQv1qiJlCR4hzeAhVRsiC3Jkj0c5hN7Lx7IQ9SphLE1ICdwko420purEWQuywN3pqxgcw2+WwAtU1GzoqiLZNwZBvMAIcO8y3YKUO8mkbmjPzjK9E0TUPjBoeyLAS0usjLAAAAAElFTkSuQmCC";
+Neo.ToolTip.line = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAU0lEQVRIx+2UQQ4AIAjD8P+PxivRGDQC47C+oN1hIgTLQAt4qIga2c23XYAVPkm3CVhlb4ShAa/rQgMi1i0NyFg3LaBq3bAA1LpfAd7/EkIIIR2YXFYSCpWS8w8AAAAASUVORK5CYII=";
+Neo.ToolTip.rect = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQElEQVRIx+3TMQ4AIAhD0WK8/5VxdcIYY8rw3wok7YAEr6iGKaU74BY0ro+6FKhyDHe4VxRwm6eFLn8AAADwwQIwTQgGo9ZMywAAAABJRU5ErkJggg==";
+Neo.ToolTip.rectfill = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANElEQVRIx+3PIQ4AIBADwcL//3xYBMEgLiQztmab0GvcxkqqO3ALPbbO7rBXDnRzAADgYwvqDwIMJlGb5QAAAABJRU5ErkJggg==";
+Neo.ToolTip.tone = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAO0lEQVRIx+3PIQ4AMAgEwaP//zNVVZUELiQ7CgWstFy8IaVsPhT1Lb/T+fQEAtwIcCPAjQC39QEAgJIL6DQCFhAqsRkAAAAASUVORK5CYII=";
 
 /*
 -------------------------------------------------------------------------
@@ -272,16 +331,24 @@ Neo.PenTip.prototype.init  = function(name, params) {
 };
 
 Neo.PenTip.prototype.update = function() {
+    for (var i = 0; i < this.tools.length; i++) {
+        if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
+    }
+
     this.draw(Neo.painter.foregroundColor);
-    this.label.innerHTML = this.toolStrings[this.mode];
+    if (this.label) {
+        this.label.innerHTML = this.toolStrings[this.mode];
+    }
 };
 
 Neo.PenTip.prototype.draw = function(c) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d");
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.fillStyle = c;
-    ctx.fillRect(2, 3, 33, 1.2);
+    if (this.canvas) {
+        var ctx = this.canvas.getContext("2d");
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.fillStyle = c;
+        ctx.fillRect(2, 3, 33, 1.2);
+    }
 };
 
 /*
@@ -298,9 +365,12 @@ Neo.Pen2Tip.prototype = new Neo.ToolTip();
 //Neo.Pen2Tip.prototype.toolStrings = ["トーン", "ぼかし", "覆い焼き", "焼き込み"]; 
 Neo.Pen2Tip.prototype.toolStrings = ["トーン"];
 Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE];
-//                               Neo.Painter.TOOLTYPE_BLUR,
-//                               Neo.Painter.TOOLTYPE_DODGE,
-//                               Neo.Painter.TOOLTYPE_BURN];
+//                             Neo.Painter.TOOLTYPE_BLUR,
+//                             Neo.Painter.TOOLTYPE_DODGE,
+//                             Neo.Painter.TOOLTYPE_BURN];
+
+Neo.Pen2Tip.prototype.hasTintImage = true;
+Neo.Pen2Tip.prototype.toolIcons = [Neo.ToolTip.tone];
 
 Neo.Pen2Tip.prototype.init  = function(name, params) {
     this.isTool = true;
@@ -309,16 +379,12 @@ Neo.Pen2Tip.prototype.init  = function(name, params) {
 };
 
 Neo.Pen2Tip.prototype.update = function() {
+    for (var i = 0; i < this.tools.length; i++) {
+        if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
+    }
+
     this.draw(Neo.painter.foregroundColor);
     this.label.innerHTML = this.toolStrings[this.mode];
-};
-
-Neo.Pen2Tip.prototype.draw = function(c) {
-    if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d");
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.fillStyle = c;
-    ctx.fillRect(2, 3, 33, 1.2);
 };
 
 /*
@@ -345,6 +411,10 @@ Neo.EraserTip.prototype.init  = function(name, params) {
 };
 
 Neo.EraserTip.prototype.update = function() {
+    for (var i = 0; i < this.tools.length; i++) {
+        if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
+    }
+
     if (this.drawOnce == false) {
         this.draw();
         this.drawOnce = true;
@@ -357,9 +427,7 @@ Neo.EraserTip.prototype.draw = function() {
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     var img = new Image();
     
-    /* base64 tooltip-eraser.png*/
-    img.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABQElEQVRIx+1WQY7CMAwcI37Cad+yXOgH4Gu8gAt9CtrDirfMHjZJbbcktVSpQnROSeMkY3vsFHhzSG3xfLpz/JVmG0mIqDkIMcc6+7Kejx6fdb0dq7w09rVFkrjejrMOunQ9vg7f/5QEIAd6E1Eo38WF8fF7n8sdALCrLerIzoFI4sI0Vtv1SYZ8CVbeF7tzF7JugIkVkxOauc6CIe8842S+XmMfsq7TN9LRTngZmTmVD4SrnzYaGYhFoxCWgajXuMjYGTuJ3dlwIBIN3U0cUVqLXCs5E7YeVsvAYJul5HWeLUhL3EpstQwooqoOTEHDOebpMn7ngkUsg3RotU8X1MkuVDrYohkIupC0YArX6T+PfX3kcbQLNV/iCKi6EB3xqXdAZ0JKthZ8B0QEl673NIEX/0I/z36Rf6ENGzZ8EP4A8Lp+9e9VWC4AAAAASUVORK5CYII=";
-
+    img.src = Neo.ToolTip.eraser;
     img.onload = function() {
         ctx.drawImage(img, 0, 0);
     };
@@ -376,10 +444,17 @@ Neo.effectTip;
 Neo.EffectTip = function() {};
 Neo.EffectTip.prototype = new Neo.ToolTip();
 
-//Neo.EffectTip.prototype.toolStrings = ["四角", "線四角", "楕円", "線楕円"];
-Neo.EffectTip.prototype.toolStrings = ["四角", "楕円"];
+Neo.EffectTip.prototype.toolStrings = ["四角", "線四角", "楕円", "線楕円"];
 Neo.EffectTip.prototype.tools = [Neo.Painter.TOOLTYPE_RECTFILL,
-                               Neo.Painter.TOOLTYPE_ELLIPSEFILL];
+                                 Neo.Painter.TOOLTYPE_RECT,
+                                 Neo.Painter.TOOLTYPE_ELLIPSEFILL,
+                                 Neo.Painter.TOOLTYPE_ELLIPSE];
+
+Neo.EffectTip.prototype.hasTintImage = true;
+Neo.EffectTip.prototype.toolIcons = [Neo.ToolTip.rectfill,
+                                     Neo.ToolTip.rect,
+                                     Neo.ToolTip.ellipsefill,
+                                     Neo.ToolTip.ellipse];
 
 Neo.EffectTip.prototype.init = function(name, params) {
     this.isTool = true;
@@ -388,10 +463,12 @@ Neo.EffectTip.prototype.init = function(name, params) {
 };
 
 Neo.EffectTip.prototype.update = function() {
-    this.label.innerHTML = this.toolStrings[this.mode];
-};
+    for (var i = 0; i < this.tools.length; i++) {
+        if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
+    }
 
-Neo.EffectTip.prototype.draw = function() {
+    this.draw(Neo.painter.foregroundColor);
+    this.label.innerHTML = this.toolStrings[this.mode];
 };
 
 /*
@@ -405,11 +482,15 @@ Neo.effect2Tip;
 Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
-Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", "左右反転", "上下反転"];
+Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", 
+                                        //"角取り", 
+                                        "左右反転", "上下反転", "傾け"];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
-                               Neo.Painter.TOOLTYPE_MERGE,
-                               Neo.Painter.TOOLTYPE_FLIP_H,
-                               Neo.Painter.TOOLTYPE_FLIP_V];
+                                  Neo.Painter.TOOLTYPE_MERGE,
+                                  //Neo.Painter.TOOLTYPE_BLURRECT,
+                                  Neo.Painter.TOOLTYPE_FLIP_H,
+                                  Neo.Painter.TOOLTYPE_FLIP_V,
+                                  Neo.Painter.TOOLTYPE_TURN];
 
 Neo.Effect2Tip.prototype.init = function(name, params) {
     this.isTool = true;
@@ -418,6 +499,10 @@ Neo.Effect2Tip.prototype.init = function(name, params) {
 };
 
 Neo.Effect2Tip.prototype.update = function() {
+    for (var i = 0; i < this.tools.length; i++) {
+        if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
+    }
+
     this.label.innerHTML = this.toolStrings[this.mode];
 };
 
@@ -487,6 +572,9 @@ Neo.DrawTip.prototype = new Neo.ToolTip();
 
 Neo.DrawTip.prototype.toolStrings = ["手書き", "直線"]; //, "BZ曲線"];
 
+Neo.DrawTip.prototype.hasTintImage = true;
+Neo.DrawTip.prototype.toolIcons = [Neo.ToolTip.freehand, Neo.ToolTip.line];
+
 Neo.DrawTip.prototype.init = function(name, params) {
     this.fixed = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
@@ -496,32 +584,23 @@ Neo.DrawTip.prototype.init = function(name, params) {
 Neo.DrawTip.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
 
+    var length = this.toolStrings.length;
     if (e.button == 2 || e.ctrlKey || e.altKey) {
-//      Neo.painter.maskColor = Neo.painter.foregroundColor;
-
+        this.mode--;
+        if (this.mode < 0) this.mode = length - 1;
     } else {
-        var length = this.toolStrings.length;
         this.mode++;
         if (this.mode >= length) this.mode = 0;
-        Neo.painter.drawType = this.mode;
     }
+    Neo.painter.drawType = this.mode;
     this.update();
 
     if (this.onmousedown) this.onmousedown(this);
 }
 
 Neo.DrawTip.prototype.update = function() {
-    this.draw(Neo.painter.maskColor);
+    this.draw(Neo.painter.foregroundColor);
     this.label.innerHTML = this.toolStrings[this.mode];
-};
-
-Neo.DrawTip.prototype.draw = function(c) {
-    if (typeof c != "string") c = Neo.painter.getColorString(c);
-
-    var ctx = this.canvas.getContext("2d");
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.fillStyle = c;
-    ctx.fillRect(1, 1, 43, 9);
 };
 
 /*
@@ -878,3 +957,5 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
         this.barButton.style.top = Math.ceil(barY) + "px";
     }
 };
+
+

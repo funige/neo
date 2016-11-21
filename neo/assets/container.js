@@ -244,6 +244,9 @@ Neo.updateUI = function() {
     for (var i = 0; i < Neo.toolButtons.length; i++) {
         var toolTip = Neo.toolButtons[i];
         toolTip.setSelected((current == toolTip) ? true : false);
+        if (current == toolTip) {
+            toolTip.update();
+        }
     }
 
     Neo.updateUIColor(true, false);
