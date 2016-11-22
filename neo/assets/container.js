@@ -347,7 +347,9 @@ Neo.openURL = function(url) {
 
 Neo.submit = function(board, blob) {
     var url = board + Neo.config.url_save;
-    var header = ""; //new Blob([Neo.config.send_header || ""]);
+    console.log("submit url=" + url);
+    var header = new Blob(); //new Blob([Neo.config.send_header || ""]);
+
     var headerLength = this.getSizeString(header.size);
     var imgLength = this.getSizeString(blob.size);
     var body = new Blob(['P', // PaintBBS
@@ -361,8 +363,12 @@ Neo.submit = function(board, blob) {
     request.open("POST", url, true);
     request.onload = function (e) {
         console.log(request.response);
-        
-        var exitURL = board + Neo.config.url_exit;
+
+        var url = Neo.config.url_exit;
+        if (url[0] == '/') {
+            url = url.replace(/^.*\//, ''); //よくわかんないけどとりあえず
+        }
+        var exitURL = board + url;
         location.href = exitURL;
     }
     request.send(body);

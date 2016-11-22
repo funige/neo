@@ -20,11 +20,11 @@
 
     <div style="text-align:center; margin-top: 2px;">
         <select id="target" name="target">
-            <option value="http://jun.2chan.net/oe/">ふたば☆ちゃんねる - お絵sql</option>
-            <option value="http://zip.2chan.net/p/">ふたば☆ちゃんねる - お絵かき</option>
-            <option value="http://nov.2chan.net/q/">ふたば☆ちゃんねる - 落書き</option>
-            <option value="http://cgi.2chan.net/u/">ふたば☆ちゃんねる - 落書き裏</option>
-       </select>
+            <option value="jun.2chan.net/oe">ふたば☆ちゃんねる - お絵sql</option>
+            <option value="zip.2chan.net/p">ふたば☆ちゃんねる - お絵かき</option>
+            <option value="nov.2chan.net/q">ふたば☆ちゃんねる - 落書き</option>
+            <option value="cgi.2chan.net/u">ふたば☆ちゃんねる - 落書き裏</option>
+        </select>
         <input id="post" type="button" value="開く" 
                onclick="load(document.getElementById('target').value);">
         <!--onclick="Neo.painter.submit(document.getElementById('target').value);"-->
@@ -35,7 +35,7 @@
 <webview id="webview" src="./test.html" preload="./dist/neo.js" autosize=on></webview>
 -->
 
-<webview id="webview" src="http://jun.2chan.net/oe/" preload="./dist/neo.js" autosize=on></webview>
+<webview id="webview" src="http://jun.2chan.net/oe" preload="./dist/neo.js" autosize=on></webview>
 
 
 <script>
@@ -44,9 +44,10 @@
     var ipc = require('electron').ipcMain;
 
     var load = function(url) {
-        if (!url.match("http://")) url = "file://" + __dirname + "/" + url;
-        console.log(url);
-        webview.loadURL(url);
+//      if (!url.match("http://")) url = "file://" + __dirname + "/" + url;
+//      console.log(url);
+
+        webview.loadURL("http://" + url);
     };
 
     var back = function() {
