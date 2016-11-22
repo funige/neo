@@ -347,7 +347,7 @@ Neo.openURL = function(url) {
 
 Neo.submit = function(board, blob) {
     var url = board + Neo.config.url_save;
-    var header = new Blob([Neo.config.send_header || ""]);
+    var header = ""; //new Blob([Neo.config.send_header || ""]);
     var headerLength = this.getSizeString(header.size);
     var imgLength = this.getSizeString(blob.size);
     var body = new Blob(['P', // PaintBBS
