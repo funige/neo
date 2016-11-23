@@ -200,7 +200,12 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
 	if (oe.alpha >= 1) {
         oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, this.lineType);
     }
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+
+//	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    var r = Math.ceil(this.lineWidth / 2);
+    var left = Math.round(oe.mouseX) - r;
+    var top = Math.round(oe.mouseY) - r;
+	oe.updateDestCanvas(left, top, r*2, r*2, true);
 };
 
 Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
@@ -214,7 +219,13 @@ Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
 Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
 	var ctx = oe.canvasCtx[oe.current];
 	oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, this.lineType);
-	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+//  oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+    var r = Math.ceil(Neo.painter.lineWidth / 2);
+    var left = Math.round((oe.mouseX < oe.prevMouseX) ? oe.mouseX : oe.prevMouseX)-r;
+    var top = Math.round((oe.mouseY < oe.prevMouseY) ? oe.mouseY: oe.prevMouseY)-r;
+    var width = Math.abs(oe.mouseX - oe.prevMouseX);
+    var height = Math.abs(oe.mouseY - oe.prevMouseY);
+	oe.updateDestCanvas(left, top, width + r*2, height + r*2, true);
 };
 
 Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function(oe) {

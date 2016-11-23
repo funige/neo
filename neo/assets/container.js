@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.6.0";
+Neo.version = "0.6.1";
 
 Neo.painter;
 Neo.fullScreen = false;
@@ -88,6 +88,9 @@ Neo.initConfig = function(applet) {
         for (var i = 0; i < params.length; i++) {
             var p = params[i];
             Neo.config[p.name] = p.value;
+
+            if (p.name == "image_width") Neo.config.width = parseInt(p.value);
+            if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
 
         var e = document.getElementById("container");
