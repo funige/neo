@@ -649,10 +649,8 @@ Neo.Painter.prototype.setZoomPosition = function(x, y) {
 	var maxy = this.canvasHeight - miny;
 
 	
-	x = Math.max(Math.min(maxx,x),minx);
-	y = Math.max(Math.min(maxy,y),miny);
-	
-	//console.log(minx, maxx, miny, maxy, this.zoomX, this.zoomY);
+	x = Math.round(Math.max(Math.min(maxx,x),minx));
+	y = Math.round(Math.max(Math.min(maxy,y),miny));
 	
 	this.zoomX = x;
 	this.zoomY = y;
@@ -764,7 +762,20 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
     }
 };
 
-Neo.Painter.prototype.fillContext = function(color) {
+Neo.Painter.prototype.getBound = function(x0, y0, x1, y1, r) {
+    var left = Math.floor((x0 < x1) ? x0 : x1);
+    var top = Math.floor((y0 < y1) ? y0 : y1);
+    var width = Math.ceil(Math.abs(x0 - x1));
+    var height = Math.ceil(Math.abs(y0 - y1));
+    r = Math.ceil(r + 1);
+    console.log(left, top, width, height, r);
+
+    if (!r) {
+        return [left, top, width + 1, height + 1];
+
+    } else {
+        return [left - r, top - r, width + r*2, height + r*2];
+    }
 };
 
 Neo.Painter.prototype.getColor = function(c) {
@@ -972,12 +983,12 @@ Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
                 if (a > 0) {
                     var a1x = Math.max(a1, 1.0/255);
 
-                    var r = (r1 * a1x + r0 * a0 * (1 - a1x)) / a;
-                    var g = (g1 * a1x + g0 * a0 * (1 - a1x)) / a;
-                    var b = (b1 * a1x + b0 * a0 * (1 - a1x)) / a;
-//                  var r = (r1 * a1x + r0 * a0) / (a0 + a1x);
-//                  var g = (g1 * a1x + g0 * a0) / (a0 + a1x);
-//                  var b = (b1 * a1x + b0 * a0) / (a0 + a1x);
+//                  var r = (r1 * a1x + r0 * a0 * (1 - a1x)) / a;
+//                  var g = (g1 * a1x + g0 * a0 * (1 - a1x)) / a;
+//                  var b = (b1 * a1x + b0 * a0 * (1 - a1x)) / a;
+                    var r = (r1 * a1x + r0 * a0) / (a0 + a1x);
+                    var g = (g1 * a1x + g0 * a0) / (a0 + a1x);
+                    var b = (b1 * a1x + b0 * a0) / (a0 + a1x);
 
                     r = (r1 > r0) ? Math.ceil(r) : Math.floor(r);
                     g = (g1 > g0) ? Math.ceil(g) : Math.floor(g);
