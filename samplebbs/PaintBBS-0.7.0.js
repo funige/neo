@@ -2948,10 +2948,32 @@ Neo.DrawToolBase.prototype.drawLineCursor = function(oe) {
 
 /* Bezier (BZ曲線) */
 
-Neo.DrawToolBase.prototype.bezierDownHandler = function(oe) {};
-Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {};
-Neo.DrawToolBase.prototype.bezierMoveHandler = function(oe) {};
-Neo.DrawToolBase.prototype.bezierUpMoveHandler = function(oe) {};
+Neo.DrawToolBase.prototype.bezierDownHandler = function(oe) {
+    this.isUpMove = false;
+    this.startX = oe.mouseX;
+    this.startY = oe.mouseY;
+    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+};
+
+Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
+    if (this.isUpMove == false) {
+        this.isUpMove = true;
+
+        oe._pushUndo();
+        oe.prepareDrawing();
+        var ctx = oe.canvasCtx[oe.current];
+
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }
+};
+
+Neo.DrawToolBase.prototype.bezierMoveHandler = function(oe) {
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    this.drawLineCursor(oe);
+};
+
+Neo.DrawToolBase.prototype.bezierUpMoveHandler = function(oe) {
+};
 
 Neo.DrawToolBase.prototype.drawBezierCursor = function(oe) {};
 

@@ -25,7 +25,7 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 ## サンプル掲示板
 組み込みテストのため[**Java難民板**](http://neo.websozai.jp)をオープンしました  
 ブラウザからアクセスして、適当にご利用ください  
-掲示板へのNEOの組み込み方法については、 [/sample_bbs](https://github.com/funige/neo/tree/master/sample_bbs) の下のREADME.mdに書きました
+掲示板へのNEOの組み込み方法については、 [/samplebbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました
 
 対応ブラウザ:  
 Chrome/FireFox/Safari（最近のバージョンのみ）  
@@ -95,4 +95,4 @@ Edgeにもそのうち対応します
 しぃペインターとかPooとかは作りません  
 
 アニメーションの記録・再生には対応していません  
-誰か.pchフォーマット(アニメーションファイル)の解析ができる人いませんか？
+
