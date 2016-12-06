@@ -388,7 +388,8 @@ Neo.Painter.prototype._keyDownHandler = function(e) {
     }
 
     //スペース・Shift+スペースででスクロールしないように
-    if (e.keyCode == 13 && this.tool.type == Neo.TOOLTYPE_TEXT) e.preventDefault();
+//  if (this.tool.type != Neo.Painter.TOOLTYPE_TEXT) e.preventDefault();
+    if (document.activeElement != this.inputText) e.preventDefault();
 };
 
 Neo.Painter.prototype._keyUpHandler = function(e) {
@@ -448,7 +449,7 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
     if (e.target['data-bar']) {
         this.pushTool(new Neo.HandTool());
 
-    } else if (this.isSpaceDown) {
+    } else if (this.isSpaceDown && document.activeElement != this.inputText) {
         this.pushTool(new Neo.HandTool());
         this.tool.reverse = true;
 

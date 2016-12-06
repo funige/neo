@@ -124,6 +124,7 @@ Neo.ToolBase.prototype.saveStates = function() {
 Neo.DrawToolBase = function() {};
 Neo.DrawToolBase.prototype = new Neo.ToolBase();
 Neo.DrawToolBase.prototype.isUpMove = false;
+Neo.DrawToolBase.prototype.step = 0;
 
 Neo.DrawToolBase.prototype.downHandler = function(oe) {
     switch (oe.drawType) {
@@ -335,24 +336,53 @@ Neo.DrawToolBase.prototype.drawLineCursor = function(oe) {
 
 Neo.DrawToolBase.prototype.bezierDownHandler = function(oe) {
     this.isUpMove = false;
-    this.startX = oe.mouseX;
-    this.startY = oe.mouseY;
+    if (this.step == 0) {
+        this.startX = this.x0 = oe.mouseX;
+        this.startY = this.y0 = oe.mouseY;
+    }
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 };
 
 Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
     if (this.isUpMove == false) {
         this.isUpMove = true;
+    }
 
-        oe._pushUndo();
-        oe.prepareDrawing();
-        var ctx = oe.canvasCtx[oe.current];
+    this.step++;
+    switch (this.step) {
+    case 1:
+        console.log("get start & end point.");
+        this.x3 = oe.mouseX;
+        this.y3 = oe.mouseY;
+        break;
 
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    case 2:
+        console.log("get 1st control point.");
+        this.x1 = oe.mouseX;
+        this.y1 = oe.mouseY;
+        break;
+
+    case 3:
+        console.log("get 2nd control point.");
+        this.x2 = oe.mouseX;
+        this.y2 = oe.mouseY;
+        console.log("[draw bezier]", 
+                    this.startX, this.startY, 
+                    this.x1, this.y1, 
+                    this.x2, this.y2, 
+                    this.x3, this.y3);
+        break;
+
+    default:
+        this.step = 0;
+        break;
     }
 };
 
 Neo.DrawToolBase.prototype.bezierMoveHandler = function(oe) {
+    oe._pushUndo();
+    oe.prepareDrawing();
+    var ctx = oe.canvasCtx[oe.current];
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     this.drawLineCursor(oe);
 };
@@ -1050,6 +1080,7 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
 		    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
             text.style.display = "none";
+            text.blur();
         }
     }
 };
@@ -1060,10 +1091,16 @@ Neo.TextTool.prototype.kill = function(oe) {
 
 Neo.TextTool.prototype.drawText = function(oe) {
     var text = oe.inputText;
+
+    // unescape entities
+    var tmp = document.createElement("textarea");
+    tmp.innerHTML = text.innerHTML;
+    var string = tmp.value;
+
     var x = this.startX;
     var y = this.startY;
 
-    if (text && text.innerHTML.length > 0) {
+    if (string.length > 0) {
         var ctx = oe.canvasCtx[Neo.painter.current];
         ctx.save();
 	    ctx.translate(x, y);
@@ -1072,7 +1109,7 @@ Neo.TextTool.prototype.drawText = function(oe) {
         ctx.font = text.style.fontSize + " Arial";
         ctx.globalAlpha = oe.alpha;
         ctx.fillStyle = oe.foregroundColor;
-        ctx.fillText(text.innerHTML, 0, 0);
+        ctx.fillText(string, 0, 0);
         ctx.restore();
     }
 };
