@@ -1,0 +1,205 @@
+<!--(********** カタログテンプレート **********
+// このテンプレートは、カタログモード用テンプレートです
+)-->
+<html><head><title>{$title}</title>
+<!--(
+// title…掲示板タイトル
+// charset…文字コード
+)-->
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset={$charset}">
+<STYLE TYPE="text/css">
+<!--
+body,tr,td,th { font-size:11pt }
+a:hover { color:#FFFFFF;background-color:#444444;TEXT-DECORATION:NONE }
+a:link  { color:#666666;background-color:#DDDDDD }
+a:vlink { color:#666666;background-color:#FFFFFF }
+span { font-size:18pt }
+big { font-size:14pt }
+small { font-size:9pt }
+-->
+</STYLE>
+<!--(========== クッキー読込み用JavaScript(必須) ==========)-->
+<Script language="JavaScript" src="loadcookie.js"></script>
+</head>
+<body bgcolor=#FFFFFF text=#000000 link=#888888 vlink=#606060 alink=#000000>
+<center>
+<p><font size=5><b><SPAN>{$title}</SPAN></b></font></p>
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>カタログモード</font></th></tr></table>
+<hr width="90%" size=1>
+[<a href="{$home}" target="_top">ホーム</a>] 
+[<a href="{$self}?mode=newpost">新規投稿</a>] 
+[<a href="{$self2}">通常表示</a>] 
+[<a href="{$self}?mode=admin">管理用</a>] 
+<!--(
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+)-->
+<hr width="90%" size=1>
+<!--(========== お絵かきフォーム ==========)-->
+<!--{def paint}-->
+<form action="{$self}" method=POST>
+<!--(========== お絵かきアプレット ==========)-->
+<!--{def applet}-->
+アプレット<select name=shi>
+<!--{def usepbbs}--><option value=0>PaintBBS</option><!--{/def}-->
+<option value=1>しぃペインター</option>
+<option value=2>しぃペインターPro</option>
+</select>
+<!--{/def}-->
+<!--(// しぃで反映されない上にお絵かき画面でパレット変更できるのでコメント化
+パレット<select name=palette><option value="" selected> デフォルト</option>
+{$palette}
+</select>
+)-->
+横<input type=text name=picw value={$pdefw} size=3>×縦<input type=text name=pich value={$pdefh} size=3>
+<!--(
+// pdefw…お絵かきデフォルトサイズ(横)
+// pdefh…お絵かきデフォルトサイズ(縦)
+)-->
+保存タイプ<select name=savetype>
+<option value='AUTO'>AUTO</option>
+<option value='PNG'>PNG</option>
+<option value='JPEG'>JPEG</option>
+</select>
+<input type=submit value="お絵かきする">
+<!--{def anime}--><input type=checkbox value="true" name=anime{$animechk}>動画記録<!--{/def}-->
+<!--(
+// anime…動画記録機能を使用するとき true が入る
+// animechk…動画記録をデフォルトでチェックするとき ' checked' が入る
+)-->
+<input type=hidden name=mode value=paint></form>
+<a href="{$self}?mode=piccom">アップロード途中の画像</a><BR>
+<!--{/def}-->
+<!--(========== お絵かき用説明(省略中) ==========)-->
+<!--{def paint2}-->
+<!--(
+<BR>
+<table cellpadding=1 cellspacing=1><tr><td><small>
+<LI>お絵かきできる画像のサイズは横 100～{$pmaxw}、縦 100～{$pmaxh}の範囲内です。
+<LI>画像は横 {$maxw}ピクセル、縦 {$maxh}ピクセルを超えると縮小表示されます。sage機能付き。
+{$addinfo}</small></td></tr></table>
+)-->
+<!--{/def}-->
+<!--(
+// pmaxw…お絵かき最大サイズ(横)
+// pmaxh…お絵かき最大サイズ(縦)
+// maxw…投稿サイズ(横)
+// maxh…投稿サイズ(縦)
+// addinfo…追加お知らせ
+)-->
+<hr width="90%" size=1>
+<table border=0 width=30% cellpadding=5 cellspacing=0>
+ <tr>
+  <td><table width=100% border=1 cellpadding=5 cellspacing=0>
+<!--(========== カタログ縦(y)配列 ==========)-->
+<!--{each y}-->
+    <tr>
+<!--(========== カタログ1行に対する横(x)配列 ==========)-->
+<!--{each y/x}-->
+<!--(========== 記事があれば表示 ==========)-->
+<!--{def y/x/no}-->
+    <td align=center nowrap>
+<!--(========== 画像があれば・・・ ==========)-->
+<!--{def y/x/imgsrc}-->
+     <a href="{$self}?res={$y/x/no}" title="{$y/x/sub} (by {$y/x/name}{$y/x/trip})"><img width={$y/x/w} src="{$y/x/imgsrc}" alt="{$y/x/sub} (by {$y/x/name}{$y/x/trip})" border=0></a><BR>
+<!--{/def}-->
+<!--(========== 文字のみならば・・・ ==========)-->
+<!--{def y/x/txt}-->
+     <a href="{$self}?res={$y/x/no}" title="{$y/x/sub} (by {$y/x/name}{$y/x/trip})">{$y/x/sub} (<B>by</B> {$y/x/name}{$y/x/trip})</a><p>
+<!--{/def}-->
+     <small>[{$y/x/no}] {$y/x/now}<!--{def y/x/updatemark}--><font color=#666666>{$y/x/updatemark}</font><!--{/def}--><!--{def y/x/id}--><B> ID:{$y/x/id}</B><!--{/def}--></small>
+<!--{def y/x/pch}-->
+     <BR><A href="{$self}?mode=openpch&pch={$y/x/pch}" target=_blank><small>※動画あり</small></A>
+<!--{/def}-->
+    </td>
+<!--{/def}-->
+<!--(========== 記事が無い場合 ==========)-->
+<!--{def y/x/noimg}-->
+    <td><BR></td>
+<!--{/def}-->
+<!--{/each}-->
+   </tr>
+<!--{/each}-->
+  </table></td>
+ </tr>
+</table><p>
+</center>
+<!--(
+// y…カタログ縦(y)配列
+// y/x…カタログ1行に対する横(x)配列
+// y/x/no…No
+// y/x/imgsrc…サムネイル画像URL
+// y/x/sub…題名
+// y/x/name…名前
+// y/x/trip…トリップ
+// y/x/w…画像幅(横)
+// y/x/txt…文字のみの場合 true が入る
+// y/x/now…投稿日
+// y/x/updatemark…編集マーク
+// y/x/id…ID
+// y/x/pch…動画ファイル用引数(フラグ兼用)
+// y/x/noimg…記事が無い場合 true が入る
+)-->
+<!--(========== メンテナンスフォーム欄 ==========)-->
+<table align=right>
+ <tr>
+  <form action="{$self}" method=POST>
+  <td nowrap align=center>【記事メンテ】[<input type=checkbox name=onlyimgdel value=on>画像だけ消す]<br>
+   記事No.<input type=text name=del[] size=4> 削除キー<input type=password name=pwd size=8 value="">
+   <select name="mode">
+    <option value="edit">編集
+<!--{def userdel}-->
+    <option value="usrdel">削除
+<!--{/def}-->
+<!--(
+// userdel…ユーザー削除権限(0は削除不可)
+)-->
+   </select>
+   <input type=submit value="OK"></form></td>
+ </tr>
+</table>
+<table align=left border=1>
+ <tr>
+<!--(========== 前ページURLが無い場合、最初のページ ==========)-->
+<!--{ndef prev}-->
+  <td>最初のページ</td>
+<!--{/ndef}-->
+<!--{def prev}-->
+  <td><A href="{$prev}">前のページ</A></td>
+<!--{/def}-->
+  <td>{$paging}</td>
+<!--{def next}-->
+  <td><A href="{$next}">次のページ</A></td>
+<!--{/def}-->
+<!--(========== 次ページURLが無い場合、最後のページ ==========)-->
+<!--{ndef next}-->
+  <td>最後のページ</td>
+<!--{/ndef}-->
+<!--(
+// prev…前ページURL
+// paging…ページングデータ
+// next…次ページURL
+)-->
+ </tr>
+</table>
+<br clear=all>
+<!--(========== JavaScriptの実行(クッキーを読込み、フォームに値をセット) ==========)-->
+<script language="JavaScript"><!--
+l(); //LoadCookie
+//--></script>
+<!--著作権表示 削除しないでください-->
+<center>
+<!-- GazouBBS v3.0 --><!-- ふたば改0.8 --><!-- POTI-board -->
+<small><a href="http://www.punyu.net/" target=_top title="POTI-board {$verlot} (by ぷにゅねっと)"><B>POTI-board {$ver}</B></a>
+Web Style by <a href="http://www.punyu.net/" target=_top title="MONO WHITE {$tver} (by ぷにゅねっと)"><B>MONO WHITE</B></a><BR>
+OriginalScript - <a href="http://www.2chan.net/" target=_top title="futaba.php v0.8 lot.031015 (by ふたば)">futaba.php</a>
+(<a href="http://php.s3.to" target=_top title="gazou.php v3.0 (by レッツPHP!)">gazou.php</a> custom)<BR>
+<!--{def paint}-->
+OekakiApplet - <!--{def usepbbs}--><a href="http://shichan.jp/" target=_top title="by しぃ堂">PaintBBS</a>　<!--{/def}--><!--{def applet}--><a href="http://shichan.jp/" target=_top title="by しぃ堂">しぃペインター</a><!--{/def}--><BR>
+<!--{/def}-->
+UseFunction - <a href="http://hoover.ktplan.ne.jp/kaihatsu/php/" target=_top title="HTMLテンプレート v1.3.2 (by PHP開発日誌)">HTMLテンプレート</a> 
+，<a href="http://wondercatstudio.com/" target=_top title="by WonderCatStudio">動的パレットスクリプト</a>
+</small>
+</center>
+</body></html>

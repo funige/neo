@@ -1,0 +1,467 @@
+<!--(********** その他テンプレート **********
+// このテンプレートは、以下のモード用テンプレートです
+// ・投稿モード
+// ・管理モード(認証)モード
+// ・管理モード(削除)モード
+// ・エラーモード
+// ・独自タグ説明モード
+)-->
+<html><head><title>{$title}</title>
+<!--(
+// title…掲示板タイトル
+// charset…文字コード
+)-->
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset={$charset}">
+<META HTTP-EQUIV="pragma" CONTENT="no-cache">
+<META name="ROBOTS" content="NOINDEX,NOFOLLOW">
+<STYLE TYPE="text/css">
+<!--
+body,tr,td,th { font-size:11pt }
+a:hover { color:#FFFFFF;background-color:#444444;TEXT-DECORATION:NONE }
+a:link  { color:#666666;background-color:#DDDDDD }
+a:vlink { color:#666666;background-color:#FFFFFF }
+span { font-size:18pt }
+big { font-size:14pt }
+small { font-size:9pt }
+-->
+</STYLE>
+</head>
+<body bgcolor=#FFFFFF text=#000000 link=#888888 vlink=#606060 alink=#000000>
+<center>
+<p><font size=5><b><SPAN>{$title}</SPAN></b></font></p>
+<!--(========== 投稿モード ==========
+// 【新規投稿、お絵かき投稿、編集】
+//
+// post_mode…投稿モードのとき true が入る
+// regist…新規投稿のとき true が入る
+// admin…管理モードのとき 管理者パスワード が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+// pictmp…お絵かき投稿モードフラグ。通常投稿:0、お絵かき絵なし:1、お絵かき絵あり:2
+// notmp…お絵かき投稿時に絵がなかったとき true が入る
+// tmp…一時保存絵用配列
+// tmp/src…一時保存絵URL
+// tmp/srcname…一時保存絵ファイル名
+// tmp/date…一時保存絵保存日
+// ptime…描画時間
+// rewrite…編集のとき 記事No が入る
+// pwd…編集のとき 記事Pass が入る
+// resno…お絵かきレス時 レス記事No が入る
+// maxbyte…最大投稿サイズ(Byte)
+// maxkb…最大投稿サイズ(KB)
+// ipcheck…IPチェック機能がONのとき true が入る
+// usename…名前が必須だと ' *' が入る
+// usesub…題名が必須だと ' *' が入る
+// usecom…本文が必須だと ' *' が入る
+// name…編集用の投稿者名
+// email…編集用のメールアドレス
+// url…編集用のURL
+// sub…編集用の題名
+// com…編集用の本文
+// fctable…文字色配列
+// fctable/color…色コードまたは色名
+// fctable/chk…編集時、指定文字色なら true が入る
+// upfile…添付ファイル入力フォームを表示させたいとき true が入る
+// potitag…独自タグ機能を使用するとき true が入る
+)-->
+<!--{def post_mode}-->
+<!--(========== クッキー読込みは新規投稿のみ ==========)-->
+<!--{def regist}-->
+<Script language="JavaScript" src="loadcookie.js"></script>
+<!--{/def}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>投稿フォーム<!--{def admin}-->［管理モード］<!--{/def}--></font></th></tr></table>
+<hr width="90%" size=1>
+[<a href="{$self2}">掲示板に戻る</a>] 
+[<a href="{$home}" target="_top">ホーム</a>] 
+[<a href="{$self}?mode=admin">管理用</a>] 
+<hr width="90%" size=1>
+<!--{def admin}-->
+<p><h4>タグがつかえます</h4></p>
+<!--{/def}-->
+<!--(========== 投稿待ちのお絵かき画像表示 ==========)-->
+<!--{def pictmp}-->
+<table border>
+ <tr>
+<!--{def notmp}-->
+  <td><big>画像が見当たりません</big></td>
+<!--{/def}-->
+<!--{def tmp}-->
+<!--{each tmp}-->
+  <td><img src="{$tmp/src}" border=0 alt="{$tmp/srcname}"><BR>
+   {$tmp/srcname}<BR>
+   <small>[{$tmp/date}]</small></td>
+<!--{/each}-->
+<!--{/def}-->
+ </tr>
+</table>
+<!--{/def}-->
+<!--{def ptime}-->
+描画時間： {$ptime}
+<!--{/def}-->
+<form action="{$self}" method="POST" enctype="multipart/form-data">
+<!--(========== モード指定:新規投稿 ==========)-->
+<!--{def regist}-->
+<input type=hidden name=mode value="regist">
+<!--{/def}-->
+<!--(========== モード指定:編集 ==========)-->
+<!--{def rewrite}-->
+<input type=hidden name=mode value="rewrite">
+<input type=hidden name=no value="{$rewrite}">
+<input type=hidden name=pwd value="{$pwd}">
+<!--{/def}-->
+<!--{def admin}-->
+<input type=hidden name=admin value="{$admin}">
+<!--{/def}-->
+<!--{def pictmp}-->
+<input type=hidden name=pictmp value={$pictmp}>
+<!--{/def}-->
+<!--{def ptime}-->
+<input type=hidden name=ptime value="{$ptime}">
+<!--{/def}-->
+<!--(========== レスお絵かき対応 ==========)-->
+<!--{def resno}-->
+<input type=hidden name=resto value="{$resno}">
+<!--{/def}-->
+<input type=hidden name="MAX_FILE_SIZE" value="{$maxbyte}">
+<!--{def ipcheck}-->
+<small>- IPアドレスチェック中 -</small>
+<!--{/def}-->
+<table cellpadding=1 cellspacing=1>
+ <tr>
+  <td><b>おなまえ</b><!--{def usename}-->(必須)<!--{/def}--></td>
+<!--(========== 編集時、valueに名前をセット ==========)-->
+  <td><input type=text name=name size="28"<!--{def name}--> value="{$name}"<!--{/def}-->></td>
+ </tr>
+ <tr>
+  <td><b>E-mail</b></td>
+<!--(========== 編集時、valueにメールアドレスをセット ==========)-->
+  <td><input type=text name=email size="28"<!--{def email}--> value="{$email}"<!--{/def}-->></td>
+ </tr>
+ <tr>
+  <td><b>U R L</b></td>
+<!--(========== 編集時、valueにURLをセット ==========)-->
+  <td><input type=text name=url size="28"<!--{def url}--> value="{$url}"<!--{/def}-->></td>
+ </tr>
+ <tr>
+  <td><b>題　　名</b><!--{def usesub}-->(必須)<!--{/def}--></td>
+<!--(========== 編集時、valueに題名をセット ==========)-->
+  <td><input type=text name=sub size="35"<!--{def sub}--> value="{$sub}"<!--{/def}-->>
+   <input type=submit value="送信する"></td>
+ </tr>
+ <tr>
+  <td><b>コメント</b><!--{def usecom}-->(必須)<!--{/def}--></td>
+<!--(========== 編集時、textarea内に本文をセット ==========)-->
+  <td><textarea name=com cols="48" rows="4" wrap=soft><!--{def com}-->{$com}<!--{/def}--></textarea></td>
+ </tr>
+<!--(========== 文字色指定(■に色付けてチェックボタンで選択する方法) ==========)-->
+<!--{def fctable}-->
+ <tr>
+  <td><b>文字色</b></td>
+<!--(========== 編集時、指定文字色に checked をつける ==========)-->
+  <td><!--{each fctable}--><input type=radio name=fcolor value="{$fctable/color}"<!--{def fctable/chk}--> checked<!--{/def}-->><font color={$fctable/color}>■</font> <!--{/each}--></td>
+ </tr>
+<!--{/def}-->
+<!--(========== ファイルアップロード欄 ==========)-->
+<!--{def upfile}-->
+ <tr>
+  <td><b>添付File</b></td>
+  <td><input type=file name=upfile size="35">[<label><input type=checkbox name=textonly value=on>画像なし</label>]</td>
+ </tr>
+<!--{/def}-->
+<!--(========== お絵かき画像選択欄 ==========)-->
+<!--{def tmp}-->
+ <tr>
+  <td><BR></td>
+  <td><select name=picfile>
+<!--{each tmp}--><option value="{$tmp/srcname}">{$tmp/srcname}</option><!--{/each}-->
+  </select></td>
+ </tr>
+<!--{/def}-->
+<!--(========== 新規投稿時は削除キー入力 ==========)-->
+<!--{def regist}-->
+ <tr>
+  <td><b>削除キー</b></td>
+  <td><input type=password name=pwd size=8 value=""><small>(記事の編集削除用。英数字で)</small></td>
+ </tr>
+<!--{/def}-->
+ <tr>
+  <td colspan=2><small>
+<!--(========== 新規投稿説明 ==========)-->
+<!--{def regist}-->
+<LI>添付可能ファイル：GIF, JPG, PNG ブラウザによっては正常に添付できないことがあります。
+<LI>画像は横 {$maxw}ピクセル、縦 {$maxh}ピクセルを超えると縮小表示されます。
+<LI>最大投稿データ量は {$maxkb} KB までです。sage機能付き。
+<!--{/def}-->
+<!--(========== 編集説明 ==========)-->
+<!--{def rewrite}-->
+<LI>E-mail以外の項目は 未入力(空白)にすると内容はそのままです。
+<LI>編集では クッキーは保存されません。さらにsageを入れても位置は変わりません。
+<LI>トリップは 再生成されるので、名前を変更しない場合は 未入力(空白)にしてください。
+<LI>最大投稿データ量は {$maxkb} KB までです。
+<!--{/def}-->
+<!--(========== 以下共通 ==========)-->
+<!--{def potitag}-->
+<LI>独自タグが使用できます … <a href="{$self}?mode=tag" target="_blank">独自タグ説明</a>
+<!--{/def}-->
+{$addinfo}</small></td>
+ </tr>
+</table>
+</form>
+<!--(========== 新規投稿のみクッキーを読込み ==========)-->
+<!--{def regist}-->
+<script language="JavaScript"><!--
+l(); //LoadCookie
+//--></script>
+<!--{/def}-->
+<!--{/def}-->
+<!--(========== 投稿モード ここまで ==========)-->
+<!--(========== 管理モード(認証) ==========
+//
+// admin_in…管理モード(認証)のとき true が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+)-->
+<!--{def admin_in}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>管理モード</font></th></tr></table>
+<hr width="90%" size=1>
+[<a href="{$self2}">掲示板に戻る</a>] 
+[<a href="{$home}" target="_top">ホーム</a>] 
+<hr width="90%" size=1>
+<p><form action="{$self}" method=POST>
+<input type=radio name=admin value=update checked>ログ更新 
+<input type=radio name=admin value=del>記事削除 
+<input type=radio name=admin value=post>管理人投稿<p>
+<input type=hidden name=mode value=admin>
+<input type=password name=pass size=8>
+<input type=submit value=" 認証 "></form>
+<!--{/def}-->
+<!--(========== 管理モード(認証) ここまで ==========)-->
+<!--(========== 管理モード(削除) ==========
+//
+// admin_del…管理モード(削除)のとき true が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+// pass…認証パスワード
+// del…削除テーブルグループ
+// del/bg…削除テーブルの背景色
+// del/no…記事No
+// del/now…書込み日付
+// del/sub…題名(半角10文字まで)
+// del/name…名前(半角10文字まで)
+// del/com…本文(半角20文字まで)
+// del/host…ホストアドレス
+// del/clip…画像へのリンクデータ
+// del/size…画像サイズ(Byte)
+// del/chk…画像MD5
+// all…画像データ合計サイズ(KB)
+)-->
+<!--{def admin_del}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>管理モード</font></th></tr></table>
+<hr width="90%" size=1>
+[<a href="{$self2}">掲示板に戻る</a>] 
+[<a href="{$home}" target="_top">ホーム</a>] 
+<hr width="90%" size=1>
+<p>
+<form action="{$self}" method=POST>
+<input type=hidden name=mode value=admin>
+<input type=hidden name=admin value=del>
+<input type=hidden name=pass value="{$pass}">
+[<a href="{$self}?mode=admin&admin=update&pass={$pass}">ログ更新</a>]<P>
+削除したい記事のチェックボックスにチェックを入れ、削除ボタンを押して下さい。<BR>
+<font color=#555555><B>（記事Noをクリックすると編集できます）</B></font><P>
+<input type=submit value="削除する"><input type=reset value="リセット">
+[<input type=checkbox name=onlyimgdel value=on checked>画像だけ消す]<P>
+<table border=1 cellspacing=0>
+ <tr bgcolor=#707070>
+  <th>削除</th>
+  <th>記事No</th>
+  <th>投稿日</th>
+  <th>題名</th>
+  <th>投稿者</th>
+  <th>コメント</th>
+  <th>ホスト名</th>
+  <th>添付(Bytes)</th>
+  <th>md5</th>
+ </tr>
+<!--{def del}--><!--{each del}-->
+ <tr bgcolor={$del/bg}>
+  <th><input type=checkbox name=del[] value="{$del/no}"></th>
+  <th><a href="{$self}?mode=edit&del[]={$del/no}&pwd={$pass}">{$del/no}</a></th>
+  <td><small>{$del/now}</small></td>
+  <td>{$del/sub}</td>
+  <td><b>{$del/name}</b></td>
+  <td><small>{$del/com}</small></td>
+  <td>{$del/host}</td>
+  <td align=center>{$del/clip}({$del/size})</td>
+  <td>{$del/chk}</td>
+ </tr>
+<!--{/each}--><!--{/def}-->
+</table><p>
+<input type=submit value="削除する"><input type=reset value="リセット"></form>
+【 画像データ合計 : <b>{$all}</b> KB 】<p>
+<!--{/def}-->
+<!--(========== 管理モード(削除) ここまで ==========)-->
+<!--(========== エラー画面 ==========
+//
+// err_mode…エラー画面のとき true が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+// mes…エラーメッセージ
+)-->
+<!--{def err_mode}-->
+<br>
+<br>
+<hr size=1>
+<br>
+<br><font color=red size=5><b>{$mes}
+<br>
+<br><a href="{$self2}">リロード</a></b></font>
+<br>
+<br>
+<hr size=1>
+<br>
+<br>
+<!--{/def}-->
+<!--(========== エラー画面 ここまで ==========)-->
+<!--(========== 独自タグ説明画面 ==========
+// 【テンプレート変数作るの面倒だから直接PHPを組込み】
+//
+// potitag_mode…独自タグ説明画面のとき true が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+)-->
+<!--{def potitag_mode}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>独自タグ説明</font></th></tr></table>
+<?php
+global $tags1,$tags2,$ryfont1,$ryfont2;
+//例題文字列
+$msg = array("うぐぅ"
+,"ｷﾀ━━━━━━(ﾟ∀ﾟ)━━━━━━ !!!!!"
+,"了承"
+,"あははー"
+,"あぅ～"
+,"わは━━━━━━ヽ(´▽｀)ノ━━━━━━ !!!!!"
+,"へぇ～"
+,"(･`ω´･)ﾉ ﾘｶｳﾞｨﾈ!!"
+,"(σ・∀・)σｹﾞｯﾁｭ!"
+,"｡･ﾟ･(ﾉД`)･ﾟ･｡"
+,"＿|￣|○"
+,"(･∀･)ｽﾝｽﾝｽｰﾝ♪( ﾟДﾟ)ﾊｯ！"
+,"（　´_ゝ`）ふーん"
+,"もう寝なさい"
+,"蟹喰え。蟹"
+);
+srand((double)microtime()*1000000);
+//独自タグ例題作成
+for($i=0; $i < count($tags1);$i++){
+  $tagtb = $tagtb."<tr><td nowrap>".$tags1[$i]."：<".$tags2[$i].">".$msg[array_rand($msg)]."</".$tags2[$i]."></td></tr>\n";
+}
+//略称フォント名連結
+for($i=0; $i < count($ryfont1);$i++){
+  $fonts = $fonts.$ryfont1[$i]."（".$ryfont2[$i]."） ";
+}
+?>
+<br>
+<table width=95%><tr><td>
+投稿コメントに独自タグが使用できます<br>
+<br>
+・使える独自タグ一覧
+<table width="100%">
+<?php echo $tagtb; //独自タグ例題表示 ?>
+<tr><td>F：font（s:size,c:color,f:face と併用します。<font color=red>s,c,fは小文字です</font>）</td></tr>
+<tr><td>RB：文にルビが振れます</td></tr>
+</table><br>
+・Fの書式は<br>
+<b>Fs(サイズ1～7)c(色名か色コード)f(ポップ体などのフォント名)</b><br>
+フォント名は正式名の他、<?php echo $fonts; //略称フォント名表示 ?>の短縮名で指定することもできます<br>
+<a href="#font">webdings,wingdingsフォント一覧（Win系フォントです）</a><br>
+<br>
+・使用方法(書式)は独自タグをM1,M2,M3,M4,…とすると<br>
+<b>[M1,M2,M3,M4,…:コメント]</b><br>
+<br>
+・RBの書式は<br>
+<b>[RB,M1,M2,…:コメント(色指定:ふりがな)]</b> (色指定をしない場合は <b>(ふりがな)</b> でOK)<br>
+<br><br>
+<b>・使用例１</b><br>
+[Fs(4)c(blue)f(HGP創英角ﾎﾟｯﾌﾟ体),B,I,U:オンドゥルルラギッタンディスカー！]<br>
+<br>
+　↓<br>
+<br>
+<font size=4 color=blue face=HGP創英角ﾎﾟｯﾌﾟ体><b><i><u>オンドゥルルラギッタンディスカー！</u></i></b></font><br>
+<br><br>
+<b>・使用例２</b><br>
+[Fs(4)c(blue)f(HGP創英角ﾎﾟｯﾌﾟ体),B,I,U:Ｍｅ]は[Fs(6)c(#e2de83),B,S:OS]の中で[Fs(4)c(blue),RB:世界一(red:フリーズ)]<br>
+<br>
+　↓<br>
+<br>
+<font size=4 color=blue face=HGP創英角ﾎﾟｯﾌﾟ体><b><i><u>Ｍｅ</u></i></b></font>は<font size=6 color=#e2de83><b><s>OS</s></b></font>の中で<font size=4 color=blue><ruby>世界一<rt style="color:red">フリーズ</rt></ruby></font>
+</td></tr></table>
+<br><a href="javascript:close()">閉じる</a><br>
+<br><br><br><br><br><br>
+<a name="font">
+<br><font size=6><b>特殊フォント</b></font><br><br>
+</center>
+<?php
+//特殊フォントテーブル値
+$wrs1 = range(0,9);
+$wrs2 = range('a','z');
+$wrs3 = range('A','Z');
+$wrs4 = array('!','"','#','$','%','&','\'','(',')','-','=','^','~','\\','|','@','`','[','{',';','+',':','*',']','}',',','<','.','>','/','?','_');
+//特殊フォント指定
+$fonts = array("webdings","wingdings");
+
+//特殊フォントテーブル作成
+foreach($fonts as $font){
+  echo "<font size=4><b>".$font."フォント一覧</b></font>";
+  foreach(range(1,4) as $i){
+    switch($i){
+      case 1:
+        $wrs = $wrs1;
+        break;
+      case 2:
+        $wrs = $wrs2;
+        break;
+      case 3:
+        $wrs = $wrs3;
+        break;
+      case 4:
+        $wrs = $wrs4;
+    }
+    $wrss = "<table border=1 bgcolor=\"white\"><tr align=center>";
+    foreach($wrs as $word){
+      $wrss .= "<td><font size=+2 face=\"$font\">$word</font></td>";
+    }
+    $wrss .= "</tr><tr align=center>";
+    foreach($wrs as $word){
+      $wrss .= "<td>$word</td>";
+    }
+    $wrss .= "</tr></table>";
+    echo $wrss."<br><br>";
+  }
+  echo "<br><br>";
+}
+?>
+<center>
+<a href="javascript:close()">閉じる</a><br><br>
+<!--{/def}-->
+<!--(========== 独自タグ説明画面 ここまで ==========)-->
+<!--著作権表示 削除しないでください-->
+<hr width="90%" size=1>
+<!-- GazouBBS v3.0 --><!-- ふたば改0.8 --><!-- POTI-board -->
+<small><a href="http://www.punyu.net/" target=_top title="POTI-board {$verlot} (by ぷにゅねっと)"><B>POTI-board {$ver}</B></a>
+Web Style by <a href="http://www.punyu.net/" target=_top title="MONO WHITE {$tver} (by ぷにゅねっと)"><B>MONO WHITE</B></a><BR>
+OriginalScript - <a href="http://www.2chan.net/" target=_top title="futaba.php v0.8 lot.031015 (by ふたば)">futaba.php</a>
+(<a href="http://php.s3.to" target=_top title="gazou.php v3.0 (by レッツPHP!)">gazou.php</a> custom)<BR>
+<!--{def paint}-->
+OekakiApplet - <!--{def usepbbs}--><a href="http://shichan.jp/" target=_top title="by しぃ堂">PaintBBS</a>　<!--{/def}--><!--{def applet}--><a href="http://shichan.jp/" target=_top title="by しぃ堂">しぃペインター</a><!--{/def}--><BR>
+<!--{/def}-->
+UseFunction - <a href="http://hoover.ktplan.ne.jp/kaihatsu/php/" target=_top title="HTMLテンプレート v1.3.2 (by PHP開発日誌)">HTMLテンプレート</a> 
+，<a href="http://wondercatstudio.com/" target=_top title="by WonderCatStudio">動的パレットスクリプト</a>
+</small>
+</center>
+</body></html>

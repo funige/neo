@@ -417,6 +417,67 @@ Neo.EraserTool.prototype = new Neo.DrawToolBase();
 Neo.EraserTool.prototype.type = Neo.Painter.TOOLTYPE_ERASER;
 Neo.EraserTool.prototype.lineType = Neo.Painter.LINETYPE_ERASER;
 
+
+/*
+-------------------------------------------------------------------------
+	Blur（ぼかし）
+-------------------------------------------------------------------------
+*/
+
+Neo.BlurTool = function() {};
+Neo.BlurTool.prototype = new Neo.DrawToolBase();
+Neo.BlurTool.prototype.type = Neo.Painter.TOOLTYPE_BLUR;
+Neo.BlurTool.prototype.lineType = Neo.Painter.LINETYPE_BLUR;
+
+Neo.BlurTool.prototype.loadStates = function() {
+    var reserve = this.getReserve();
+    if (reserve) {
+        Neo.painter.lineWidth = reserve.size;
+        Neo.painter.alpha = 128 / 255.0;
+        Neo.updateUI();
+    }
+};
+
+/*
+-------------------------------------------------------------------------
+	Dodge（覆い焼き）
+-------------------------------------------------------------------------
+*/
+
+Neo.DodgeTool = function() {};
+Neo.DodgeTool.prototype = new Neo.DrawToolBase();
+Neo.DodgeTool.prototype.type = Neo.Painter.TOOLTYPE_DODGE;
+Neo.DodgeTool.prototype.lineType = Neo.Painter.LINETYPE_DODGE;
+
+Neo.DodgeTool.prototype.loadStates = function() {
+    var reserve = this.getReserve();
+    if (reserve) {
+        Neo.painter.lineWidth = reserve.size;
+        Neo.painter.alpha = 128 / 255.0;
+        Neo.updateUI();
+    }
+};
+
+/*
+-------------------------------------------------------------------------
+	Burn（焼き込み）
+-------------------------------------------------------------------------
+*/
+
+Neo.BurnTool = function() {};
+Neo.BurnTool.prototype = new Neo.DrawToolBase();
+Neo.BurnTool.prototype.type = Neo.Painter.TOOLTYPE_BURN;
+Neo.BurnTool.prototype.lineType = Neo.Painter.LINETYPE_BURN;
+
+Neo.BurnTool.prototype.loadStates = function() {
+    var reserve = this.getReserve();
+    if (reserve) {
+        Neo.painter.lineWidth = reserve.size;
+        Neo.painter.alpha = 128 / 255.0;
+        Neo.updateUI();
+    }
+};
+
 /*
 -------------------------------------------------------------------------
 	Hand（スクロール）
@@ -704,7 +765,7 @@ Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
 
 /*
 -------------------------------------------------------------------------
-	BlurRect（角取り）
+	DodgeRect（角取り）
 -------------------------------------------------------------------------
 */
 
@@ -724,7 +785,6 @@ Neo.BlurRectTool.prototype.loadStates = function() {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 0.5;
         Neo.updateUI();
-        console.log("blurrect...");
     };
 }
 
@@ -915,6 +975,86 @@ Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
     oe.doFill(ctx, x, y, width, height, oe.ellipseFillMask);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
+
+/*
+-------------------------------------------------------------------------
+	Text（テキスト）
+-------------------------------------------------------------------------
+*/
+
+Neo.TextTool = function() {};
+Neo.TextTool.prototype = new Neo.ToolBase();
+Neo.TextTool.prototype.type = Neo.Painter.TOOLTYPE_TEXT;
+Neo.TextTool.prototype.isUpMove = false;
+
+Neo.TextTool.prototype.downHandler = function(oe) {
+//  this.startX = oe.rawMouseX;
+//  this.startY = oe.rawMouseY;
+    this.startX = oe.mouseX;
+    this.startY = oe.mouseY;
+
+    if (Neo.painter.inputText) {
+        Neo.painter.updateInputText();
+
+        var rect = oe.container.getBoundingClientRect();
+        var text = Neo.painter.inputText;
+        var x = oe.rawMouseX - rect.left - 5;
+        var y = oe.rawMouseY - rect.top - 5;
+
+        text.style.left = x + "px";
+        text.style.top = y + "px";
+        text.style.display = "block";
+        text.focus();
+    }
+};
+
+Neo.TextTool.prototype.upHandler = function(oe) {
+};
+
+Neo.TextTool.prototype.moveHandler = function(oe) {};
+Neo.TextTool.prototype.upMoveHandler = function(oe) {};
+Neo.TextTool.prototype.rollOverHandler= function(oe) {};
+Neo.TextTool.prototype.rollOutHandler= function(oe) {};
+
+Neo.TextTool.prototype.keyDownHandler = function(e) {
+    if (e.keyCode == 13) { // Returnで確定
+        e.preventDefault();
+
+        var oe = Neo.painter;
+        var text = oe.inputText;
+        if (text) {
+            oe._pushUndo();
+            this.drawText(oe);
+		    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+
+            text.style.display = "none";
+        }
+    }
+};
+
+Neo.TextTool.prototype.kill = function(oe) {
+    Neo.painter.hideInputText();
+};
+
+Neo.TextTool.prototype.drawText = function(oe) {
+    var text = oe.inputText;
+    var x = this.startX;
+    var y = this.startY;
+
+    if (text && text.innerHTML.length > 0) {
+        var ctx = oe.canvasCtx[Neo.painter.current];
+        ctx.save();
+	    ctx.translate(x, y);
+	    ctx.scale(1/oe.zoom, 1/oe.zoom);
+
+        ctx.font = text.style.fontSize + " Arial";
+        ctx.globalAlpha = oe.alpha;
+        ctx.fillStyle = oe.foregroundColor;
+        ctx.fillText(text.innerHTML, 0, 0);
+        ctx.restore();
+    }
+};
+
 
 /*
 -------------------------------------------------------------------------

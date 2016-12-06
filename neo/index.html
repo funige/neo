@@ -47,8 +47,9 @@
 //      if (!url.match("http://")) url = "file://" + __dirname + "/" + url;
 //      console.log(url);
 
+//      webview.loadURL("http://" + url, { userAgent: "PaintBBS/NEO" });
         webview.loadURL("http://" + url);
-    };
+  };
 
     var back = function() {
         if (webview.canGoBack()) webview.goBack();
@@ -94,7 +95,7 @@
         document.getElementById("edit").className = "buttonDisabled";
 
         setTimeout(function() {
-           webview.executeJavaScript("document.neo.start();");
+           webview.executeJavaScript("document.neo.start(true);");
         }, 500);
    });
 

@@ -2,11 +2,16 @@
 
 document.addEventListener("DOMContentLoaded", function() {
     Neo.init();
+
+    if (!navigator.userAgent.match("Electron")) {
+        Neo.start();
+    }
 });
+
 
 var Neo = function() {};
 
-Neo.version = "0.6.1";
+Neo.version = "0.7.0";
 
 Neo.painter;
 Neo.fullScreen = false;
@@ -14,8 +19,23 @@ Neo.fullScreen = false;
 Neo.config = {
     width: 300,
     height: 300,
-   
+
     color_bk: "#ccccff",
+    color_bk2: "#bbbbff",
+    color_bar: "#6f6fae",
+
+    color_tool_icon: "#e8dfae",
+
+    color_icon: "#ccccff",
+    color_iconselect: "#ffaaaa",
+    color_text: "#666699",
+    color_bar: "#6f6fae",
+
+    tool_color_button: "#e8dfae",
+    tool_color_button2: "#f8daaa",
+    tool_color_text: "#773333",
+    tool_color_bar: "#ddddff",
+    tool_color_frame: "#000000",
 
     colors: [ 
         "#000000", "#FFFFFF",
@@ -41,10 +61,14 @@ document.neo = Neo;
 
 Neo.init = function() {
     var applets = document.getElementsByTagName('applet');
+    if (applets.length == 0) {
+        applets = document.getElementsByTagName('applet-dummy');
+    }
+
     for (var i = 0; i < applets.length; i++) {
         var applet = applets[i];
-        var code = applet.attributes.code.value;
-        if (code == "pbbs.PaintBBS.class") {
+        var name = applet.attributes.name.value;
+        if (name == "paintbbs") {
             Neo.applet = applet;
             Neo.createContainer(applet);
             Neo.initConfig(applet);
@@ -64,12 +88,17 @@ Neo.init2 = function() {
 
     Neo.painter = new Neo.Painter();
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-    Neo.canvas.oncontextmenu = function() {return false;};
-//  Neo.painter.onUpdateCanvas = null;
+//  Neo.canvas.oncontextmenu = function() {return false;};
+    Neo.container.oncontextmenu = function() {return false;};
 
-    Neo.initSkin();
-    Neo.initComponents();
-    Neo.initButtons();
+//  Neo.painter.onUpdateCanvas = null;
+    if (Neo.config.image_canvas) {
+        Neo.painter.loadCanvas(Neo.config.image_canvas);
+    }
+
+//  Neo.initSkin();
+//  Neo.initComponents();
+//  Neo.initButtons();
 
 //  // insertCSSが終わってから
 //  Neo.resizeCanvas();
@@ -95,9 +124,7 @@ Neo.initConfig = function(applet) {
 
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
-
-        applet.outerHTML = "";
-        document[name] = Neo;
+        if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
     }
 
     Neo.config.reserves = [
@@ -114,10 +141,85 @@ Neo.initSkin = function() {
     var sheet = document.styleSheets[0];
     if (!sheet) return;
 
-    if (Neo.config.color_bk) {
-        sheet.addRule(".NEO #container", "background-color: " + Neo.config.color_bk);
-    }
     Neo.styleSheet = sheet;
+
+    var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
+    var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
+    var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
+    var darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
+    var bgImage = Neo.backgroundImage();
+
+    Neo.addRule(".NEO #container", "background-image", "url(" + bgImage + ")");
+    Neo.addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .sizeSlider .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .layerControl .label1", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .layerControl .label0", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .toolTipOn .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .toolTipOff .label", "color", Neo.config.tool_color_text);
+
+    Neo.addRule(".NEO #toolSet", "background-color", Neo.config.color_bk);
+    Neo.addRule(".NEO #tools", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .layerControl .bg", "border-bottom", "1px solid " + Neo.config.tool_color_text);
+
+
+    Neo.addRule(".NEO .buttonOn", "color", Neo.config.color_text);
+    Neo.addRule(".NEO .buttonOff", "color", Neo.config.color_text);
+
+    Neo.addRule(".NEO .buttonOff", "background-color", Neo.config.color_icon);
+    Neo.addRule(".NEO .buttonOff", "border-top", "1px solid ",  Neo.config.color_icon);
+    Neo.addRule(".NEO .buttonOff", "border-left", "1px solid ", Neo.config.color_icon);
+    Neo.addRule(".NEO .buttonOff", "box-shadow", "0 0 0 1px " + Neo.config.color_icon + ", 0 0 0 2px " + Neo.config.color_frame);
+
+    Neo.addRule(".NEO .buttonOff:hover", "background-color", Neo.config.color_icon);
+    Neo.addRule(".NEO .buttonOff:hover", "border-top", "1px solid " + lightBorder);
+    Neo.addRule(".NEO .buttonOff:hover", "border-left", "1px solid " + lightBorder);
+    Neo.addRule(".NEO .buttonOff:hover", "box-shadow", "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame);
+
+    Neo.addRule(".NEO .buttonOff:active, .NEO .buttonOn", "background-color", darkBorder);
+    Neo.addRule(".NEO .buttonOff:active, .NEO .buttonOn", "border-top", "1px solid " + darkBorder);
+    Neo.addRule(".NEO .buttonOff:active, .NEO .buttonOn", "border-left", "1px solid " + darkBorder);
+    Neo.addRule(".NEO .buttonOff:active, .NEO .buttonOn", "box-shadow", "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame);
+
+    Neo.addRule(".NEO #canvas", "border", "1px solid " + Neo.config.color_frame);
+    Neo.addRule(".NEO #scrollH, .NEO #scrollV", "background-color", Neo.config.color_icon);
+    Neo.addRule(".NEO #scrollH, .NEO #scrollV", "box-shadow", "0 0 0 1px white" + ", 0 0 0 2px " + Neo.config.color_frame);
+
+    Neo.addRule(".NEO #scrollH div, .NEO #scrollV div", "background-color", Neo.config.color_bar);
+    Neo.addRule(".NEO #scrollH div, .NEO #scrollV div", "box-shadow", "0 0 0 1px " + Neo.config.color_icon);
+    Neo.addRule(".NEO #scrollH div:hover, .NEO #scrollV div:hover", "box-shadow", "0 0 0 1px " + Neo.config.color_iconselect);
+
+    Neo.addRule(".NEO #scrollH div, .NEO #scrollV div", "border-top", "1px solid " + lightBar);
+    Neo.addRule(".NEO #scrollH div, .NEO #scrollV div", "border-left", "1px solid " + lightBar);
+    Neo.addRule(".NEO #scrollH div, .NEO #scrollV div", "border-right", "1px solid " + darkBar);
+    Neo.addRule(".NEO #scrollH div, .NEO #scrollV div", "border-bottom", "1px solid " + darkBar);
+
+    Neo.addRule(".NEO .toolTipOn", "background-color", Neo.multColor(Neo.config.tool_color_button, 0.7));
+    Neo.addRule(".NEO .toolTipOff", "background-color", Neo.config.tool_color_button);
+    Neo.addRule(".NEO .toolTipFixed", "background-color", Neo.config.tool_color_button2);
+
+    Neo.addRule(".NEO .colorSlider, .NEO .sizeSlider", "background-color", Neo.config.tool_color_bar);
+    Neo.addRule(".NEO .reserveControl", "background-color", Neo.config.tool_color_bar);
+    Neo.addRule(".NEO .reserveControl", "background-color", Neo.config.tool_color_bar);
+    Neo.addRule(".NEO .layerControl", "background-color", Neo.config.tool_color_bar);
+
+    Neo.addRule(".NEO .colorTipOn, .NEO .colorTipOff", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+    Neo.addRule(".NEO .toolTipOn, .NEO .toolTipOff", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+    Neo.addRule(".NEO .toolTipFixed", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+    Neo.addRule(".NEO .colorSlider, .NEO .sizeSlider", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+    Neo.addRule(".NEO .reserveControl", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+    Neo.addRule(".NEO .layerControl", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+};
+
+Neo.addRule = function(selector, styleName, value, sheet) {
+    if (!sheet) sheet = Neo.styleSheet;
+    if (sheet.addRule) {
+        sheet.addRule(selector, styleName + ":" + value, sheet.rules.length);
+
+    } else if (sheet.insertRule) {
+        var rule = selector + "{" + styleName + ":" + value + "}";
+        var index = sheet.cssRules.length;
+        sheet.insertRule(rule, index);
+    }
 };
 
 Neo.getInheritColor = function(e) {
@@ -136,6 +238,37 @@ Neo.getInheritColor = function(e) {
     return result;
 };
 
+Neo.backgroundImage = function() {
+    var c1 = Neo.painter.getColor(Neo.config.color_bk) | 0xff000000;
+    var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 0xff000000;
+    var bgCanvas = document.createElement("canvas");
+    bgCanvas.width = 16;
+    bgCanvas.height = 16;
+    var ctx = bgCanvas.getContext("2d");
+    var imageData = ctx.getImageData(0, 0, 16, 16);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var index = 0;
+    for (var y = 0; y < 16; y++) {
+        for (var x = 0; x < 16; x++) {
+            buf32[index++] = (x == 14 || y == 14) ? c2 : c1;
+        }
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+    return bgCanvas.toDataURL('image/png');
+};
+
+Neo.multColor = function(c, scale) {
+    var r = Math.round(parseInt(c.substr(1, 2), 16) * scale);
+    var g = Math.round(parseInt(c.substr(3, 2), 16) * scale);
+    var b = Math.round(parseInt(c.substr(5, 2), 16) * scale);
+    r = ("0" + Math.min(Math.max(r, 0), 255).toString(16)).substr(-2);
+    g = ("0" + Math.min(Math.max(g, 0), 255).toString(16)).substr(-2);
+    b = ("0" + Math.min(Math.max(b, 0), 255).toString(16)).substr(-2);
+    return '#' + r + g + b;
+};
+
 Neo.initComponents = function() {
     document.getElementById("copyright").innerHTML += "v" + Neo.version;
 
@@ -150,8 +283,8 @@ Neo.initComponents = function() {
     }, false);
 
     if (Neo.styleSheet) {
-        Neo.styleSheet.addRule("*", "user-select:none;");
-        Neo.styleSheet.addRule("*", "-webkit-user-select:none;");
+        Neo.addRule("*", "user-select", "none");
+        Neo.addRule("*", "-webkit-user-select", "none");
     }
 }
 
@@ -226,13 +359,24 @@ Neo.initButtons = function() {
     new Neo.ScrollBarButton().init("scrollV");
 };
 
-Neo.start = function() {
+Neo.start = function(isApp) {
+    Neo.initSkin();
+    Neo.initComponents();
+    Neo.initButtons();
+
+    Neo.isApp = isApp;
     if (Neo.applet) {
+        var name = Neo.applet.attributes.name.value || "paintbbs";
+        Neo.applet.outerHTML = "";
+        document[name] = Neo;
+        
         Neo.resizeCanvas();
         Neo.container.style.visibility = "visible";
 
-        var ipc = require('electron').ipcRenderer;
-        ipc.sendToHost('neo-status', 'ok');
+        if (Neo.isApp) {
+            var ipc = require('electron').ipcRenderer;
+            ipc.sendToHost('neo-status', 'ok');
+        }
     }
 };
 
@@ -317,7 +461,7 @@ Neo.resizeCanvas = function() {
     Neo.canvas.style.width = width + "px";
     Neo.canvas.style.height = height + "px";
     Neo.toolsWrapper.style.height = Neo.container.clientHeight + "px";
-    
+
     Neo.painter.setZoom(Neo.painter.zoom);
     Neo.painter.updateDestCanvas();
 };
@@ -345,13 +489,18 @@ Neo.getSizeString = function(len) {
 };
 
 Neo.openURL = function(url) {
-    require('electron').shell.openExternal(url);
+    if (Neo.isApp) {
+        require('electron').shell.openExternal(url);
+
+    } else {
+        location.href = url;
+    }
 };
 
 Neo.submit = function(board, blob) {
     var url = board + Neo.config.url_save;
     console.log("submit url=" + url);
-    var header = new Blob(); //new Blob([Neo.config.send_header || ""]);
+    var header = new Blob([Neo.config.send_header || ""]);
 
     var headerLength = this.getSizeString(header.size);
     var imgLength = this.getSizeString(blob.size);
@@ -421,7 +570,7 @@ Neo.createContainer = function(applet) {
                         <div id="redo">やり直し</div>
                         <div id="undo">元に戻す</div>
                         <div id="fill">塗り潰し</div>
-                   </div>
+                    </div>
                     <div id="painter">
                         <div id="canvas">
                             <div id="scrollH"></div>
@@ -471,7 +620,7 @@ Neo.createContainer = function(applet) {
                             </div>
                             <div id="layerControl" style="margin-top:6px;"></div>
 
-                            <div id="toolPad" style="height:20px;"></div>
+                            <!--<div id="toolPad" style="height:20px;"></div>-->
                         </div>
                     </div>
                 </div>
@@ -488,7 +637,9 @@ Neo.createContainer = function(applet) {
 </div>
 
 <div id="windowView" style="display: none;">
+
 </div>
+
 
 */}).toString().match(/\/\*([^]*)\*\//)[1];
 

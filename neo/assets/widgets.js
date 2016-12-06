@@ -26,19 +26,20 @@ Neo.Button.prototype.init = function(name, params) {
 
 Neo.Button.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
+
+    if ((this.params.type == "fill") && (this.selected == false)) {
+        for (var i = 0; i < Neo.toolButtons.length; i++) {
+            var toolTip = Neo.toolButtons[i];
+            toolTip.setSelected((this.selected) ? false : true);
+        }
+        Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
+    }
+
     if (this.onmousedown) this.onmousedown(this);
 };
 Neo.Button.prototype._mouseUpHandler = function(e) {
     if (this.isMouseDown) {
         this.isMouseDown = false;
-
-        if ((this.params.type == "fill") && (this.selected == false)) {
-            for (var i = 0; i < Neo.toolButtons.length; i++) {
-                var toolTip = Neo.toolButtons[i];
-                toolTip.setSelected((this.selected) ? false : true);
-            }
-            Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
-        }
 
         if (this.onmouseup) this.onmouseup(this);
     }
@@ -108,8 +109,12 @@ Neo.ColorTip.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
     for (var i = 0; i < Neo.colorTips.length; i++) {
         var colorTip = Neo.colorTips[i];
-        if (this == colorTip && e.shiftKey) {
-            this.setColor(Neo.config.colors[this.params.index - 1]);
+        if (this == colorTip) {
+            if (e.shiftKey) {
+                this.setColor(Neo.config.colors[this.params.index - 1]);
+            } else if (e.button == 2 || e.ctrlKey || e.altKey) {
+                this.setColor(Neo.painter.foregroundColor);
+            }
         }
         colorTip.setSelected(this == colorTip) ? true : false;
     }
@@ -240,10 +245,15 @@ Neo.ToolTip.prototype._mouseOverHandler = function(e) {
 };
 
 Neo.ToolTip.prototype.setSelected = function(selected) {
-    if (selected) {
-        this.element.className = "toolTipOn";
+    if (this.fixed) {
+        this.element.className = "toolTipFixed";
+
     } else {
-        this.element.className = "toolTipOff";
+        if (selected) {
+            this.element.className = "toolTipOn";
+        } else {
+            this.element.className = "toolTipOff";
+        }
     }
     this.selected = selected;
 };
@@ -305,8 +315,10 @@ Neo.ToolTip.ellipsefill = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAA
 Neo.ToolTip.eraser = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABQElEQVRIx+1WQY7CMAwcI37Cad+yXOgH4Gu8gAt9CtrDirfMHjZJbbcktVSpQnROSeMkY3vsFHhzSG3xfLpz/JVmG0mIqDkIMcc6+7Kejx6fdb0dq7w09rVFkrjejrMOunQ9vg7f/5QEIAd6E1Eo38WF8fF7n8sdALCrLerIzoFI4sI0Vtv1SYZ8CVbeF7tzF7JugIkVkxOauc6CIe8842S+XmMfsq7TN9LRTngZmTmVD4SrnzYaGYhFoxCWgajXuMjYGTuJ3dlwIBIN3U0cUVqLXCs5E7YeVsvAYJul5HWeLUhL3EpstQwooqoOTEHDOebpMn7ngkUsg3RotU8X1MkuVDrYohkIupC0YArX6T+PfX3kcbQLNV/iCKi6EB3xqXdAZ0JKthZ8B0QEl673NIEX/0I/z36Rf6ENGzZ8EP4A8Lp+9e9VWC4AAAAASUVORK5CYII=";
 Neo.ToolTip.freehand = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAdUlEQVRIx+2WUQrAMAhD3dj9r+y+VoSyLhYDynzQv1qiJlCR4hzeAhVRsiC3Jkj0c5hN7Lx7IQ9SphLE1ICdwko420purEWQuywN3pqxgcw2+WwAtU1GzoqiLZNwZBvMAIcO8y3YKUO8mkbmjPzjK9E0TUPjBoeyLAS0usjLAAAAAElFTkSuQmCC";
 Neo.ToolTip.line = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAU0lEQVRIx+2UQQ4AIAjD8P+PxivRGDQC47C+oN1hIgTLQAt4qIga2c23XYAVPkm3CVhlb4ShAa/rQgMi1i0NyFg3LaBq3bAA1LpfAd7/EkIIIR2YXFYSCpWS8w8AAAAASUVORK5CYII=";
+Neo.ToolTip.pen = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAK0lEQVRIx+3OsQkAMAwDQXn/oe3WfSAEctd9I5TA32pHJ/3AoTpfAQCAGwaa5AICJLKWSQAAAABJRU5ErkJggg==";
 Neo.ToolTip.rect = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQElEQVRIx+3TMQ4AIAhD0WK8/5VxdcIYY8rw3wok7YAEr6iGKaU74BY0ro+6FKhyDHe4VxRwm6eFLn8AAADwwQIwTQgGo9ZMywAAAABJRU5ErkJggg==";
 Neo.ToolTip.rectfill = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANElEQVRIx+3PIQ4AIBADwcL//3xYBMEgLiQztmab0GvcxkqqO3ALPbbO7rBXDnRzAADgYwvqDwIMJlGb5QAAAABJRU5ErkJggg==";
+Neo.ToolTip.text = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAcUlEQVRIx+2VwQ7AIAhDy7L//2V2WmIYg+ky2KEv8aCCqYQqQMgrJNpUQMXEKKDmAPHyspgSrBBvLZu3cQqZEdwhfusq0KdkVR5HlFfBvpI0mtIzeusFot7vFPqYuzZYMXUFlzc+qrIn7tf/ACGEkIwDlEQ94YZjzcgAAAAASUVORK5CYII=";
 Neo.ToolTip.tone = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAO0lEQVRIx+3PIQ4AMAgEwaP//zNVVZUELiQ7CgWstFy8IaVsPhT1Lb/T+fQEAtwIcCPAjQC39QEAgJIL6DQCFhAqsRkAAAAASUVORK5CYII=";
 
 /*
@@ -320,9 +332,15 @@ Neo.penTip;
 Neo.PenTip = function() {};
 Neo.PenTip.prototype = new Neo.ToolTip();
 
-Neo.PenTip.prototype.toolStrings = ["鉛筆", "水彩"]; 
+Neo.PenTip.prototype.toolStrings = ["鉛筆", "水彩", "ﾃｷｽﾄ"]; 
 Neo.PenTip.prototype.tools = [Neo.Painter.TOOLTYPE_PEN,
-                              Neo.Painter.TOOLTYPE_BRUSH];
+                              Neo.Painter.TOOLTYPE_BRUSH,
+                              Neo.Painter.TOOLTYPE_TEXT];
+
+Neo.PenTip.prototype.hasTintImage = true;
+Neo.PenTip.prototype.toolIcons = [Neo.ToolTip.pen,
+                                  Neo.ToolTip.brush,
+                                  Neo.ToolTip.text];
 
 Neo.PenTip.prototype.init  = function(name, params) {
     this.isTool = true;
@@ -341,6 +359,7 @@ Neo.PenTip.prototype.update = function() {
     }
 };
 
+/*
 Neo.PenTip.prototype.draw = function(c) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
     if (this.canvas) {
@@ -350,6 +369,7 @@ Neo.PenTip.prototype.draw = function(c) {
         ctx.fillRect(2, 3, 33, 1.2);
     }
 };
+*/
 
 /*
 -------------------------------------------------------------------------
@@ -362,15 +382,20 @@ Neo.pen2Tip;
 Neo.Pen2Tip = function() {};
 Neo.Pen2Tip.prototype = new Neo.ToolTip();
 
-//Neo.Pen2Tip.prototype.toolStrings = ["トーン", "ぼかし", "覆い焼き", "焼き込み"]; 
-Neo.Pen2Tip.prototype.toolStrings = ["トーン"];
-Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE];
-//                             Neo.Painter.TOOLTYPE_BLUR,
-//                             Neo.Painter.TOOLTYPE_DODGE,
-//                             Neo.Painter.TOOLTYPE_BURN];
+Neo.Pen2Tip.prototype.toolStrings = ["トーン", 
+                                     //"ぼかし", 
+                                     "覆い焼き", 
+                                     "焼き込み"]; 
+Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE,
+                             //Neo.Painter.TOOLTYPE_BLUR,
+                               Neo.Painter.TOOLTYPE_DODGE,
+                               Neo.Painter.TOOLTYPE_BURN];
 
 Neo.Pen2Tip.prototype.hasTintImage = true;
-Neo.Pen2Tip.prototype.toolIcons = [Neo.ToolTip.tone];
+Neo.Pen2Tip.prototype.toolIcons = [Neo.ToolTip.tone,
+                                 //Neo.ToolTip.tone,
+                                   Neo.ToolTip.dodge,
+                                   Neo.ToolTip.burn];
 
 Neo.Pen2Tip.prototype.init  = function(name, params) {
     this.isTool = true;
@@ -483,11 +508,11 @@ Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
 Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", 
-                                        //"角取り", 
+//                                      "角取り", 
                                         "左右反転", "上下反転", "傾け"];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_MERGE,
-                                  //Neo.Painter.TOOLTYPE_BLURRECT,
+//                                Neo.Painter.TOOLTYPE_BLURRECT,
                                   Neo.Painter.TOOLTYPE_FLIP_H,
                                   Neo.Painter.TOOLTYPE_FLIP_V,
                                   Neo.Painter.TOOLTYPE_TURN];
@@ -520,7 +545,7 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク"];
+Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク"]; //, "加算", "逆加算"];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;
@@ -570,10 +595,12 @@ Neo.drawTip;
 Neo.DrawTip = function() {};
 Neo.DrawTip.prototype = new Neo.ToolTip();
 
-Neo.DrawTip.prototype.toolStrings = ["手書き", "直線"]; //, "BZ曲線"];
+Neo.DrawTip.prototype.toolStrings = ["手書き", "直線", "BZ曲線"];
 
 Neo.DrawTip.prototype.hasTintImage = true;
-Neo.DrawTip.prototype.toolIcons = [Neo.ToolTip.freehand, Neo.ToolTip.line];
+Neo.DrawTip.prototype.toolIcons = [Neo.ToolTip.freehand, 
+                                   Neo.ToolTip.line,
+                                   Neo.ToolTip.bezier];
 
 Neo.DrawTip.prototype.init = function(name, params) {
     this.fixed = true;
@@ -782,9 +809,14 @@ Neo.SizeSlider.prototype.setSize = function(value) {
     Neo.painter.lineWidth = Math.max(Math.min(30, Math.round(value)), 1);
 
     var tool = Neo.painter.getCurrentTool();
-    if (tool && (tool.type == Neo.Painter.TOOLTYPE_BRUSH)) {
-        Neo.painter.alpha = tool.getAlpha();
-        Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
+    if (tool) {
+        if (tool.type == Neo.Painter.TOOLTYPE_BRUSH) {
+            Neo.painter.alpha = tool.getAlpha();
+            Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
+
+        } else if (tool.type == Neo.Painter.TOOLTYPE_TEXT) {
+            Neo.painter.updateInputText();
+        }
     }
     this.update();
 };
@@ -944,17 +976,19 @@ Neo.ScrollBarButton.prototype.init = function(name, params) {
 Neo.ScrollBarButton.prototype.update = function(oe) {
     if (this.name == "scrollH") {
         var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
-        var barWidth = oe.destCanvas.width * a;
-        var barX = (oe.scrollBarX) * (oe.destCanvas.width - barWidth - 2);
+        var barWidth = Math.ceil(oe.destCanvas.width * a);
+        var barX = (oe.scrollBarX) * (oe.destCanvas.width - barWidth);
         this.barButton.style.width = (Math.ceil(barWidth) - 4) + "px";
-        this.barButton.style.left = Math.ceil(barX) + "px";
+        this.barButton.style.left = Math.floor(barX) + "px";
+
+//      console.log("width=" + (Math.ceil(barWidth) - 4) + " x=" + Math.ceil(barX))
 
     } else {
         var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
-        var barHeight = oe.destCanvas.height * a;
-        var barY = (oe.scrollBarY) * (oe.destCanvas.height - barHeight - 2);
+        var barHeight = Math.ceil(oe.destCanvas.height * a);
+        var barY = (oe.scrollBarY) * (oe.destCanvas.height - barHeight);
         this.barButton.style.height = (Math.ceil(barHeight) - 4) + "px";
-        this.barButton.style.top = Math.ceil(barY) + "px";
+        this.barButton.style.top = Math.floor(barY) + "px";
     }
 };
 

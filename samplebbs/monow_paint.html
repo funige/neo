@@ -1,0 +1,807 @@
+<!--(********** お絵かきテンプレート **********
+// このテンプレートは、以下のモード用テンプレートです
+// ・お絵かきモード
+// ・動画表示モード
+// ・コンティニューモード
+)-->
+<html><head><title>{$title}</title>
+<!--(
+// title…掲示板タイトル
+// charset…文字コード
+)-->
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset={$charset}">
+<META name="ROBOTS" content="NOINDEX,NOFOLLOW">
+<STYLE TYPE="text/css">
+<!--
+body,tr,td,th { font-size:11pt }
+a:hover { color:#FFFFFF;background-color:#444444;TEXT-DECORATION:NONE }
+a:link  { color:#666666;background-color:#DDDDDD }
+a:vlink { color:#666666;background-color:#FFFFFF }
+span { font-size:18pt }
+big { font-size:14pt }
+small { font-size:9pt }
+-->
+</STYLE>
+
+<!-- NEOを使う -->
+<!--{def useneo}-->
+<link rel="stylesheet" href="PaintBBS-0.7.0.css" type="text/css" />
+<script src="PaintBBS-0.7.0.js" charset="UTF-8"></script>
+<!--{/def}-->
+
+</head>
+<body bgcolor=#FFFFFF text=#000000 link=#888888 vlink=#606060 alink=#000000>
+
+<center>
+<p><font size=5><b><SPAN>{$title}</SPAN></b></font></p>
+<!--(========== お絵かきモード ==========
+// 【お絵かき(通常/続き)】
+//
+// paint_mode…お絵かきモードのとき true が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+// palettes…パレット配列データ
+// paintbbs…PaintBBSを選択したとき true が入る
+// normal…しぃペインターを選択したとき true が入る
+// pro…しぃペインターProを選択したとき true が入る
+// w…アプレット領域サイズ(横)
+// h…アプレット領域サイズ(縦)
+// layer_count…レイヤー数(しぃペインター)
+// quality…クオリティ値(しぃペインター)
+// picw…キャンバスサイズ(横)
+// pich…キャンバスサイズ(縦)
+// image_jpeg…JPEG保存を許可してるなら true が入る(AUTO or JPEG)
+// image_size…JPEG変換(AUTO)もしくは減色処理(PNG)の判定値(KB)
+// compress_level…PNGの減色率とJPEGの圧縮率
+// undo…アンドゥの回数
+// undo_in_mg…アンドゥを幾つにまとめて保存しておくか
+// mode…投稿モード指示
+// stime…描画開始時間(UNIXタイムスタンプ)
+// anime…動画記録ONなら true が入る
+// pchfile…動画ファイル名(動画から続きを描く場合)
+// imgfile…画像ファイル名(画像から続きを描く場合)
+// usercode…ユーザーコード(投稿者認識用)
+// cpal…お絵かき開始前にパレットを指定したとき、初期パレット配列データが入る
+// security…セキュリティが有効な場合 true が入る
+// security_click…セキュリティクリック数
+// security_timer…セキュリティタイマー(秒)
+// security_url…セキュリティにヒットした場合の飛び先
+// palsize…パレット総数
+// dynp…パレットの名前配列データ
+// applet…しぃペインターを使用するとき true が入る
+// usepbbs…しぃペインターとPaintBBSの両方を使用するとき true が入る
+// palette…パレット選択用データ(selectタグ用option配列)
+// newpaint…新規お絵かきのとき true が入る(コンティニューは false)
+// savetypes…保存タイプ選択用データ(selectタグ用option配列)
+// animeform…動画記録出来るときに true が入る(画像から続きを描く場合は false)
+// qualitys…クオリティ値選択用データ(selectタグ用option配列)
+// resno…レス時の親記事No
+// no…記事No(コンティニュー)
+// pch…動画ファイル名(コンティニュー)
+// ctype…動画からの続きか、画像からの続きか(コンティニュー)
+// type…差し換えか、新規投稿か(コンティニュー)
+// pwd…記事Pass(コンティニュー)
+// ext…画像拡張子(コンティニュー)
+// mode2…現在のモード
+)-->
+<!--{def paint_mode}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>お絵かきモード</font></th></tr></table>
+<hr width="90%" size=1>
+[<a href="{$self2}">掲示板に戻る</a>] 
+[<a href="{$home}" target="_top">ホーム</a>] 
+[<a href="{$self}?mode=admin">管理用</a>] 
+<hr width="90%" size=1>
+<!--(========== 動的パレットスクリプト ここから ==========)-->
+<Script Language="JavaScript">
+<!--
+var DynamicColor = 1;	// パレットリストに色表示
+var Palettes = new Array();
+<!--(========== パレット配列作成 ==========)-->
+<!--{def palettes}--><!--{each palettes}-->
+{$palettes}
+<!--{/each}--><!--{/def}-->
+//-------------------------------------------------------------------
+// OS&ブラウザ判定
+var uAgent,aName,version,BROWSER,OS;
+uAgent = navigator.userAgent.toUpperCase();
+aName   = navigator.appName.toUpperCase();
+if (uAgent.indexOf("MAC") >= 0)			{ OS="MAC" }
+else if (uAgent.indexOf("WIN") >= 0)		{ OS="WIN" }
+
+if (aName.indexOf("NETSCAPE") >= 0)		{ BROWSER="NN" }
+else if (aName.indexOf("MICROSOFT") >= 0)	{ BROWSER="IE" }
+
+if (aName.indexOf("NETSCAPE") >= 0){
+	appVer  = navigator.appVersion;
+	s = appVer.indexOf(" ",0);
+	version = eval(parseInt(appVer.substring(0,s)));
+	if (version >= 5) version++;
+}else if (aName.indexOf("MICROSOFT") >= 0){
+	appVer  = navigator.userAgent;
+	s = appVer.indexOf("MSIE ",0) + 5;
+	e = appVer.indexOf(";",s);
+	version = eval(parseInt(appVer.substring(s,e)));
+}
+
+function setPalette(){
+	d = document
+	d.paintbbs.setColors(Palettes[d.Palette.select.selectedIndex])
+}
+function PaletteSave(){
+	Palettes[0] = String(document.paintbbs.getColors())
+}
+var cutomP = 0;
+function PaletteNew(){
+	d = document
+	p = String(d.paintbbs.getColors())
+	s = d.Palette.select
+	Palettes[s.length] = p
+	cutomP++
+	str = prompt("パレット名","パレット " + cutomP)
+	if(str == null || str == ""){cutomP--;return}
+	s.options[s.length] = new Option(str)
+	if(s.length < 30) s.size = s.length
+}
+function PaletteRenew(){
+	d = document
+	Palettes[d.Palette.select.selectedIndex] = String(d.paintbbs.getColors())
+}
+function PaletteDel(){
+	p = Palettes.length
+	s = document.Palette.select
+	i = s.selectedIndex
+	if(i == -1)return
+	
+	flag = confirm("「"+s.options[i].text + "」を削除してよろしいですか？")
+	if (!flag) return
+	s.options[i] = null
+	while(i<p){
+		Palettes[i] = Palettes[i+1]
+		i++
+	}
+	if(s.length < 30) s.size = s.length
+}
+function P_Effect(v){
+	v=parseInt(v)
+	x = 1
+	if(v==255)x=-1
+	d = document.paintbbs
+	p=String(d.getColors()).split("\n")
+	l = p.length
+	var s = ""
+	for(n=0; n<l;n++){
+		R = v+(parseInt("0x" + p[n].substr(1,2))*x)
+		G = v+(parseInt("0x" + p[n].substr(3,2))*x)
+		B = v+(parseInt("0x" + p[n].substr(5,2))*x)
+		if(R > 255){ R = 255}
+		else if(R < 0){ R = 0}
+		if(G > 255){ G = 255}
+		else if(G < 0){ G = 0}
+		if(B > 255){ B = 255}
+		else if(B < 0){ B = 0}
+		s += "#"+Hex(R)+Hex(G)+Hex(B)+"\n"
+	}
+	d.setColors(s)
+}
+function PaletteMatrixGet(){
+	d = document.Palette
+	p = Palettes.length
+	s = d.select
+	m = d.m_m.selectedIndex
+	t = d.setr
+	t.value = "!Palette\\n"+String(document.paintbbs.getColors())
+	switch(m){
+	case 0:case 2:default:
+		n=0;c=0
+		while(n<p){
+			if(s.options[n] != null){ t.value = t.value + "\n!"+ s.options[n].text +"\n" + Palettes[n];c++}
+			n++
+		}
+		alert ("パレット数："+c+"\nパレットマトリクスを取得しました");break
+	case 1:
+		alert("現在使用されているパレット情報を取得しました");break
+	}
+		t.value = t.value + "\n!Matrix"
+}
+function PalleteMatrixSet(){
+	m = document.Palette.m_m.selectedIndex;
+	str = "パレットマトリクスをセットします。"
+	switch(m){
+	case 0:default:
+		flag = confirm(str+"\n現在の全パレット情報は失われますがよろしいですか？");break
+	case 1:
+		flag = confirm(str+"\n現在表示しているパレットと置き換えますがよろしいですか？");break;
+	case 2:
+		flag = confirm(str+"\n現在のパレット情報に追加しますがよろしいですか？");break
+	}
+		if (!flag) return
+	
+	PaletteSet()
+	if(s.length < 30){ s.size = s.length}else{s.size=30};
+	if(DynamicColor) PaletteListSetColor()
+}
+function PalleteMatrixHelp(){
+	alert("★PALETTE MATRIX\nパレットマトリクスとはパレット情報を列挙したテキストを用いる事により\n自由なパレット設定を使用する事が出来ます。\n\n■マトリクスの取得\n1)「取得」ボタンよりパレットマトリクスを取得します。\n2)取得された情報が下のテキストエリアに出ます、これを全てコピーします。\n3)このマトリクス情報をテキストとしてファイルに保存しておくなりしましょう。\n\n■マトリクスのセット\n1）コピーしたマトリクスを下のテキストエリアに貼り付け(ペースト)します。\n2)ファイルに保存してある場合は、それをコピーし貼り付けます。\n3)「セット」ボタンを押せば保存されたパレットが使用できます。\n\n余分な情報があるとパレットが正しくセットされませんのでご注意下さい。");
+}
+function PaletteSet(){
+	d = document.Palette
+	se = d.setr.value;
+	s = d.select;
+	m = d.m_m.selectedIndex;
+	l = se.length
+	if(l<1){
+		alert("マトリクス情報がありません。");return
+	}
+		n = 0;o = 0;e = 0
+	switch(m){
+	case 0:default:
+		n = s.length
+		while(n > 0){
+			n--
+			s.options[n] = null
+		}
+	case 2:
+		i=s.options.length
+		n = se.indexOf("!",0)+1
+		if(n == 0)return
+		while(n<l){
+			e = se.indexOf("\n#",n)
+			if(e == -1)return
+			
+			pn = se.substring(n,e-1)
+			o = se.indexOf("!",e)
+			if(o == -1)return
+			pa = se.substring(e+1,o-2)
+			if (pn != "Palette"){
+			if(i >= 0)s.options[i] = new Option(pn)
+			
+			Palettes[i] = pa
+			i++
+			}else{document.paintbbs.setColors(pa)}
+			
+			n=o+1
+		}
+		break
+	case 1:
+		n = se.indexOf("!",0)+1
+		if(n == 0)return
+		e = se.indexOf("\n#",n)
+		o = se.indexOf("!",e)
+			if(e >= 0){
+				pa = se.substring(e+1,o-2)
+			}
+		document.paintbbs.setColors(pa)
+	}
+}
+function PaletteListSetColor(){
+	var s = document.Palette.select;
+	for(i = 1; s.options.length > i; i ++) {
+		var c = Palettes[i].split("\n");
+		s.options[i].style.background = c[4];
+		s.options[i].style.color = GetBright(c[4]);
+	}
+}
+function GetBright(c){
+	r=parseInt("0x"+c.substr(1,2)),
+	g=parseInt("0x"+c.substr(3,2)),
+	b=parseInt("0x"+c.substr(5,2));
+	c=(r>=g)?(r>=b)?r:b:(g>=b)?g:b;
+	return c<128?"#FFFFFF":"#000000";
+}
+function Chenge_(){
+	var st = document.grad.pst.value
+	var ed = document.grad.ped.value
+	
+	if(isNaN(parseInt("0x" + st)))return
+	if(isNaN(parseInt("0x" + ed)))return
+	GradView("#"+st,"#"+ed);
+}
+function ChengeGrad(){
+	var d =document
+	st = d.grad.pst.value
+	ed = d.grad.ped.value
+	Chenge_()
+
+	degi_R = parseInt("0x" + st.substr(0,2))
+	degi_G = parseInt("0x" + st.substr(2,2))
+	degi_B = parseInt("0x" + st.substr(4,2))
+	R = parseInt((degi_R - parseInt("0x" + ed.substr(0,2)))/15)
+	G = parseInt((degi_G - parseInt("0x" + ed.substr(2,2)))/15)
+	B = parseInt((degi_B - parseInt("0x" + ed.substr(4,2)))/15)
+	if(isNaN(R)) R = 1
+	if(isNaN(G)) G = 1
+	if(isNaN(B)) B = 1
+	var p = new String()
+	for(cnt=0,m1=degi_R,m2=degi_G,m3=degi_B; cnt<14; cnt++,m1-=R,m2-=G,m3-=B){
+		if ((m1 > 255)||(m1 < 0)){ R *= -1;m1-=R}
+		if ((m2 > 255)||(m2 < 0)){ G *= -1;m2-=G}
+		if ((m3 > 255)||(m3 < 0)){ B *= -1;m2-=B}
+		p += "#"+Hex(m1)+Hex(m2)+Hex(m3)+"\n"
+	}
+	d.paintbbs.setColors(p)
+}
+function Hex(n){
+	n = parseInt(n);if (n < 0) n *=-1;
+	var hex = new String()
+	var m
+	var k
+	while(n > 16){
+	m = n
+	if (n >16){
+		n = parseInt(n/16)
+		m -= (n * 16)
+	}
+		k = Hex_(m)
+		hex = k + hex
+	}
+		k = Hex_(n)
+		hex = k + hex
+	while(hex.length < 2){hex="0" + hex}
+	return hex
+}
+function Hex_(n){
+	if(! isNaN(n)){
+		if(n == 10){n="A"}
+		else if(n == 11){n="B"}
+		else if(n == 12){n="C"}
+		else if(n == 13){n="D"}
+		else if(n == 14){n="E"}
+		else if(n == 15){n="F"}
+	}else{n=""}
+	return n
+}
+function GetPalette(){
+	d = document
+	p = String(document.paintbbs.getColors());
+	if(p == "null" || p == ""){return};
+	ps = p.split("\n");
+	st = d.grad.p_st.selectedIndex
+	ed = d.grad.p_ed.selectedIndex
+	d.grad.pst.value = ps[st].substr(1.6)
+	d.grad.ped.value = ps[ed].substr(1.6)
+	if(OS == "WIN" & (BROWSER == "IE" | (BROWSER == "NN" & version == "6"))) GradSelC()
+	GradView(ps[st],ps[ed])
+	if(DynamicColor) PaletteListSetColor()
+}
+function GradSelC(){
+	if(! d.grad.view.checked)return
+	d = document.grad
+	for(n=0;ps.length>n;n++){
+		d.p_st.options[n].style.background = ps[n];
+		d.p_st.options[n].style.color = GetBright(ps[n]);
+		d.p_ed.options[n].style.background = ps[n];
+		d.p_ed.options[n].style.color = GetBright(ps[n]);
+	}
+}
+function GradView(st,ed){
+	d = document
+	if (! d.grad.view.checked)return
+	html = "<TABLE BGCOLOR=white cellspacing=0 cellpadding=0><TR><TD colspan=2><TT><font color=#FF6699><B>GRADATION</B></TT></TD></TR><TR><TD><TT><font color=#FF6699>START </TT></TD><TD><FONT COLOR="+st+" SIZE=4>■</FONT></TD></TR><TR><TD><font color=#FF6699><TT>END </TT></TD><TD><FONT COLOR="+ed+" SIZE=4>■</FONT></TD></TR></TABLE>";
+	if(d.layers) {
+		with(d.layers["psft"]){
+			left = window.innerWidth - 120
+			top = window.pageYOffset+5
+			d = document
+			d.open()
+			d.write(html)
+			d.close();
+		}
+	} else if(d.all){
+		with(d.all("psft")){
+			style.left = d.body.offsetWidth - 120
+			style.top = d.body.scrollTop+5
+			innerHTML = html
+		}
+	}
+}
+function showHideLayer() { //v3.0
+	d = document
+	var l
+	if(d.layers) {
+		l = d.layers["psft"]
+	}else{
+		l = d.all("psft").style
+	}
+	if (! d.grad.view.checked){
+		l.visibility = "hidden"
+	}
+	if (d.grad.view.checked){
+		l.visibility = "visible";GetPalette();
+	}
+}
+//-->
+</Script>
+<!--(========== 動的パレットスクリプト ここまで ==========)-->
+<NOSCRIPT><H3>JavaScriptが有効でないため正常に動作致しません</H3></NOSCRIPT>
+<TABLE><TR><TD>
+<!--( <APPLET～</APPLET>の～部分の詳しい事は、PaintBBS及びしぃペインターのReadmeを参照 )-->
+<!--(========== PaintBBS個別設定 ==========)-->
+<!--{def paintbbs}-->
+<!-- NEOを使う時はアプレットを読み込まないように -->
+<!--{def useneo}--><APPLET-DUMMY <!--{/def}-->
+<!--{ndef useneo}--><APPLET <!--{/ndef}-->
+ CODE="pbbs.PaintBBS.class" ARCHIVE="./PaintBBS.jar" NAME="paintbbs" WIDTH="{$w}" HEIGHT="{$h}" MAYSCRIPT>
+<!--{/def}-->
+<!--(========== しぃペインター個別設定 ==========)-->
+<!--{def normal}-->
+<applet code="c.ShiPainter.class" archive="spainter_all.jar" name="paintbbs" WIDTH="{$w}" HEIGHT="{$h}" MAYSCRIPT>
+<param name=dir_resource value="./">
+<param name=tt.zip value="tt_def.zip">
+<param name=res.zip value="res.zip"><!--(しぃペインターv1.05_9以前を使うなら res_normal.zip に変更)-->
+<param name=tools value="normal">
+<param name=layer_count value="{$layer_count}">
+<!--{def quality}-->
+<param name=quality value="{$quality}">
+<!--{/def}-->
+<!--{/def}-->
+<!--(========== しぃペインターPro個別設定 ==========)-->
+<!--{def pro}-->
+<applet code="c.ShiPainter.class" archive="spainter_all.jar" name="paintbbs" WIDTH="{$w}" HEIGHT="{$h}" MAYSCRIPT>
+<param name=dir_resource value="./">
+<param name=tt.zip value="tt_def.zip">
+<param name=res.zip value="res.zip"><!--(しぃペインターv1.05_9以前を使うなら res_pro.zip に変更)-->
+<param name=tools value="pro">
+<param name=layer_count value="{$layer_count}">
+<!--{def quality}-->
+<param name=quality value="{$quality}">
+<!--{/def}-->
+<!--{/def}-->
+<!--(========== 共通設定(変更不可) ==========)-->
+<param name="image_width" value="{$picw}">
+<param name="image_height" value="{$pich}">
+<param name="image_jpeg" value="{$image_jpeg}">
+<param name="image_size" value="{$image_size}">
+<param name="compress_level" value="{$compress_level}">
+<param name="undo" value="{$undo}">
+<param name="undo_in_mg" value="{$undo_in_mg}">
+<param name="poo" value="false">
+<param name="send_advance" value="true">
+<param name="tool_advance" value="true">
+<param name="thumbnail_width" value="100%">
+<param name="thumbnail_height" value="100%">
+<param name="url_save" value="picpost.php">
+<param name="url_exit" value="{$self}?mode={$mode}&stime={$stime}">
+<!--{def anime}-->
+<param name="thumbnail_type" value="animation">
+<!--{/def}-->
+<!--{def pchfile}-->
+<param name="pch_file" value="{$pchfile}">
+<!--{/def}-->
+<!--{def imgfile}-->
+<param name="image_canvas" value="{$imgfile}">
+<!--{/def}-->
+<!--{def usercode}-->
+<param name="send_header" value="usercode={$usercode}">
+<!--{/def}-->
+<!--{def security}-->
+<!--{def security_click}-->
+<param name="security_click" value="{$security_click}">
+<!--{/def}-->
+<!--{def security_timer}-->
+<param name="security_timer" value="{$security_timer}">
+<!--{/def}-->
+<param name="security_url" value="{$security_url}">
+<param name="security_post" value="false">
+<!--{/def}-->
+<!--(========== 共通設定(変更不可) ここまで ==========)-->
+<!--(========== アプレットのカラー設定(変更可) ==========)-->
+<param name="image_bkcolor" value="#FFFFFF">
+<param name="color_text" value="#333333">
+<param name="color_bk" value="#FFFFFF">
+<param name="color_bk2" value="#DDDDDD">
+<param name="color_icon" value="#FFFFFF">
+<param name="color_iconselect" value="#999999">
+<param name="color_bar" value="#999999">
+<param name="color_frame" value="#666666">
+<param name="tool_color_button" value="#FFFFFF">
+<param name="tool_color_button2" value="#FFFFFF">
+<param name="tool_color_text" value="#333333">
+<param name="tool_color_bar" value="#FFFFFF">
+<param name="tool_color_frame" value="#666666">
+<!--(========== アプレットのカラー設定(変更可) ここまで ==========)-->
+<!--{def cpal}--><!--{each cpal}-->
+<param name="color_{$cpal/no}" value="#{$cpal/pal}">
+<!--{/each}--><!--{/def}-->
+</APPLET>
+</TD><TD ALIGN="CENTER" VALIGN="top"><BR>
+<!--(========== 動的パレット制御関連 ==========)-->
+<TABLE BGCOLOR="black" CELLPADDING="1" CELLSPACING="0" width=100%><TR><FORM name="Palette">
+<TD><TABLE BGCOLOR="white" CELLPADDING="3" CELLSPACING="0" width=100%><TR>
+<TD><FONT SIZE=2><font face="Impact, Arial Black" color="black" size="2">PALETTE</font> <INPUT TYPE=button VALUE="一時保存" OnClick="PaletteSave()"><BR>
+<select name="select" size="{$palsize}" onChange="setPalette()">
+<option>一時保存パレット</option>
+<!--{def dynp}--><!--{each dynp}-->
+<option>{$dynp}</option>
+<!--{/each}--><!--{/def}-->
+</select><BR>
+<INPUT TYPE=button VALUE="作成" OnClick="PaletteNew()">
+<INPUT TYPE=button VALUE="変更" OnClick="PaletteRenew()">
+<INPUT TYPE=button VALUE="削除" OnClick="PaletteDel()"><BR>
+<INPUT TYPE=button VALUE="明＋" OnClick="P_Effect(10)">
+<INPUT TYPE=button VALUE="明－" OnClick="P_Effect(-10)">
+<INPUT TYPE=button VALUE="反転" OnClick="P_Effect(255)">
+<HR SIZE=1><font face="Impact, Arial Black" color="black" size="2">MATRIX</font>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SELECT name="m_m">
+<option value=0>全体</option>
+<option value=1>現在</option>
+<option value=2>追加</option>
+</SELECT><BR>
+<INPUT name="m_g" TYPE=button VALUE="取得" OnClick="PaletteMatrixGet()">
+<INPUT name="m_s" TYPE=button VALUE="セット" OnClick="PalleteMatrixSet()">
+<INPUT name="m_h" TYPE=button VALUE=" ? " OnClick="PalleteMatrixHelp()"><BR>
+<TEXTAREA rows="1" name="setr" cols="13" onmouseover="this.select()"></TEXTAREA><BR>
+</TD></TR></TABLE></TD></FORM></TR></TABLE>
+<BR>
+<TABLE BGCOLOR="black" CELLPADDING=1 CELLSPACING=0><TR><TD><TABLE BGCOLOR="white" CELLPADDING=3 CELLSPACING=0 width=100%><TR><FORM name=grad>
+<TD><FONT SIZE=2><font face="Impact, Arial Black" color="black" size=2>GRADATION</font>&nbsp;<INPUT TYPE=checkbox name=view OnClick="showHideLayer()"><INPUT TYPE=button VALUE=" OK " OnClick="ChengeGrad()"><BR>
+<SELECT name=p_st onChange="GetPalette()">
+<option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option>12</option>
+<option>13</option>
+<option>14</option>
+</SELECT><input type=text name=pst size=8 onKeyPress="Chenge_()" onChange="Chenge_()"><BR>
+<SELECT name=p_ed onChange="GetPalette()">
+<option>1</option>
+<option>2</option>
+<option>3</option>
+<option>4</option>
+<option>5</option>
+<option>6</option>
+<option>7</option>
+<option>8</option>
+<option>9</option>
+<option>10</option>
+<option>11</option>
+<option selected>12</option>
+<option>13</option>
+<option>14</option>
+</SELECT><input type=text name=ped size=8 onKeyPress="Chenge_()" onChange="Chenge_()"><div id=psft style="position:absolute;width:100px;height:30px;z-index:1;left:5px;top:10px;"></div>
+</TD></TR></TABLE></TD></FORM></TR></TABLE>
+<center><A href="http://wondercatstudio.com/" target="_blank" title="WonderCatStudio"><small>DynamicPalette<BR>(C)のらネコ</small></A></center>
+</TD></TR></TABLE>
+<Script Language="JavaScript">
+<!--
+if(DynamicColor) PaletteListSetColor();
+//-->
+</Script>
+<!--(========== 動的パレット制御関連 ここまで ==========)-->
+<!--(========== 描画時間動的表示 ==========)-->
+<FORM NAME="watch" style = "display: none;">描画時間
+<INPUT SIZE="20" NAME="count">
+</FORM>
+<Script Language="JavaScript">
+<!--
+timerID = 10;
+stime = new Date();
+function SetTimeCount() {
+	now = new Date();
+	s = Math.floor((now.getTime() - stime.getTime())/1000);
+	disp = '';
+	if(s >= 86400){
+		d = Math.floor(s/86400);
+		disp += d+"日";
+		s -= d*86400;
+	}
+	if(s >= 3600){
+		h = Math.floor(s/3600);
+		disp += h+"時間";
+		s -= h*3600;
+	}
+	if(s >= 60){
+		m = Math.floor(s/60);
+		disp += m+"分";
+		s -= m*60;
+	}
+	document.watch.count.value = disp+s+"秒";
+	clearTimeout(timerID);
+	timerID = setTimeout('SetTimeCount()',250);
+}
+SetTimeCount();
+//-->
+</Script>
+<!--(========== 描画時間動的表示 ここまで ==========)-->
+<!--{def anime}--><p>★描画アニメ記録中★</p><!--{/def}-->
+<BR><BR>
+<!--(========== お絵かき設定値の再設定関連 ==========)-->
+<form action="{$self}" method=POST>
+<!--{def applet}-->
+アプレット<select name=shi>
+<!--{def usepbbs}--><option value=0>PaintBBS</option><!--{/def}-->
+<option value=1<!--{def normal}--> selected<!--{/def}-->>しぃペインター</option>
+<option value=2<!--{def pro}--> selected<!--{/def}-->>しぃペインターPro</option>
+</select>
+<!--{/def}-->
+<!--(// しぃで反映されない上にお絵かき画面でパレット変更できるのでコメント化
+パレット<select name=palette><option value="" selected> デフォルト</option>
+{$palette}
+</select>
+)-->
+<!--{def newpaint}-->
+横<input type=text name=picw value={$picw} size=3>×縦<input type=text name=pich value={$pich} size=3> 
+<!--{/def}-->
+保存タイプ<select name=savetype>{$savetypes}</select> 
+<!--{def newpaint}--><!--{def animeform}-->
+<input type=checkbox value="true" name=anime<!--{def anime}--> checked<!--{/def}-->>動画記録
+<!--{/def}--><!--{/def}-->
+<BR>
+UNDO　<input type=text name=undo value={$undo} size=3><font size=1 color=#888888>*a</font>回 
+(<input type=text name=undo_in_mg value={$undo_in_mg} size=3><font size=1 color=#888888>*b</font>回ごとにメモリに保存)<BR>
+<!--{def applet}-->
+キャンバスクオリティ　<select name=quality>{$qualitys}</select> (しぃペインターのみ)<BR>
+<small style="background-color:#EEEEEE">※クオリティを3以上にする時は <font color=#888888>*a</font>÷<font color=#888888>*b</font> が2になる様にしないとメモリ不足に陥る可能性があります。</small><BR>
+<!--{/def}-->
+<!--{def resno}--><input type=hidden name=resto value="{$resno}"><!--{/def}-->
+<!--{def no}--><input type=hidden name=no value={$no}><!--{/def}-->
+<!--{def pch}--><input type=hidden name=pch value="{$pch}"><!--{/def}-->
+<!--{def ctype}--><input type=hidden name=ctype value="{$ctype}"><!--{/def}-->
+<!--{def type}--><input type=hidden name=type value="{$type}"><!--{/def}-->
+<!--{def pwd}--><input type=hidden name=pwd value="{$pwd}"><!--{/def}-->
+<!--{def ext}--><input type=hidden name=ext value="{$ext}"><!--{/def}-->
+<!--{ndef newpaint}--><input type=hidden name=picw value={$picw}><input type=hidden name=pich value={$pich}><!--{/ndef}-->
+<input type=hidden name=mode value={$mode2}>
+<p>
+
+<!-- NEOを使う -->
+<label><input type=checkbox name=useneo checked=checked /><b>NEOを使う</b></label>
+<input type=submit value="設定を変更してお絵かき">
+</form>
+<!--(========== お絵かき設定値の再設定関連 ここまで ==========)-->
+<a href="{$self}?mode=piccom<!--{def resno}-->&resto={$resno}<!--{/def}-->">アップロード途中の画像</a><p>
+<BR><BR>
+<!--PaintBBS HELP START-->
+<SIIHELP>
+<!--PaintBBS HELP END-->
+<!--{/def}-->
+<!--(========== お絵かきモード ここまで ==========)-->
+<!--(========== 動画表示モード ==========
+//
+// pch_mode…動画表示モードのとき true が入る
+// paintbbs…PaintBBSのPCHファイルなら true が入る
+// normal…しぃペインターのSPCHファイルなら true が入る
+// w…アプレット領域サイズ(横)
+// h…アプレット領域サイズ(縦)
+// picw…キャンバスサイズ(横)
+// pich…キャンバスサイズ(縦)
+// pchfile…動画ファイル名(.pch or .spch)
+// speed…動画再生スピード初期値
+// datasize…動画ファイルサイズ(Byte)
+)-->
+<!--{def pch_mode}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>動画表示モード</font></th></tr></table>
+<p>
+<!--{def paintbbs}-->
+<APPLET name="pch" code="pch.PCHViewer.class" archive="PCHViewer.jar,PaintBBS.jar" width="{$w}" height="{$h}" MAYSCRIPT>
+<!--{/def}-->
+<!--{def normal}-->
+<APPLET name="pch" code="pch2.PCHViewer.class" archive="PCHViewer.jar,spainter_all.jar" codebase="./" width="{$w}" height="{$h}">
+<param name=res.zip value="res.zip"><!--(しぃペインターv1.05_9以前を使うなら res_normal.zip に変更)-->
+<param name=tt.zip value="tt_def.zip">
+<param name=tt_size value="31">
+<!--{/def}-->
+<param name="image_width" value="{$picw}">
+<param name="image_height" value="{$pich}">
+<param name="pch_file" value="{$pchfile}">
+<param name="speed" value="{$speed}">
+<param name="buffer_progress" value="false">
+<param name="buffer_canvas" value="false">
+<param name="color_back" value="#FFFFFF">
+<param name="color_text" value="#333333">
+<param name="color_icon" value="#FFFFFF">
+<param name="color_bar" value="#AAAAAA">
+<param name="color_bar_select" value="#999999">
+<param name="color_frame" value="#666666">
+</APPLET>
+<BR>
+-<A href="{$pchfile}" target="_blank">Download</A>-<BR>
+<small>Datasize : {$datasize} byte</small><BR>
+<BR>
+<a href="javascript:close()">閉じる</a><p>
+<!--{/def}-->
+<!--(========== 動画表示モード ここまで ==========)-->
+<!--(========== コンティニューモード ==========
+//
+// continue_mode…コンティニューモードのとき true が入る
+// home…ホームページURL
+// self…POTI-boardのスクリプト名
+// self2…入口(TOP)ページのURL
+// picfile…画像URL
+// picw…画像サイズ(横)
+// pich…画像サイズ(縦)
+// painttime…描画時間
+// no…記事No
+// pch…動画ファイル名
+// ext…画像拡張子
+// ctype_pch…動画より続きが描けるとき true が入る
+// ctype_img…画像より続きが描けるとき true が入る
+// applet…しぃペインターが使用できるとき true が入る
+// usepbbs…しぃペインターとPaintBBSの両方が使用できるとき true が入る
+// palette…パレット選択用データ(selectタグ用option配列)
+// passflag…削除キー入力を促す場合 true が入る
+)-->
+<!--{def continue_mode}-->
+<table width=100% cellpadding=3 cellspacing=0><tr><th bgcolor=#444444><font color=#FFFFFF>コンティニューモード</font></th></tr></table>
+<hr width="90%" size=1>
+[<a href="{$self2}">掲示板に戻る</a>] 
+[<a href="{$home}" target="_top">ホーム</a>] 
+[<a href="{$self}?mode=admin">管理用</a>] 
+<hr width="90%" size=1>
+<!--(========== クッキー読込み用JavaScript(必須) ==========)-->
+<Script language="JavaScript" src="loadcookie.js"></script>
+<!--(========== 画像と描画時間 ==========)-->
+<img src="{$picfile}" border=0 width={$picw} height={$pich} vspace=20><BR>
+<!--{def painttime}-->描画時間：{$painttime}<BR><!--{/def}-->
+<!--(========== コンティニューフォーム欄 ==========)-->
+<form action="{$self}" method=POST>
+<input type=hidden name=mode value=contpaint>
+<input type=hidden name=anime value=true>
+<input type=hidden name=picw value={$picw}>
+<input type=hidden name=pich value={$pich}>
+<input type=hidden name=no value={$no}>
+<input type=hidden name=pch value="{$pch}">
+<input type=hidden name=ext value="{$ext}">
+<select name=ctype>
+<!--{def ctype_pch}--><option value='pch'>動画より続きを描く</option><!--{/def}-->
+<!--{def ctype_img}--><option value='img'>画像より続きを描く</option><!--{/def}-->
+</select>
+　画像は<select name=type>
+<option value='rep'>差し換え</option>
+<option value='new'>新規投稿</option>
+</select>
+<BR>
+<!--{def applet}-->
+アプレット<select name=shi>
+<!--{def usepbbs}--><option value=0>PaintBBS</option><!--{/def}-->
+<option value=1>しぃペインター</option>
+<option value=2>しぃペインターPro</option>
+</select>
+<!--{/def}-->
+<!--(// しぃで反映されない上にお絵かき画面でパレット変更できるのでコメント化
+パレット<select name=palette><option value="" selected> デフォルト</option>
+{$palette}
+</select>
+)-->
+<!--{def passflag}-->削除キー<input type=password name=pwd size=8 value=""><!--{/def}-->
+
+<!-- NEOを使う -->
+<label><input type=checkbox name=useneo checked=checked /><b>NEOを使う</b></label>
+<input type=submit value="続きを描く">
+</form>
+<BR>
+<!--(========== コンティニュー説明 ==========)-->
+<table cellpadding=1 cellspacing=1><tr><td><small>
+<LI>画像より続きを描く場合、読み込める画像はJavaに依存します。<br>例えばPNGはSunJVMがサポートしておりMSJVMはサポートされていません。
+<!--{def passflag}--><LI>続きを描くには描いたときの削除キーが必要です。<!--{/def}-->
+{$addinfo}</small></td></tr></table>
+<BR><BR>
+<!--(========== JavaScriptの実行(クッキーを読込み、フォームに値をセット) ==========)-->
+<script language="JavaScript"><!--
+l(); //LoadCookie
+//--></script>
+<!--{/def}-->
+<!--(========== コンティニューモード ここまで ==========)-->
+<!--著作権表示 削除しないでください-->
+<hr width="90%" size=1>
+<!-- GazouBBS v3.0 --><!-- ふたば改0.8 --><!-- POTI-board -->
+<small><a href="http://www.punyu.net/" target=_top title="POTI-board {$verlot} (by ぷにゅねっと)"><B>POTI-board {$ver}</B></a>
+Web Style by <a href="http://www.punyu.net/" target=_top title="MONO WHITE {$tver} (by ぷにゅねっと)"><B>MONO WHITE</B></a><BR>
+OriginalScript - <a href="http://www.2chan.net/" target=_top title="futaba.php v0.8 lot.031015 (by ふたば)">futaba.php</a>
+(<a href="http://php.s3.to" target=_top title="gazou.php v3.0 (by レッツPHP!)">gazou.php</a> custom)<BR>
+<!--{def paint}-->
+OekakiApplet - <!--{def usepbbs}--><a href="http://shichan.jp/" target=_top title="by しぃ堂">PaintBBS</a>　<!--{/def}--><!--{def applet}--><a href="http://shichan.jp/" target=_top title="by しぃ堂">しぃペインター</a><!--{/def}--><BR>
+<!--{/def}-->
+UseFunction - <a href="http://hoover.ktplan.ne.jp/kaihatsu/php/" target=_top title="HTMLテンプレート v1.3.2 (by PHP開発日誌)">HTMLテンプレート</a> 
+，<a href="http://wondercatstudio.com/" target=_top title="by WonderCatStudio">動的パレットスクリプト</a>
+</small>
+</center>
+</body></html>
