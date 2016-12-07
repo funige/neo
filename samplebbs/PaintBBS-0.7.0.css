@@ -145,7 +145,7 @@
 
 .NEO #zoomPlusWrapper {
     position: absolute;
-    left: -21px; //-21px;
+    left: -21px;
     bottom: -21px;
     width: 19px;
     height: 19px;

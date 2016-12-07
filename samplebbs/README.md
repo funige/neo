@@ -6,8 +6,8 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 
     <head>
     ...
-    <link rel="stylesheet" href="neo.css" type="text/css" />
-    <script src="neo.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="PaintBBS-0.7.0.css" type="text/css" />
+    <script src="PaintBBS-0.7.0.js" charset="UTF-8"></script>
 
     </head>
 
@@ -17,7 +17,7 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 このサンプルは、[PHP製のお絵かき掲示板POTI-board + MONO_WHITE](http://www.punyu.net/php/oekaki.php) に「NEOを使う」かどうかの選択機能を追加したものです。  
 
 
-* neo.jsとneo.cssは [sample_bbs](https://github.com/funige/neo/tree/master/sample_bbs) の下にあるのをそのまま使っちゃって下さい。
+* jsとcssファイルは [/dist](https://github.com/funige/neo/tree/master/neo/dist) の下にある最新のものを使って下さい。
 
 * &lt;head>に2行追加するとき、ついでに&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEO使用時の起動が早くなります。
 

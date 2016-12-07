@@ -11,10 +11,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.7.0";
+Neo.version = "0.8.0";
 
 Neo.painter;
 Neo.fullScreen = false;
+Neo.uploaded = false;
 
 Neo.config = {
     width: 300,
@@ -88,21 +89,29 @@ Neo.init2 = function() {
 
     Neo.painter = new Neo.Painter();
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-//  Neo.canvas.oncontextmenu = function() {return false;};
-    Neo.container.oncontextmenu = function() {return false;};
 
+    Neo.container.oncontextmenu = function() {return false;};
 //  Neo.painter.onUpdateCanvas = null;
+
+    // 続きから描く
     if (Neo.config.image_canvas) {
-        Neo.painter.loadCanvas(Neo.config.image_canvas);
+        Neo.painter.loadImage(Neo.config.image_canvas);
     }
 
-//  Neo.initSkin();
-//  Neo.initComponents();
-//  Neo.initButtons();
+    // 描きかけの画像が見つかったとき
+    if (sessionStorage.getItem('timestamp')) {
+        if (confirm("以前の編集データを復元しますか？")) {
+            Neo.painter.loadSession();
+        }
+    }
 
-//  // insertCSSが終わってから
-//  Neo.resizeCanvas();
-//  Neo.container.style.visibility = "visible";
+    window.addEventListener("beforeunload", function(e) { 
+        if (!Neo.uploaded) {
+            Neo.painter.saveSession();
+        } else {
+            Neo.painter.clearSession();
+        }
+    }, false);
 }
 
 Neo.initConfig = function(applet) {
@@ -515,6 +524,7 @@ Neo.submit = function(board, blob) {
     request.open("POST", url, true);
     request.onload = function (e) {
         console.log(request.response);
+        Neo.uploaded = true;
 
         var url = Neo.config.url_exit;
         if (url[0] == '/') {

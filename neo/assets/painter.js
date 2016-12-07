@@ -122,7 +122,6 @@ Neo.Painter.prototype.build = function(div, width, height)
 
     this.setTool(new Neo.PenTool());
 
-    //alert("quickload");
 };
 
 Neo.Painter.prototype.setTool = function(tool) {
@@ -252,8 +251,6 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
-
-    window.onbeforeunload = function(e) {ref._beforeUnloadHandler(e)};
 
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
@@ -734,7 +731,7 @@ Neo.Painter.prototype.getPNG = function() {
 };
 
 Neo.Painter.prototype.clearCanvas = function(doConfirm) {
-	if (!doConfirm || window.confirm("全消しします")) {
+	if (!doConfirm || confirm("全消しします")) {
 		//Register undo first;
 		this._pushUndo();
 	
@@ -1951,13 +1948,48 @@ Neo.Painter.prototype.isWidget = function(element) {
     return  false;
 };
 
-Neo.Painter.prototype.loadCanvas = function (filename) {
-    console.log("loadCanvas " + filename);
+Neo.Painter.prototype.loadImage = function (filename) {
+    console.log("loadImage " + filename);
     var img = new Image();
     img.src = filename;
     img.onload = function() {
         var oe = Neo.painter;
         oe.canvasCtx[0].drawImage(img, 0, 0);
-	    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     };
+}
+
+Neo.Painter.prototype.loadSession = function (filename) {
+    if (sessionStorage) {
+        var img0 = new Image();
+        img0.src = sessionStorage.getItem('layer0');
+        img0.onload = function() {
+            var img1 = new Image();
+            img1.src = sessionStorage.getItem('layer1');
+            img1.onload = function() {
+                var oe = Neo.painter;
+                oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+                oe.canvasCtx[1].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+                oe.canvasCtx[0].drawImage(img0, 0, 0);
+                oe.canvasCtx[1].drawImage(img1, 0, 0);
+                oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+            }
+        }
+    }
+};
+
+Neo.Painter.prototype.saveSession = function() {
+    if (sessionStorage) {
+        sessionStorage.setItem('timestamp', +(new Date()));
+        sessionStorage.setItem('layer0', this.canvas[0].toDataURL('image/png'));
+        sessionStorage.setItem('layer1', this.canvas[1].toDataURL('image/png'));
+    }
+};
+
+Neo.Painter.prototype.clearSession = function() {
+    if (sessionStorage) {
+        sessionStorage.removeItem('timestamp');
+        sessionStorage.removeItem('layer0');
+        sessionStorage.removeItem('layer1');
+    }
 };

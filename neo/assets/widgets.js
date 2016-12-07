@@ -508,11 +508,11 @@ Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
 Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", 
-//                                      "角取り", 
+                                        "角取り", 
                                         "左右反転", "上下反転", "傾け"];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_MERGE,
-//                                Neo.Painter.TOOLTYPE_BLURRECT,
+                                  Neo.Painter.TOOLTYPE_BLURRECT,
                                   Neo.Painter.TOOLTYPE_FLIP_H,
                                   Neo.Painter.TOOLTYPE_FLIP_V,
                                   Neo.Painter.TOOLTYPE_TURN];
@@ -545,7 +545,7 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク"]; //, "加算", "逆加算"];
+Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク", "加算", "逆加算"];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;

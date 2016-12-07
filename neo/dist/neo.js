@@ -11,10 +11,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.7.0";
+Neo.version = "0.8.0";
 
 Neo.painter;
 Neo.fullScreen = false;
+Neo.uploaded = false;
 
 Neo.config = {
     width: 300,
@@ -88,21 +89,29 @@ Neo.init2 = function() {
 
     Neo.painter = new Neo.Painter();
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-//  Neo.canvas.oncontextmenu = function() {return false;};
-    Neo.container.oncontextmenu = function() {return false;};
 
+    Neo.container.oncontextmenu = function() {return false;};
 //  Neo.painter.onUpdateCanvas = null;
+
+    // 続きから描く
     if (Neo.config.image_canvas) {
-        Neo.painter.loadCanvas(Neo.config.image_canvas);
+        Neo.painter.loadImage(Neo.config.image_canvas);
     }
 
-//  Neo.initSkin();
-//  Neo.initComponents();
-//  Neo.initButtons();
+    // 描きかけの画像が見つかったとき
+    if (sessionStorage.getItem('timestamp')) {
+        if (confirm("以前の編集データを復元しますか？")) {
+            Neo.painter.loadSession();
+        }
+    }
 
-//  // insertCSSが終わってから
-//  Neo.resizeCanvas();
-//  Neo.container.style.visibility = "visible";
+    window.addEventListener("beforeunload", function(e) { 
+        if (!Neo.uploaded) {
+            Neo.painter.saveSession();
+        } else {
+            Neo.painter.clearSession();
+        }
+    }, false);
 }
 
 Neo.initConfig = function(applet) {
@@ -515,6 +524,7 @@ Neo.submit = function(board, blob) {
     request.open("POST", url, true);
     request.onload = function (e) {
         console.log(request.response);
+        Neo.uploaded = true;
 
         var url = Neo.config.url_exit;
         if (url[0] == '/') {
@@ -775,7 +785,6 @@ Neo.Painter.prototype.build = function(div, width, height)
 
     this.setTool(new Neo.PenTool());
 
-    //alert("quickload");
 };
 
 Neo.Painter.prototype.setTool = function(tool) {
@@ -905,8 +914,6 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
-
-    window.onbeforeunload = function(e) {ref._beforeUnloadHandler(e)};
 
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
@@ -1387,7 +1394,7 @@ Neo.Painter.prototype.getPNG = function() {
 };
 
 Neo.Painter.prototype.clearCanvas = function(doConfirm) {
-	if (!doConfirm || window.confirm("全消しします")) {
+	if (!doConfirm || confirm("全消しします")) {
 		//Register undo first;
 		this._pushUndo();
 	
@@ -2604,16 +2611,52 @@ Neo.Painter.prototype.isWidget = function(element) {
     return  false;
 };
 
-Neo.Painter.prototype.loadCanvas = function (filename) {
-    console.log("loadCanvas " + filename);
+Neo.Painter.prototype.loadImage = function (filename) {
+    console.log("loadImage " + filename);
     var img = new Image();
     img.src = filename;
     img.onload = function() {
         var oe = Neo.painter;
         oe.canvasCtx[0].drawImage(img, 0, 0);
-	    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     };
+}
+
+Neo.Painter.prototype.loadSession = function (filename) {
+    if (sessionStorage) {
+        var img0 = new Image();
+        img0.src = sessionStorage.getItem('layer0');
+        img0.onload = function() {
+            var img1 = new Image();
+            img1.src = sessionStorage.getItem('layer1');
+            img1.onload = function() {
+                var oe = Neo.painter;
+                oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+                oe.canvasCtx[1].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+                oe.canvasCtx[0].drawImage(img0, 0, 0);
+                oe.canvasCtx[1].drawImage(img1, 0, 0);
+                oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+            }
+        }
+    }
 };
+
+Neo.Painter.prototype.saveSession = function() {
+    if (sessionStorage) {
+        sessionStorage.setItem('timestamp', +(new Date()));
+        sessionStorage.setItem('layer0', this.canvas[0].toDataURL('image/png'));
+        sessionStorage.setItem('layer1', this.canvas[1].toDataURL('image/png'));
+    }
+};
+
+Neo.Painter.prototype.clearSession = function() {
+    if (sessionStorage) {
+        sessionStorage.removeItem('timestamp');
+        sessionStorage.removeItem('layer0');
+        sessionStorage.removeItem('layer1');
+    }
+};
+
 'use strict';
 
 Neo.ToolBase = function() {};
@@ -4359,11 +4402,11 @@ Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
 Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", 
-//                                      "角取り", 
+                                        "角取り", 
                                         "左右反転", "上下反転", "傾け"];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_MERGE,
-//                                Neo.Painter.TOOLTYPE_BLURRECT,
+                                  Neo.Painter.TOOLTYPE_BLURRECT,
                                   Neo.Painter.TOOLTYPE_FLIP_H,
                                   Neo.Painter.TOOLTYPE_FLIP_V,
                                   Neo.Painter.TOOLTYPE_TURN];
@@ -4396,7 +4439,7 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク"]; //, "加算", "逆加算"];
+Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク", "加算", "逆加算"];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;
