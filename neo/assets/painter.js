@@ -1273,6 +1273,30 @@ Neo.Painter.prototype.xorPixel = function(buf32, bufWidth, x, y, c) {
     buf32[index] ^= c;
 };
 
+Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y3) {
+    var a0 = (1 - t) * (1 - t) * (1 - t);
+    var a1 = (1 - t) * (1 - t) * t * 3;
+    var a2 = (1 - t) *  t * t * 3;
+    var a3 = t * t * t;
+
+    var x = x0 * a0 + x1 * a1 + x2 * a2 + x3 * a3;
+    var y = y0 * a0 + y1 * a1 + y2 * a2 + y3 * a3;
+    return [x, y];
+}
+
+Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
+    var n = Math.ceil(Math.max(Math.abs(x3 - x0), Math.abs(y3 - y0)) / 5);
+
+    for (var i = 0; i < n; i++) {
+        var t0 = i * 1.0 / n;
+        var t1 = (i + 1) * 1.0 / n;
+        var p0 = this.getBezierPoint(t0, x0, y0, x1, y1, x2, y2, x3, y3);
+        var p1 = this.getBezierPoint(t1, x0, y0, x1, y1, x2, y2, x3, y3);
+
+        this.drawLine(ctx, p0[0], p0[1], p1[0], p1[1], type);
+    }
+}
+
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
 Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
     x0 = Math.round(x0);
@@ -1441,7 +1465,7 @@ Neo.Painter.prototype.drawXORLine = function(ctx, x0, y0, x1, y1, c) {
 
     var left = ((x0 < x1) ? x0 : x1);
     var top = ((y0 < y1) ? y0 : y1);
-    console.log("left:"+left+" top:"+top+" width:"+width+" height:"+height);
+//  console.log("left:"+left+" top:"+top+" width:"+width+" height:"+height);
 
     var imageData = ctx.getImageData(left, top, width + 1, height + 1);
     var buf32 = new Uint32Array(imageData.data.buffer);

@@ -383,17 +383,17 @@ Neo.Pen2Tip = function() {};
 Neo.Pen2Tip.prototype = new Neo.ToolTip();
 
 Neo.Pen2Tip.prototype.toolStrings = ["トーン", 
-                                     //"ぼかし", 
+                                     "ぼかし", 
                                      "覆い焼き", 
                                      "焼き込み"]; 
 Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE,
-                             //Neo.Painter.TOOLTYPE_BLUR,
+                               Neo.Painter.TOOLTYPE_BLUR,
                                Neo.Painter.TOOLTYPE_DODGE,
                                Neo.Painter.TOOLTYPE_BURN];
 
 Neo.Pen2Tip.prototype.hasTintImage = true;
 Neo.Pen2Tip.prototype.toolIcons = [Neo.ToolTip.tone,
-                                 //Neo.ToolTip.tone,
+                                   Neo.ToolTip.tone,
                                    Neo.ToolTip.dodge,
                                    Neo.ToolTip.burn];
 

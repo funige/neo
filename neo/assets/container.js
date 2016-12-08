@@ -100,9 +100,11 @@ Neo.init2 = function() {
 
     // 描きかけの画像が見つかったとき
     if (sessionStorage.getItem('timestamp')) {
-        if (confirm("以前の編集データを復元しますか？")) {
-            Neo.painter.loadSession();
-        }
+        setTimeout(function () {
+            if (confirm("以前の編集データを復元しますか？")) {
+                Neo.painter.loadSession();
+            }
+        }, 1);
     }
 
     window.addEventListener("beforeunload", function(e) { 

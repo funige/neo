@@ -126,6 +126,11 @@ Neo.DrawToolBase.prototype = new Neo.ToolBase();
 Neo.DrawToolBase.prototype.isUpMove = false;
 Neo.DrawToolBase.prototype.step = 0;
 
+Neo.DrawToolBase.prototype.init = function() {
+    this.step = 0;
+    this.isUpMove = true;
+};
+
 Neo.DrawToolBase.prototype.downHandler = function(oe) {
     switch (oe.drawType) {
     case Neo.Painter.DRAWTYPE_FREEHAND:
@@ -167,6 +172,13 @@ Neo.DrawToolBase.prototype.upMoveHandler = function(oe) {
         this.lineUpMoveHandler(oe); break;
     case Neo.Painter.DRAWTYPE_BEZIER:
         this.bezierUpMoveHandler(oe); break;
+    }
+};
+
+Neo.DrawToolBase.prototype.keyDownHandler = function(e) {
+    switch (Neo.painter.drawType) {
+    case Neo.Painter.DRAWTYPE_BEZIER:
+        this.bezierKeyDownHandler(e); break;
     }
 };
 
@@ -242,13 +254,6 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
     var r = oe.lineWidth + 1;
     var rect = oe.getBound(oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, r);
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
-
-//  var r = Math.ceil(Neo.painter.lineWidth / 2);
-//  var left = Math.round((oe.mouseX < oe.prevMouseX) ? oe.mouseX : oe.prevMouseX)-r;
-//  var top = Math.round((oe.mouseY < oe.prevMouseY) ? oe.mouseY: oe.prevMouseY)-r;
-//  var width = Math.abs(oe.mouseX - oe.prevMouseX);
-//  var height = Math.abs(oe.mouseY - oe.prevMouseY);
-//	oe.updateDestCanvas(left, top, width + r*2, height + r*2, true);
 };
 
 Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function(oe) {
@@ -313,9 +318,9 @@ Neo.DrawToolBase.prototype.lineMoveHandler = function(oe) {
 Neo.DrawToolBase.prototype.lineUpMoveHandler = function(oe) {
 };
 
-Neo.DrawToolBase.prototype.drawLineCursor = function(oe) {
-    var mx = oe.mouseX;
-    var my = oe.mouseY;
+Neo.DrawToolBase.prototype.drawLineCursor = function(oe, mx, my) {
+    if (!mx) mx = oe.mouseX;
+    if (!my) my = oe.mouseY;
     var nx = this.startX;
     var ny = this.startY;
     var ctx = oe.destCanvasCtx;
@@ -352,6 +357,7 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
     switch (this.step) {
     case 1:
         console.log("get start & end point.");
+        oe.prepareDrawing();
         this.x3 = oe.mouseX;
         this.y3 = oe.mouseY;
         break;
@@ -366,11 +372,16 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         console.log("get 2nd control point.");
         this.x2 = oe.mouseX;
         this.y2 = oe.mouseY;
-        console.log("[draw bezier]", 
-                    this.startX, this.startY, 
-                    this.x1, this.y1, 
-                    this.x2, this.y2, 
-                    this.x3, this.y3);
+
+        oe._pushUndo();
+//      oe.prepareDrawing();
+        oe.drawBezier(oe.canvasCtx[oe.current],
+                      this.x0, this.y0, this.x1, this.y1,
+                      this.x2, this.y2, this.x3, this.y3, this.lineType);
+
+        oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        this.step = 0;
         break;
 
     default:
@@ -380,18 +391,78 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
 };
 
 Neo.DrawToolBase.prototype.bezierMoveHandler = function(oe) {
-    oe._pushUndo();
-    oe.prepareDrawing();
-    var ctx = oe.canvasCtx[oe.current];
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    this.drawLineCursor(oe);
+    switch (this.step) {
+    case 0:
+        if (!this.isUpMove) {
+            oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, false);
+            this.drawLineCursor(oe);
+        }
+        break;
+    case 1:
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, false);
+        this.drawBezierCursor1(oe);
+        break;
+
+    case 2:
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, false);
+        this.drawBezierCursor2(oe);
+        break;
+    }
 };
 
 Neo.DrawToolBase.prototype.bezierUpMoveHandler = function(oe) {
+    this.bezierMoveHandler(oe);
 };
 
-Neo.DrawToolBase.prototype.drawBezierCursor = function(oe) {};
+Neo.DrawToolBase.prototype.bezierKeyDownHandler = function(e) {
+    if (e.keyCode == 27) { //Escでキャンセル
+        this.step = 0;
 
+        var oe = Neo.painter;
+        oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+	    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }
+};
+
+
+Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
+    var ctx = oe.destCanvasCtx;
+    oe.drawXORLine(ctx, this.x0, this.y0, oe.mouseX, oe.mouseY);
+    oe.drawXOREllipse(ctx, oe.mouseX-4, oe.mouseY-4, 8, 8);
+    oe.drawXOREllipse(ctx, this.x0-4, this.y0-4, 8, 8);
+
+    // preview
+    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.drawBezier(oe.tempCanvasCtx,
+                  this.x0, this.y0,
+                  oe.mouseX, oe.mouseY,
+                  oe.mouseX, oe.mouseY,
+                  this.x3, this.y3, this.lineType);
+    ctx.drawImage(oe.tempCanvas,
+                  0, 0, oe.canvasWidth, oe.canvasHeight,
+                  0, 0, oe.canvasWidth, oe.canvasHeight);
+};
+
+Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
+    var ctx = oe.destCanvasCtx;
+    oe.drawXORLine(ctx, this.x3, this.y3, oe.mouseX, oe.mouseY);
+    oe.drawXOREllipse(ctx, oe.mouseX-4, oe.mouseY-4, 8, 8);
+
+    oe.drawXORLine(ctx, this.x0, this.y0, this.x1, this.y1);
+    oe.drawXOREllipse(ctx, this.x1-4, this.y1-4, 8, 8);
+    oe.drawXOREllipse(ctx, this.x0-4, this.y0-4, 8, 8);
+
+    // preview
+    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.drawBezier(oe.tempCanvasCtx,
+                  this.x0, this.y0,
+                  this.x1, this.y1,
+                  oe.mouseX, oe.mouseY,
+                  this.x3, this.y3, this.lineType);
+    ctx.drawImage(oe.tempCanvas,
+                  0, 0, oe.canvasWidth, oe.canvasHeight,
+                  0, 0, oe.canvasWidth, oe.canvasHeight);
+};
 
 /*
 -------------------------------------------------------------------------
@@ -1040,8 +1111,6 @@ Neo.TextTool.prototype.type = Neo.Painter.TOOLTYPE_TEXT;
 Neo.TextTool.prototype.isUpMove = false;
 
 Neo.TextTool.prototype.downHandler = function(oe) {
-//  this.startX = oe.rawMouseX;
-//  this.startY = oe.rawMouseY;
     this.startX = oe.mouseX;
     this.startY = oe.mouseY;
 
