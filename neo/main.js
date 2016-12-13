@@ -7,11 +7,12 @@ let win;
 
 function createWindow() {
     win = new BrowserWindow({
-        "width": 1400, "height": 750,
+//      "width": 1400, "height": 750,
+        "width": 800, "height": 750,
         "node-integration": true,
     });
     win.loadURL('file://' + __dirname + '/index.html');
-    win.webContents.openDevTools(); // width: 550px
+//  win.webContents.openDevTools();
 
     win.on('closed', function() {
         win = null;
