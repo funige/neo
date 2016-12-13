@@ -38,7 +38,7 @@ Edgeにもそのうち対応します
 - リロードした時にキャンバスが保存されるように修正
 - Chromeでドラッグ中のカーソルがおかしくなる問題を修正
 
-![ver0.8](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161213/20161213130410.png?1481601887)
+![ver0.8](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161213/20161213130410.png?1481601887)  
   ver1.0は12/24予定  
   残り時間でバグをできるだけ取ります  
   オリジナルと違う部分は後世の誰かが直してくれると期待して……  
