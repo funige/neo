@@ -454,11 +454,18 @@ Neo.resizeCanvas = function() {
     var appletWidth = Neo.container.clientWidth;
     var appletHeight = Neo.container.clientHeight;
 
-    var width0 = Neo.painter.canvasWidth * Neo.painter.zoom;
-    var height0 = Neo.painter.canvasHeight * Neo.painter.zoom;
+    var canvasWidth = Neo.painter.canvasWidth;
+    var canvasHeight = Neo.painter.canvasHeight;
+
+    var width0 = canvasWidth * Neo.painter.zoom;
+    var height0 = canvasHeight * Neo.painter.zoom;
 
     var width = (width0 < appletWidth - 100) ? width0 : appletWidth - 100;
     var height = (height0 < appletHeight - 120) ? height0 : appletHeight - 120;
+
+    //width, heightは偶数でないと誤差が出るため
+    width = Math.floor(width / 2) * 2;
+    height = Math.floor(height / 2) * 2;
 
     Neo.painter.destWidth = width;
     Neo.painter.destHeight = height;
@@ -471,10 +478,13 @@ Neo.resizeCanvas = function() {
 
     Neo.canvas.style.width = width + "px";
     Neo.canvas.style.height = height + "px";
-    Neo.toolsWrapper.style.height = Neo.container.clientHeight + "px";
+
+    var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
+    Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
+//  Neo.toolsWrapper.style.height = Neo.container.clientHeight + "px";
 
     Neo.painter.setZoom(Neo.painter.zoom);
-    Neo.painter.updateDestCanvas();
+    Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight);
 };
 
 /*

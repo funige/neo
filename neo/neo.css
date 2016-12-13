@@ -31,7 +31,6 @@
 
 .NEO #toolsWrapper{
     width: 52px;
-    height: 100%; /* ここはうまく書けなかったので手動でcontainerの高さに合わせて！ */
     display: table;
     position:absolute;
     top: 0;

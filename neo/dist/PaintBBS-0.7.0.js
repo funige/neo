@@ -454,11 +454,18 @@ Neo.resizeCanvas = function() {
     var appletWidth = Neo.container.clientWidth;
     var appletHeight = Neo.container.clientHeight;
 
-    var width0 = Neo.painter.canvasWidth * Neo.painter.zoom;
-    var height0 = Neo.painter.canvasHeight * Neo.painter.zoom;
+    var canvasWidth = Neo.painter.canvasWidth;
+    var canvasHeight = Neo.painter.canvasHeight;
+
+    var width0 = canvasWidth * Neo.painter.zoom;
+    var height0 = canvasHeight * Neo.painter.zoom;
 
     var width = (width0 < appletWidth - 100) ? width0 : appletWidth - 100;
     var height = (height0 < appletHeight - 120) ? height0 : appletHeight - 120;
+
+    //width, heightは偶数でないと誤差が出るため
+    width = Math.floor(width / 2) * 2;
+    height = Math.floor(height / 2) * 2;
 
     Neo.painter.destWidth = width;
     Neo.painter.destHeight = height;
@@ -471,10 +478,13 @@ Neo.resizeCanvas = function() {
 
     Neo.canvas.style.width = width + "px";
     Neo.canvas.style.height = height + "px";
-    Neo.toolsWrapper.style.height = Neo.container.clientHeight + "px";
+
+    var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
+    Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
+//  Neo.toolsWrapper.style.height = Neo.container.clientHeight + "px";
 
     Neo.painter.setZoom(Neo.painter.zoom);
-    Neo.painter.updateDestCanvas();
+    Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight);
 };
 
 /*
@@ -713,7 +723,7 @@ Neo.Painter.prototype.isShiftDown = false;
 Neo.Painter.prototype.isCtrlDown = false;
 Neo.Painter.prototype.isAltDown = false;
 
-Neo.Painter.prototype.onUpdateCanvas;
+//Neo.Painter.prototype.onUpdateCanvas;
 Neo.Painter.prototype._roundData = [];
 Neo.Painter.prototype._toneData = [];
 Neo.Painter.prototype.toolStack = [];
@@ -895,11 +905,18 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     this.tempCanvas.style.position = "absolute";
     this.tempCanvas.enabled = false;
 
-    this.destCanvas = document.createElement("canvas");
+    var array = this.container.getElementsByTagName("canvas");
+    if (array.length > 0) {
+        this.destCanvas = array[0];
+    } else {
+        this.destCanvas = document.createElement("canvas");
+        this.container.appendChild(this.destCanvas);
+    }
+
     this.destCanvasCtx = this.destCanvas.getContext("2d");
+//  this.destCanvas.id = "destCanvas";
     this.destCanvas.width = destWidth;
     this.destCanvas.height = destHeight;
-    this.container.appendChild(this.destCanvas);
 
     this.destCanvas.style.imageRendering = "pixelated";
     this.destCanvasCtx.imageSmoothingEnabled = false;
@@ -983,12 +1000,15 @@ Neo.Painter.prototype.getToneData = function(alpha) {
             return this._toneData[i];
         }
     }
-//  console.log("toneData " + i);
     return this._toneData[i];
 };
 
 Neo.Painter.prototype._initInputText = function() {
-    var text = document.createElement("div");
+    var text = document.getElementById("inputtext");
+    if (!text) {
+        text = document.createElement("div");
+    }
+
     text.id = "inputext";
     text.setAttribute("contentEditable", true);
     text.spellcheck = false;
@@ -996,6 +1016,7 @@ Neo.Painter.prototype._initInputText = function() {
     text.innerHTML = "";
 
     text.style.display = "none";
+//  text.style.userSelect = "none";
     Neo.painter.container.appendChild(text);
     this.inputText = text;
 
@@ -1004,6 +1025,7 @@ Neo.Painter.prototype._initInputText = function() {
 
 Neo.Painter.prototype.hideInputText = function() {
     var text = this.inputText;
+    text.blur();
     text.style.display = "none";
 };
 
@@ -1078,6 +1100,12 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
+    if (e.target == Neo.painter.destCanvas) {
+        //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
+        //http://stackoverflow.com/questions/2745028/chrome-sets-cursor-to-text-while-dragging-why    
+        e.preventDefault(); 
+    }
+
     if (e.button == 2) {
         this.isMouseDownRight = true;
 
@@ -1439,11 +1467,46 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
                                      x + this.tempX, y + this.tempY, width, height);
 	}
 	this.destCanvasCtx.restore();
-	
-	if (this.onUpdateCanvas) {
-        this.onUpdateCanvas(this);
-    }
 };
+
+/*
+Neo.Painter.prototype.__updateDestCanvas = function(x, y, width, height, useTemp) {
+    if (x + width > this.canvasWidth) width = this.canvasWidth - x;
+    if (y + height > this.canvasHeight) height = this.canvasHeight - y;
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (width <= 0 || height <= 0) return;
+
+    var destImageData = this.destCanvasCtx.getImageData(x, y, width, height);
+    var destBuf32 = new Uint32Array(destImageData.data.buffer);
+    var destBuf8 = new Uint8ClampedArray(destImageData.data.buffer);
+
+    var imageData = this.canvasCtx[0].getImageData(x, y, width, height);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+
+    var index = 0;
+    for (var j = 0; j < height; j++) {
+        for (var i = 0; i < width; i++) {
+            var r = buf8[index + 0];
+            var g = buf8[index + 1];
+            var b = buf8[index + 2];
+            var a = buf8[index + 3];
+
+            destBuf8[index + 0] = r;
+            destBuf8[index + 1] = g;
+            destBuf8[index + 2] = b;
+            destBuf8[index + 3] = a;
+
+            index += 4;
+        }
+    }
+
+    destImageData.data.set(destBuf8);
+    this.destCanvasCtx.putImageData(destImageData, x, y);
+};
+*/
+
 
 Neo.Painter.prototype.getBound = function(x0, y0, x1, y1, r) {
     var left = Math.floor((x0 < x1) ? x0 : x1);
@@ -1541,35 +1604,56 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
     var g = this._currentMask[1];
     var b = this._currentMask[2];
 
+    var r1 = this._currentColor[0];
+    var g1 = this._currentColor[1];
+    var b1 = this._currentColor[2];
+
+    var r0 = buf8[index + 0];
+    var g0 = buf8[index + 1];
+    var b0 = buf8[index + 2];
+    var a0 = buf8[index + 3];
+
     switch (this.maskType) {
     case Neo.Painter.MASKTYPE_NONE:
         return;
 
     case Neo.Painter.MASKTYPE_NORMAL:
-        return (buf8[index + 3] != 0 &&
-                buf8[index + 0] == r &&
-                buf8[index + 1] == g &&
-                buf8[index + 2] == b) ? true : false;
+        return (a0 != 0 &&
+                r0 == r &&
+                g0 == g &&
+                b0 == b) ? true : false;
 
     case Neo.Painter.MASKTYPE_REVERSE:
-        return (buf8[index + 3] == 0 ||
-                buf8[index + 0] != r ||
-                buf8[index + 1] != g ||
-                buf8[index + 2] != b) ? true : false;
+        return (a0 == 0 ||
+                r0 != r ||
+                g0 != g ||
+                b0 != b) ? true : false;
 
     case Neo.Painter.MASKTYPE_ADD:
-        return (buf8[index + 3] != 0 &&
-                !(buf8[index + 0] > r &&
-                  buf8[index + 1] > g &&
-                  buf8[index + 2] > b)) ? true : false;
+        if (a0 > 0) {
+            var sort = this.test(r0, g0, b0);
+            for (var i = 0; i < 3; i++) {
+                var c = sort[i];
+                if (buf8[index + c] < this._currentColor[c]) return true;
+            }
+            return false;
+
+        } else {
+            return false;
+        }
 
     case Neo.Painter.MASKTYPE_SUB:
-        return (buf8[index + 3] == 0 ||
-                buf8[index + 0] <= r ||
-                buf8[index + 1] <= g ||
-                buf8[index + 2] <= b) ? true : false;
+        if (a0 > 0) {
+            var sort = this.test(r0, g0, b0);
+            for (var i = 0; i < 3; i++) {
+                var c = sort[i];
+                if (buf8[index + c] > this._currentColor[c]) return true;
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
-    return false;
 };
 
 Neo.Painter.prototype.setPoint = function(buf8, bufWidth, x0, y0, left, top, type) {
@@ -1786,39 +1870,35 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y) {
 
     var shape = this._roundData[d];
     var shapeIndex = 0;
+    var height = buf8.length / (width * 4);
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+//  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    var a1 = this.alpha / 12;
     if (a1 == 0) return;
+    var blur = a1;
 
-    for (var i = 0; i < d; i++) {
-        for (var j = 0; j < d; j++) {
+    var tmp = new Uint8ClampedArray(buf8.length);
+    for (var i = 0; i < buf8.length; i++) {
+        tmp[i] = buf8[i];
+    }
+
+    for (var j = 0; j < d; j++) {
+        for (var i = 0; i < d; i++) {
             if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-                var r0 = buf8[index + 0];
-                var g0 = buf8[index + 1];
-                var b0 = buf8[index + 2];
-                var a0 = buf8[index + 3] / 255.0;
+                var rgba = [0, 0, 0, 0, 0];
 
-                var a = a0 + a1 - a0 * a1;
-                if (a > 0) {
-                    var a1x = Math.max(a1, 1.0/255);
+                this.addBlur(tmp, index, 1.0 - blur*4, rgba);
 
-                    var r = (r1 * a1x + r0 * a0) / (a0 + a1x);
-                    var g = (g1 * a1x + g0 * a0) / (a0 + a1x);
-                    var b = (b1 * a1x + b0 * a0) / (a0 + a1x);
+                if (x + i > 0) this.addBlur(tmp, index - 4, blur, rgba);
+                if (x + i < width - 1) this.addBlur(tmp, index + 4, blur, rgba);
+                if (y + j > 0) this.addBlur(tmp, index - width*4, blur, rgba);
+                if (y + j < height - 1) this.addBlur(tmp, index + width*4, blur, rgba);
 
-                    r = (r1 > r0) ? Math.ceil(r) : Math.floor(r);
-                    g = (g1 > g0) ? Math.ceil(g) : Math.floor(g);
-                    b = (b1 > b0) ? Math.ceil(b) : Math.floor(b);
-                }
-
-                var tmp = a * 255;
-                a = Math.ceil(tmp);
-
-                buf8[index + 0] = r;
-                buf8[index + 1] = g;
-                buf8[index + 2] = b;
-                buf8[index + 3] = a;
-
+                var w = rgba[4]
+                buf8[index + 0] = Math.round(rgba[0]);
+                buf8[index + 1] = Math.round(rgba[1]);
+                buf8[index + 2] = Math.round(rgba[2]);
+                buf8[index + 3] = Math.round((rgba[3] / w) * 255.0);
             }
             index += 4;
         }
@@ -2299,52 +2379,56 @@ Neo.Painter.prototype.blurRect = function(ctx, x, y, width, height) {
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var clone = new Uint8ClampedArray(buf8.length);
 
-    for (var i = 0; i < buf8.length; i++) {
-        clone[i] = buf8[i];
-    }
+    var tmp = new Uint8ClampedArray(buf8.length);
+    for (var i = 0; i < buf8.length; i++) tmp[i] = buf8[i];
 
     var index = 0;
-    var a0 = this.alpha;
-    var a1 = 1.0 - this.alpha;
+    var a1 = this.alpha / 12;
+    var blur = a1;
 
     for (var j = 0; j < height; j++) {
         for (var i = 0; i < width; i++) {
-            var rgbaw = [0, 0, 0, 0, 0];
+            var rgba = [0, 0, 0, 0, 0];
 
-            this.addNeighbor(clone, index, a1, rgbaw);
-            if (i > 0) this.addNeighbor(clone, index - 1, a0, rgbaw);
-            if (i < width - 1) this.addNeighbor(clone, index + 1, a0, rgbaw);
+            this.addBlur(tmp, index, 1.0 - blur*4, rgba);
 
-            if (j > 0) {
-                this.addNeighbor(clone, index - width, a0, rgbaw);
-                if (i > 0) this.addNeighbor(clone, index - width-1, a0, rgbaw);
-                if (i < width-1) this.addNeighbor(clone, index - width+1, a0, rgbaw);
-            }
-            if (j < height - 1) {
-                this.addNeighbor(clone, index + width, a0, rgbaw);
-                if (i > 0) this.addNeighbor(clone, index + width-1, a0, rgbaw);
-                if (i < width-1) this.addNeighbor(clone, index + width+1, a0, rgbaw);
-            }
+            if (i > 0) this.addBlur(tmp, index - 4, blur, rgba);
+            if (i < width - 1) this.addBlur(tmp, index + 4, blur, rgba);
+            if (j > 0) this.addBlur(tmp, index - width*4, blur, rgba);
+            if (j < height - 1) this.addBlur(tmp, index + width*4, blur, rgba);
 
-            buf8[index*4 + 0] = Math.round(rgbaw[0] / rgbaw[4]);
-            buf8[index*4 + 1] = Math.round(rgbaw[1] / rgbaw[4]);
-            buf8[index*4 + 2] = Math.round(rgbaw[2] / rgbaw[4]);
-            buf8[index*4 + 3] = Math.round(rgbaw[3] / rgbaw[4]);
-            index++;
+            var w = rgba[4];
+            buf8[index + 0] = Math.round(rgba[0]);
+            buf8[index + 1] = Math.round(rgba[1]);
+            buf8[index + 2] = Math.round(rgba[2]);
+            buf8[index + 3] = Math.ceil((rgba[3] / w) * 255.0);
+
+            index += 4;
         }
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.addNeighbor = function(buffer, index, a, rgbaw) {
-    rgbaw[0] += buffer[index*4 + 0] * a;
-    rgbaw[1] += buffer[index*4 + 1] * a;
-    rgbaw[2] += buffer[index*4 + 2] * a;
-    rgbaw[3] += buffer[index*4 + 3] * a;
-    rgbaw[4] += a;
+Neo.Painter.prototype.addBlur = function(buffer, index, a, rgba) {
+    var r0 = rgba[0];
+    var g0 = rgba[1];
+    var b0 = rgba[2];
+    var a0 = rgba[3];
+    var r1 = buffer[index + 0];
+    var g1 = buffer[index + 1];
+    var b1 = buffer[index + 2];
+    var a1 = (buffer[index + 3] / 255.0) * a;
+    rgba[4] += a;
+
+    var a = a0 + a1;
+    if (a > 0) {
+        rgba[0] = (r1 * a1 + r0 * a0) / (a0 + a1);
+        rgba[1] = (g1 * a1 + g0 * a0) / (a0 + a1);
+        rgba[2] = (b1 * a1 + b0 * a0) / (a0 + a1);
+        rgba[3] = a;
+    }
 };
 
 Neo.Painter.prototype.pickColor = function(x, y) {
@@ -2637,6 +2721,7 @@ Neo.Painter.prototype.isWidget = function(element) {
     return  false;
 };
 
+
 Neo.Painter.prototype.loadImage = function (filename) {
     console.log("loadImage " + filename);
     var img = new Image();
@@ -2682,6 +2767,15 @@ Neo.Painter.prototype.clearSession = function() {
         sessionStorage.removeItem('layer1');
     }
 };
+
+Neo.Painter.prototype.test = function(r0, g0, b0) {
+    var min = (r0 < g0) ? ((r0 < b0) ? 0 : 2) : ((g0 < b0) ? 1 : 2);
+    var max = (r0 > g0) ? ((r0 > b0) ? 0 : 2) : ((g0 > b0) ? 1 : 2);
+    var mid = (min + max == 1) ? 2 : ((min + max == 2) ? 1 : 0);
+    return [min, mid, max];
+}
+
+
 
 'use strict';
 
@@ -2936,7 +3030,7 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
         oe.cursorRect = null;
     }
 
-    var r = oe.lineWidth + 1;
+    var r = Math.ceil(oe.lineWidth / 2);
     var rect = oe.getBound(oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, r);
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
 };
@@ -2948,8 +3042,6 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function(oe) {
         oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
         oe.cursorRect = null;
     }
-
-//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     this.drawCursor(oe);
 };
 
@@ -2970,7 +3062,7 @@ Neo.DrawToolBase.prototype.drawCursor = function(oe) {
     oe.drawXOREllipse(ctx, x-r, y-r, r*2, r*2, false, c);
 
     ctx.restore();
-    oe.cursorRect = oe.getBound(mx, my, mx, my, d * 0.5);
+    oe.cursorRect = oe.getBound(mx, my, mx, my, Math.ceil(d / 2));
 }
 
 
@@ -4291,19 +4383,22 @@ Neo.ToolTip.prototype.tintImage = function(ctx, c) {
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
-
 };
 
 Neo.ToolTip.bezier = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
 Neo.ToolTip.blur = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAASUlEQVRIx+3VMQ4AIAgEQeD/f8bWWBnJYUh2SgtgK82G8/MhzVKwxOtTLgIUx6tDout4laiPIICA0Qj4bXxAy0+8LZP9yACAJwsqkggS55eiZgAAAABJRU5ErkJggg==";
+Neo.ToolTip.blurrect = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAX0lEQVRIx+2XQQ4AEAwEt+I7/v+8Org6lJKt6NzLjjYE8DAKtLpYoDeCCCC7tYUd3ru2qQOzDTyndhJzB6KSAmxSgM0fAlGuzBnmlziqxB8jFJkUYJMCbAQYPxt2kF06fvYKgjPBO/IAAAAASUVORK5CYII=";
 Neo.ToolTip.brush = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQUlEQVRIx2NgGOKAEcb4z8CweRA4xpdUPSxofJ8BdP8WcjQxDaCDqQLQY4CsUBgFo2AUjIJRMApGwSgYBaNgZAIA0CoDwDbZu8oAAAAASUVORK5CYII=";
 Neo.ToolTip.burn = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPklEQVRIx+3PMRIAMAQAQbzM0/0sKZPeiDG57TQ4keH0Htx9VR+MCM1vOezl8xUsv4IAAkYjoBsB3QgAgL9tYXgF19rh9yoAAAAASUVORK5CYII=";
-Neo.ToolTip.dodge = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPklEQVRIx+3PMRIAMAQAQbzM0/0sKZPeiDG57TQ4keH0HiJiVR90d81vOezl8xUsv4IAAkYjoBsB3QgAgL9tIyQHV/nXwScAAAAASUVORK5CYII=";
+Neo.ToolTip.copy = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAW0lEQVRIx+2XMQoAIAwDU/E7/v95Orh2KMUSC7m5Qs6AUqAxG1gzOLirwxhgmXOjOlg1oQY8sjf2mvYNSICNBNhIgE3oH/jlzfdo34AE2EiATXsBA+5mww6S5QASDwSGMt8ouwAAAABJRU5ErkJggg==";
+Neo.ToolTip.copy2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAN0lEQVRIx+3PwQkAIBADwdPKt3MtQVCOPNz5B7JV0pNxOwRW9zng+G92n+hmQJoBaQakGSBJf9tyBgQUV/fKCAAAAABJRU5ErkJggg==";
 Neo.ToolTip.ellipse = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAATklEQVRIx+2VMQ4AIAgD6/8fjbOJi1LFmt4OPQ0KIE7LNgggCBLbHkuFM9lM+Om+QwDjpksyb4tT86vlvzgEbYxefQPyv5D8HjDGGGOk6b3jJ+lYubd8AAAAAElFTkSuQmCC";
 Neo.ToolTip.ellipsefill = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAVUlEQVRIx+2VURIAEAgFc/9D5waSHpV5+43ZHRMizRnRA1REARLHHq6NCFl01Nail+LeEDMgU34nYhlQQd6K+PsGKkSEZyArBPoK3Y6K/AOEEEJIayZHbhIKjkZrFwAAAABJRU5ErkJggg==";
 Neo.ToolTip.eraser = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABQElEQVRIx+1WQY7CMAwcI37Cad+yXOgH4Gu8gAt9CtrDirfMHjZJbbcktVSpQnROSeMkY3vsFHhzSG3xfLpz/JVmG0mIqDkIMcc6+7Kejx6fdb0dq7w09rVFkrjejrMOunQ9vg7f/5QEIAd6E1Eo38WF8fF7n8sdALCrLerIzoFI4sI0Vtv1SYZ8CVbeF7tzF7JugIkVkxOauc6CIe8842S+XmMfsq7TN9LRTngZmTmVD4SrnzYaGYhFoxCWgajXuMjYGTuJ3dlwIBIN3U0cUVqLXCs5E7YeVsvAYJul5HWeLUhL3EpstQwooqoOTEHDOebpMn7ngkUsg3RotU8X1MkuVDrYohkIupC0YArX6T+PfX3kcbQLNV/iCKi6EB3xqXdAZ0JKthZ8B0QEl673NIEX/0I/z36Rf6ENGzZ8EP4A8Lp+9e9VWC4AAAAASUVORK5CYII=";
+Neo.ToolTip.flip = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAZklEQVRIx+2XQQoAIAgE1+g7/f95degWHSyTTXDOhTsSiUBgOtCq8mD3DiOA3NxTCVgKaLA0qHiFOsHSnC8ELKQAmxRgE15APQfWv9pzLjwX+CXsjvBPKAXYpACb8AICzM2GHeSWAfVOCIiJuQ9tAAAAAElFTkSuQmCC";
 Neo.ToolTip.freehand = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAdUlEQVRIx+2WUQrAMAhD3dj9r+y+VoSyLhYDynzQv1qiJlCR4hzeAhVRsiC3Jkj0c5hN7Lx7IQ9SphLE1ICdwko420purEWQuywN3pqxgcw2+WwAtU1GzoqiLZNwZBvMAIcO8y3YKUO8mkbmjPzjK9E0TUPjBoeyLAS0usjLAAAAAElFTkSuQmCC";
 Neo.ToolTip.line = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAU0lEQVRIx+2UQQ4AIAjD8P+PxivRGDQC47C+oN1hIgTLQAt4qIga2c23XYAVPkm3CVhlb4ShAa/rQgMi1i0NyFg3LaBq3bAA1LpfAd7/EkIIIR2YXFYSCpWS8w8AAAAASUVORK5CYII=";
+Neo.ToolTip.merge = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAW0lEQVRIx+2XQQrAQAgDx9Lv9JF9+e6h54IINlgyZ4UMOYgwmAXXmRxc3WECorJ3dAfrJtXAC7c6PPygAQuosYAaC6hJ3YHqlfyC8Q1YQI0F1IwXCHg+G3WQKhvwgwUFmFyYbwAAAABJRU5ErkJggg==";
 Neo.ToolTip.pen = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAK0lEQVRIx+3OsQkAMAwDQXn/oe3WfSAEctd9I5TA32pHJ/3AoTpfAQCAGwaa5AICJLKWSQAAAABJRU5ErkJggg==";
 Neo.ToolTip.rect = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQElEQVRIx+3TMQ4AIAhD0WK8/5VxdcIYY8rw3wok7YAEr6iGKaU74BY0ro+6FKhyDHe4VxRwm6eFLn8AAADwwQIwTQgGo9ZMywAAAABJRU5ErkJggg==";
 Neo.ToolTip.rectfill = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANElEQVRIx+3PIQ4AIBADwcL//3xYBMEgLiQztmab0GvcxkqqO3ALPbbO7rBXDnRzAADgYwvqDwIMJlGb5QAAAABJRU5ErkJggg==";
@@ -4375,15 +4470,15 @@ Neo.Pen2Tip.prototype.toolStrings = ["トーン",
                                      "ぼかし", 
                                      "覆い焼き", 
                                      "焼き込み"]; 
-Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE,
-                               Neo.Painter.TOOLTYPE_BLUR,
+Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE, 
+                              Neo.Painter.TOOLTYPE_BLUR,
                                Neo.Painter.TOOLTYPE_DODGE,
                                Neo.Painter.TOOLTYPE_BURN];
 
 Neo.Pen2Tip.prototype.hasTintImage = true;
 Neo.Pen2Tip.prototype.toolIcons = [Neo.ToolTip.tone,
-                                   Neo.ToolTip.tone,
-                                   Neo.ToolTip.dodge,
+                                   Neo.ToolTip.blur,
+                                   Neo.ToolTip.burn,
                                    Neo.ToolTip.burn];
 
 Neo.Pen2Tip.prototype.init  = function(name, params) {
@@ -4397,9 +4492,54 @@ Neo.Pen2Tip.prototype.update = function() {
         if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
-    this.draw(Neo.painter.foregroundColor);
+    switch (this.tools[this.mode]) {
+    case Neo.Painter.TOOLTYPE_TONE:
+        this.drawTone(Neo.painter.foregroundColor);
+        break;
+
+    case Neo.Painter.TOOLTYPE_DODGE:
+        this.draw(0xffc0c0c0);
+        break;
+
+    case Neo.Painter.TOOLTYPE_BURN:
+        this.draw(0xff404040);
+        break;
+
+    default:
+        this.draw(Neo.painter.foregroundColor);
+        break;
+    }
     this.label.innerHTML = this.toolStrings[this.mode];
 };
+
+Neo.Pen2Tip.prototype.drawTone = function() {
+    var ctx = this.canvas.getContext("2d");
+    
+    var imageData = ctx.getImageData(0, 0, 46, 18);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var c = Neo.painter.getColor() | 0xff000000;
+    var a = Math.floor(Neo.painter.alpha * 255);
+    var toneData = Neo.painter.getToneData(a);
+
+    for (var j = 0; j < 18; j++) {
+        for (var i = 0; i < 46; i++) {
+            if (j >= 1 && j < 12 && 
+                i >= 2 && i < 26 &&
+                toneData[(i%4) + (j%4) * 4]) {
+                buf32[j * 46 + i] =  c;
+
+            } else {
+                buf32[j * 46 + i] =  0;
+            }
+        }
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+
+    this.prevMode = this.mode;
+};
+
 
 /*
 -------------------------------------------------------------------------
@@ -4506,9 +4646,21 @@ Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_FLIP_V,
                                   Neo.Painter.TOOLTYPE_TURN];
 
+Neo.Effect2Tip.prototype.hasTintImage = true;
+Neo.Effect2Tip.prototype.toolIcons = [Neo.ToolTip.copy,
+                                      Neo.ToolTip.merge,
+                                      Neo.ToolTip.blurrect,
+                                      Neo.ToolTip.flip,
+                                      Neo.ToolTip.flip,
+                                      Neo.ToolTip.flip];
+
 Neo.Effect2Tip.prototype.init = function(name, params) {
     this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
+
+    this.img = document.createElement("img");
+    this.img.src = Neo.ToolTip.copy2;
+    this.element.appendChild(this.img);
     return this;
 };
 
@@ -4517,10 +4669,8 @@ Neo.Effect2Tip.prototype.update = function() {
         if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
+    this.draw(Neo.painter.foregroundColor);
     this.label.innerHTML = this.toolStrings[this.mode];
-};
-
-Neo.Effect2Tip.prototype.draw = function() {
 };
 
 /*
@@ -4534,7 +4684,7 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆マスク", "加算", "逆加算"];
+Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆ﾏｽｸ", "加算", "逆加算"];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;
@@ -4701,6 +4851,7 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
     if (this.type == Neo.SLIDERTYPE_ALPHA) {
         Neo.painter.alpha = this.value / 255.0;
         this.update();
+        Neo.updateUIColor(false, false);
 
     } else {
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;

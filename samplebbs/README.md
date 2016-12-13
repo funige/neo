@@ -6,8 +6,8 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 
     <head>
     ...
-    <link rel="stylesheet" href="PaintBBS-0.7.0.css" type="text/css" />
-    <script src="PaintBBS-0.7.0.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="PaintBBS-0.8.0.css" type="text/css" />
+    <script src="PaintBBS-0.8.0.js" charset="UTF-8"></script>
 
     </head>
 
@@ -19,7 +19,7 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 
 * jsとcssファイルは [/dist](https://github.com/funige/neo/tree/master/neo/dist) の下にある最新のものを使って下さい。
 
-* &lt;head>に2行追加するとき、ついでに&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEO使用時の起動が早くなります。
+* &lt;head>に2行追加するとき、ついでに&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEOの起動が早くなります。
 
   詳細はサンプルのソースコードを参照してください。
 

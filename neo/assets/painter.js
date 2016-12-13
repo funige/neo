@@ -48,7 +48,7 @@ Neo.Painter.prototype.isShiftDown = false;
 Neo.Painter.prototype.isCtrlDown = false;
 Neo.Painter.prototype.isAltDown = false;
 
-Neo.Painter.prototype.onUpdateCanvas;
+//Neo.Painter.prototype.onUpdateCanvas;
 Neo.Painter.prototype._roundData = [];
 Neo.Painter.prototype._toneData = [];
 Neo.Painter.prototype.toolStack = [];
@@ -230,11 +230,18 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     this.tempCanvas.style.position = "absolute";
     this.tempCanvas.enabled = false;
 
-    this.destCanvas = document.createElement("canvas");
+    var array = this.container.getElementsByTagName("canvas");
+    if (array.length > 0) {
+        this.destCanvas = array[0];
+    } else {
+        this.destCanvas = document.createElement("canvas");
+        this.container.appendChild(this.destCanvas);
+    }
+
     this.destCanvasCtx = this.destCanvas.getContext("2d");
+//  this.destCanvas.id = "destCanvas";
     this.destCanvas.width = destWidth;
     this.destCanvas.height = destHeight;
-    this.container.appendChild(this.destCanvas);
 
     this.destCanvas.style.imageRendering = "pixelated";
     this.destCanvasCtx.imageSmoothingEnabled = false;
@@ -318,12 +325,15 @@ Neo.Painter.prototype.getToneData = function(alpha) {
             return this._toneData[i];
         }
     }
-//  console.log("toneData " + i);
     return this._toneData[i];
 };
 
 Neo.Painter.prototype._initInputText = function() {
-    var text = document.createElement("div");
+    var text = document.getElementById("inputtext");
+    if (!text) {
+        text = document.createElement("div");
+    }
+
     text.id = "inputext";
     text.setAttribute("contentEditable", true);
     text.spellcheck = false;
@@ -331,6 +341,7 @@ Neo.Painter.prototype._initInputText = function() {
     text.innerHTML = "";
 
     text.style.display = "none";
+//  text.style.userSelect = "none";
     Neo.painter.container.appendChild(text);
     this.inputText = text;
 
@@ -339,6 +350,7 @@ Neo.Painter.prototype._initInputText = function() {
 
 Neo.Painter.prototype.hideInputText = function() {
     var text = this.inputText;
+    text.blur();
     text.style.display = "none";
 };
 
@@ -413,6 +425,12 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
+    if (e.target == Neo.painter.destCanvas) {
+        //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
+        //http://stackoverflow.com/questions/2745028/chrome-sets-cursor-to-text-while-dragging-why    
+        e.preventDefault(); 
+    }
+
     if (e.button == 2) {
         this.isMouseDownRight = true;
 
@@ -774,11 +792,46 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
                                      x + this.tempX, y + this.tempY, width, height);
 	}
 	this.destCanvasCtx.restore();
-	
-	if (this.onUpdateCanvas) {
-        this.onUpdateCanvas(this);
-    }
 };
+
+/*
+Neo.Painter.prototype.__updateDestCanvas = function(x, y, width, height, useTemp) {
+    if (x + width > this.canvasWidth) width = this.canvasWidth - x;
+    if (y + height > this.canvasHeight) height = this.canvasHeight - y;
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (width <= 0 || height <= 0) return;
+
+    var destImageData = this.destCanvasCtx.getImageData(x, y, width, height);
+    var destBuf32 = new Uint32Array(destImageData.data.buffer);
+    var destBuf8 = new Uint8ClampedArray(destImageData.data.buffer);
+
+    var imageData = this.canvasCtx[0].getImageData(x, y, width, height);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+
+    var index = 0;
+    for (var j = 0; j < height; j++) {
+        for (var i = 0; i < width; i++) {
+            var r = buf8[index + 0];
+            var g = buf8[index + 1];
+            var b = buf8[index + 2];
+            var a = buf8[index + 3];
+
+            destBuf8[index + 0] = r;
+            destBuf8[index + 1] = g;
+            destBuf8[index + 2] = b;
+            destBuf8[index + 3] = a;
+
+            index += 4;
+        }
+    }
+
+    destImageData.data.set(destBuf8);
+    this.destCanvasCtx.putImageData(destImageData, x, y);
+};
+*/
+
 
 Neo.Painter.prototype.getBound = function(x0, y0, x1, y1, r) {
     var left = Math.floor((x0 < x1) ? x0 : x1);
@@ -876,35 +929,56 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
     var g = this._currentMask[1];
     var b = this._currentMask[2];
 
+    var r1 = this._currentColor[0];
+    var g1 = this._currentColor[1];
+    var b1 = this._currentColor[2];
+
+    var r0 = buf8[index + 0];
+    var g0 = buf8[index + 1];
+    var b0 = buf8[index + 2];
+    var a0 = buf8[index + 3];
+
     switch (this.maskType) {
     case Neo.Painter.MASKTYPE_NONE:
         return;
 
     case Neo.Painter.MASKTYPE_NORMAL:
-        return (buf8[index + 3] != 0 &&
-                buf8[index + 0] == r &&
-                buf8[index + 1] == g &&
-                buf8[index + 2] == b) ? true : false;
+        return (a0 != 0 &&
+                r0 == r &&
+                g0 == g &&
+                b0 == b) ? true : false;
 
     case Neo.Painter.MASKTYPE_REVERSE:
-        return (buf8[index + 3] == 0 ||
-                buf8[index + 0] != r ||
-                buf8[index + 1] != g ||
-                buf8[index + 2] != b) ? true : false;
+        return (a0 == 0 ||
+                r0 != r ||
+                g0 != g ||
+                b0 != b) ? true : false;
 
     case Neo.Painter.MASKTYPE_ADD:
-        return (buf8[index + 3] != 0 &&
-                !(buf8[index + 0] > r &&
-                  buf8[index + 1] > g &&
-                  buf8[index + 2] > b)) ? true : false;
+        if (a0 > 0) {
+            var sort = this.test(r0, g0, b0);
+            for (var i = 0; i < 3; i++) {
+                var c = sort[i];
+                if (buf8[index + c] < this._currentColor[c]) return true;
+            }
+            return false;
+
+        } else {
+            return false;
+        }
 
     case Neo.Painter.MASKTYPE_SUB:
-        return (buf8[index + 3] == 0 ||
-                buf8[index + 0] <= r ||
-                buf8[index + 1] <= g ||
-                buf8[index + 2] <= b) ? true : false;
+        if (a0 > 0) {
+            var sort = this.test(r0, g0, b0);
+            for (var i = 0; i < 3; i++) {
+                var c = sort[i];
+                if (buf8[index + c] > this._currentColor[c]) return true;
+            }
+            return false;
+        } else {
+            return true;
+        }
     }
-    return false;
 };
 
 Neo.Painter.prototype.setPoint = function(buf8, bufWidth, x0, y0, left, top, type) {
@@ -1121,39 +1195,35 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y) {
 
     var shape = this._roundData[d];
     var shapeIndex = 0;
+    var height = buf8.length / (width * 4);
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+//  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    var a1 = this.alpha / 12;
     if (a1 == 0) return;
+    var blur = a1;
 
-    for (var i = 0; i < d; i++) {
-        for (var j = 0; j < d; j++) {
+    var tmp = new Uint8ClampedArray(buf8.length);
+    for (var i = 0; i < buf8.length; i++) {
+        tmp[i] = buf8[i];
+    }
+
+    for (var j = 0; j < d; j++) {
+        for (var i = 0; i < d; i++) {
             if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-                var r0 = buf8[index + 0];
-                var g0 = buf8[index + 1];
-                var b0 = buf8[index + 2];
-                var a0 = buf8[index + 3] / 255.0;
+                var rgba = [0, 0, 0, 0, 0];
 
-                var a = a0 + a1 - a0 * a1;
-                if (a > 0) {
-                    var a1x = Math.max(a1, 1.0/255);
+                this.addBlur(tmp, index, 1.0 - blur*4, rgba);
 
-                    var r = (r1 * a1x + r0 * a0) / (a0 + a1x);
-                    var g = (g1 * a1x + g0 * a0) / (a0 + a1x);
-                    var b = (b1 * a1x + b0 * a0) / (a0 + a1x);
+                if (x + i > 0) this.addBlur(tmp, index - 4, blur, rgba);
+                if (x + i < width - 1) this.addBlur(tmp, index + 4, blur, rgba);
+                if (y + j > 0) this.addBlur(tmp, index - width*4, blur, rgba);
+                if (y + j < height - 1) this.addBlur(tmp, index + width*4, blur, rgba);
 
-                    r = (r1 > r0) ? Math.ceil(r) : Math.floor(r);
-                    g = (g1 > g0) ? Math.ceil(g) : Math.floor(g);
-                    b = (b1 > b0) ? Math.ceil(b) : Math.floor(b);
-                }
-
-                var tmp = a * 255;
-                a = Math.ceil(tmp);
-
-                buf8[index + 0] = r;
-                buf8[index + 1] = g;
-                buf8[index + 2] = b;
-                buf8[index + 3] = a;
-
+                var w = rgba[4]
+                buf8[index + 0] = Math.round(rgba[0]);
+                buf8[index + 1] = Math.round(rgba[1]);
+                buf8[index + 2] = Math.round(rgba[2]);
+                buf8[index + 3] = Math.round((rgba[3] / w) * 255.0);
             }
             index += 4;
         }
@@ -1634,52 +1704,56 @@ Neo.Painter.prototype.blurRect = function(ctx, x, y, width, height) {
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var clone = new Uint8ClampedArray(buf8.length);
 
-    for (var i = 0; i < buf8.length; i++) {
-        clone[i] = buf8[i];
-    }
+    var tmp = new Uint8ClampedArray(buf8.length);
+    for (var i = 0; i < buf8.length; i++) tmp[i] = buf8[i];
 
     var index = 0;
-    var a0 = this.alpha;
-    var a1 = 1.0 - this.alpha;
+    var a1 = this.alpha / 12;
+    var blur = a1;
 
     for (var j = 0; j < height; j++) {
         for (var i = 0; i < width; i++) {
-            var rgbaw = [0, 0, 0, 0, 0];
+            var rgba = [0, 0, 0, 0, 0];
 
-            this.addNeighbor(clone, index, a1, rgbaw);
-            if (i > 0) this.addNeighbor(clone, index - 1, a0, rgbaw);
-            if (i < width - 1) this.addNeighbor(clone, index + 1, a0, rgbaw);
+            this.addBlur(tmp, index, 1.0 - blur*4, rgba);
 
-            if (j > 0) {
-                this.addNeighbor(clone, index - width, a0, rgbaw);
-                if (i > 0) this.addNeighbor(clone, index - width-1, a0, rgbaw);
-                if (i < width-1) this.addNeighbor(clone, index - width+1, a0, rgbaw);
-            }
-            if (j < height - 1) {
-                this.addNeighbor(clone, index + width, a0, rgbaw);
-                if (i > 0) this.addNeighbor(clone, index + width-1, a0, rgbaw);
-                if (i < width-1) this.addNeighbor(clone, index + width+1, a0, rgbaw);
-            }
+            if (i > 0) this.addBlur(tmp, index - 4, blur, rgba);
+            if (i < width - 1) this.addBlur(tmp, index + 4, blur, rgba);
+            if (j > 0) this.addBlur(tmp, index - width*4, blur, rgba);
+            if (j < height - 1) this.addBlur(tmp, index + width*4, blur, rgba);
 
-            buf8[index*4 + 0] = Math.round(rgbaw[0] / rgbaw[4]);
-            buf8[index*4 + 1] = Math.round(rgbaw[1] / rgbaw[4]);
-            buf8[index*4 + 2] = Math.round(rgbaw[2] / rgbaw[4]);
-            buf8[index*4 + 3] = Math.round(rgbaw[3] / rgbaw[4]);
-            index++;
+            var w = rgba[4];
+            buf8[index + 0] = Math.round(rgba[0]);
+            buf8[index + 1] = Math.round(rgba[1]);
+            buf8[index + 2] = Math.round(rgba[2]);
+            buf8[index + 3] = Math.ceil((rgba[3] / w) * 255.0);
+
+            index += 4;
         }
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.addNeighbor = function(buffer, index, a, rgbaw) {
-    rgbaw[0] += buffer[index*4 + 0] * a;
-    rgbaw[1] += buffer[index*4 + 1] * a;
-    rgbaw[2] += buffer[index*4 + 2] * a;
-    rgbaw[3] += buffer[index*4 + 3] * a;
-    rgbaw[4] += a;
+Neo.Painter.prototype.addBlur = function(buffer, index, a, rgba) {
+    var r0 = rgba[0];
+    var g0 = rgba[1];
+    var b0 = rgba[2];
+    var a0 = rgba[3];
+    var r1 = buffer[index + 0];
+    var g1 = buffer[index + 1];
+    var b1 = buffer[index + 2];
+    var a1 = (buffer[index + 3] / 255.0) * a;
+    rgba[4] += a;
+
+    var a = a0 + a1;
+    if (a > 0) {
+        rgba[0] = (r1 * a1 + r0 * a0) / (a0 + a1);
+        rgba[1] = (g1 * a1 + g0 * a0) / (a0 + a1);
+        rgba[2] = (b1 * a1 + b0 * a0) / (a0 + a1);
+        rgba[3] = a;
+    }
 };
 
 Neo.Painter.prototype.pickColor = function(x, y) {
@@ -1972,6 +2046,7 @@ Neo.Painter.prototype.isWidget = function(element) {
     return  false;
 };
 
+
 Neo.Painter.prototype.loadImage = function (filename) {
     console.log("loadImage " + filename);
     var img = new Image();
@@ -2017,3 +2092,12 @@ Neo.Painter.prototype.clearSession = function() {
         sessionStorage.removeItem('layer1');
     }
 };
+
+Neo.Painter.prototype.test = function(r0, g0, b0) {
+    var min = (r0 < g0) ? ((r0 < b0) ? 0 : 2) : ((g0 < b0) ? 1 : 2);
+    var max = (r0 > g0) ? ((r0 > b0) ? 0 : 2) : ((g0 > b0) ? 1 : 2);
+    var mid = (min + max == 1) ? 2 : ((min + max == 2) ? 1 : 0);
+    return [min, mid, max];
+}
+
+

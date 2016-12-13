@@ -251,7 +251,7 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
         oe.cursorRect = null;
     }
 
-    var r = oe.lineWidth + 1;
+    var r = Math.ceil(oe.lineWidth / 2);
     var rect = oe.getBound(oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, r);
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
 };
@@ -263,8 +263,6 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function(oe) {
         oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
         oe.cursorRect = null;
     }
-
-//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     this.drawCursor(oe);
 };
 
@@ -285,7 +283,7 @@ Neo.DrawToolBase.prototype.drawCursor = function(oe) {
     oe.drawXOREllipse(ctx, x-r, y-r, r*2, r*2, false, c);
 
     ctx.restore();
-    oe.cursorRect = oe.getBound(mx, my, mx, my, d * 0.5);
+    oe.cursorRect = oe.getBound(mx, my, mx, my, Math.ceil(d / 2));
 }
 
 
