@@ -10,9 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 var Neo = function() {};
-
-Neo.version = "0.8.0";
-
+Neo.version = "0.8.5";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -172,7 +170,6 @@ Neo.initSkin = function() {
     Neo.addRule(".NEO #tools", "color", Neo.config.tool_color_text);
     Neo.addRule(".NEO .layerControl .bg", "border-bottom", "1px solid " + Neo.config.tool_color_text);
 
-
     Neo.addRule(".NEO .buttonOn", "color", Neo.config.color_text);
     Neo.addRule(".NEO .buttonOff", "color", Neo.config.color_text);
 
@@ -219,6 +216,7 @@ Neo.initSkin = function() {
     Neo.addRule(".NEO .colorSlider, .NEO .sizeSlider", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
     Neo.addRule(".NEO .reserveControl", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
     Neo.addRule(".NEO .layerControl", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
+    Neo.addRule(".NEO .reserveControl .reserve", "border", "1px solid " + Neo.config.tool_color_frame);
 };
 
 Neo.addRule = function(selector, styleName, value, sheet) {

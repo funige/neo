@@ -10,9 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 var Neo = function() {};
-
-Neo.version = "0.8.0";
-
+Neo.version = "0.8.5";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1134,27 +1132,29 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         }
     }
 
-    //console.log(e.target.id || "??");
+    if (this.drawtype != Neo.Painter.DRAWTYPE_BEZIER || 
+        this.tool.step == 0) {
 
-    if (e.target['data-bar']) {
-        this.pushTool(new Neo.HandTool());
+        if (e.target['data-bar']) {
+            this.pushTool(new Neo.HandTool());
 
-    } else if (this.isSpaceDown && document.activeElement != this.inputText) {
-        this.pushTool(new Neo.HandTool());
-        this.tool.reverse = true;
+        } else if (this.isSpaceDown && document.activeElement != this.inputText) {
+            this.pushTool(new Neo.HandTool());
+            this.tool.reverse = true;
 
-    } else if (e.target['data-slider'] != undefined) {
-        this.pushTool(new Neo.SliderTool());
-        this.tool.target = e.target;
+        } else if (e.target['data-slider'] != undefined) {
+            this.pushTool(new Neo.SliderTool());
+            this.tool.target = e.target;
 
-    } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
-        this.pushTool(new Neo.SliderTool());
-        this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.tool.alt = true;
+        } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
+            this.pushTool(new Neo.SliderTool());
+            this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
+            this.tool.alt = true;
 
-    } else if (this.isWidget(e.target)) {
-        this.isMouseDown = false;
-        this.pushTool(new Neo.DummyTool());
+        } else if (this.isWidget(e.target)) {
+            this.isMouseDown = false;
+            this.pushTool(new Neo.DummyTool());
+        }
     }
 
 	this.tool.downHandler(this);
@@ -1441,32 +1441,35 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
     if (y < 0) y = 0;
     if (width <= 0 || height <= 0) return;
 
-	this.destCanvasCtx.save();
+    var ctx = this.destCanvasCtx;
+	ctx.save();
 
-	this.destCanvasCtx.translate(this.destCanvas.width*.5, this.destCanvas.height*.5);
-	this.destCanvasCtx.scale(this.zoom, this.zoom);
-	this.destCanvasCtx.translate(-this.zoomX, -this.zoomY);
-	this.destCanvasCtx.globalAlpha = 1.0;
-	this.destCanvasCtx.fillStyle = "#ffffff";
-	this.destCanvasCtx.fillRect(x, y, width, height);
+	ctx.translate(this.destCanvas.width*.5, this.destCanvas.height*.5);
+	ctx.scale(this.zoom, this.zoom);
+	ctx.translate(-this.zoomX, -this.zoomY);
+	ctx.globalAlpha = 1.0;
+    ctx.msImageSmoothingEnabled = 0;
+
+	ctx.fillStyle = "#ffffff";
+	ctx.fillRect(x, y, width, height);
 
 	if (this.visible[0]) {
-	    this.destCanvasCtx.drawImage(this.canvas[0], 
-                                     x, y, width, height, 
-                                     x, y, width, height);
+	    ctx.drawImage(this.canvas[0], 
+                      x, y, width, height, 
+                      x, y, width, height);
     }
     if (this.visible[1]) {
-	    this.destCanvasCtx.drawImage(this.canvas[1], 
-                                     x, y, width, height, 
-                                     x, y, width, height);
+	    ctx.drawImage(this.canvas[1], 
+                      x, y, width, height, 
+                      x, y, width, height);
     }
 	if (useTemp) {
-		this.destCanvasCtx.globalAlpha = 1.0; //this.alpha;
-		this.destCanvasCtx.drawImage(this.tempCanvas, 
-                                     x, y, width, height, 
-                                     x + this.tempX, y + this.tempY, width, height);
+		ctx.globalAlpha = 1.0; //this.alpha;
+		ctx.drawImage(this.tempCanvas, 
+                      x, y, width, height, 
+                      x + this.tempX, y + this.tempY, width, height);
 	}
-	this.destCanvasCtx.restore();
+	ctx.restore();
 };
 
 /*
@@ -2538,9 +2541,35 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
     this.tempCanvasCtx.drawImage(this.canvas[this.current],
                                  x, y, width, height,
                                  x, y, width, height);
+
+    var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    this.temp = new Uint32Array(buf32.length);
+    for (var i = 0; i < buf32.length; i++) {
+        this.temp[i] = buf32[i];
+    }
 };
 
 Neo.Painter.prototype.paste = function(x, y, width, height) {
+    var ctx = this.canvasCtx[this.current];
+    var imageData = ctx.getImageData(x + this.tempX, y + this.tempY, width, height);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    for (var i = 0; i < buf32.length; i++) {
+        buf32[i] = this.temp[i];
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, x + this.tempX, y + this.tempY);
+
+    this.temp = null;
+    this.tempX = 0;
+    this.tempY = 0;
+	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+};
+
+/*
+Neo.Painter.prototype.__paste = function(x, y, width, height) {
     this.canvasCtx[this.current].clearRect(x + this.tempX, y + this.tempY, width, height);
     this.canvasCtx[this.current].drawImage(this.tempCanvas,
                                  x, y, width, height,
@@ -2550,6 +2579,7 @@ Neo.Painter.prototype.paste = function(x, y, width, height) {
     this.tempY = 0;
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
+*/
 
 Neo.Painter.prototype.turn = function(x, y, width, height) {
     x = Math.round(x);
@@ -2591,10 +2621,9 @@ Neo.Painter.prototype.turn = function(x, y, width, height) {
 };
 
 Neo.Painter.prototype.doFill = function(ctx, x, y, width, height, maskFunc) {
-    x = Math.round(x);
-    y = Math.round(y);
-    width = Math.round(width);
-    height = Math.round(height);
+    if (Math.round(x) != x) console.log("integer!!");
+    if (Math.round(width) != width) console.log("integer!!");
+    if (Math.round(height) != height) console.log("integer!!");
 
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -2691,9 +2720,9 @@ Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
 -----------------------------------------------------------------------
 */
 
-Neo.Painter.prototype.getDestCanvasMousePosition = function(mx, my, isClip) {
-    var mx = Math.round(mx);
-    var my = Math.round(my);
+Neo.Painter.prototype.getDestCanvasPosition = function(mx, my, isClip) {
+    var mx = Math.floor(mx); //Math.round(mx);
+    var my = Math.floor(my); //Math.round(my);
     var x = (mx - this.zoomX + this.destCanvas.width * 0.5 / this.zoom) * this.zoom;
     var y = (my - this.zoomY + this.destCanvas.height * 0.5 / this.zoom) * this.zoom;
 
@@ -2988,7 +3017,6 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     oe.prepareDrawing();
 	this.isUpMove = false;
 	var ctx = oe.canvasCtx[oe.current];
-
 	if (oe.alpha >= 1) {
         oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, this.lineType);
     }
@@ -2999,10 +3027,11 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
         oe.cursorRect = null;
     }
 
-//  var r = Math.ceil(this.lineWidth / 2);
-//  var left = Math.round(oe.mouseX) - r;
-//  var top = Math.round(oe.mouseY) - r;
-//	oe.updateDestCanvas(left, top, r*2, r*2, true);
+    if (oe.alpha >= 1) {
+        var r = Math.ceil(oe.lineWidth / 2);
+        var rect = oe.getBound(oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, r);
+        oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
+    }
 };
 
 Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
@@ -3133,20 +3162,17 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
     this.step++;
     switch (this.step) {
     case 1:
-        console.log("get start & end point.");
         oe.prepareDrawing();
         this.x3 = oe.mouseX;
         this.y3 = oe.mouseY;
         break;
 
     case 2:
-        console.log("get 1st control point.");
         this.x1 = oe.mouseX;
         this.y1 = oe.mouseY;
         break;
 
     case 3:
-        console.log("get 2nd control point.");
         this.x2 = oe.mouseX;
         this.y2 = oe.mouseY;
 
@@ -3204,9 +3230,13 @@ Neo.DrawToolBase.prototype.bezierKeyDownHandler = function(e) {
 
 Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
     var ctx = oe.destCanvasCtx;
-    oe.drawXORLine(ctx, this.x0, this.y0, oe.mouseX, oe.mouseY);
-    oe.drawXOREllipse(ctx, oe.mouseX-4, oe.mouseY-4, 8, 8);
-    oe.drawXOREllipse(ctx, this.x0-4, this.y0-4, 8, 8);
+    var p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY);
+    var p0 = oe.getDestCanvasPosition(this.x0, this.y0);
+    var p3 = oe.getDestCanvasPosition(this.x3, this.y3);
+
+    oe.drawXORLine(ctx, p0.x, p0.y, p.x, p.y);
+    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
+    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 
     // preview
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3215,19 +3245,31 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
                   oe.mouseX, oe.mouseY,
                   oe.mouseX, oe.mouseY,
                   this.x3, this.y3, this.lineType);
+
+    ctx.save();
+	ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
+	ctx.scale(oe.zoom, oe.zoom);
+	ctx.translate(-oe.zoomX, -oe.zoomY);
     ctx.drawImage(oe.tempCanvas,
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
+
+    ctx.restore();
 };
 
 Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
     var ctx = oe.destCanvasCtx;
-    oe.drawXORLine(ctx, this.x3, this.y3, oe.mouseX, oe.mouseY);
-    oe.drawXOREllipse(ctx, oe.mouseX-4, oe.mouseY-4, 8, 8);
+    var p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY);
+    var p0 = oe.getDestCanvasPosition(this.x0, this.y0);
+    var p1 = oe.getDestCanvasPosition(this.x1, this.y1);
+    var p3 = oe.getDestCanvasPosition(this.x3, this.y3);
 
-    oe.drawXORLine(ctx, this.x0, this.y0, this.x1, this.y1);
-    oe.drawXOREllipse(ctx, this.x1-4, this.y1-4, 8, 8);
-    oe.drawXOREllipse(ctx, this.x0-4, this.y0-4, 8, 8);
+    oe.drawXORLine(ctx, p3.x, p3.y, p.x, p.y);
+    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
+
+    oe.drawXORLine(ctx, p0.x, p0.y, p1.x, p1.y);
+    oe.drawXOREllipse(ctx, p1.x - 4, p1.y - 4, 8, 8);
+    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 
     // preview
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3236,9 +3278,15 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
                   this.x1, this.y1,
                   oe.mouseX, oe.mouseY,
                   this.x3, this.y3, this.lineType);
+
+    ctx.save();
+	ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
+	ctx.scale(oe.zoom, oe.zoom);
+	ctx.translate(-oe.zoomX, -oe.zoomY);
     ctx.drawImage(oe.tempCanvas,
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
+    ctx.restore();
 };
 
 /*
@@ -3556,18 +3604,25 @@ Neo.EffectToolBase.prototype.downHandler = function(oe) {
 Neo.EffectToolBase.prototype.upHandler = function(oe) {
     this.isUpMove = true;
 
+    this.startX = Math.floor(this.startX);
+    this.startY = Math.floor(this.startY);
+    this.endX = Math.floor(this.endX);
+    this.endY = Math.floor(this.endY);
+
     var x = (this.startX < this.endX) ? this.startX : this.endX;
     var y = (this.startY < this.endY) ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX);
-    var height = Math.abs(this.startY - this.endY);
+    var width = Math.abs(this.startX - this.endX) + 1;
+    var height = Math.abs(this.startY - this.endY) + 1;
     var ctx = oe.canvasCtx[oe.current];
 
     if (width > 0 && height > 0) {
         oe._pushUndo();
         oe.prepareDrawing();
-
-//      console.log(x + "," + y + "," + width + "," + height);
         this.doEffect(oe, x, y, width, height);
+    }
+    
+    if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
+	    oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
     }
 };
 
@@ -3589,13 +3644,13 @@ Neo.EffectToolBase.prototype.drawCursor = function(oe) {
     ctx.save();
     this.transformForZoom(oe);
 
-    var start = oe.getDestCanvasMousePosition(this.startX, this.startY, true);
-    var end = oe.getDestCanvasMousePosition(this.endX, this.endY, true);
+    var start = oe.getDestCanvasPosition(this.startX, this.startY, true);
+    var end = oe.getDestCanvasPosition(this.endX, this.endY, true);
 
     var x = (start.x < end.x) ? start.x : end.x;
     var y = (start.y < end.y) ? start.y : end.y;
-    var width = Math.abs(start.x - end.x);
-    var height = Math.abs(start.y - end.y);
+    var width = Math.abs(start.x - end.x) + oe.zoom;
+    var height = Math.abs(start.y - end.y) + oe.zoom;
 
     if (this.isEllipse) {
         oe.drawXOREllipse(ctx, x, y, width, height, this.isFill);
@@ -3797,8 +3852,8 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
     ctx.save();
     this.transformForZoom(oe);
 
-  var start = oe.getDestCanvasMousePosition(this.x, this.y, true);
-    var end = oe.getDestCanvasMousePosition(this.x + this.width, this.y + this.height, true);
+    var start = oe.getDestCanvasPosition(this.x, this.y, true);
+    var end = oe.getDestCanvasPosition(this.x + this.width, this.y + this.height, true);
 
     var x = start.x + oe.tempX * oe.zoom;
     var y = start.y + oe.tempY * oe.zoom;

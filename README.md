@@ -22,7 +22,7 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 ## サンプル掲示板
 組み込みのテストのために[**Java難民板**](http://neo.websozai.jp)をオープンしました  
 ブラウザからアクセスして、適当にご利用ください  
-掲示板へのNEOの組み込み方法については、 [/sample_bbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました
+掲示板へのNEOの組み込み方法については、 [/samplebbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました
 
 対応ブラウザ:  
 Chrome/FireFox/Safari（最近のバージョンのみ）  
@@ -31,13 +31,15 @@ Edgeにもそのうち対応します
 
 ## 履歴
 
+#### ver0.9 (2016/12/18)
+- バグ修正
+
 #### ver0.8 (2016/12/13)
 - ベジェ曲線
 - 角取り・ぼかし
 - 加算・逆加算テスト
 - リロードした時にキャンバスが保存されるように修正
 - Chromeでドラッグ中のカーソルがおかしくなる問題を修正
-
 ![ver0.8](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161213/20161213130410.png?1481601887)  
   ver1.0は12/24予定  
   残り時間でバグをできるだけ取ります  

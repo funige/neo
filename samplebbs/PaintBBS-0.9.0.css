@@ -1,4 +1,3 @@
-
 .NEO {
     margin:0;
     line-height:18px;
@@ -395,7 +394,7 @@
      position: absolute;
      width: 11px;
      height: 8px;
-//   border: 1px solid #7474ab;
+     border: 1px solid #7474ab;
      background-color: white;
 }
 

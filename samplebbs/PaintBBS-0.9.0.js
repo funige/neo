@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.9.0";
+Neo.version = "0.8.5";
 
 Neo.painter;
 Neo.fullScreen = false;
@@ -1134,27 +1134,29 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         }
     }
 
-    //console.log(e.target.id || "??");
+    if (this.drawtype != Neo.Painter.DRAWTYPE_BEZIER || 
+        this.tool.step == 0) {
 
-    if (e.target['data-bar']) {
-        this.pushTool(new Neo.HandTool());
+        if (e.target['data-bar']) {
+            this.pushTool(new Neo.HandTool());
 
-    } else if (this.isSpaceDown && document.activeElement != this.inputText) {
-        this.pushTool(new Neo.HandTool());
-        this.tool.reverse = true;
+        } else if (this.isSpaceDown && document.activeElement != this.inputText) {
+            this.pushTool(new Neo.HandTool());
+            this.tool.reverse = true;
 
-    } else if (e.target['data-slider'] != undefined) {
-        this.pushTool(new Neo.SliderTool());
-        this.tool.target = e.target;
+        } else if (e.target['data-slider'] != undefined) {
+            this.pushTool(new Neo.SliderTool());
+            this.tool.target = e.target;
 
-    } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
-        this.pushTool(new Neo.SliderTool());
-        this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.tool.alt = true;
+        } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
+            this.pushTool(new Neo.SliderTool());
+            this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
+            this.tool.alt = true;
 
-    } else if (this.isWidget(e.target)) {
-        this.isMouseDown = false;
-        this.pushTool(new Neo.DummyTool());
+        } else if (this.isWidget(e.target)) {
+            this.isMouseDown = false;
+            this.pushTool(new Neo.DummyTool());
+        }
     }
 
 	this.tool.downHandler(this);
@@ -2704,6 +2706,7 @@ Neo.Painter.prototype.getDestCanvasPosition = function(mx, my, isClip) {
     return {x:x, y:y};
 };
 
+/*
 Neo.Painter.prototype.getDestCanvasMousePosition = function(mx, my, isClip) {
     var mx = Math.round(mx);
     var my = Math.round(my);
@@ -2716,6 +2719,7 @@ Neo.Painter.prototype.getDestCanvasMousePosition = function(mx, my, isClip) {
     }
     return {x:x, y:y};
 };
+*/
 
 Neo.Painter.prototype.isWidget = function(element) {
     while (1) {

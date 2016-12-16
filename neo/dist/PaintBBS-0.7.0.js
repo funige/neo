@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "0.8.0";
+Neo.version = "0.9.0";
 
 Neo.painter;
 Neo.fullScreen = false;
@@ -2691,6 +2691,19 @@ Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
 -----------------------------------------------------------------------
 */
 
+Neo.Painter.prototype.getDestCanvasPosition = function(mx, my, isClip) {
+    var mx = Math.round(mx);
+    var my = Math.round(my);
+    var x = (mx - this.zoomX + this.destCanvas.width * 0.5 / this.zoom) * this.zoom;
+    var y = (my - this.zoomY + this.destCanvas.height * 0.5 / this.zoom) * this.zoom;
+
+    if (isClip) {
+        x = Math.max(Math.min(x, this.destCanvas.width), 0);
+        y =  Math.max(Math.min(y, this.destCanvas.height), 0);
+    }
+    return {x:x, y:y};
+};
+
 Neo.Painter.prototype.getDestCanvasMousePosition = function(mx, my, isClip) {
     var mx = Math.round(mx);
     var my = Math.round(my);
@@ -3204,9 +3217,13 @@ Neo.DrawToolBase.prototype.bezierKeyDownHandler = function(e) {
 
 Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
     var ctx = oe.destCanvasCtx;
-    oe.drawXORLine(ctx, this.x0, this.y0, oe.mouseX, oe.mouseY);
-    oe.drawXOREllipse(ctx, oe.mouseX-4, oe.mouseY-4, 8, 8);
-    oe.drawXOREllipse(ctx, this.x0-4, this.y0-4, 8, 8);
+    var p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY);
+    var p0 = oe.getDestCanvasPosition(this.x0, this.y0);
+    var p3 = oe.getDestCanvasPosition(this.x3, this.y3);
+
+    oe.drawXORLine(ctx, p0.x, p0.y, p.x, p.y);
+    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
+    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 
     // preview
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3215,19 +3232,31 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
                   oe.mouseX, oe.mouseY,
                   oe.mouseX, oe.mouseY,
                   this.x3, this.y3, this.lineType);
+
+    ctx.save();
+	ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
+	ctx.scale(oe.zoom, oe.zoom);
+	ctx.translate(-oe.zoomX, -oe.zoomY);
     ctx.drawImage(oe.tempCanvas,
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
+
+    ctx.restore();
 };
 
 Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
     var ctx = oe.destCanvasCtx;
-    oe.drawXORLine(ctx, this.x3, this.y3, oe.mouseX, oe.mouseY);
-    oe.drawXOREllipse(ctx, oe.mouseX-4, oe.mouseY-4, 8, 8);
+    var p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY);
+    var p0 = oe.getDestCanvasPosition(this.x0, this.y0);
+    var p1 = oe.getDestCanvasPosition(this.x1, this.y1);
+    var p3 = oe.getDestCanvasPosition(this.x3, this.y3);
 
-    oe.drawXORLine(ctx, this.x0, this.y0, this.x1, this.y1);
-    oe.drawXOREllipse(ctx, this.x1-4, this.y1-4, 8, 8);
-    oe.drawXOREllipse(ctx, this.x0-4, this.y0-4, 8, 8);
+    oe.drawXORLine(ctx, p3.x, p3.y, p.x, p.y);
+    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
+
+    oe.drawXORLine(ctx, p0.x, p0.y, p1.x, p1.y);
+    oe.drawXOREllipse(ctx, p1.x - 4, p1.y - 4, 8, 8);
+    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 
     // preview
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3236,9 +3265,15 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
                   this.x1, this.y1,
                   oe.mouseX, oe.mouseY,
                   this.x3, this.y3, this.lineType);
+
+    ctx.save();
+	ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
+	ctx.scale(oe.zoom, oe.zoom);
+	ctx.translate(-oe.zoomX, -oe.zoomY);
     ctx.drawImage(oe.tempCanvas,
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
+    ctx.restore();
 };
 
 /*
@@ -3589,8 +3624,8 @@ Neo.EffectToolBase.prototype.drawCursor = function(oe) {
     ctx.save();
     this.transformForZoom(oe);
 
-    var start = oe.getDestCanvasMousePosition(this.startX, this.startY, true);
-    var end = oe.getDestCanvasMousePosition(this.endX, this.endY, true);
+    var start = oe.getDestCanvasPosition(this.startX, this.startY, true);
+    var end = oe.getDestCanvasPosition(this.endX, this.endY, true);
 
     var x = (start.x < end.x) ? start.x : end.x;
     var y = (start.y < end.y) ? start.y : end.y;
@@ -3797,8 +3832,8 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
     ctx.save();
     this.transformForZoom(oe);
 
-  var start = oe.getDestCanvasMousePosition(this.x, this.y, true);
-    var end = oe.getDestCanvasMousePosition(this.x + this.width, this.y + this.height, true);
+    var start = oe.getDestCanvasPosition(this.x, this.y, true);
+    var end = oe.getDestCanvasPosition(this.x + this.width, this.y + this.height, true);
 
     var x = start.x + oe.tempX * oe.zoom;
     var y = start.y + oe.tempY * oe.zoom;
