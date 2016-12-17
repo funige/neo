@@ -369,7 +369,6 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         this.y2 = oe.mouseY;
 
         oe._pushUndo();
-//      oe.prepareDrawing();
         oe.drawBezier(oe.canvasCtx[oe.current],
                       this.x0, this.y0, this.x1, this.y1,
                       this.x2, this.y2, this.x3, this.y3, this.lineType);
@@ -1102,7 +1101,6 @@ Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 Neo.EllipseTool = function() {};
 Neo.EllipseTool.prototype = new Neo.EffectToolBase();
 Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSE;
-//Neo.EllipseTool.prototype.isUpMove = false;
 Neo.EllipseTool.prototype.isEllipse = true;
 Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
     var ctx = oe.canvasCtx[oe.current];
@@ -1119,7 +1117,6 @@ Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
 Neo.EllipseFillTool = function() {};
 Neo.EllipseFillTool.prototype = new Neo.EffectToolBase();
 Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
-//Neo.EllipseFillTool.prototype.isUpMove = false;
 Neo.EllipseFillTool.prototype.isEllipse = true;
 Neo.EllipseFillTool.prototype.isFill = true;
 Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
@@ -1199,33 +1196,6 @@ Neo.TextTool.prototype.drawText = function(oe) {
 };
 
 /*
-Neo.TextTool.prototype.__drawText = function(oe) {
-    var text = oe.inputText;
-
-    // unescape entities
-    var tmp = document.createElement("textarea");
-    tmp.innerHTML = text.innerHTML;
-    var string = tmp.value;
-
-    var x = this.startX;
-    var y = this.startY;
-
-    if (string.length > 0) {
-        var ctx = oe.canvasCtx[Neo.painter.current];
-        ctx.save();
-	    ctx.translate(x, y);
-	    ctx.scale(1/oe.zoom, 1/oe.zoom);
-
-        ctx.font = text.style.fontSize + " Arial";
-        ctx.globalAlpha = oe.alpha;
-        ctx.fillStyle = oe.foregroundColor;
-        ctx.fillText(string, 0, 0);
-        ctx.restore();
-    }
-};
-*/
-
-/*
 -------------------------------------------------------------------------
 	Dummy（何もしない時）
 -------------------------------------------------------------------------
@@ -1247,6 +1217,3 @@ Neo.DummyTool.prototype.moveHandler = function(oe) {};
 Neo.DummyTool.prototype.upMoveHandler = function(oe) {}
 Neo.DummyTool.prototype.rollOverHandler= function(oe) {}
 Neo.DummyTool.prototype.rollOutHandler= function(oe) {}
-
-
-

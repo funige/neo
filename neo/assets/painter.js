@@ -402,7 +402,6 @@ Neo.Painter.prototype._keyDownHandler = function(e) {
     }
 
     //スペース・Shift+スペースででスクロールしないように
-//  if (this.tool.type != Neo.Painter.TOOLTYPE_TEXT) e.preventDefault();
     if (document.activeElement != this.inputText) e.preventDefault();
 };
 
@@ -1860,9 +1859,6 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
     this.tempX = 0;
     this.tempY = 0;
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-//    this.tempCanvasCtx.drawImage(this.canvas[this.current],
-//                                 x, y, width, height,
-//                                 x, y, width, height);
 
     var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -1905,19 +1901,6 @@ Neo.Painter.prototype.paste = function(x, y, width, height) {
     this.tempY = 0;
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
-
-/*
-Neo.Painter.prototype.__paste = function(x, y, width, height) {
-    this.canvasCtx[this.current].clearRect(x + this.tempX, y + this.tempY, width, height);
-    this.canvasCtx[this.current].drawImage(this.tempCanvas,
-                                 x, y, width, height,
-                                 x + this.tempX, y + this.tempY, width, height);
-
-    this.tempX = 0;
-    this.tempY = 0;
-	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-};
-*/
 
 Neo.Painter.prototype.turn = function(x, y, width, height) {
     var ctx = this.canvasCtx[this.current];

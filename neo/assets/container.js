@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 var Neo = function() {};
-Neo.version = "0.8.5";
+Neo.version = "0.9.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -21,10 +21,7 @@ Neo.config = {
 
     color_bk: "#ccccff",
     color_bk2: "#bbbbff",
-    color_bar: "#6f6fae",
-
     color_tool_icon: "#e8dfae",
-
     color_icon: "#ccccff",
     color_iconselect: "#ffaaaa",
     color_text: "#666699",
@@ -89,7 +86,6 @@ Neo.init2 = function() {
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
     Neo.container.oncontextmenu = function() {return false;};
-//  Neo.painter.onUpdateCanvas = null;
 
     // 続きから描く
     if (Neo.config.image_canvas) {

@@ -25,13 +25,13 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 掲示板へのNEOの組み込み方法については、 [/samplebbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました
 
 対応ブラウザ:  
-Chrome/FireFox/Safari（最近のバージョンのみ）  
-Edgeにもそのうち対応します
+Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
 
 
 ## 履歴
 
 #### ver0.9 (2016/12/18)
+- Edge対応
 - バグ修正
 
 #### ver0.8 (2016/12/13)
@@ -43,7 +43,7 @@ Edgeにもそのうち対応します
 ![ver0.8](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161213/20161213130410.png?1481601887)  
   ver1.0は12/24予定  
   残り時間でバグをできるだけ取ります  
-  オリジナルと違う部分は後世の誰かが直してくれると期待して……  
+  オリジナルと違う部分はそのうち誰かが直してくれると期待して……  
 
 #### ver0.7 (2016/12/5)
 - 覆い焼き・焼き込み

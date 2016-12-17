@@ -98,8 +98,6 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.element.innerHTML = "<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />"
 
     this.setColor(Neo.config.colors[params.index - 1]);
-//  this.color = Neo.config.colors[params.index - 1];
-//  this.element.style.backgroundColor = this.color;
 
     this.setSelected(this.selected);
     Neo.colorTips.push(this);
@@ -361,18 +359,6 @@ Neo.PenTip.prototype.update = function() {
         this.label.innerHTML = this.toolStrings[this.mode];
     }
 };
-
-/*
-Neo.PenTip.prototype.draw = function(c) {
-    if (typeof c != "string") c = Neo.painter.getColorString(c);
-    if (this.canvas) {
-        var ctx = this.canvas.getContext("2d");
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.fillStyle = c;
-        ctx.fillRect(2, 3, 33, 1.2);
-    }
-};
-*/
 
 /*
 -------------------------------------------------------------------------
@@ -1039,8 +1025,6 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
         var barX = (oe.scrollBarX) * (oe.destCanvas.width - barWidth);
         this.barButton.style.width = (Math.ceil(barWidth) - 4) + "px";
         this.barButton.style.left = Math.floor(barX) + "px";
-
-//      console.log("width=" + (Math.ceil(barWidth) - 4) + " x=" + Math.ceil(barX))
 
     } else {
         var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);

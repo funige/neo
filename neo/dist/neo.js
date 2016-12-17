@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 var Neo = function() {};
-Neo.version = "0.8.5";
+Neo.version = "0.9.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -21,10 +21,7 @@ Neo.config = {
 
     color_bk: "#ccccff",
     color_bk2: "#bbbbff",
-    color_bar: "#6f6fae",
-
     color_tool_icon: "#e8dfae",
-
     color_icon: "#ccccff",
     color_iconselect: "#ffaaaa",
     color_text: "#666699",
@@ -89,7 +86,6 @@ Neo.init2 = function() {
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
     Neo.container.oncontextmenu = function() {return false;};
-//  Neo.painter.onUpdateCanvas = null;
 
     // 続きから描く
     if (Neo.config.image_canvas) {
@@ -1075,7 +1071,6 @@ Neo.Painter.prototype._keyDownHandler = function(e) {
     }
 
     //スペース・Shift+スペースででスクロールしないように
-//  if (this.tool.type != Neo.Painter.TOOLTYPE_TEXT) e.preventDefault();
     if (document.activeElement != this.inputText) e.preventDefault();
 };
 
@@ -2533,9 +2528,6 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
     this.tempX = 0;
     this.tempY = 0;
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-//    this.tempCanvasCtx.drawImage(this.canvas[this.current],
-//                                 x, y, width, height,
-//                                 x, y, width, height);
 
     var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -2578,19 +2570,6 @@ Neo.Painter.prototype.paste = function(x, y, width, height) {
     this.tempY = 0;
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
-
-/*
-Neo.Painter.prototype.__paste = function(x, y, width, height) {
-    this.canvasCtx[this.current].clearRect(x + this.tempX, y + this.tempY, width, height);
-    this.canvasCtx[this.current].drawImage(this.tempCanvas,
-                                 x, y, width, height,
-                                 x + this.tempX, y + this.tempY, width, height);
-
-    this.tempX = 0;
-    this.tempY = 0;
-	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-};
-*/
 
 Neo.Painter.prototype.turn = function(x, y, width, height) {
     var ctx = this.canvasCtx[this.current];
@@ -3244,7 +3223,6 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         this.y2 = oe.mouseY;
 
         oe._pushUndo();
-//      oe.prepareDrawing();
         oe.drawBezier(oe.canvasCtx[oe.current],
                       this.x0, this.y0, this.x1, this.y1,
                       this.x2, this.y2, this.x3, this.y3, this.lineType);
@@ -3977,7 +3955,6 @@ Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 Neo.EllipseTool = function() {};
 Neo.EllipseTool.prototype = new Neo.EffectToolBase();
 Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSE;
-//Neo.EllipseTool.prototype.isUpMove = false;
 Neo.EllipseTool.prototype.isEllipse = true;
 Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
     var ctx = oe.canvasCtx[oe.current];
@@ -3994,7 +3971,6 @@ Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
 Neo.EllipseFillTool = function() {};
 Neo.EllipseFillTool.prototype = new Neo.EffectToolBase();
 Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
-//Neo.EllipseFillTool.prototype.isUpMove = false;
 Neo.EllipseFillTool.prototype.isEllipse = true;
 Neo.EllipseFillTool.prototype.isFill = true;
 Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
@@ -4074,33 +4050,6 @@ Neo.TextTool.prototype.drawText = function(oe) {
 };
 
 /*
-Neo.TextTool.prototype.__drawText = function(oe) {
-    var text = oe.inputText;
-
-    // unescape entities
-    var tmp = document.createElement("textarea");
-    tmp.innerHTML = text.innerHTML;
-    var string = tmp.value;
-
-    var x = this.startX;
-    var y = this.startY;
-
-    if (string.length > 0) {
-        var ctx = oe.canvasCtx[Neo.painter.current];
-        ctx.save();
-	    ctx.translate(x, y);
-	    ctx.scale(1/oe.zoom, 1/oe.zoom);
-
-        ctx.font = text.style.fontSize + " Arial";
-        ctx.globalAlpha = oe.alpha;
-        ctx.fillStyle = oe.foregroundColor;
-        ctx.fillText(string, 0, 0);
-        ctx.restore();
-    }
-};
-*/
-
-/*
 -------------------------------------------------------------------------
 	Dummy（何もしない時）
 -------------------------------------------------------------------------
@@ -4122,9 +4071,6 @@ Neo.DummyTool.prototype.moveHandler = function(oe) {};
 Neo.DummyTool.prototype.upMoveHandler = function(oe) {}
 Neo.DummyTool.prototype.rollOverHandler= function(oe) {}
 Neo.DummyTool.prototype.rollOutHandler= function(oe) {}
-
-
-
 
 'use strict';
 
@@ -4318,8 +4264,6 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.element.innerHTML = "<img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />"
 
     this.setColor(Neo.config.colors[params.index - 1]);
-//  this.color = Neo.config.colors[params.index - 1];
-//  this.element.style.backgroundColor = this.color;
 
     this.setSelected(this.selected);
     Neo.colorTips.push(this);
@@ -4581,18 +4525,6 @@ Neo.PenTip.prototype.update = function() {
         this.label.innerHTML = this.toolStrings[this.mode];
     }
 };
-
-/*
-Neo.PenTip.prototype.draw = function(c) {
-    if (typeof c != "string") c = Neo.painter.getColorString(c);
-    if (this.canvas) {
-        var ctx = this.canvas.getContext("2d");
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.fillStyle = c;
-        ctx.fillRect(2, 3, 33, 1.2);
-    }
-};
-*/
 
 /*
 -------------------------------------------------------------------------
@@ -5259,8 +5191,6 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
         var barX = (oe.scrollBarX) * (oe.destCanvas.width - barWidth);
         this.barButton.style.width = (Math.ceil(barWidth) - 4) + "px";
         this.barButton.style.left = Math.floor(barX) + "px";
-
-//      console.log("width=" + (Math.ceil(barWidth) - 4) + " x=" + Math.ceil(barX))
 
     } else {
         var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
