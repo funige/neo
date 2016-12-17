@@ -209,7 +209,7 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     oe.prepareDrawing();
 	this.isUpMove = false;
 	var ctx = oe.canvasCtx[oe.current];
-	if (oe.alpha >= 1) {
+	if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, this.lineType);
     }
 
@@ -948,10 +948,15 @@ Neo.TurnTool.prototype.type = Neo.Painter.TOOLTYPE_TURN;
 Neo.TurnTool.prototype.upHandler = function(oe) {
     this.isUpMove = true;
 
+    this.startX = Math.floor(this.startX);
+    this.startY = Math.floor(this.startY);
+    this.endX = Math.floor(this.endX);
+    this.endY = Math.floor(this.endY);
+
     var x = (this.startX < this.endX) ? this.startX : this.endX;
     var y = (this.startY < this.endY) ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX);
-    var height = Math.abs(this.startY - this.endY);
+    var width = Math.abs(this.startX - this.endX) + 1;
+    var height = Math.abs(this.startY - this.endY) + 1;
 
     if (width > 0 && height > 0) {
         oe._pushUndo();
@@ -1027,7 +1032,7 @@ Neo.PasteTool.prototype.moveHandler = function(oe) {
     oe.tempY = dy;
 
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    this.drawCursor(oe);
+//  this.drawCursor(oe);
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function(e) {

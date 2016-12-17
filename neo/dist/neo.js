@@ -912,7 +912,6 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     }
 
     this.destCanvasCtx = this.destCanvas.getContext("2d");
-//  this.destCanvas.id = "destCanvas";
     this.destCanvas.width = destWidth;
     this.destCanvas.height = destHeight;
 
@@ -929,9 +928,11 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     container.onmouseover = function(e) {ref._rollOverHandler(e)};
     container.onmouseout = function(e) {ref._rollOutHandler(e)};
 
-    container.ontouchstart = function(e) {ref._mouseDownHandler(e)};
-    container.ontouchmove = function(e) {ref._mouseMoveHandler(e)};
-    container.ontouchend = function(e) {ref._mouseUpHandler(e)};
+    //TODO
+    //モバイル対応……
+//  container.ontouchstart = function(e) {ref._mouseDownHandler(e)};
+//  container.ontouchmove = function(e) {ref._mouseMoveHandler(e)};
+//  container.ontouchend = function(e) {ref._mouseUpHandler(e)};
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
@@ -1594,25 +1595,41 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
     var b0 = buf8[index + 2];
     var a0 = buf8[index + 3];
 
-    switch (this.maskType) {
+    if (a0 == 0) {
+        r0 = 0xff;
+        g0 = 0xff;
+        b0 = 0xff;
+    }
+
+    var type = this.maskType;
+
+    //TODO
+    //いろいろ試したのですが半透明で描画するときの加算・逆加算を再現する方法がわかりません。
+    //とりあえず単純に無視しています。
+    if (type == Neo.Painter.MASKTYPE_ADD ||
+        type == Neo.Painter.MASKTYPE_SUB) {
+        if (this._currentColor[3] < 250) {
+            type = Neo.Painter.MASKTYPE_NONE;
+        }
+    }
+
+    switch (type) {
     case Neo.Painter.MASKTYPE_NONE:
         return;
 
     case Neo.Painter.MASKTYPE_NORMAL:
-        return (a0 != 0 &&
-                r0 == r &&
+        return (r0 == r &&
                 g0 == g &&
                 b0 == b) ? true : false;
 
     case Neo.Painter.MASKTYPE_REVERSE:
-        return (a0 == 0 ||
-                r0 != r ||
+        return (r0 != r ||
                 g0 != g ||
                 b0 != b) ? true : false;
 
     case Neo.Painter.MASKTYPE_ADD:
         if (a0 > 0) {
-            var sort = this.test(r0, g0, b0);
+            var sort = this.sortColor(r0, g0, b0);
             for (var i = 0; i < 3; i++) {
                 var c = sort[i];
                 if (buf8[index + c] < this._currentColor[c]) return true;
@@ -1625,7 +1642,7 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
 
     case Neo.Painter.MASKTYPE_SUB:
         if (a0 > 0) {
-            var sort = this.test(r0, g0, b0);
+            var sort = this.sortColor(r0, g0, b0);
             for (var i = 0; i < 3; i++) {
                 var c = sort[i];
                 if (buf8[index + c] > this._currentColor[c]) return true;
@@ -2516,9 +2533,9 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
     this.tempX = 0;
     this.tempY = 0;
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    this.tempCanvasCtx.drawImage(this.canvas[this.current],
-                                 x, y, width, height,
-                                 x, y, width, height);
+//    this.tempCanvasCtx.drawImage(this.canvas[this.current],
+//                                 x, y, width, height,
+//                                 x, y, width, height);
 
     var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -2527,6 +2544,20 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
     for (var i = 0; i < buf32.length; i++) {
         this.temp[i] = buf32[i];
     }
+
+    //tempCanvasに乗せる画像を作る
+    imageData = this.tempCanvasCtx.getImageData(x, y, width, height);
+    buf32 = new Uint32Array(imageData.data.buffer);
+    buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    for (var i = 0; i < buf32.length; i++) {
+        if (this.temp[i] >> 24) {
+            buf32[i] = this.temp[i] | 0xff000000;
+        } else {
+            buf32[i] = 0xffffffff;
+        }
+    }
+    imageData.data.set(buf8);
+    this.tempCanvasCtx.putImageData(imageData, x, y);
 };
 
 Neo.Painter.prototype.paste = function(x, y, width, height) {
@@ -2562,24 +2593,22 @@ Neo.Painter.prototype.__paste = function(x, y, width, height) {
 */
 
 Neo.Painter.prototype.turn = function(x, y, width, height) {
-    x = Math.round(x);
-    y = Math.round(y);
-    width = Math.round(width);
-    height = Math.round(height);
     var ctx = this.canvasCtx[this.current];
-
+    
     // 傾けツールのバグを再現するため一番上のラインで対象領域を埋める
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var clone = new Uint32Array(buf32.length);
+    var temp = new Uint32Array(buf32.length);
 
     var index = 0;
-    for (var j = 1; j < height; j++) {
-        var index = j * width;
+    for (var j = 0; j < height; j++) {
         for (var i = 0; i < width; i++) {
-            clone[index + i] = buf32[index + i];
-            buf32[index + i] = buf32[i];
+            temp[index] = buf32[index];
+            if (index >= width) {
+                buf32[index] = buf32[index % width];
+            }
+            index++;
         }
     }
     imageData.data.set(buf8);
@@ -2593,7 +2622,7 @@ Neo.Painter.prototype.turn = function(x, y, width, height) {
     index = 0;
     for (var j = height - 1; j >= 0; j--) {
         for (var i = 0; i < width; i++) {
-            buf32[i * height + j] = clone[index++];
+            buf32[i * height + j] = temp[index++];
         }
     }
     imageData.data.set(buf8);
@@ -2619,7 +2648,9 @@ Neo.Painter.prototype.doFill = function(ctx, x, y, width, height, maskFunc) {
     for (var j = 0; j < height; j++) {
         for (var i = 0; i < width; i++) {
             if (maskFunc && maskFunc.call(this, i, j, width, height)) {
-                if (!this.isMasked(buf8, index)) {
+                //なぜか加算逆加算は適用されない
+                if (this.maskType >= Neo.Painter.MASKTYPE_ADD || 
+                    !this.isMasked(buf8, index)) {
                     var r0 = buf8[index + 0];
                     var g0 = buf8[index + 1];
                     var b0 = buf8[index + 2];
@@ -2777,7 +2808,7 @@ Neo.Painter.prototype.clearSession = function() {
     }
 };
 
-Neo.Painter.prototype.test = function(r0, g0, b0) {
+Neo.Painter.prototype.sortColor = function(r0, g0, b0) {
     var min = (r0 < g0) ? ((r0 < b0) ? 0 : 2) : ((g0 < b0) ? 1 : 2);
     var max = (r0 > g0) ? ((r0 > b0) ? 0 : 2) : ((g0 > b0) ? 1 : 2);
     var mid = (min + max == 1) ? 2 : ((min + max == 2) ? 1 : 0);
@@ -2786,8 +2817,9 @@ Neo.Painter.prototype.test = function(r0, g0, b0) {
 
 Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     //テキスト描画
+    //描画位置がずれるので適当に調整
     fontSize = parseInt(fontSize, 10);
-    y -= Math.round((5.0 + fontSize/8) / this.zoom); //適当に調整
+    y -= Math.round((5.0 + fontSize/8) / this.zoom);
     x += Math.round(2.0 / this.zoom);
 
     var ctx = this.tempCanvasCtx;
@@ -2801,7 +2833,7 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     ctx.fillText(string, 0, 0);
     ctx.restore();
 
-    // 二値化
+    // 適当に二値化
     var c = this.getColor();
     var r = c & 0xff;
     var g = (c & 0xff00) >> 8;
@@ -3052,7 +3084,7 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     oe.prepareDrawing();
 	this.isUpMove = false;
 	var ctx = oe.canvasCtx[oe.current];
-	if (oe.alpha >= 1) {
+	if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         oe.drawLine(ctx, oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, this.lineType);
     }
 
@@ -3791,10 +3823,15 @@ Neo.TurnTool.prototype.type = Neo.Painter.TOOLTYPE_TURN;
 Neo.TurnTool.prototype.upHandler = function(oe) {
     this.isUpMove = true;
 
+    this.startX = Math.floor(this.startX);
+    this.startY = Math.floor(this.startY);
+    this.endX = Math.floor(this.endX);
+    this.endY = Math.floor(this.endY);
+
     var x = (this.startX < this.endX) ? this.startX : this.endX;
     var y = (this.startY < this.endY) ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX);
-    var height = Math.abs(this.startY - this.endY);
+    var width = Math.abs(this.startX - this.endX) + 1;
+    var height = Math.abs(this.startY - this.endY) + 1;
 
     if (width > 0 && height > 0) {
         oe._pushUndo();
@@ -3870,7 +3907,7 @@ Neo.PasteTool.prototype.moveHandler = function(oe) {
     oe.tempY = dy;
 
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    this.drawCursor(oe);
+//  this.drawCursor(oe);
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function(e) {
