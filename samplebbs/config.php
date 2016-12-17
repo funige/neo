@@ -169,7 +169,7 @@ define(IMG_DIR, 'src/');
 define(THUMB_DIR, 'thumb/');
 
 //タイトル（<title>とTOP）
-define(TITLE, 'Java難民板');
+define(TITLE, 'NEOテスト');
 
 //「ホーム」へのリンク
 define(HOME, '../');

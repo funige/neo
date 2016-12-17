@@ -20,7 +20,7 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 2. 実行ファイル (neo.app または neo.exe) をダブルクリック
 
 ## サンプル掲示板
-組み込みのテストのために[**Java難民板**](http://neo.websozai.jp)をオープンしました  
+テスト用の掲示板[**NEOテスト**](http://neo.websozai.jp)をオープンしました  
 ブラウザからアクセスして、適当にご利用ください  
 掲示板へのNEOの組み込み方法については、 [/samplebbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました
 
