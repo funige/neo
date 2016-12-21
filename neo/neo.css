@@ -6,6 +6,7 @@
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
 
     touch-callout: none;
     -webkit-touch-callout: none;

@@ -6,10 +6,12 @@
     "hello": "echo 'hello'"
   },
   "dependencies": {
-    "request": "^2.75.0"
+    "request": "^2.79.0"
   },
   "devDependencies": {
-    "gulp-concat": "^2.6.0",
+    "electron": "^1.4.13",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^2.0.0"
   }

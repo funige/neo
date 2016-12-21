@@ -144,7 +144,11 @@ Neo.initConfig = function(applet) {
 
 Neo.initSkin = function() {
     var sheet = document.styleSheets[0];
-    if (!sheet) return;
+    if (!sheet) {
+        var style = document.createElement("style");
+        document.head.appendChild(style); // must append before you can access sheet property
+        sheet = style.sheet;
+    }
 
     Neo.styleSheet = sheet;
 
@@ -290,6 +294,7 @@ Neo.initComponents = function() {
     if (Neo.styleSheet) {
         Neo.addRule("*", "user-select", "none");
         Neo.addRule("*", "-webkit-user-select", "none");
+        Neo.addRule("*", "-ms-user-select", "none");
     }
 }
 

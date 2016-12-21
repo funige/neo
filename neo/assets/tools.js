@@ -793,6 +793,7 @@ Neo.EffectToolBase.prototype.downHandler = function(oe) {
 };
 
 Neo.EffectToolBase.prototype.upHandler = function(oe) {
+    if (this.isUpMove) return;
     this.isUpMove = true;
 
     this.startX = Math.floor(this.startX);

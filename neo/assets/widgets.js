@@ -25,6 +25,7 @@ Neo.Button.prototype.init = function(name, params) {
 };
 
 Neo.Button.prototype._mouseDownHandler = function(e) {
+    if (Neo.painter.isUIPaused()) return;
     this.isMouseDown = true;
 
     if ((this.params.type == "fill") && (this.selected == false)) {
@@ -104,7 +105,9 @@ Neo.ColorTip.prototype.init = function(name, params) {
 };
 
 Neo.ColorTip.prototype._mouseDownHandler = function(e) {
+    if (Neo.painter.isUIPaused()) return;
     this.isMouseDown = true;
+
     for (var i = 0; i < Neo.colorTips.length; i++) {
         var colorTip = Neo.colorTips[i];
         if (this == colorTip) {

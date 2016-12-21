@@ -255,11 +255,15 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     container.onmouseover = function(e) {ref._rollOverHandler(e)};
     container.onmouseout = function(e) {ref._rollOutHandler(e)};
 
-    //TODO
-    //モバイル対応……
-//  container.ontouchstart = function(e) {ref._mouseDownHandler(e)};
-//  container.ontouchmove = function(e) {ref._mouseMoveHandler(e)};
-//  container.ontouchend = function(e) {ref._mouseUpHandler(e)};
+    container.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+    }, true);
+    container.addEventListener("touchmove", function(e) {
+        ref._mouseMoveHandler(e);
+    }, true);
+    container.addEventListener("touchend", function(e) {
+        ref._mouseUpHandler(e);
+    }, true);
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
@@ -463,9 +467,7 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         }
     }
 
-    if (this.drawtype != Neo.Painter.DRAWTYPE_BEZIER || 
-        this.tool.step == 0) {
-
+    if (!this.isUIPaused()) {
         if (e.target['data-bar']) {
             this.pushTool(new Neo.HandTool());
 
@@ -487,9 +489,7 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
             this.pushTool(new Neo.DummyTool());
         }
     }
-
 	this.tool.downHandler(this);
-	//console.log(e.button);
 	
 	var ref = this;
 	document.onmouseup = function(e) {
@@ -521,13 +521,15 @@ Neo.Painter.prototype._mouseMoveHandler = function(e) {
 
 Neo.Painter.prototype._updateMousePosition = function(e) {
     var rect = this.destCanvas.getBoundingClientRect();
+    var x = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
+    var y = (e.clientY !== undefined) ? e.clientY : e.touches[0].clientY;
 
     if (this.zoom <= 0) this.zoom = 1; //なぜか0になることがあるので
 
-	this.mouseX = (e.clientX - rect.left) / this.zoom 
+	this.mouseX = (x - rect.left) / this.zoom 
             + this.zoomX 
             - this.destCanvas.width * 0.5 / this.zoom;
-	this.mouseY = (e.clientY - rect.top)  / this.zoom 
+	this.mouseY = (y - rect.top)  / this.zoom 
             + this.zoomY 
             - this.destCanvas.height * 0.5 / this.zoom;
 	
@@ -538,8 +540,8 @@ Neo.Painter.prototype._updateMousePosition = function(e) {
 		this.prevMosueY = this.mouseY;
 	}
 
-    this.rawMouseX = e.clientX;
-    this.rawMouseY = e.clientY;
+    this.rawMouseX = x;
+    this.rawMouseY = y;
     this.clipMouseX = Math.max(Math.min(this.canvasWidth, this.mouseX), 0);
     this.clipMouseY = Math.max(Math.min(this.canvasHeight, this.mouseY), 0);
 };
@@ -2128,8 +2130,8 @@ Neo.Painter.prototype.sortColor = function(r0, g0, b0) {
 Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     //テキスト描画
     //描画位置がずれるので適当に調整
-    fontSize = parseInt(fontSize, 10);
-    y -= Math.round((5.0 + fontSize/8) / this.zoom);
+    var offset = parseInt(fontSize, 10);
+    y -= Math.round((5.0 + offset/8) / this.zoom);
     x += Math.round(2.0 / this.zoom);
 
     var ctx = this.tempCanvasCtx;
@@ -2181,4 +2183,13 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
                   0, 0, this.canvasWidth, this.canvasHeight);
 
 	this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+};
+
+Neo.Painter.prototype.isUIPaused = function() {
+    if (this.drawType == Neo.Painter.DRAWTYPE_BEZIER) {
+        if (this.tool.step && this.tool.step > 0) {
+            return true;
+        }
+    }
+    return false;
 };
