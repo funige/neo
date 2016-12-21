@@ -36,6 +36,7 @@ Chrome/FireFox/Safari/Edge/IE（最近のバージョンのみ）
 
 ## 履歴
 
+- うーん
 
 #### ver0.9 (2016/12/18)
 - Edge対応
