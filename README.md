@@ -11,7 +11,14 @@ javaアプレットが絶滅する前に、javascriptで書き直しておきた
 2. PaintBBSと見た目や操作性がだいたい同じになってきたら、  
 管理人さんに連絡取って直接組み込んでもらうことを目指します
 
+**(2017/01/18) 落書き板とSQLでNEOが使えるようになりました！**
+
 ----
+
+## 対応ブラウザ
+Chrome/FireFox/Safari/<s>Edge/IE</s>（最近のバージョンのみ）  
+- **WindowsのEdgeとIEでは投稿できない不具合があるようです**
+- 一応モバイルブラウザでも動くみたいですが、サポート対象外にまります
 
 ## Mac/Win用アプリの実行方法
 このアプリを使えば、javaを使わずに掲示板に投稿できます
@@ -30,10 +37,6 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 掲示板へのNEOの組み込み方法については、 [/samplebbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました  
 不明な点があればサンプル掲示板で聞いてください
 
-対応ブラウザ:  
-Chrome/FireFox/Safari/Edge/IE（最近のバージョンのみ）  
-- モバイルブラウザではサポート対象外になります
-
 ## 履歴
 
 #### ver1.0 (2016/12/22)
@@ -46,8 +49,8 @@ Chrome/FireFox/Safari/Edge/IE（最近のバージョンのみ）
 ![ver1.0](http://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20161221/20161221215643.png?1482325021)  
 
 #### ver0.9 (2016/12/18) 
-- Edge対応
-- IE対応
+- <s>Edge対応</s>
+- <s>IE対応</s>
 - バグ修正
 
 #### ver0.8 (2016/12/13)
