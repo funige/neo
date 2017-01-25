@@ -730,7 +730,12 @@ Neo.ColorSlider.prototype.init = function(name, params) {
 };
 
 Neo.ColorSlider.prototype.downHandler = function(x, y) {
-    this.slide(x, y);
+    if (Neo.painter.isShiftDown) {
+        this.shift(x, y);
+
+    } else {
+        this.slide(x, y);
+    }
 };
 
 Neo.ColorSlider.prototype.moveHandler = function(x, y) {
@@ -738,6 +743,32 @@ Neo.ColorSlider.prototype.moveHandler = function(x, y) {
 };
 
 Neo.ColorSlider.prototype.upHandler = function(x, y) {
+};
+
+Neo.ColorSlider.prototype.shift = function(x, y) {
+    var value;
+    console.log("shift " + x);
+    
+    value = (x - 0.5) * 255.0 / 48.0;
+    value = Math.round(value / 5) * 5;
+
+    var min = (this.type == Neo.SLIDERTYPE_ALPHA) ? 1 : 0;
+    if (this.value > value && this.value > min) this.value--;
+    if (this.value < value && this.value < 255) this.value++;
+
+    if (this.type == Neo.SLIDERTYPE_ALPHA) {
+        Neo.painter.alpha = this.value / 255.0;
+        this.update();
+        Neo.updateUIColor(false, false);
+
+    } else {
+        var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
+        var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
+        var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
+
+        Neo.painter.setColor(r<<16 | g<<8 | b);
+        Neo.updateUIColor(true, true);
+    }
 };
 
 Neo.ColorSlider.prototype.slide = function(x, y) {
@@ -819,9 +850,14 @@ Neo.SizeSlider.prototype.init = function(name, params) {
 };
 
 Neo.SizeSlider.prototype.downHandler = function(x, y) {
-    this.value0 = this.value;
-    this.y0 = y;
-    this.slide(x, y);
+    if (Neo.painter.isShiftDown) {
+        this.shift(x, y);
+
+    } else {
+        this.value0 = this.value;
+        this.y0 = y;
+        this.slide(x, y);
+    }
 };
 
 Neo.SizeSlider.prototype.moveHandler = function(x, y) {
@@ -829,6 +865,10 @@ Neo.SizeSlider.prototype.moveHandler = function(x, y) {
 };
 
 Neo.SizeSlider.prototype.upHandler = function(x, y) {
+};
+
+Neo.ColorSlider.prototype.shift = function(x, y) {
+    console.log("shift " + y);
 };
 
 Neo.SizeSlider.prototype.slide = function(x, y) {

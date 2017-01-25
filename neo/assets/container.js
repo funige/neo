@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 var Neo = function() {};
-Neo.version = "1.0.0";
+
+Neo.version = "1.0.3";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -291,6 +292,9 @@ Neo.initComponents = function() {
         container.style.borderColor = 'transparent';
     }, false);
 
+    // Microsoftのブラウザでは送信に失敗することがあるので警告を表示する
+    Neo.showMSWarning();
+
     if (Neo.styleSheet) {
         Neo.addRule("*", "user-select", "none");
         Neo.addRule("*", "-webkit-user-select", "none");
@@ -387,6 +391,25 @@ Neo.start = function(isApp) {
             var ipc = require('electron').ipcRenderer;
             ipc.sendToHost('neo-status', 'ok');
         }
+    }
+};
+
+Neo.showMSWarning = function() {
+    //http://stackoverflow.com/questions/31757852/how-can-i-detect-internet-explorer-ie-and-microsoft-edge-using-javascript
+    var ms = false;
+    if (/MSIE 10/i.test(navigator.userAgent)) {
+        ms = true; // This is internet explorer 10
+    }
+    if (/MSIE 9/i.test(navigator.userAgent) ||
+        /rv:11.0/i.test(navigator.userAgent)) {
+        ms = true; // This is internet explorer 9 or 11
+    }
+    if (/Edge\/\d./i.test(navigator.userAgent)){
+        ms = true; // This is Microsoft Edge
+    }
+
+    if (ms) {
+        document.getElementById("MSWarning").innerHTML = "このブラウザでは<br>投稿に失敗することがあります";
     }
 };
 
@@ -533,7 +556,8 @@ Neo.submit = function(board, blob) {
 
     var request = new XMLHttpRequest();
     request.open("POST", url, true);
-    request.onload = function (e) {
+    
+    request.onload = function(e) {
         console.log(request.response);
         Neo.uploaded = true;
 
@@ -543,7 +567,17 @@ Neo.submit = function(board, blob) {
         }
         var exitURL = board + url;
         location.href = exitURL;
-    }
+    };
+    request.onerror = function(e) {
+        console.log("error");
+    };
+    request.onabort = function(e) {
+        console.log("abort");
+    };
+    request.ontimeout = function(e) {
+        console.log("timeout");
+    };
+    
     request.send(body);
 };
 
@@ -602,6 +636,7 @@ Neo.createContainer = function(applet) {
                             <div id="zoomMinusWrapper">
                                 <div id="zoomMinus">-</div>
                             </div>
+                            <div id="MSWarning"></div>
                         </div>
                     </div>
                     <div id="lower">

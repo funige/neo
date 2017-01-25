@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 var Neo = function() {};
-Neo.version = "1.0.0";
+
+Neo.version = "1.0.2";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -534,7 +535,7 @@ Neo.submit = function(board, blob) {
     var request = new XMLHttpRequest();
     request.open("POST", url, true);
     request.onload = function (e) {
-        console.log(request.response);
+        console.log("response='" + request.response + "'");
         Neo.uploaded = true;
 
         var url = Neo.config.url_exit;
@@ -2713,6 +2714,27 @@ Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
     return  false;
 }
 
+Neo.Painter.prototype.__ellipseMask = function(x, y, width, height) {
+    var d = this.lineWidth;
+    var cx = width / 2 - 0.5;
+    var cy = height / 2 - 0.5;
+
+    if (cx <= d || cy <= d) return this.ellipseFillMask(x, y, width, height);
+
+    var x2 = (x - cx) / (cx - d);
+    var y2 = (y - cy) / (cy - d);
+
+    x = (x - cx) / cx;
+    y = (y - cy) / cy;
+
+    if ((x * x) + (y * y) < 1) {
+        if ((x2 * x2) + (y2 * y2) >= 1) {
+            return true;
+        }
+    }
+    return  false;
+}
+
 /*
 -----------------------------------------------------------------------
 */
@@ -2974,6 +2996,9 @@ Neo.ToolBase.prototype.loadStates = function() {
     var reserve = this.getReserve();
     if (reserve) {
         Neo.painter.lineWidth = reserve.size;
+//      Neo.painter.color = reserve.color;
+//      Neo.painter.alpha = reserve.alpha;
+//      Neo.painter.tool = reserve.tool;
         Neo.updateUI();
     }
 };
@@ -2982,6 +3007,9 @@ Neo.ToolBase.prototype.saveStates = function() {
     var reserve = this.getReserve();
     if (reserve) {
         reserve.size = Neo.painter.lineWidth;
+//      reserve.color = Neo.painter.color;
+//      reserve.alpha = Neo.painter.alpha;
+//      reserve.tool = Neo.painter.tool;
     }
 };
 
@@ -3677,6 +3705,11 @@ Neo.EffectToolBase.prototype.upHandler = function(oe) {
     var height = Math.abs(this.startY - this.endY) + 1;
     var ctx = oe.canvasCtx[oe.current];
 
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x + width > oe.canvasWidth) width = oe.canvasWidth - x;
+    if (y + height > oe.canvasHeight) height = oe.canvasHeight - y;
+    
     if (width > 0 && height > 0) {
         oe._pushUndo();
         oe.prepareDrawing();
@@ -4059,9 +4092,12 @@ Neo.TextTool.prototype.drawText = function(oe) {
     var text = oe.inputText;
 
     // unescape entities
-    var tmp = document.createElement("textarea");
-    tmp.innerHTML = text.innerHTML;
-    var string = tmp.value;
+    //var tmp = document.createElement("textarea");
+    //tmp.innerHTML = text.innerHTML;
+    //var string = tmp.value;
+
+    var string = text.textContent || text.innerText;
+    
     if (string.length <= 0) return;
     oe.doText(this.startX, this.startY, string, text.style.fontSize);
 };

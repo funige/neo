@@ -366,8 +366,8 @@ Neo.Painter.prototype.hideInputText = function() {
 Neo.Painter.prototype.updateInputText = function() {
     var text = this.inputText;
     var d = this.lineWidth;
-    var fontSize = Math.round(d * 55/30 + 7);
-    var height = Math.round(d * 68/30 + 12);
+    var fontSize = Math.round(d * 55/28 + 7);
+    var height = Math.round(d * 68/28 + 12);
 
     text.style.fontSize = fontSize + "px";
     text.style.lineHeight = fontSize + "px";
@@ -2006,30 +2006,30 @@ Neo.Painter.prototype.rectFillMask = function(x, y, width, height) {
 Neo.Painter.prototype.rectMask = function(x, y, width, height) {
     var d = this.lineWidth;
     return (x < d || x > width - 1 - d || 
-            y < d || y > height -1 - d) ? true : false;
+            y < d || y > height - 1 - d) ? true : false;
 };
 
 Neo.Painter.prototype.ellipseFillMask = function(x, y, width, height) {
-    var cx = width / 2 - 0.5;
-    var cy = height / 2 - 0.5;
-    x = (x - cx) / cx;
-    y = (y - cy) / cy;
+    var cx = (width - 1) / 2.0;
+    var cy = (height - 1) / 2.0;
+    x = (x - cx) / (cx + 1);
+    y = (y - cy) / (cy + 1);
 
     return ((x * x) + (y * y) < 1) ? true : false;
 }
 
 Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
     var d = this.lineWidth;
-    var cx = width / 2 - 0.5;
-    var cy = height / 2 - 0.5;
+    var cx = (width - 1) / 2.0;
+    var cy = (height - 1) / 2.0;
 
     if (cx <= d || cy <= d) return this.ellipseFillMask(x, y, width, height);
 
-    var x2 = (x - cx) / (cx - d);
-    var y2 = (y - cy) / (cy - d);
+    var x2 = (x - cx) / (cx - d + 1);
+    var y2 = (y - cy) / (cy - d + 1);
 
-    x = (x - cx) / cx;
-    y = (y - cy) / cy;
+    x = (x - cx) / (cx + 1);
+    y = (y - cy) / (cy + 1);
 
     if ((x * x) + (y * y) < 1) {
         if ((x2 * x2) + (y2 * y2) >= 1) {

@@ -686,7 +686,8 @@ Neo.SliderTool.prototype.isUpMove = false;
 Neo.SliderTool.prototype.alt = false;
 
 Neo.SliderTool.prototype.downHandler = function(oe) {
-	this.isDrag = true;
+    if (!oe.isShiftDown) this.isDrag = true;
+    
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     var rect = this.target.getBoundingClientRect();
@@ -807,6 +808,11 @@ Neo.EffectToolBase.prototype.upHandler = function(oe) {
     var height = Math.abs(this.startY - this.endY) + 1;
     var ctx = oe.canvasCtx[oe.current];
 
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x + width > oe.canvasWidth) width = oe.canvasWidth - x;
+    if (y + height > oe.canvasHeight) height = oe.canvasHeight - y;
+    
     if (width > 0 && height > 0) {
         oe._pushUndo();
         oe.prepareDrawing();
@@ -1189,9 +1195,12 @@ Neo.TextTool.prototype.drawText = function(oe) {
     var text = oe.inputText;
 
     // unescape entities
-    var tmp = document.createElement("textarea");
-    tmp.innerHTML = text.innerHTML;
-    var string = tmp.value;
+    //var tmp = document.createElement("textarea");
+    //tmp.innerHTML = text.innerHTML;
+    //var string = tmp.value;
+
+    var string = text.textContent || text.innerText;
+    
     if (string.length <= 0) return;
     oe.doText(this.startX, this.startY, string, text.style.fontSize);
 };
