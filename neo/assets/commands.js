@@ -83,9 +83,10 @@ Neo.SubmitCommand.prototype.execute = function() {
 Neo.CopyrightCommand = function(data) {this.data = data};
 Neo.CopyrightCommand.prototype = new Neo.CommandBase();
 Neo.CopyrightCommand.prototype.execute = function() {
-//  var url = "https://web.archive.org/web/20070924062559/http://www.shichan.jp";
-    var url = "http://hp.vector.co.jp/authors/VA016309/";
-    if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
+//  var url = "http://hp.vector.co.jp/authors/VA016309/";
+//  if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
+    var url = "http://github.com/funige/neo/";
+    if (confirm("PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？" + "\n")) {
         Neo.openURL(url);
     }
 };

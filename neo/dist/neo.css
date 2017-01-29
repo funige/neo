@@ -1,4 +1,3 @@
-
 .NEO {
     margin:0;
     line-height:18px;
@@ -364,11 +363,20 @@
     box-shadow: -1px 0 0 0px rgba(0, 0, 0, 0.3) inset;
 }
 
+.NEO .colorSlider .hit {
+     position:absolute;
+     width: 60px;
+     height: 13px;
+     left: -6px;
+     background-color: white;
+     opacity: 0.01;
+}
+
 .NEO .sizeSlider {
     width: 48px;
     height:33px;
     position: relative;
-    margin-top: 3px;
+    margin-top: 4px;
 }
 
 .NEO .sizeSlider .label {
@@ -390,6 +398,15 @@
     height: 33%;
     background-color: #82f238;
     box-shadow: 0 -1px 0 0px rgba(0, 0, 0, 0.3) inset;
+}
+
+.NEO .sizeSlider .hit {
+     position:absolute;
+     width: 48px;
+     height: 41px;
+     top: -4px;
+     background-color: white;
+     opacity: 0.01;
 }
 
 .NEO .reserveControl {

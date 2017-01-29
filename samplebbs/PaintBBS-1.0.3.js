@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.0.3";
+Neo.version = "1.0.4";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -565,6 +565,22 @@ Neo.submit = function(board, blob) {
         if (url[0] == '/') {
             url = url.replace(/^.*\//, ''); //よくわかんないけどとりあえず
         }
+
+        // ふたばのpaintpost.phpは、画像投稿に成功するとresponseに
+        // "./futaba.php?mode=paintcom&amp;painttmp=.png"
+        // という文字列を返します。 (今はまったく機能していないのですが）
+        // 
+        // NEOでは、responseに文字列"painttmp="が含まれる場合は
+        // <PARAM>で指定されたurl_exitを無視して、このURLにジャンプします。
+        //
+        // これを使えば、例の「画像がみつかりません」エラーが出る問題を
+        // 直せるのでは無いかと……。
+        
+        var responseURL = request.response.replace(/&amp;/g, '&');
+        if (responseURL.match(/painttmp=/)) {
+            url = respnseURL;
+        }
+
         var exitURL = board + url;
         location.href = exitURL;
     };
@@ -577,6 +593,19 @@ Neo.submit = function(board, blob) {
     request.ontimeout = function(e) {
         console.log("timeout");
     };
+
+    if (0) {
+    // 送信エラーのデバッグのため
+    // データをuint8arrayにコピーしておく
+    if (1) {
+        var fr = new FileReader();
+        fr.onload = function () {
+            var array = fr.result;
+            console.log(array);
+        }
+        fr.readAsArrayBuffer();
+    }
+    }
     
     request.send(body);
 };
@@ -704,6 +733,16 @@ Neo.createContainer = function(applet) {
     parent.insertBefore(neo, applet);
 
 //  applet.style.display = "none";
+
+    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
+    setTimeout(function() {
+        var tmp = document.getElementsByClassName("NEO");
+        if (tmp.length > 1) {
+            for (var i = 1; i < tmp.length; i++) {
+                tmp[i].style.display = "none";
+            }
+        }
+    }, 0);
 };
 
 
@@ -4218,9 +4257,11 @@ Neo.SubmitCommand.prototype.execute = function() {
 Neo.CopyrightCommand = function(data) {this.data = data};
 Neo.CopyrightCommand.prototype = new Neo.CommandBase();
 Neo.CopyrightCommand.prototype.execute = function() {
-//  var url = "https://web.archive.org/web/20070924062559/http://www.shichan.jp";
-    var url = "http://hp.vector.co.jp/authors/VA016309/";
-    if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
+//  var url = "http://hp.vector.co.jp/authors/VA016309/";
+//  if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
+
+    var url = "http://github.com/funige/neo/";
+    if (confirm("PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) を勝手にhtml5化する\nプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？" + "\n")) {
         Neo.openURL(url);
     }
 };

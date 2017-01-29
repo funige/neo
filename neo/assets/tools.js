@@ -229,6 +229,8 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
 Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
 	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 
+    console.log("rect", oe.cursorRect);
+    
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
         oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
@@ -236,8 +238,7 @@ Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
     }
 
 //	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-
-	this.drawCursor(oe);
+//	this.drawCursor(oe);
     oe.prevLine = null;
 };
 

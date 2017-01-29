@@ -2131,14 +2131,14 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     //テキスト描画
     //描画位置がずれるので適当に調整
     var offset = parseInt(fontSize, 10);
-    y -= Math.round((5.0 + offset/8) / this.zoom);
-    x += Math.round(2.0 / this.zoom);
+//  y -= Math.round((5.0 + offset/8) / this.zoom);
+//  x += Math.round(2.0 / this.zoom);
 
     var ctx = this.tempCanvasCtx;
 	ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.save();
 	ctx.translate(x, y);
-	ctx.scale(1/this.zoom, 1/this.zoom);
+//	ctx.scale(1/this.zoom, 1/this.zoom);
 
     ctx.font = fontSize + " Arial";
     ctx.fillStyle = 0;

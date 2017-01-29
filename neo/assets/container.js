@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.0.3";
+Neo.version = "1.0.5";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -565,6 +565,22 @@ Neo.submit = function(board, blob) {
         if (url[0] == '/') {
             url = url.replace(/^.*\//, ''); //よくわかんないけどとりあえず
         }
+
+        // ふたばのpaintpost.phpは、画像投稿に成功するとresponseに
+        // "./futaba.php?mode=paintcom&amp;painttmp=.png"
+        // という文字列を返します。 (今はまったく機能していないのですが）
+        // 
+        // NEOでは、responseに文字列"painttmp="が含まれる場合は
+        // <PARAM>で指定されたurl_exitを無視して、このURLにジャンプします。
+        //
+        // これを使えば、例の「画像がみつかりません」エラーが出る問題を
+        // 直せるのでは無いかと……。
+        
+        var responseURL = request.response.replace(/&amp;/g, '&');
+        if (responseURL.match(/painttmp=/)) {
+            url = respnseURL;
+        }
+
         var exitURL = board + url;
         location.href = exitURL;
     };
@@ -577,7 +593,14 @@ Neo.submit = function(board, blob) {
     request.ontimeout = function(e) {
         console.log("timeout");
     };
-    
+
+    if (1) { // データのデバッグのため送信するデータをuint8arrayにコピーしておく
+        var fr = new FileReader();
+        fr.onload = function () {
+            var result = fr.result;
+        }
+        fr.readAsArrayBuffer(body);
+    }
     request.send(body);
 };
 
@@ -704,5 +727,15 @@ Neo.createContainer = function(applet) {
     parent.insertBefore(neo, applet);
 
 //  applet.style.display = "none";
+
+    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
+    setTimeout(function() {
+        var tmp = document.getElementsByClassName("NEO");
+        if (tmp.length > 1) {
+            for (var i = 1; i < tmp.length; i++) {
+                tmp[i].style.display = "none";
+            }
+        }
+    }, 0);
 };
 

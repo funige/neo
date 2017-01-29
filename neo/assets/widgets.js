@@ -697,12 +697,12 @@ Neo.ColorSlider.prototype.init = function(name, params) {
 
     this.element.className = "colorSlider";
     this.element.innerHTML = "<div class='slider'></div><div class='label'></div>"; 
+    this.element.innerHTML += "<div class='hit'></div>";
+
     this.slider = this.element.getElementsByClassName('slider')[0];
     this.label = this.element.getElementsByClassName('label')[0];
-
-    this.element['data-slider'] = params.type;
-    this.slider['data-slider'] = params.type;
-    this.label['data-slider'] = params.type;
+    this.hit = this.element.getElementsByClassName('hit')[0];
+    this.hit['data-slider'] = params.type;
 
     switch (this.type) {
     case Neo.SLIDERTYPE_RED: 
@@ -723,7 +723,6 @@ Neo.ColorSlider.prototype.init = function(name, params) {
         this.value = 255;
         break;
     }
-    this.label.innerHTML = this.prefix + "99";
 
     this.update();
     return this;
@@ -747,14 +746,20 @@ Neo.ColorSlider.prototype.upHandler = function(x, y) {
 
 Neo.ColorSlider.prototype.shift = function(x, y) {
     var value;
-    console.log("shift " + x);
-    
-    value = (x - 0.5) * 255.0 / 48.0;
-    value = Math.round(value / 5) * 5;
+    if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
+        var v = Math.floor((x - 5) * 5.0);
+        var min = (this.type == Neo.SLIDERTYPE_ALPHA) ? 1 : 0;
 
-    var min = (this.type == Neo.SLIDERTYPE_ALPHA) ? 1 : 0;
-    if (this.value > value && this.value > min) this.value--;
-    if (this.value < value && this.value < 255) this.value++;
+        value = Math.max(Math.min(v, 255), min);
+        if (this.value > value || this.value == 255) {
+            this.value--;
+        } else {
+            this.value++;
+        }
+        this.value = Math.max(Math.min(this.value, 255), min);
+        this.value0 = this.value;
+        this.x0 = x;
+    }
 
     if (this.type == Neo.SLIDERTYPE_ALPHA) {
         Neo.painter.alpha = this.value / 255.0;
@@ -773,9 +778,9 @@ Neo.ColorSlider.prototype.shift = function(x, y) {
 
 Neo.ColorSlider.prototype.slide = function(x, y) {
     var value;
-    if (x >= 0 && x <= 49 && y >= 0 && y <= 15) {
-        value = (x - 0.5) * 255.0 / 48.0;
-        value = Math.round(value / 5) * 5;
+    if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
+        var v = Math.floor((x - 5) * 5.0);
+        value = Math.round(v / 5) * 5;
 
         this.value0 = value;
         this.x0 = x;
@@ -784,8 +789,9 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
         var d = (x - this.x0) / 3.0;
         value = this.value0 + d; 
     }
+    
     var min = (this.type == Neo.SLIDERTYPE_ALPHA) ? 1 : 0;
-    this.value = Math.max(Math.min(255, value), min);
+    this.value = Math.max(Math.min(value, 255), min);
 
     if (this.type == Neo.SLIDERTYPE_ALPHA) {
         Neo.painter.alpha = this.value / 255.0;
@@ -815,7 +821,7 @@ Neo.ColorSlider.prototype.update = function() {
 
     var width = this.value * 49.0 / 255.0;
     width = Math.max(Math.min(48, width), 1);
-
+    
     this.slider.style.width = width.toFixed(2) + "px";
     this.label.innerHTML = this.prefix + this.value.toFixed(0);
 };
@@ -833,16 +839,16 @@ Neo.SizeSlider.prototype.init = function(name, params) {
     this.params = params || {};
     this.name = name;
     this.isMouseDown = false;
-    this.value = 1;
+    this.value = this.value0 = 1;
 
     this.element.className = "sizeSlider";
-    this.element.innerHTML = "<div class='slider'></div><div class='label'></div>"; 
+    this.element.innerHTML = "<div class='slider'></div><div class='label'></div>";
+    this.element.innerHTML += "<div class='hit'></div>"
+
     this.slider = this.element.getElementsByClassName('slider')[0];
     this.label = this.element.getElementsByClassName('label')[0];
-
-    this.element['data-slider'] = params.type;
-    this.slider['data-slider'] = params.type;
-    this.label['data-slider'] = params.type;
+    this.hit = this.element.getElementsByClassName('hit')[0];
+    this.hit['data-slider'] = params.type;
 
     this.slider.style.backgroundColor = Neo.painter.foregroundColor;
     this.update();
@@ -867,17 +873,30 @@ Neo.SizeSlider.prototype.moveHandler = function(x, y) {
 Neo.SizeSlider.prototype.upHandler = function(x, y) {
 };
 
-Neo.ColorSlider.prototype.shift = function(x, y) {
-    console.log("shift " + y);
+Neo.SizeSlider.prototype.shift = function(x, y) {
+    var value0 = Neo.painter.lineWidth;
+    var value;
+    
+    if (!Neo.painter.tool.alt) {
+        var v = Math.floor((y - 4) * 30.0 / 33.0);
+
+        value = Math.max(Math.min(v, 30), 1);
+        if (value0 > value || value0 == 30) {
+            value0--;
+        } else {
+            value0++;
+        }
+        this.setSize(value0);
+    }
 };
 
 Neo.SizeSlider.prototype.slide = function(x, y) {
     var value;
     if (!Neo.painter.tool.alt) {
-        if (x >= 0 && x <= 49 && y >= 0 && y <= 34) {
-            value = (y - 0.5) * 30.0 / 33.0;
-            value = Math.round(value);
-            
+        if (x >= 0 && x < 48 && y >= 0 && y < 41) {
+            var v = Math.floor((y - 4) * 30.0 / 33.0);
+            value = v;
+
             this.value0 = value;
             this.y0 = y;
 
@@ -890,11 +909,14 @@ Neo.SizeSlider.prototype.slide = function(x, y) {
         var d = y - this.y0;
         value = this.value0 + d; 
     }
+
+    value = Math.max(Math.min(value, 30), 1);
     this.setSize(value);
 };
 
 Neo.SizeSlider.prototype.setSize = function(value) {
-    Neo.painter.lineWidth = Math.max(Math.min(30, Math.round(value)), 1);
+    value = Math.round(value);
+    Neo.painter.lineWidth = Math.max(Math.min(30, value), 1);
 
     var tool = Neo.painter.getCurrentTool();
     if (tool) {
@@ -912,7 +934,7 @@ Neo.SizeSlider.prototype.setSize = function(value) {
 Neo.SizeSlider.prototype.update = function() {
     this.value = Neo.painter.lineWidth;
 
-    var height = this.value * 34.0 / 30.0;
+    var height = this.value * 33.0 / 30.0;
     height = Math.max(Math.min(34, height), 1);
 
     this.slider.style.height = height.toFixed(2) + "px";
@@ -1077,5 +1099,4 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
         this.barButton.style.top = Math.floor(barY) + "px";
     }
 };
-
 
