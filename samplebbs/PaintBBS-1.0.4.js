@@ -134,9 +134,21 @@ Neo.initConfig = function(applet) {
     }
 
     Neo.config.reserves = [
-        { size:1, color:"#000000", alpha:1.0, tool:Neo.Painter.TOOLTYPE_PEN },
-        { size:5, color:"#FFFFFF", alpha:1.0, tool:Neo.Painter.TOOLTYPE_ERASER },
-        { size:10, color:"#FFFFFF", alpha:1.0, tool:Neo.Painter.TOOLTYPE_ERASER },
+        { size:1,
+          color:"#000000", alpha:1.0,
+          tool:Neo.Painter.TOOLTYPE_PEN,
+          drawType:Neo.Painter.DRAWTYPE_FREEHAND
+        },
+        { size:5,
+          color:"#FFFFFF", alpha:1.0,
+          tool:Neo.Painter.TOOLTYPE_ERASER,
+          drawType:Neo.Painter.DRAWTYPE_FREEHAND
+        },
+        { size:10,
+          color:"#FFFFFF", alpha:1.0,
+          tool:Neo.Painter.TOOLTYPE_ERASER,
+          drawType:Neo.Painter.DRAWTYPE_FREEHAND
+        },
     ];
 
     Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
@@ -428,7 +440,10 @@ Neo.updateUI = function() {
             toolTip.update();
         }
     }
-
+    if (Neo.drawTip) {
+        Neo.drawTip.update();
+    }
+    
     Neo.updateUIColor(true, false);
 }
 
@@ -2629,7 +2644,7 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
 
 Neo.Painter.prototype.paste = function(x, y, width, height) {
     var ctx = this.canvasCtx[this.current];
-    console.log(this.tempX, this.tempY);
+//  console.log(this.tempX, this.tempY);
 
     var imageData = ctx.getImageData(x + this.tempX, y + this.tempY, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -3167,8 +3182,6 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
 Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
 	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 
-    console.log("rect", oe.cursorRect);
-    
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
         oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
@@ -3630,7 +3643,7 @@ Neo.SliderTool.prototype.downHandler = function(oe) {
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     var rect = this.target.getBoundingClientRect();
-    var sliderType = this.target['data-slider'];
+    var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
     Neo.sliders[sliderType].downHandler(oe.rawMouseX - rect.left, 
                                         oe.rawMouseY - rect.top);
 };
@@ -3640,7 +3653,7 @@ Neo.SliderTool.prototype.upHandler = function(oe) {
     oe.popTool();
 
     var rect = this.target.getBoundingClientRect();
-    var sliderType = this.target['data-slider'];
+    var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
     Neo.sliders[sliderType].upHandler(oe.rawMouseX - rect.left, 
                                       oe.rawMouseY - rect.top);
 };
@@ -3648,7 +3661,7 @@ Neo.SliderTool.prototype.upHandler = function(oe) {
 Neo.SliderTool.prototype.moveHandler = function(oe) {	
     if (this.isDrag) {
         var rect = this.target.getBoundingClientRect();
-        var sliderType = this.target['data-slider'];
+        var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
         Neo.sliders[sliderType].moveHandler(oe.rawMouseX - rect.left, 
                                             oe.rawMouseY - rect.top);
     }
@@ -3805,7 +3818,7 @@ Neo.EffectToolBase.prototype.loadStates = function() {
         Neo.painter.alpha = this.defaultAlpha || 1.0;
         Neo.updateUI();
     };
-}
+};
 
 /*
 -------------------------------------------------------------------------
@@ -4142,6 +4155,15 @@ Neo.TextTool.prototype.drawText = function(oe) {
     
     if (string.length <= 0) return;
     oe.doText(this.startX, this.startY, string, text.style.fontSize);
+};
+
+Neo.TextTool.prototype.loadStates = function() {
+    var reserve = this.getReserve();
+    if (reserve) {
+        Neo.painter.lineWidth = reserve.size;
+        Neo.painter.alpha = 1.0;
+        Neo.updateUI();
+    };
 };
 
 /*
@@ -4935,6 +4957,7 @@ Neo.DrawTip.prototype._mouseDownHandler = function(e) {
 }
 
 Neo.DrawTip.prototype.update = function() {
+    this.mode = Neo.painter.drawType;
     this.draw(Neo.painter.foregroundColor);
     this.label.innerHTML = this.toolStrings[this.mode];
 };
@@ -5299,16 +5322,24 @@ Neo.ReserveControl.prototype._mouseDownHandler = function(e) {
 };
 
 Neo.ReserveControl.prototype.load = function() {
+    Neo.painter.setToolByType(this.reserve.tool)
     Neo.painter.foregroundColor = this.reserve.color;
     Neo.painter.lineWidth = this.reserve.size;
     Neo.painter.alpha = this.reserve.alpha;
-    Neo.painter.setToolByType(this.reserve.tool)
+
+    switch (this.reserve.tool) {
+    case Neo.Painter.TOOLTYPE_PEN:
+    case Neo.Painter.TOOLTYPE_BRUSH:
+    case Neo.Painter.TOOLTYPE_TONE:
+        Neo.painter.drawType = this.reserve.drawType;
+    };
     Neo.updateUI();
 };
 
 Neo.ReserveControl.prototype.save = function() {
     this.reserve.color = Neo.painter.foregroundColor;
     this.reserve.size = Neo.painter.lineWidth;
+    this.reserve.drawType = Neo.painter.drawType;
     this.reserve.alpha = Neo.painter.alpha;
     this.reserve.tool = Neo.painter.tool.getType();
     this.element.style.backgroundColor = this.reserve.color;

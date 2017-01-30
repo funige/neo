@@ -229,8 +229,6 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
 Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
 	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 
-    console.log("rect", oe.cursorRect);
-    
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
         oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
@@ -692,7 +690,7 @@ Neo.SliderTool.prototype.downHandler = function(oe) {
 	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     var rect = this.target.getBoundingClientRect();
-    var sliderType = this.target['data-slider'];
+    var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
     Neo.sliders[sliderType].downHandler(oe.rawMouseX - rect.left, 
                                         oe.rawMouseY - rect.top);
 };
@@ -702,7 +700,7 @@ Neo.SliderTool.prototype.upHandler = function(oe) {
     oe.popTool();
 
     var rect = this.target.getBoundingClientRect();
-    var sliderType = this.target['data-slider'];
+    var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
     Neo.sliders[sliderType].upHandler(oe.rawMouseX - rect.left, 
                                       oe.rawMouseY - rect.top);
 };
@@ -710,7 +708,7 @@ Neo.SliderTool.prototype.upHandler = function(oe) {
 Neo.SliderTool.prototype.moveHandler = function(oe) {	
     if (this.isDrag) {
         var rect = this.target.getBoundingClientRect();
-        var sliderType = this.target['data-slider'];
+        var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
         Neo.sliders[sliderType].moveHandler(oe.rawMouseX - rect.left, 
                                             oe.rawMouseY - rect.top);
     }
@@ -867,7 +865,7 @@ Neo.EffectToolBase.prototype.loadStates = function() {
         Neo.painter.alpha = this.defaultAlpha || 1.0;
         Neo.updateUI();
     };
-}
+};
 
 /*
 -------------------------------------------------------------------------
@@ -1204,6 +1202,15 @@ Neo.TextTool.prototype.drawText = function(oe) {
     
     if (string.length <= 0) return;
     oe.doText(this.startX, this.startY, string, text.style.fontSize);
+};
+
+Neo.TextTool.prototype.loadStates = function() {
+    var reserve = this.getReserve();
+    if (reserve) {
+        Neo.painter.lineWidth = reserve.size;
+        Neo.painter.alpha = 1.0;
+        Neo.updateUI();
+    };
 };
 
 /*

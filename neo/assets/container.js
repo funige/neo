@@ -134,9 +134,21 @@ Neo.initConfig = function(applet) {
     }
 
     Neo.config.reserves = [
-        { size:1, color:"#000000", alpha:1.0, tool:Neo.Painter.TOOLTYPE_PEN },
-        { size:5, color:"#FFFFFF", alpha:1.0, tool:Neo.Painter.TOOLTYPE_ERASER },
-        { size:10, color:"#FFFFFF", alpha:1.0, tool:Neo.Painter.TOOLTYPE_ERASER },
+        { size:1,
+          color:"#000000", alpha:1.0,
+          tool:Neo.Painter.TOOLTYPE_PEN,
+          drawType:Neo.Painter.DRAWTYPE_FREEHAND
+        },
+        { size:5,
+          color:"#FFFFFF", alpha:1.0,
+          tool:Neo.Painter.TOOLTYPE_ERASER,
+          drawType:Neo.Painter.DRAWTYPE_FREEHAND
+        },
+        { size:10,
+          color:"#FFFFFF", alpha:1.0,
+          tool:Neo.Painter.TOOLTYPE_ERASER,
+          drawType:Neo.Painter.DRAWTYPE_FREEHAND
+        },
     ];
 
     Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
@@ -428,7 +440,10 @@ Neo.updateUI = function() {
             toolTip.update();
         }
     }
-
+    if (Neo.drawTip) {
+        Neo.drawTip.update();
+    }
+    
     Neo.updateUIColor(true, false);
 }
 

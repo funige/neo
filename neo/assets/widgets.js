@@ -673,6 +673,7 @@ Neo.DrawTip.prototype._mouseDownHandler = function(e) {
 }
 
 Neo.DrawTip.prototype.update = function() {
+    this.mode = Neo.painter.drawType;
     this.draw(Neo.painter.foregroundColor);
     this.label.innerHTML = this.toolStrings[this.mode];
 };
@@ -1037,16 +1038,24 @@ Neo.ReserveControl.prototype._mouseDownHandler = function(e) {
 };
 
 Neo.ReserveControl.prototype.load = function() {
+    Neo.painter.setToolByType(this.reserve.tool)
     Neo.painter.foregroundColor = this.reserve.color;
     Neo.painter.lineWidth = this.reserve.size;
     Neo.painter.alpha = this.reserve.alpha;
-    Neo.painter.setToolByType(this.reserve.tool)
+
+    switch (this.reserve.tool) {
+    case Neo.Painter.TOOLTYPE_PEN:
+    case Neo.Painter.TOOLTYPE_BRUSH:
+    case Neo.Painter.TOOLTYPE_TONE:
+        Neo.painter.drawType = this.reserve.drawType;
+    };
     Neo.updateUI();
 };
 
 Neo.ReserveControl.prototype.save = function() {
     this.reserve.color = Neo.painter.foregroundColor;
     this.reserve.size = Neo.painter.lineWidth;
+    this.reserve.drawType = Neo.painter.drawType;
     this.reserve.alpha = Neo.painter.alpha;
     this.reserve.tool = Neo.painter.tool.getType();
     this.element.style.backgroundColor = this.reserve.color;

@@ -1885,9 +1885,10 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
     this.tempCanvasCtx.putImageData(imageData, x, y);
 };
 
+
 Neo.Painter.prototype.paste = function(x, y, width, height) {
     var ctx = this.canvasCtx[this.current];
-    console.log(this.tempX, this.tempY);
+//  console.log(this.tempX, this.tempY);
 
     var imageData = ctx.getImageData(x + this.tempX, y + this.tempY, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
