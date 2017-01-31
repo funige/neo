@@ -805,7 +805,7 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
         var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
 
         Neo.painter.setColor(r<<16 | g<<8 | b);
-        Neo.updateUIColor(true, true);
+//      Neo.updateUIColor(true, true);
     }
 };
 

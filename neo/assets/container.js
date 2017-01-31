@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.0.5";
+Neo.version = "1.1.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -435,9 +435,13 @@ Neo.updateUI = function() {
     var current = Neo.painter.tool.getToolButton();
     for (var i = 0; i < Neo.toolButtons.length; i++) {
         var toolTip = Neo.toolButtons[i];
-        toolTip.setSelected((current == toolTip) ? true : false);
-        if (current == toolTip) {
-            toolTip.update();
+        if (current) {
+            if (current == toolTip) {
+                toolTip.setSelected(true);
+                toolTip.update();
+            } else {
+                toolTip.setSelected(false);
+            }
         }
     }
     if (Neo.drawTip) {

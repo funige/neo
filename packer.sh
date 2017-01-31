@@ -7,4 +7,5 @@ for f in neo-darwin-x64 neo-win32-ia32 neo-win32-x64; do
     ditto -c -k --sequesterRsrc --keepParent $f $f.zip 
 done
 
+
 echo "done."
