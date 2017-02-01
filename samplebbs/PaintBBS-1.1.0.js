@@ -597,7 +597,7 @@ Neo.submit = function(board, blob) {
         
         var responseURL = request.response.replace(/&amp;/g, '&');
         if (responseURL.match(/painttmp=/)) {
-            url = respnseURL;
+            url = responseURL;
         }
 
         var exitURL = board + url;
