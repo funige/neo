@@ -712,7 +712,16 @@ Neo.Painter.prototype.setZoomPosition = function(x, y) {
 */
 
 Neo.Painter.prototype.submit = function(board) {
-    Neo.submit(board, this.getPNG());
+    var thumbnail = null;
+    var thumbnail2 = null;
+
+    if (Neo.config.thumbnail_type) {
+        thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
+    }
+    if (Neo.config.thumbnail_type2) {
+        thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
+    }
+    Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
 };
 
 Neo.Painter.prototype.dataURLtoBlob = function(dataURL) {
@@ -731,29 +740,88 @@ Neo.Painter.prototype.dataURLtoBlob = function(dataURL) {
     return new Blob([ia], {type:'image/png'});
 };
 
-Neo.Painter.prototype.getPNG = function() {
+Neo.Painter.prototype.getImage = function(imageWidth, imageHeight) {
     var width = this.canvasWidth;
     var height = this.canvasHeight;
+    imageWidth = imageWidth || width;
+    imageHeight = imageHeight || height;
+
     var pngCanvas = document.createElement("canvas");
-    pngCanvas.width = width;
-    pngCanvas.height = height;
+    pngCanvas.width = imageWidth;
+    pngCanvas.height = imageHeight;
     var pngCanvasCtx = pngCanvas.getContext("2d");
     pngCanvasCtx.fillStyle = "#ffffff";
-    pngCanvasCtx.fillRect(0, 0, width, height);
+    pngCanvasCtx.fillRect(0, 0, imageWidth, imageHeight);
 
-	if (this.visible[0]) {
+    if (this.visible[0]) {
 	    pngCanvasCtx.drawImage(this.canvas[0], 
                                0, 0, width, height, 
-                               0, 0, width, height);
+                               0, 0, imageWidth, imageHeight);
     }
     if (this.visible[1]) {
 	    pngCanvasCtx.drawImage(this.canvas[1], 
                                0, 0, width, height, 
-                               0, 0, width, height);
+                               0, 0, imageWidth, imageHeight);
     }
-
-    var dataURL = pngCanvas.toDataURL('image/png');
+    return pngCanvas;
+};
+    
+Neo.Painter.prototype.getPNG = function() {
+    var image = this.getImage();
+    var dataURL = image.toDataURL('image/png');
     return this.dataURLtoBlob(dataURL);
+};
+
+Neo.Painter.prototype.getThumbnail = function(type) {
+    if (type != "animation") {
+        var thumbnailWidth = this.getThumbnailWidth();
+        var thumbnailHeight = this.getThumbnailHeight();
+        if (thumbnailWidth || thumbnailHeight) {
+            var width = this.canvasWidth;
+            var height = this.canvasHeight;
+            if (thumbnailWidth == 0) {
+                thumbnailWidth = thumbnailHeight * width / height;
+            }
+            if (thumbnailHeight == 0) {
+                thumbnailHeight = thumbnailWidth * height / width;
+            }
+        } else {
+            thumbnailWidth = thumbnailHeight = null;
+        }
+
+        console.log("get thumbnail", thumbnailWidth, thumbnailHeight);
+        
+        var image = this.getImage(thumbnailWidth, thumbnailHeight);
+        var dataURL = image.toDataURL('image/' + type);
+        return this.dataURLtoBlob(dataURL);
+        
+    } else {
+        return new Blob([]); //animationには対応していないのでダミーデータを返す
+    }
+};
+
+Neo.Painter.prototype.getThumbnailWidth = function() {
+    var width = Neo.config.thumbnail_width;
+    if (width) {
+        if (width.match(/%$/)) {
+            return Math.floor(this.canvasWidth * (parseInt(width) / 100.0));
+        } else {
+            return parseInt(width);
+        }
+    }
+    return 0;
+};
+
+Neo.Painter.prototype.getThumbnailHeight = function() {
+    var height = Neo.config.thumbnail_height;
+    if (height) {
+        if (height.match(/%$/)) {
+            return Math.floor(this.canvasHeight * (parseInt(height) / 100.0));
+        } else {
+            return parseInt(height);
+        }
+    }
+    return 0;
 };
 
 Neo.Painter.prototype.clearCanvas = function(doConfirm) {

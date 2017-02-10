@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.0";
+Neo.version = "1.1.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -386,6 +386,8 @@ Neo.initButtons = function() {
 };
 
 Neo.start = function(isApp) {
+    if (!Neo.painter) return;
+    
     Neo.initSkin();
     Neo.initComponents();
     Neo.initButtons();
@@ -559,19 +561,38 @@ Neo.openURL = function(url) {
     }
 };
 
-Neo.submit = function(board, blob) {
+Neo.submit = function(board, blob, thumbnail, thumbnail2) {
     var url = board + Neo.config.url_save;
     console.log("submit url=" + url);
-    var header = new Blob([Neo.config.send_header || ""]);
 
+    var headerString = Neo.config.send_header || "";
+    var imageType = Neo.config.send_header_image_type;
+    if (imageType && imageType == "true") {
+        headerString = "image_type=png&" + headerString
+        console.log("header=" + headerString);
+    }
+
+    var header = new Blob([headerString]);
     var headerLength = this.getSizeString(header.size);
     var imgLength = this.getSizeString(blob.size);
-    var body = new Blob(['P', // PaintBBS
-                         headerLength,
-                         header,
-                         imgLength,
-                         '\r\n', 
-                         blob], {type: 'blob'});
+
+    var array = ['P', // PaintBBS
+                 headerLength,
+                 header,
+                 imgLength,
+                 '\r\n', 
+                 blob];
+
+    if (thumbnail) {
+        var thumbnailLength = this.getSizeString(thumbnail.size);
+        array.push(thumbnailLength, thumbnail);
+    }
+    if (thumbnail2) {
+        var thumbnail2Length = this.getSizeString(thumbnail2.size);
+        array.push(thumbnail2Length, thumbnail2);
+    }
+    
+    var body = new Blob(array, {type: 'blob'});
 
     var request = new XMLHttpRequest();
     request.open("POST", url, true);
@@ -587,20 +608,23 @@ Neo.submit = function(board, blob) {
 
         // ふたばのpaintpost.phpは、画像投稿に成功するとresponseに
         // "./futaba.php?mode=paintcom&amp;painttmp=.png"
-        // という文字列を返します。 (今はまったく機能していないのですが）
+        // という文字列を返します。
         // 
         // NEOでは、responseに文字列"painttmp="が含まれる場合は
         // <PARAM>で指定されたurl_exitを無視して、このURLにジャンプします。
-        //
-        // これを使えば、例の「画像がみつかりません」エラーが出る問題を
-        // 直せるのでは無いかと……。
-        
         var responseURL = request.response.replace(/&amp;/g, '&');
         if (responseURL.match(/painttmp=/)) {
             url = responseURL;
         }
-
         var exitURL = board + url;
+
+        // しぃちゃんのドキュメントをよく見たら
+        // responseが "URL:〜" の形だった場合はそこへ飛ばすって書いてありました。
+        // こっちを使うべきでした……
+        if (responseURL.match(/^URL:/)) {
+            exitURL = responseURL.replace(/^URL:/, '');
+        }
+
         location.href = exitURL;
     };
     request.onerror = function(e) {
