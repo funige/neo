@@ -1437,7 +1437,7 @@ Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3,
 }
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
-Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
+Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
     x0 = Math.round(x0);
     x1 = Math.round(x1);
     y0 = Math.round(y0);
@@ -1463,7 +1463,7 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
     while (true) {
         if (this.prevLine == null ||
             !((this.prevLine[0] == x0 && this.prevLine[1] == y0) ||
-              (this.prevLine[2] == x0 && this.prevLine[3] == y0))) {
+              (this.prevLine[2] == x0 && this.prevLine[3] == y0)) || drawCap) {
             this.setPoint(buf8, imageData.width, x0, y0, left, top, type);
         }
 
@@ -2112,9 +2112,13 @@ Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
 -----------------------------------------------------------------------
 */
 
-Neo.Painter.prototype.getDestCanvasPosition = function(mx, my, isClip) {
+Neo.Painter.prototype.getDestCanvasPosition = function(mx, my, isClip, isCenter) {
     var mx = Math.floor(mx); //Math.round(mx);
     var my = Math.floor(my); //Math.round(my);
+    if (isCenter) {
+       mx += 0.499;
+       my += 0.499;
+    }
     var x = (mx - this.zoomX + this.destCanvas.width * 0.5 / this.zoom) * this.zoom;
     var y = (my - this.zoomY + this.destCanvas.height * 0.5 / this.zoom) * this.zoom;
 
