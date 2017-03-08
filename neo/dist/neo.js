@@ -3799,8 +3799,10 @@ Neo.FillTool.prototype.type = Neo.Painter.TOOLTYPE_FILL;
 Neo.FillTool.prototype.isUpMove = false;
 
 Neo.FillTool.prototype.downHandler = function(oe) {
+    var x = Math.floor(oe.mouseX);
+    var y = Math.floor(oe.mouseY);
     oe._pushUndo();
-    oe.fill(oe.mouseX, oe.mouseY, oe.canvasCtx[oe.current]);
+    oe.fill(x, y, oe.canvasCtx[oe.current]);
 };
 
 Neo.FillTool.prototype.upHandler = function(oe) {
