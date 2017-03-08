@@ -295,14 +295,16 @@ Neo.initComponents = function() {
     document.getElementById("copyright").innerHTML += "v" + Neo.version;
 
     //アプレットのborderの動作をエミュレート
-    var container = document.getElementById("container");
-    container.addEventListener("mousedown", function(e) {
-        container.style.borderColor = Neo.config.inherit_color;
-        e.stopPropagation();
-    }, false);
-    document.addEventListener("mousedown", function(e) {
-        container.style.borderColor = 'transparent';
-    }, false);
+    if (navigator.userAgent.search("FireFox") > -1) {
+        var container = document.getElementById("container");
+        container.addEventListener("mousedown", function(e) {
+            container.style.borderColor = Neo.config.inherit_color;
+            e.stopPropagation();
+        }, false);
+        document.addEventListener("mousedown", function(e) {
+            container.style.borderColor = 'transparent';
+        }, false);
+    }
 
     // Microsoftのブラウザでは送信に失敗することがあるので警告を表示する
     Neo.showMSWarning();
