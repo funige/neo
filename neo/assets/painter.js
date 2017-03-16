@@ -1421,23 +1421,24 @@ Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y
     var x = x0 * a0 + x1 * a1 + x2 * a2 + x3 * a3;
     var y = y0 * a0 + y1 * a1 + y2 * a2 + y3 * a3;
     return [x, y];
-}
+};
 
 Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
-    var n = Math.ceil(Math.max(Math.abs(x3 - x0), Math.abs(y3 - y0)) / 5);
+    var xmax = Math.max(x0, x1, x2, x3);
+    var xmin = Math.min(x0, x1, x2, x3);
+    var ymax = Math.max(y0, y1, y2, y3);
+    var ymin = Math.min(y0, y1, y2, y3);
+    var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 3);
 
     for (var i = 0; i < n; i++) {
-        var t0 = i * 1.0 / n;
-        var t1 = (i + 1) * 1.0 / n;
-        var p0 = this.getBezierPoint(t0, x0, y0, x1, y1, x2, y2, x3, y3);
-        var p1 = this.getBezierPoint(t1, x0, y0, x1, y1, x2, y2, x3, y3);
-
-        this.drawLine(ctx, p0[0], p0[1], p1[0], p1[1], type);
+        var t = i * 1.0 / n;
+        var p = this.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
+        this.drawPoint(ctx, p[0], p[1], type);
     }
-}
+};
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
-Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
+Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
     x0 = Math.round(x0);
     x1 = Math.round(x1);
     y0 = Math.round(y0);
@@ -1463,7 +1464,7 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
     while (true) {
         if (this.prevLine == null ||
             !((this.prevLine[0] == x0 && this.prevLine[1] == y0) ||
-              (this.prevLine[2] == x0 && this.prevLine[3] == y0)) || drawCap) {
+              (this.prevLine[2] == x0 && this.prevLine[3] == y0))) {
             this.setPoint(buf8, imageData.width, x0, y0, left, top, type);
         }
 
@@ -1477,6 +1478,10 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
     ctx.putImageData(imageData, left, top);
     
     this.prevLine = prev;
+};
+
+Neo.Painter.prototype.drawPoint = function(ctx, x, y, type) {
+    this.drawLine(ctx, x, y, x, y, type);
 };
 
 Neo.Painter.prototype.xorRect = function(buf32, bufWidth, x, y, width, height, c) {

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.2";
+Neo.version = "1.1.3";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -2208,23 +2208,24 @@ Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y
     var x = x0 * a0 + x1 * a1 + x2 * a2 + x3 * a3;
     var y = y0 * a0 + y1 * a1 + y2 * a2 + y3 * a3;
     return [x, y];
-}
+};
 
 Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
-    var n = Math.ceil(Math.max(Math.abs(x3 - x0), Math.abs(y3 - y0)) / 5);
+    var xmax = Math.max(x0, x1, x2, x3);
+    var xmin = Math.min(x0, x1, x2, x3);
+    var ymax = Math.max(y0, y1, y2, y3);
+    var ymin = Math.min(y0, y1, y2, y3);
+    var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 3);
 
     for (var i = 0; i < n; i++) {
-        var t0 = i * 1.0 / n;
-        var t1 = (i + 1) * 1.0 / n;
-        var p0 = this.getBezierPoint(t0, x0, y0, x1, y1, x2, y2, x3, y3);
-        var p1 = this.getBezierPoint(t1, x0, y0, x1, y1, x2, y2, x3, y3);
-
-        this.drawLine(ctx, p0[0], p0[1], p1[0], p1[1], type);
+        var t = i * 1.0 / n;
+        var p = this.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
+        this.drawPoint(ctx, p[0], p[1], type);
     }
-}
+};
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
-Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
+Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
     x0 = Math.round(x0);
     x1 = Math.round(x1);
     y0 = Math.round(y0);
@@ -2250,7 +2251,7 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
     while (true) {
         if (this.prevLine == null ||
             !((this.prevLine[0] == x0 && this.prevLine[1] == y0) ||
-              (this.prevLine[2] == x0 && this.prevLine[3] == y0)) || drawCap) {
+              (this.prevLine[2] == x0 && this.prevLine[3] == y0))) {
             this.setPoint(buf8, imageData.width, x0, y0, left, top, type);
         }
 
@@ -2264,6 +2265,10 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type, drawCap) {
     ctx.putImageData(imageData, left, top);
     
     this.prevLine = prev;
+};
+
+Neo.Painter.prototype.drawPoint = function(ctx, x, y, type) {
+    this.drawLine(ctx, x, y, x, y, type);
 };
 
 Neo.Painter.prototype.xorRect = function(buf32, bufWidth, x, y, width, height, c) {
@@ -3366,7 +3371,7 @@ Neo.DrawToolBase.prototype.lineUpHandler = function(oe) {
         var ctx = oe.canvasCtx[oe.current];
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe.drawLine(ctx, x0, y0, this.startX, this.startY, this.lineType, true);
+        oe.drawLine(ctx, x0, y0, this.startX, this.startY, this.lineType);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
 };
@@ -3402,6 +3407,7 @@ Neo.DrawToolBase.prototype.drawLineCursor = function(oe, mx, my) {
 
 Neo.DrawToolBase.prototype.bezierDownHandler = function(oe) {
     this.isUpMove = false;
+
     if (this.step == 0) {
         this.startX = this.x0 = Math.floor(oe.mouseX);
         this.startY = this.y0 = Math.floor(oe.mouseY);
@@ -3423,13 +3429,13 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         break;
 
     case 2:
-        this.x1 = oe.mouseX; //Math.floor(oe.mouseX);
-        this.y1 = oe.mouseY; //Math.floor(oe.mouseY);
+        this.x1 = Math.floor(oe.mouseX);
+        this.y1 = Math.floor(oe.mouseY);
         break;
 
     case 3:
-        this.x2 = oe.mouseX; //Math.floor(oe.mouseX);
-        this.y2 = oe.mouseY; //Math.floor(oe.mouseY);
+        this.x2 = Math.floor(oe.mouseX);
+        this.y2 = Math.floor(oe.mouseY);
 
         oe._pushUndo();
         oe.drawBezier(oe.canvasCtx[oe.current],
@@ -3490,6 +3496,11 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
     var p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
     var p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
 
+    // handle
+    oe.drawXORLine(ctx, p0.x, p0.y, p.x, p.y);
+    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
+    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
+
     // preview
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.drawBezier(oe.tempCanvasCtx,
@@ -3507,11 +3518,6 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
                   0, 0, oe.canvasWidth, oe.canvasHeight);
 
     ctx.restore();
-
-    // handle
-    oe.drawXORLine(ctx, p0.x, p0.y, p.x, p.y);
-    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
-    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 };
 
 Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
@@ -3522,6 +3528,13 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
     var p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
     var p1 = oe.getDestCanvasPosition(this.x1, this.y1, false, true);
     var p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
+
+    // handle
+    oe.drawXORLine(ctx, p3.x, p3.y, p.x, p.y);
+    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
+    oe.drawXORLine(ctx, p0.x, p0.y, p1.x, p1.y);
+    oe.drawXOREllipse(ctx, p1.x - 4, p1.y - 4, 8, 8);
+    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 
     // preview
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3539,13 +3552,6 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
     ctx.restore();
-
-    // handle
-    oe.drawXORLine(ctx, p3.x, p3.y, p.x, p.y);
-    oe.drawXOREllipse(ctx, p.x - 4, p.y - 4, 8, 8);
-    oe.drawXORLine(ctx, p0.x, p0.y, p1.x, p1.y);
-    oe.drawXOREllipse(ctx, p1.x - 4, p1.y - 4, 8, 8);
-    oe.drawXOREllipse(ctx, p0.x - 4, p0.y - 4, 8, 8);
 };
 
 /*
