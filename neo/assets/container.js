@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.3";
+Neo.version = "1.1.4";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -122,7 +122,7 @@ Neo.initConfig = function(applet) {
         var params = applet.getElementsByTagName('param');
         for (var i = 0; i < params.length; i++) {
             var p = params[i];
-            Neo.config[p.name] = p.value;
+            Neo.config[p.name] = Neo.fixConfig(p.value);
 
             if (p.name == "image_width") Neo.config.width = parseInt(p.value);
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
@@ -153,6 +153,14 @@ Neo.initConfig = function(applet) {
 
     Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
     Neo.reserveEraser = Neo.clone(Neo.config.reserves[1]);
+};
+
+Neo.fixConfig = function(value) {
+    // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
+    if (value.match(/^#[0-9a-fA-F]{5}$/)) {
+        value = "#0" + value.slice(1);
+    }
+    return value;
 };
 
 Neo.initSkin = function() {
@@ -526,8 +534,15 @@ Neo.resizeCanvas = function() {
 
     var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
     Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
-//  Neo.toolsWrapper.style.height = Neo.container.clientHeight + "px";
 
+    if (top < 0) {
+        var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
+        Neo.toolsWrapper.style.transform =
+            "translate(0, " + top + "px) scale(1," + s + ")";
+    } else {
+        Neo.toolsWrapper.style.transform = "";
+    }
+    
     Neo.painter.setZoom(Neo.painter.zoom);
     Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight);
 };

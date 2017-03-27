@@ -715,13 +715,25 @@ Neo.Painter.prototype.submit = function(board) {
     var thumbnail = null;
     var thumbnail2 = null;
 
-    if (Neo.config.thumbnail_type) {
+    if (this.useThumbnail()) {
         thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
-    }
-    if (Neo.config.thumbnail_type2) {
-        thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
+        if (Neo.config.thumbnail_type2) {
+            thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
+        }
     }
     Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
+};
+
+Neo.Painter.prototype.useThumbnail = function() {
+    var thumbnailWidth = this.getThumbnailWidth();
+    var thumbnailHeight = this.getThumbnailHeight();
+    if (thumbnailWidth && thumbnailHeight) {
+        if (thumbnailWidth < this.canvasWidth ||
+            thumbnailHeight < this.canvasHeight) {
+            return true;
+        }
+    }
+    return false;
 };
 
 Neo.Painter.prototype.dataURLtoBlob = function(dataURL) {
