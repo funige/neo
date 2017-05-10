@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.4";
+Neo.version = "1.1.5";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -314,8 +314,8 @@ Neo.initComponents = function() {
         }, false);
     }
 
-    // Microsoftのブラウザでは送信に失敗することがあるので警告を表示する
-    Neo.showMSWarning();
+    // 投稿に失敗する可能性があるときは警告を表示する
+    Neo.showWarning();
 
     if (Neo.styleSheet) {
         Neo.addRule("*", "user-select", "none");
@@ -418,8 +418,12 @@ Neo.start = function(isApp) {
     }
 };
 
-Neo.showMSWarning = function() {
-    //http://stackoverflow.com/questions/31757852/how-can-i-detect-internet-explorer-ie-and-microsoft-edge-using-javascript
+Neo.showWarning = function() {
+    var futaba = location.hostname.match(/2chan.net/i);
+
+    var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
+    if (chrome && chrome.length > 1) chrome = chrome[1];
+    
     var ms = false;
     if (/MSIE 10/i.test(navigator.userAgent)) {
         ms = true; // This is internet explorer 10
@@ -432,9 +436,21 @@ Neo.showMSWarning = function() {
         ms = true; // This is Microsoft Edge
     }
 
-    if (ms) {
-        document.getElementById("MSWarning").innerHTML = "このブラウザでは<br>投稿に失敗することがあります";
+    var str = "";
+    if (futaba) {
+	if (ms || (chrome && chrome >= 58)) {
+            str = "このブラウザでは<br>投稿に失敗することがあります<br>";
+	}
     }
+
+    // もし<PARAM NAME="neo_warning" VALUE="...">があれば表示する
+    if (Neo.config.neo_warning) {
+	str += Neo.config.neo_warning;
+    }
+
+    var warning = document.getElementById("neoWarning")
+    warning.innerHTML = str;
+    setTimeout(function() { warning.style.opacity = "0"; }, 15000);
 };
 
 /*
@@ -654,7 +670,7 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
         console.log("timeout");
     };
 
-    if (1) { // データのデバッグのため送信するデータをuint8arrayにコピーしておく
+    if (0) { // データのデバッグのため送信するデータをuint8arrayにコピーしておく
         var fr = new FileReader();
         fr.onload = function () {
             var result = fr.result;
@@ -719,7 +735,7 @@ Neo.createContainer = function(applet) {
                             <div id="zoomMinusWrapper">
                                 <div id="zoomMinus">-</div>
                             </div>
-                            <div id="MSWarning"></div>
+                            <div id="neoWarning"></div>
                         </div>
                     </div>
                     <div id="lower">
