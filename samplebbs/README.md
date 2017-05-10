@@ -48,3 +48,8 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 
 の部分をコメントアウトしています。
 POTI-board以外の掲示板スクリプトについては、調べてみないと何とも言えません……。
+
+(2017/05/11)
+
+- BBSNote8.0でも設置できるそうです。
+  https://twitter.com/sapniji/status/861930241559642113
