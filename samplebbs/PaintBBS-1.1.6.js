@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.5";
+Neo.version = "1.1.6";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -419,31 +419,8 @@ Neo.start = function(isApp) {
 };
 
 Neo.showWarning = function() {
-    var futaba = location.hostname.match(/2chan.net/i);
-
-    var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
-    if (chrome && chrome.length > 1) chrome = chrome[1];
-    
-    var ms = false;
-    if (/MSIE 10/i.test(navigator.userAgent)) {
-        ms = true; // This is internet explorer 10
-    }
-    if (/MSIE 9/i.test(navigator.userAgent) ||
-        /rv:11.0/i.test(navigator.userAgent)) {
-        ms = true; // This is internet explorer 9 or 11
-    }
-    if (/Edge\/\d./i.test(navigator.userAgent)){
-        ms = true; // This is Microsoft Edge
-    }
-
+    // もし <PARAM NAME="neo_warning" VALUE="..."> があれば警告を表示する
     var str = "";
-    if (futaba) {
-	if (ms || (chrome && chrome >= 58)) {
-            str = "このブラウザでは<br>投稿に失敗することがあります<br>";
-	}
-    }
-
-    // もし<PARAM NAME="neo_warning" VALUE="...">があれば表示する
     if (Neo.config.neo_warning) {
 	str += Neo.config.neo_warning;
     }
@@ -625,7 +602,7 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
         array.push(thumbnail2Length, thumbnail2);
     }
     
-    var body = new Blob(array, {type: 'blob'});
+    var body = new Blob(array, {type: 'application/octet-binary'}); //これが必要！！
 
     var request = new XMLHttpRequest();
     request.open("POST", url, true);
@@ -677,6 +654,7 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
         }
         fr.readAsArrayBuffer(body);
     }
+
     request.send(body);
 };
 
