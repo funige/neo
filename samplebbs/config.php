@@ -41,7 +41,7 @@ define(LANG, 'Japanese');
 
 // 出力文字コード指定 1:EUC-JP, 2:Shift_JIS, 3:ISO-2022-JP(JIS), 4:UTF-8
 //※1～4に該当しない場合は、直接文字コード名を入れて下さい
-define(CHARSET_OUT, '2');
+define(CHARSET_OUT, '4');
 
 // 文字コード変換対象指定 0:出力HTMLとログも含むすべて, 1:クッキーとメールのみ
 define(CHARSET_CONVERT, '0');

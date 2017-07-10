@@ -782,6 +782,9 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(strlen($sub) > MAX_SUB) error(MSG014,$dest);
 	if(strlen($resto) > 10) error(MSG015,$dest);
 
+	//本文に日本語がなければ拒絶
+	if(strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest);
+
 	//ホスト取得
 	$host = gethostbyaddr(getenv("REMOTE_ADDR"));
 
@@ -1822,6 +1825,9 @@ function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
 	if(strlen($name) > MAX_NAME) error(MSG012);
 	if(strlen($email) > MAX_EMAIL) error(MSG013);
 	if(strlen($sub) > MAX_SUB) error(MSG014);
+
+	//本文に日本語がなければ拒絶
+	if(strlen($com) == mb_strlen($com,'utf8')) error(MSG035);
 
 	//ホスト取得
 	$host = gethostbyaddr(getenv("REMOTE_ADDR"));
