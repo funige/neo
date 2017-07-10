@@ -6,8 +6,8 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 
     <head>
     ...
-    <link rel="stylesheet" href="PaintBBS-1.1.6.css" type="text/css" />
-    <script src="PaintBBS-1.1.6.js" charset="UTF-8"></script>
+    <link rel="stylesheet" href="PaintBBS-1.1.8.css" type="text/css" />
+    <script src="PaintBBS-1.1.8.js" charset="UTF-8"></script>
 
     </head>
 

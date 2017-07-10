@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.7";
+Neo.version = "1.1.8";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -420,6 +420,7 @@ Neo.start = function(isApp) {
 
 Neo.showWarning = function() {
     var futaba = location.hostname.match(/2chan.net/i);
+    var samplebbs = location.hostname.match(/neo.websozai.jp/i);
 
     var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
     if (chrome && chrome.length > 1) chrome = chrome[1];
@@ -437,14 +438,13 @@ Neo.showWarning = function() {
     }
 
     var str = "";
-    if (futaba) {
+    if (futaba || samplebbs) {
 	if (ms) {
             str = "このブラウザでは<br>投稿に失敗することがあります<br>";
 	}
     }
 
     // もし<PARAM NAME="neo_warning" VALUE="...">があれば表示する
-    var str = "";
     if (Neo.config.neo_warning) {
 	str += Neo.config.neo_warning;
     }
