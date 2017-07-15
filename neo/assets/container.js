@@ -425,6 +425,9 @@ Neo.showWarning = function() {
     var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
     if (chrome && chrome.length > 1) chrome = chrome[1];
 
+    var edge = navigator.userAgent.match(/Edge\/(\d+)/i);
+    if (edge && edge.length > 1) edge = edge[1];
+
     var ms = false;
     if (/MSIE 10/i.test(navigator.userAgent)) {
         ms = true; // This is internet explorer 10
@@ -433,13 +436,10 @@ Neo.showWarning = function() {
         /rv:11.0/i.test(navigator.userAgent)) {
         ms = true; // This is internet explorer 9 or 11
     }
-    if (/Edge\/\d./i.test(navigator.userAgent)){
-      ms = true; // This is Microsoft Edge
-    }
 
     var str = "";
     if (futaba || samplebbs) {
-	if (ms) {
+        if (ms || (edge && edge < 15)) {
             str = "このブラウザでは<br>投稿に失敗することがあります<br>";
 	}
     }
