@@ -263,6 +263,7 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
 
 Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function(oe) {
     this.isUpMove = true;
+
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
         oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
@@ -276,13 +277,19 @@ Neo.DrawToolBase.prototype.drawCursor = function(oe) {
     var mx = oe.mouseX;
     var my = oe.mouseY;
     var d = oe.lineWidth;
-    var ctx = oe.destCanvasCtx;
-    ctx.save();
-    this.transformForZoom(oe)
 
     var x = (mx - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
     var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
+
+    if (!(x > -r &&
+	  y > -r &&
+	  x < oe.destCanvas.width + r &&
+	  y < oe.destCanvas.height + r)) return;
+    
+    var ctx = oe.destCanvasCtx;
+    ctx.save();
+    this.transformForZoom(oe)
 
     var c = (this.type == Neo.Painter.TOOLTYPE_ERASER) ? 0x0000ff : 0xffff7f;
     oe.drawXOREllipse(ctx, x-r, y-r, r*2, r*2, false, c);

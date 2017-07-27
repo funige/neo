@@ -847,7 +847,7 @@ Neo.Painter.prototype.clearCanvas = function(doConfirm) {
 	}
 };
 
-Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) {	
+Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) {
     var canvasWidth = this.canvasWidth;
     var canvasHeight = this.canvasHeight;
     var updateAll = false;
@@ -862,40 +862,44 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
     if (width <= 0 || height <= 0) return;
 
     var ctx = this.destCanvasCtx;
-	ctx.save();
-	ctx.fillStyle = "#ffffff";
+    ctx.save();
+    ctx.fillStyle = "#ffffff";
 
     if (updateAll) {
-	    ctx.fillRect(0, 0, this.destCanvas.width, this.destCanvas.height);
+	ctx.fillRect(0, 0, this.destCanvas.width, this.destCanvas.height);
+    } else {
+	//カーソルの描画ゴミが残るのをごまかすため
+	if (x + width == this.canvasWidth) width++;
+	if (y + height == this.canvasHeight) height++;
     }
-
-	ctx.translate(this.destCanvas.width*.5, this.destCanvas.height*.5);
-	ctx.scale(this.zoom, this.zoom);
-	ctx.translate(-this.zoomX, -this.zoomY);
-	ctx.globalAlpha = 1.0;
+    
+    ctx.translate(this.destCanvas.width*.5, this.destCanvas.height*.5);
+    ctx.scale(this.zoom, this.zoom);
+    ctx.translate(-this.zoomX, -this.zoomY);
+    ctx.globalAlpha = 1.0;
     ctx.msImageSmoothingEnabled = 0;
 
     if (!updateAll) {
-	    ctx.fillRect(x, y, width, height);
+	ctx.fillRect(x, y, width, height);
     }
 
-	if (this.visible[0]) {
-	    ctx.drawImage(this.canvas[0], 
+    if (this.visible[0]) {
+	ctx.drawImage(this.canvas[0], 
                       x, y, width, height, 
                       x, y, width, height);
     }
     if (this.visible[1]) {
-	    ctx.drawImage(this.canvas[1], 
+	ctx.drawImage(this.canvas[1], 
                       x, y, width, height, 
                       x, y, width, height);
     }
-	if (useTemp) {
-		ctx.globalAlpha = 1.0; //this.alpha;
-		ctx.drawImage(this.tempCanvas, 
+    if (useTemp) {
+	ctx.globalAlpha = 1.0; //this.alpha;
+	ctx.drawImage(this.tempCanvas, 
                       x, y, width, height, 
                       x + this.tempX, y + this.tempY, width, height);
-	}
-	ctx.restore();
+    }
+    ctx.restore();
 };
 
 Neo.Painter.prototype.getBound = function(x0, y0, x1, y1, r) {
@@ -1084,7 +1088,7 @@ Neo.Painter.prototype.setPoint = function(buf8, bufWidth, x0, y0, left, top, typ
         break;
 
     case Neo.Painter.LINETYPE_BLUR:
-        this.setBlurPoint(buf8, bufWidth, x, y);
+        this.setBlurPoint(buf8, bufWidth, x, y, x0, y0);
         break;
 
     case Neo.Painter.LINETYPE_DODGE:
@@ -1266,13 +1270,11 @@ Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
     }
 };
 
-Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y) {
+Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
     var d = this.lineWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
-
-    var index = (y * width + x) * 4;
 
     var shape = this._roundData[d];
     var shapeIndex = 0;
@@ -1288,27 +1290,35 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y) {
         tmp[i] = buf8[i];
     }
 
-    for (var j = 0; j < d; j++) {
-        for (var i = 0; i < d; i++) {
+    var left = x0 - x - r0;
+    var top = y0 - y - r0;
+
+    var xstart = 0, xend = d;
+    var ystart = 0, yend = d;
+    if (xstart > left) xstart = -left;
+    if (ystart > top) ystart = -top;
+    if (xend > this.canvasWidth - left) xend = this.canvasWidth - left;
+    if (yend > this.canvasHeight - top) yend = this.canvasHeight - top;
+
+    for (var j = ystart; j < yend; j++) {
+	var index = (j * width + xstart) * 4;
+	for (var i = xstart; i < xend; i++) {
             if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
                 var rgba = [0, 0, 0, 0, 0];
 
                 this.addBlur(tmp, index, 1.0 - blur*4, rgba);
+		if (i > xstart) this.addBlur(tmp, index - 4, blur, rgba);
+                if (i < xend - 1) this.addBlur(tmp, index + 4, blur, rgba);
+                if (j > ystart) this.addBlur(tmp, index - width*4, blur, rgba);
+                if (j < yend - 1) this.addBlur(tmp, index + width*4, blur, rgba);
 
-                if (x + i > 0) this.addBlur(tmp, index - 4, blur, rgba);
-                if (x + i < width - 1) this.addBlur(tmp, index + 4, blur, rgba);
-                if (y + j > 0) this.addBlur(tmp, index - width*4, blur, rgba);
-                if (y + j < height - 1) this.addBlur(tmp, index + width*4, blur, rgba);
-
-                var w = rgba[4]
                 buf8[index + 0] = Math.round(rgba[0]);
                 buf8[index + 1] = Math.round(rgba[1]);
                 buf8[index + 2] = Math.round(rgba[2]);
-                buf8[index + 3] = Math.round((rgba[3] / w) * 255.0);
+                buf8[index + 3] = Math.round((rgba[3] / rgba[4]) * 255.0);
             }
             index += 4;
         }
-        index += (width - d) * 4;
     }
 };
 
