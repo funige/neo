@@ -15,10 +15,18 @@ Neo.Button.prototype.init = function(name, params) {
     this.isMouseDown = false;
     
     var ref = this;
+    if (window.PointerEvent) {
+	this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
+	this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
+	this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
+	this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+
+    } else {
 	this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
 	this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
 	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
 	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    }
     this.element.className = (!this.params.type == 'fill') ? "button" : "buttonOff";
 
     return this;
@@ -85,10 +93,18 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.isMouseDown = false;
 
     var ref = this;
-    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-    this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-    this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-    this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    if (window.PointerEvent) {
+	this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
+	this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
+	this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
+	this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+
+    } else {
+	this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+	this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    }
     this.element.className = "colorTipOff";
 
     var index = parseInt(this.name.slice(5)) - 1;
@@ -185,11 +201,18 @@ Neo.ToolTip.prototype.init = function(name, params) {
     this.isMouseDown = false;
 
     var ref = this;
-    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-    this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-    this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-    this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    if (window.PointerEvent) {
+	this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
+	this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
+	this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
+	this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
 
+    } else {
+	this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+	this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    }
     this.selected = (this.params.type == "pen") ? true : false;
     this.setSelected(this.selected);
 
@@ -957,7 +980,9 @@ Neo.LayerControl.prototype.init = function(name, params) {
     this.isMouseDown = false;
 
     var ref = this;
-    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+
+    var mousedown = (window.PointerEvent) ? "onpointerdown" : "onmousedown";
+    this.element[mousedown] = function(e) { ref._mouseDownHandler(e); }
     this.element.className = "layerControl";
     this.element.innerHTML = "<div class='bg'></div><div class='label0'>Layer0</div><div class='label1'>Layer1</div><div class='line1'></div><div class='line0'></div>";
 
@@ -1014,7 +1039,9 @@ Neo.ReserveControl.prototype.init = function(name, params) {
     this.name = name;
 
     var ref = this;
-    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+
+    var mousedown = (window.PointerEvent) ? "onpointerdown" : "onmousedown";
+    this.element[mousedown] = function(e) { ref._mouseDownHandler(e); }
     this.element.className = "reserve";
 
     var index = parseInt(this.name.slice(7)) - 1;

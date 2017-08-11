@@ -44,6 +44,10 @@ Neo.Painter.prototype.prevMouseY;
 Neo.Painter.prototype.mouseX;
 Neo.Painter.prototype.mouseY;
 
+Neo.Painter.prototype.slowX = 0;
+Neo.Painter.prototype.slowY = 0;
+Neo.Painter.prototype.stab = null;
+
 Neo.Painter.prototype.isShiftDown = false;
 Neo.Painter.prototype.isCtrlDown = false;
 Neo.Painter.prototype.isAltDown = false;
@@ -249,22 +253,37 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     var ref = this;
 
     var container = document.getElementById("container");
-    container.onmousedown = function(e) {ref._mouseDownHandler(e)};
-    container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
-    container.onmouseup = function(e) {ref._mouseUpHandler(e)};
-    container.onmouseover = function(e) {ref._rollOverHandler(e)};
-    container.onmouseout = function(e) {ref._rollOutHandler(e)};
 
-    container.addEventListener("touchstart", function(e) {
-        ref._mouseDownHandler(e);
-    }, true);
-    container.addEventListener("touchmove", function(e) {
-        ref._mouseMoveHandler(e);
-    }, true);
-    container.addEventListener("touchend", function(e) {
-        ref._mouseUpHandler(e);
-    }, true);
+    if (window.PointerEvent) {
+	container.addEventListener("pointerdown", function(e) {
+	    ref._mouseDownHandler(e); });
+	container.addEventListener("pointerup", function(e) {
+	    ref._mouseUpHandler(e); });
+	container.addEventListener("pointermove", function(e) {
+	    ref._mouseMoveHandler(e); });
+	container.addEventListener("pointerover", function(e) {
+	    ref._rollOverHandler(e); });
+	container.addEventListener("pointerout", function(e) {
+	    ref._rollOutHandler(e); });
+	
+    } else {
+	container.onmousedown = function(e) {ref._mouseDownHandler(e)};
+	container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
+	container.onmouseup = function(e) {ref._mouseUpHandler(e)};
+	container.onmouseover = function(e) {ref._rollOverHandler(e)};
+	container.onmouseout = function(e) {ref._rollOutHandler(e)};
 
+	container.addEventListener("touchstart", function(e) {
+            ref._mouseDownHandler(e);
+	}, true);
+	container.addEventListener("touchmove", function(e) {
+            ref._mouseMoveHandler(e);
+	}, true);
+	container.addEventListener("touchend", function(e) {
+            ref._mouseUpHandler(e);
+	}, true);
+    }
+    
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
 
@@ -526,20 +545,45 @@ Neo.Painter.prototype._updateMousePosition = function(e) {
 
     if (this.zoom <= 0) this.zoom = 1; //なぜか0になることがあるので
 
-	this.mouseX = (x - rect.left) / this.zoom 
-            + this.zoomX 
-            - this.destCanvas.width * 0.5 / this.zoom;
-	this.mouseY = (y - rect.top)  / this.zoom 
-            + this.zoomY 
-            - this.destCanvas.height * 0.5 / this.zoom;
+    this.mouseX = (x - rect.left) / this.zoom 
+        + this.zoomX 
+        - this.destCanvas.width * 0.5 / this.zoom;
+    this.mouseY = (y - rect.top)  / this.zoom 
+        + this.zoomY 
+        - this.destCanvas.height * 0.5 / this.zoom;
 	
-	if (isNaN(this.prevMouseX)) {
-		this.prevMouseX = this.mouseX;
-	}
-	if (isNaN(this.prevMouseY)) {
-		this.prevMosueY = this.mouseY;
-	}
+    if (isNaN(this.prevMouseX)) {
+	this.prevMouseX = this.mouseX;
+    }
+    if (isNaN(this.prevMouseY)) {
+	this.prevMosueY = this.mouseY;
+    }
 
+    this.slowX = this.slowX * 0.8 + this.mouseX * 0.2;
+    this.slowY = this.slowY * 0.8 + this.mouseY * 0.2;
+    var now = new Date().getTime();
+    if (this.stab) {
+	var pause = this.stab[3];
+	if (pause) {
+	    // ポーズ中
+	    if (now > pause) {
+		this.stab = [this.slowX, this.slowY, now];
+	    }
+	    
+	} else {
+	    // ポーズされていないとき
+	    var prev = this.stab[2];
+	    if (now - prev > 150) {	 // 150ms以上止まっていたらポーズをオンにする
+		this.stab[3] = now + 200 // 200msペンの位置を固定
+		
+	    } else {
+		this.stab = [this.slowX, this.slowY, now];
+	    }
+	}
+    } else {
+	this.stab = [this.slowX, this.slowY, now];
+    }
+    
     this.rawMouseX = x;
     this.rawMouseY = y;
     this.clipMouseX = Math.max(Math.min(this.canvasWidth, this.mouseX), 0);
@@ -548,6 +592,10 @@ Neo.Painter.prototype._updateMousePosition = function(e) {
 
 Neo.Painter.prototype._beforeUnloadHandler = function(e) {
     // quick save
+};
+
+Neo.Painter.prototype.getStabilized = function() {
+    return this.stab;
 };
 
 /*
@@ -1445,12 +1493,19 @@ Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y
     return [x, y];
 };
 
+var nmax = 1;
+
 Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
     var xmax = Math.max(x0, x1, x2, x3);
     var xmin = Math.min(x0, x1, x2, x3);
     var ymax = Math.max(y0, y1, y2, y3);
     var ymin = Math.min(y0, y1, y2, y3);
-    var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 3);
+    var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 2.5);
+
+    if (n > nmax) {
+	n = (n < nmax * 2) ? n : nmax * 2;
+	nmax = n;
+    }
 
     for (var i = 0; i < n; i++) {
         var t = i * 1.0 / n;
@@ -1498,7 +1553,7 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
 
     imageData.data.set(buf8);
     ctx.putImageData(imageData, left, top);
-    
+
     this.prevLine = prev;
 };
 

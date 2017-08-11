@@ -436,8 +436,11 @@ Neo.DrawToolBase.prototype.bezierKeyDownHandler = function(e) {
 
 Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
     var ctx = oe.destCanvasCtx;
-    var x = oe.mouseX; //Math.floor(oe.mouseX);
-    var y = oe.mouseY; //Math.floor(oe.mouseY);
+//  var x = oe.mouseX; //Math.floor(oe.mouseX);
+//  var y = oe.mouseY; //Math.floor(oe.mouseY);
+    var stab = oe.getStabilized();
+    var x = Math.floor(stab[0]);
+    var y = Math.floor(stab[1]);
     var p = oe.getDestCanvasPosition(x, y, false, true);
     var p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
     var p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
@@ -468,8 +471,11 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
 
 Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
     var ctx = oe.destCanvasCtx;
-    var x = oe.mouseX; //Math.floor(oe.mouseX);
-    var y = oe.mouseY; //Math.floor(oe.mouseY);
+//  var x = oe.mouseX; //Math.floor(oe.mouseX);
+//  var y = oe.mouseY; //Math.floor(oe.mouseY);
+    var stab = oe.getStabilized();
+    var x = Math.floor(stab[0]);
+    var y = Math.floor(stab[1]);
     var p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY, false, true);
     var p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
     var p1 = oe.getDestCanvasPosition(this.x1, this.y1, false, true);
