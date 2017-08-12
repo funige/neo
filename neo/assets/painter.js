@@ -1907,6 +1907,11 @@ Neo.Painter.prototype.addBlur = function(buffer, index, a, rgba) {
     }
 };
 
+Neo.Painter.prototype.__pickColor = function(x, y) {
+    this.setToolByType(Neo.eraserTip.tools[Neo.eraserTip.mode]);
+//  this.setToolByType(Neo.penTip.tools[Neo.penTip.mode]);
+};
+
 Neo.Painter.prototype.pickColor = function(x, y) {
     var r = 0xff, g = 0xff, b = 0xff, a;
 
@@ -1928,12 +1933,23 @@ Neo.Painter.prototype.pickColor = function(x, y) {
                 b = b * (1.0 - a) + buf8[0] * a;
             }
         }
-	    r = Math.max(Math.min(Math.round(r), 255), 0);
-	    g = Math.max(Math.min(Math.round(g), 255), 0);
-	    b = Math.max(Math.min(Math.round(b), 255), 0);
+	r = Math.max(Math.min(Math.round(r), 255), 0);
+	g = Math.max(Math.min(Math.round(g), 255), 0);
+	b = Math.max(Math.min(Math.round(b), 255), 0);
         var result = r | g<<8 | b<<16;
     }
     this.setColor(result);
+
+    if (this.current > 0 && a == 0) {
+	if (result == 0xffffff || this.getEmulationMode() < 2.16) {
+	    this.setToolByType(Neo.eraserTip.tools[Neo.eraserTip.mode]);
+
+	} else {
+	    if (Neo.eraserTip.selected) {
+		this.setToolByType(Neo.penTip.tools[Neo.penTip.mode]);
+	    }
+	}
+    }
 };
 
 Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y) {
@@ -2347,4 +2363,8 @@ Neo.Painter.prototype.isUIPaused = function() {
         }
     }
     return false;
+};
+
+Neo.Painter.prototype.getEmulationMode = function() {
+    return parseFloat(Neo.config.neo_emulation_mode || 2.22)
 };

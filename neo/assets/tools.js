@@ -58,8 +58,8 @@ Neo.ToolBase.prototype.getToolButton = function() {
         return Neo.effect2Tip;
 
     case Neo.Painter.TOOLTYPE_ERASER:
-    case Neo.Painter.TOOLTYPE_ERASERALL:
-    case Neo.Painter.TOOLTYPE_ERASERRECT:
+    case Neo.Painter.TOOLTYPE_ERASEALL:
+    case Neo.Painter.TOOLTYPE_ERASERECT:
         return Neo.eraserTip;
 
     case Neo.Painter.TOOLTYPE_FILL:
@@ -76,8 +76,8 @@ Neo.ToolBase.prototype.getReserve = function() {
     case Neo.Painter.TOOLTYPE_PEN:
     case Neo.Painter.TOOLTYPE_BRUSH:
     case Neo.Painter.TOOLTYPE_TONE:
-    case Neo.Painter.TOOLTYPE_ERASERRECT:
-    case Neo.Painter.TOOLTYPE_ERASERALL:
+    case Neo.Painter.TOOLTYPE_ERASERECT:
+    case Neo.Painter.TOOLTYPE_ERASEALL:
     case Neo.Painter.TOOLTYPE_COPY:
     case Neo.Painter.TOOLTYPE_MERGE:
     case Neo.Painter.TOOLTYPE_FIP_H:
