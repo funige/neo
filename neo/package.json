@@ -9,7 +9,7 @@
     "request": "^2.79.0"
   },
   "devDependencies": {
-    "electron": "^1.7.5",
+    "electron": "^1.7.6",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",

@@ -6,8 +6,8 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 
     <head>
     ...
-    <link rel="stylesheet" href="https://rawgit.com/funige/neo/master/neo/dist/neo.css" type="text/css" />
-    <script src="https://rawgit.com/funige/neo/master/neo/dist/neo.js" charset="UTF-8">
+    <link rel="stylesheet" href="https://rawgit.com/funige/neo/master/PaintBBS.css" type="text/css" />
+    <script src="https://rawgit.com/funige/neo/master/PaintBBS.js" charset="UTF-8">
     </head>
 
 ただし、この書き方だと常に最新版のNEOが使われるので、最新版に問題があったりすると動かなくなってしまいます。
