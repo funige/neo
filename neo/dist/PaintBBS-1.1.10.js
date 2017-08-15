@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.10";
+Neo.version = "1.1.11";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -2727,11 +2727,6 @@ Neo.Painter.prototype.addBlur = function(buffer, index, a, rgba) {
     }
 };
 
-Neo.Painter.prototype.__pickColor = function(x, y) {
-    this.setToolByType(Neo.eraserTip.tools[Neo.eraserTip.mode]);
-//  this.setToolByType(Neo.penTip.tools[Neo.penTip.mode]);
-};
-
 Neo.Painter.prototype.pickColor = function(x, y) {
     var r = 0xff, g = 0xff, b = 0xff, a;
 
@@ -2760,8 +2755,9 @@ Neo.Painter.prototype.pickColor = function(x, y) {
     }
     this.setColor(result);
 
-    if (this.current > 0 && a == 0) {
-	if (result == 0xffffff || this.getEmulationMode() < 2.16) {
+
+    if (this.current > 0) {
+	if (a == 0 && (result == 0xffffff || this.getEmulationMode() < 2.16)) {
 	    this.setToolByType(Neo.eraserTip.tools[Neo.eraserTip.mode]);
 
 	} else {
