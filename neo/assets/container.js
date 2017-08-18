@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.11";
+Neo.version = "1.1.12";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -414,7 +414,12 @@ Neo.start = function(isApp) {
         if (Neo.isApp) {
             var ipc = require('electron').ipcRenderer;
             ipc.sendToHost('neo-status', 'ok');
-        }
+
+        } else {
+	  if (document.paintBBSCallback) {
+	    document.paintBBSCallback('start');
+	  }
+	}
     }
 };
 
@@ -598,6 +603,12 @@ Neo.openURL = function(url) {
 Neo.submit = function(board, blob, thumbnail, thumbnail2) {
     var url = board + Neo.config.url_save;
     console.log("submit url=" + url);
+
+    if (document.paintBBSCallback) {
+        if (!document.paintBBSCallback('check')) {
+            return;
+        }
+    }
 
     var headerString = Neo.config.send_header || "";
     var imageType = Neo.config.send_header_image_type;
