@@ -5,20 +5,14 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 #### 1. 基本的には&lt;head>に２行追加するだけです
 
     <head>
-    ...
-    <link rel="stylesheet" href="https://rawgit.com/funige/neo/master/neo/dist/neo.css" type="text/css" />
-    <script src="https://rawgit.com/funige/neo/master/neo/dist/neo.js" charset="UTF-8">
-    </head>
-
-ただし、この書き方だと常に最新版のNEOが使われるので、最新版に問題があったりすると動かなくなってしまいます。
-
-特定のバージョンのNEOを使用したいときは、[/dist](https://github.com/funige/neo/tree/master/neo/dist) の下にあるPaintBBS-x.x.x.js（とcss）をダウンロードして組み込んで下さい。
-
-    <head>
-    ...
     <link rel="stylesheet" href="PaintBBS-x.x.x.css" type="text/css" />
     <script src="PaintBBS-x.x.x.js" charset="UTF-8">
+    ...
     </head>
+
+jsと.cssの2つのファイルは[/dist](https://github.com/funige/neo/tree/master/neo/dist) から最新盤をダウンロードしてください。
+同じフォルダにあるneo.jsとneo.cssは最新版のエイリアスです。
+
 
 * 必須ではありませんが、&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEOの起動が早くなります。
 
@@ -27,6 +21,7 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
   [このサンプル掲示板](http://neo.websozai.jp/) は、[PHP製のお絵かき掲示板POTI-board + MONO_WHITE](http://www.punyu.net/php/oekaki.php) に「NEOを使う」かどうかの選択機能を追加したものです。  
 
   詳細はソースコードを参照してください。
+
 
 #### 2. セキュリティチェックのコードを修正（ふたばでは不要です）
 ふたば以外の多くの掲示板では、送信された画像のUser-Agentを見て不正な投稿かどうかチェックしているようです。アプリではUser-Agentを簡単に偽装できるのですが、埋め込みのNEOでは偽装は難しいので、このチェックを外す必要があります。

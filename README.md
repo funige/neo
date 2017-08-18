@@ -36,7 +36,7 @@ Chrome/FireFox/Safari/Edge（最近のバージョンのみ）
 サンプルとして[**NEOテスト**](http://neo.websozai.jp)をオープンしました  
 動作確認にご利用ください
 
-掲示板へのNEOの組み込み方法については、 [/samplebbs](https://github.com/funige/neo/tree/master/samplebbs) の下のREADME.mdに書きました  
+掲示板へのNEOの組み込み方法については、/samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に書きました  
 不明な点があればサンプル掲示板で聞いてください
 
 
@@ -52,8 +52,11 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 
 ## 履歴
 
+#### ver1.1.11 (2017/8/16)
+- スポイトツールのバグ修正
+
 #### ver1.1.10 (2017/8/11)
-- /samplebbs/README.md修正。管理者の方は御一読を。
+- <s>/samplebbs/[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md)修正。</s>
 - スポイトツールの動作変更
 - ベジェツールを微妙に調整
 - Chromeでペンを認識しなくなることがあるので PointerEvents を使うように修正
