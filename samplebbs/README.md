@@ -1,4 +1,5 @@
 # 掲示板へのNEOの組み込み方法
+
 PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）にスクリプトを埋め込んで、javaアプレットの代わりにお絵かき機能を提供することができます。
 
 
@@ -13,6 +14,7 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 jsと.cssの2つのファイルは[/dist](https://github.com/funige/neo/tree/master/neo/dist) から最新盤をダウンロードしてください。
 同じフォルダにあるneo.jsとneo.cssは最新版のエイリアスです。
 
+* **以前ダウンロードせずにrawgit.comにリンクする方法を推奨しましたが、不具合が出るので廃止にします。**
 
 * 必須ではありませんが、&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEOの起動が早くなります。
 
@@ -55,7 +57,7 @@ POTI-board以外の掲示板スクリプトについては、調べてみない�
   https://twitter.com/sapniji/status/861930241559642113
 
 
-#### NEO独自のパラメータについて
+# NEO独自のパラメータについて
 
   &lt;applet>の下に、他のパラメータと同じように指定してください。
 

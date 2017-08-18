@@ -24,9 +24,13 @@ small { font-size:9pt }
 </STYLE>
 
 <!-- NEOを使う -->
+<script>
+document.paintBBSCallback = function (str) {console.log('callback!--', str)}
+</script>
+
 <!--{def useneo}-->
-<link rel="stylesheet" href="PaintBBS-1.1.11.css" type="text/css" />
-<script src="PaintBBS-1.1.11.js" charset="UTF-8"></script>
+<link rel="stylesheet" href="PaintBBS-1.1.12.css" type="text/css" />
+<script src="PaintBBS-1.1.12.js" charset="UTF-8"></script>
 
 <!--{/def}-->
 
