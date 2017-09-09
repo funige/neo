@@ -602,15 +602,22 @@ Neo.openURL = function(url) {
 
 Neo.submit = function(board, blob, thumbnail, thumbnail2) {
     var url = board + Neo.config.url_save;
-    console.log("submit url=" + url);
+    var headerString = Neo.str_header || "";
+    console.log("submit url=" + url + " header=" + headerString);
 
     if (document.paintBBSCallback) {
-        if (!document.paintBBSCallback('check')) {
+        var result = document.paintBBSCallback('check')
+        if (result == 0 || result == "false") {
             return;
         }
-    }
 
-    var headerString = Neo.config.send_header || "";
+	result = document.paintBBSCallback('header')
+	if (result && typeof result == "string") {
+	    headerString == result;
+	}
+    }
+    if (!headerString) headerString = Neo.config.send_header || "";
+
     var imageType = Neo.config.send_header_image_type;
     if (imageType && imageType == "true") {
         headerString = "image_type=png&" + headerString
@@ -713,6 +720,13 @@ Neo.setColors = function(colors) {
         Neo.colorTips[i].setColor(color);
     }
 };
+
+
+Neo.pExit = function() {
+    new Neo.SubmitCommand(Neo.painter).execute();
+};
+
+Neo.str_header = "";
 
 /*
 -----------------------------------------------------------------------

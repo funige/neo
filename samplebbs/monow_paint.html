@@ -25,7 +25,14 @@ small { font-size:9pt }
 
 <!-- NEOを使う -->
 <script>
-document.paintBBSCallback = function (str) {console.log('callback!--', str)}
+  document.paintBBSCallback = function (str) {
+    console.log('paintBBSCallback', str)
+    if (value == 'check') {
+      return true;
+    else {
+      return;
+    }
+  }
 </script>
 
 <!--{def useneo}-->

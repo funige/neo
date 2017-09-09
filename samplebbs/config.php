@@ -207,7 +207,7 @@ define(MAX_EMAIL, '100');
 define(MAX_SUB, '100');
 
 //本文の制限文字数。半角で
-define(MAX_COM, '1000');
+define(MAX_COM, '2000000');
 
 //一ページに表示する記事
 define(PAGE_DEF, '10');
@@ -278,7 +278,7 @@ $badstring = array("irc.s16.xrea.com","著作権の侵害","未承諾広告");
 $badfile = array("dummy","dummy2");
 
 //拒絶するホスト
-$badip = array("addr.dummy.com","addr2.dummy.com");
+$badip = array("addr.dummy.com", "addr2.dummy.com", ".ru", ".nash.net.ua", ".kyivstar.net", ".ml", "tor.t-3.net");
 
 
 /* ---------- サムネイル設定 ---------- */

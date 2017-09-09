@@ -11,10 +11,10 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
     ...
     </head>
 
-jsと.cssの2つのファイルは[/dist](https://github.com/funige/neo/tree/master/neo/dist) から最新盤をダウンロードしてください。
+jsと.cssの2つのファイルは[/dist](https://github.com/funige/neo/tree/master/neo/dist) から最新版をダウンロードしてください。  
 同じフォルダにあるneo.jsとneo.cssは最新版のエイリアスです。
 
-* **以前ダウンロードせずにrawgit.comにリンクする方法を推奨しましたが、不具合が出るので廃止にします。すみません。**
+* **以前ダウンロードせずにrawgit.comにリンクする方法を推奨しましたが、不具合出るので廃止します。**
 
 * 必須ではありませんが、&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEOの起動が早くなります。
 
