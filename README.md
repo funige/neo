@@ -25,13 +25,13 @@ http://hp.vector.co.jp/authors/VA016309/
 
 ----
 
-## 対応ブラウザ
+## <a name="browser">対応ブラウザ</a>
 
 Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
   Firefox推奨。IEはサポート対象外です  
   モバイルブラウザでも一応動くのですが、サポート対象外とします
 
-## サンプル掲示板
+## <a name="samplebbs">サンプル掲示板</a>
 
 サンプルとして[**NEOテスト**](http://neo.websozai.jp)をオープンしました  
 動作確認にご利用ください
@@ -40,7 +40,7 @@ Chrome/FireFox/Safari/Edge（最近のバージョンのみ）
 不明な点があればサンプル掲示板で聞いてください
 
 
-## Mac/Win用アプリについて
+## <a name="app">Mac/Win用アプリについて</a>
 NEOが入っていない掲示板でも、このアプリを使えばNEOを使うことができます  
 Chrome等のブラウザで描きたい掲示板を開いて、アドレスバーからURLをこのアプリにドラッグドロップしてください。
 
@@ -50,7 +50,7 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 2. 実行ファイル (neo.app または neo.exe) をダブルクリック
 
 
-## 履歴
+## <a name="history">履歴</a>
 
 #### ver1.1.12 (2017/9/9)
 - 掲示板開発者用のpaintBBSCallbackがちゃんと実装されていなかったので実装
