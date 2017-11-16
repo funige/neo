@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.12";
+Neo.version = "1.1.13";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -2831,7 +2831,8 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     var baseColor = buf32[y * width + x];
     var fillColor = this.getColor();
 
-    if ((baseColor & 0xffffff00) == 0 ||
+//  if ((baseColor & 0xffffff00) == 0 ||
+    if ((baseColor & 0xff000000) == 0 ||
         (baseColor & 0xffffff) != (fillColor & 0xffffff)) {
         while (stack.length > 0) {
             var point = stack.pop();
@@ -2863,6 +2864,30 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
 
 	this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
+
+// 確実にfillできるバージョン
+Neo.Painter.prototype.__fill = function(x, y, ctx) {
+  // https://en.wikipedia.org/wiki/Flood_fill
+  x = Math.round(x);
+  y = Math.round(y);
+
+  var imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+  var buf32 = new Uint32Array(imageData.data.buffer);
+  var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+  var width = imageData.width;
+  var stack = [];
+
+  var baseColor = buf32[y * width + x];
+  var fillColor = this.getColor();
+
+  if ((baseColor ))
+  
+  // ...
+  
+  imageData.data.set(buf8);
+  ctx.putImageData(imageData, 0, 0);
+  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+}
 
 Neo.Painter.prototype.copy = function(x, y, width, height) {
     this.tempX = 0;

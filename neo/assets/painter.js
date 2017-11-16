@@ -1986,7 +1986,8 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     var baseColor = buf32[y * width + x];
     var fillColor = this.getColor();
 
-    if ((baseColor & 0xffffff00) == 0 ||
+//  if ((baseColor & 0xffffff00) == 0 ||
+    if ((baseColor & 0xff000000) == 0 ||
         (baseColor & 0xffffff) != (fillColor & 0xffffff)) {
         while (stack.length > 0) {
             var point = stack.pop();
@@ -2000,7 +2001,8 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
             for (; 0 < x0; x0--) {
                 if (buf32[y * width + (x0 - 1)] != baseColor) break;
             }
-            for (; x1 < this.canvasHeight - 1; x1++) {
+//          for (; x1 < this.canvasHeight - 1; x1++) {
+            for (; x1 < this.canvasWidth - 1; x1++) {
                 if (buf32[y * width + (x1 + 1)] != baseColor) break;
             }
             this.fillHorizontalLine(buf32, x0, x1, y);

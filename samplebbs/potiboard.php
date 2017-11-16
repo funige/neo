@@ -765,7 +765,8 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(!$sub||ereg("^[ |　|]*$",$sub))   $sub="";
 	if(!$url||ereg("^[ |　|]*$",$url))   $url="";
 
-	if(!$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
+	//if(!$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest); //荒らし対策。画像無し投稿を禁止
+	if(!$resto&&!@is_file($dest)) error(MSG007,$dest);
 	if(RES_UPLOAD&&$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
 	if(!$com&&!@is_file($dest)) error(MSG008,$dest);
 
