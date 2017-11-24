@@ -1262,11 +1262,15 @@ Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
 Neo.Painter.prototype.setTonePoint = function(buf8, width, x, y, x0, y0) {
     var d = this.lineWidth;
     var r0 = Math.floor(d / 2);
+
     x -= r0;
     y -= r0;
-
-    if (r0%2) { x0++; y0++; } //なぜか模様がずれるので
-
+    x0 -= r0;
+    y0 -= r0;
+//  x -= r0;
+//  y -= r0;
+//  if (r0%2) { x0++; y0++; } //なぜか模様がずれるので
+   
     var shape = this._roundData[d];
     var shapeIndex = 0;
     var index = (y * width + x) * 4;
@@ -1972,7 +1976,7 @@ Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     }
 };
 
-Neo.Painter.prototype.fill = function(x, y, ctx) {
+Neo.Painter.prototype.__fill = function(x, y, ctx) {
     // http://sandbox.serendip.ws/javascript_canvas_scanline_seedfill.html
     x = Math.round(x);
     y = Math.round(y);
@@ -2019,6 +2023,49 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     ctx.putImageData(imageData, 0, 0);
 
 	this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+};
+
+Neo.Painter.prototype.fill = function(x, y, ctx) {
+    x = Math.round(x);
+    y = Math.round(y);
+
+    var imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var width = imageData.width;
+    var stack = [{x: x, y: y}];
+
+    var baseColor = buf32[y * width + x];
+    var fillColor = this.getColor();
+
+    if ((baseColor & 0xff000000) == 0 || (baseColor != fillColor)) {
+        while (stack.length > 0) {
+            var point = stack.pop();
+            var x = point.x;
+            var y = point.y;
+            var x0 = x;
+            var x1 = x;
+            if (buf32[y * width + x] == fillColor) break;
+
+            for (; 0 < x0; x0--) {
+                if (buf32[y * width + (x0 - 1)] != baseColor) break;
+            }
+            for (; x1 < this.canvasWidth - 1; x1++) {
+                if (buf32[y * width + (x1 + 1)] != baseColor) break;
+            }
+            this.fillHorizontalLine(buf32, x0, x1, y);
+
+            if (y + 1 < this.canvasHeight) {
+                this.scanLine(x0, x1, y + 1, baseColor, buf32, stack);
+            }
+            if (y - 1 >= 0) {
+                this.scanLine(x0, x1, y - 1, baseColor, buf32, stack);
+            }
+	}
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
 Neo.Painter.prototype.copy = function(x, y, width, height) {

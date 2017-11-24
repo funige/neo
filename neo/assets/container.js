@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.13";
+Neo.version = "1.1.14";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -102,6 +102,16 @@ Neo.init2 = function() {
         }, 1);
     }
 
+    window.onbeforeunload = function(e) {
+        if (!Neo.uploaded) {
+            Neo.painter.saveSession();
+	    return 'このページを離れてもよろしいですか？'
+        } else {
+            Neo.painter.clearSession();
+	    return null
+        }
+    }
+    /*
     window.addEventListener("beforeunload", function(e) { 
         if (!Neo.uploaded) {
             Neo.painter.saveSession();
@@ -109,6 +119,7 @@ Neo.init2 = function() {
             Neo.painter.clearSession();
         }
     }, false);
+    */
 }
 
 Neo.initConfig = function(applet) {
@@ -596,7 +607,7 @@ Neo.openURL = function(url) {
         require('electron').shell.openExternal(url);
 
     } else {
-        location.href = url;
+	window.open(url, '_blank');
     }
 };
 
