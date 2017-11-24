@@ -718,8 +718,14 @@ LiveConnect
 */
 
 Neo.getColors = function() {
-    console.log("getColors");
-    return Neo.config.colors.join('\n');
+    console.log("getColors")
+    console.log("defaultColors==", Neo.config.colors.join('\n'));
+    var array = []
+    for (var i = 0; i < 14; i++) {
+	array.push(Neo.colorTips[i].color)
+    }
+    return array.join('\n');
+//  return Neo.config.colors.join('\n');
 };
 
 Neo.setColors = function(colors) {

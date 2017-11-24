@@ -718,8 +718,14 @@ LiveConnect
 */
 
 Neo.getColors = function() {
-    console.log("getColors");
-    return Neo.config.colors.join('\n');
+    console.log("getColors")
+    console.log("defaultColors==", Neo.config.colors.join('\n'));
+    var array = []
+    for (var i = 0; i < 14; i++) {
+	array.push(Neo.colorTips[i].color)
+    }
+    return array.join('\n');
+//  return Neo.config.colors.join('\n');
 };
 
 Neo.setColors = function(colors) {
@@ -5458,8 +5464,14 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
+	var color = (r<<16 | g<<8 | b);
 
-        Neo.painter.setColor(r<<16 | g<<8 | b);
+	var colorTip = Neo.ColorTip.getCurrent()
+	if (colorTip) {
+	    colorTip.setColor(Neo.painter.getColorString(color))
+	}
+
+        Neo.painter.setColor(color);
 //      Neo.updateUIColor(true, true);
     }
 };

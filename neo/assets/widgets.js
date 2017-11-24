@@ -826,8 +826,14 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
+	var color = (r<<16 | g<<8 | b);
 
-        Neo.painter.setColor(r<<16 | g<<8 | b);
+	var colorTip = Neo.ColorTip.getCurrent()
+	if (colorTip) {
+	    colorTip.setColor(Neo.painter.getColorString(color))
+	}
+
+        Neo.painter.setColor(color);
 //      Neo.updateUIColor(true, true);
     }
 };
