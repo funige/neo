@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.14";
+Neo.version = "1.1.15";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -102,6 +102,16 @@ Neo.init2 = function() {
         }, 1);
     }
 
+    window.onbeforeunload = function(e) {
+        if (!Neo.uploaded) {
+            Neo.painter.saveSession();
+	    return 'このページを離れてもよろしいですか？'
+        } else {
+            Neo.painter.clearSession();
+	    return null
+        }
+    }
+    /*
     window.addEventListener("beforeunload", function(e) { 
         if (!Neo.uploaded) {
             Neo.painter.saveSession();
@@ -109,6 +119,7 @@ Neo.init2 = function() {
             Neo.painter.clearSession();
         }
     }, false);
+    */
 }
 
 Neo.initConfig = function(applet) {
@@ -596,7 +607,7 @@ Neo.openURL = function(url) {
         require('electron').shell.openExternal(url);
 
     } else {
-        location.href = url;
+	window.open(url, '_blank');
     }
 };
 
@@ -707,8 +718,14 @@ LiveConnect
 */
 
 Neo.getColors = function() {
-    console.log("getColors");
-    return Neo.config.colors.join('\n');
+    console.log("getColors")
+    console.log("defaultColors==", Neo.config.colors.join('\n'));
+    var array = []
+    for (var i = 0; i < 14; i++) {
+	array.push(Neo.colorTips[i].color)
+    }
+    return array.join('\n');
+//  return Neo.config.colors.join('\n');
 };
 
 Neo.setColors = function(colors) {
@@ -2107,11 +2124,15 @@ Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
 Neo.Painter.prototype.setTonePoint = function(buf8, width, x, y, x0, y0) {
     var d = this.lineWidth;
     var r0 = Math.floor(d / 2);
+
     x -= r0;
     y -= r0;
-
-    if (r0%2) { x0++; y0++; } //なぜか模様がずれるので
-
+    x0 -= r0;
+    y0 -= r0;
+//  x -= r0;
+//  y -= r0;
+//  if (r0%2) { x0++; y0++; } //なぜか模様がずれるので
+   
     var shape = this._roundData[d];
     var shapeIndex = 0;
     var index = (y * width + x) * 4;
@@ -2801,7 +2822,7 @@ Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y) {
     }
 };
 
-Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
+Neo.Painter.prototype.__scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     var width = this.canvasWidth;
 
     while (x0 <= x1) {
@@ -2817,7 +2838,7 @@ Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     }
 };
 
-Neo.Painter.prototype.fill = function(x, y, ctx) {
+Neo.Painter.prototype.__fill = function(x, y, ctx) {
     // http://sandbox.serendip.ws/javascript_canvas_scanline_seedfill.html
     x = Math.round(x);
     y = Math.round(y);
@@ -2864,6 +2885,75 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     ctx.putImageData(imageData, 0, 0);
 
 	this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+};
+
+Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
+    var width = this.canvasWidth;
+    for (var x = x0; x <= x1; x++) {
+	stack.push({x:x, y: y})
+    }
+/*
+    while (x0 <= x1) {
+        for (; x0 <= x1; x0++) {
+            if (buf32[y * width + x0] == baseColor) break;
+        }
+        if (x1 < x0) break;
+
+        for (; x0 <= x1; x0++) {
+            if (buf32[y * width + x0] != baseColor) break;
+        }
+        stack.push({x:x0 - 1, y: y})
+    }
+*/
+};
+
+Neo.Painter.prototype.fill = function(x, y, ctx) {
+    x = Math.round(x);
+    y = Math.round(y);
+
+    var imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var width = imageData.width;
+    var stack = [{x: x, y: y}];
+
+    var baseColor = buf32[y * width + x];
+    var fillColor = this.getColor();
+
+    if ((baseColor & 0xff000000) == 0 || (baseColor != fillColor)) {
+        while (stack.length > 0) {
+	    if (stack.length > 1000000) {
+		console.log('too much stack')
+		break;
+	    }
+
+            var point = stack.pop();
+            var x = point.x;
+            var y = point.y;
+            var x0 = x;
+            var x1 = x;
+            if (buf32[y * width + x] == fillColor) continue;
+            if (buf32[y * width + x] != baseColor) continue;
+
+	    for (; 0 < x0; x0--) {
+                if (buf32[y * width + (x0 - 1)] != baseColor) break;
+	    }
+	    for (; x1 < this.canvasWidth - 1; x1++) {
+                if (buf32[y * width + (x1 + 1)] != baseColor) break;
+	    }
+	    this.fillHorizontalLine(buf32, x0, x1, y);
+
+	    if (y + 1 < this.canvasHeight) {
+                this.scanLine(x0, x1, y + 1, baseColor, buf32, stack);
+	    }
+	    if (y - 1 >= 0) {
+                this.scanLine(x0, x1, y - 1, baseColor, buf32, stack);
+	    }
+	}
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
 Neo.Painter.prototype.copy = function(x, y, width, height) {
@@ -5400,8 +5490,14 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
+	var color = (r<<16 | g<<8 | b);
 
-        Neo.painter.setColor(r<<16 | g<<8 | b);
+	var colorTip = Neo.ColorTip.getCurrent()
+	if (colorTip) {
+	    colorTip.setColor(Neo.painter.getColorString(color))
+	}
+
+        Neo.painter.setColor(color);
 //      Neo.updateUIColor(true, true);
     }
 };

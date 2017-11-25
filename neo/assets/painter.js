@@ -1960,7 +1960,7 @@ Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y) {
     }
 };
 
-Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
+Neo.Painter.prototype.__scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     var width = this.canvasWidth;
 
     while (x0 <= x1) {
@@ -2025,6 +2025,26 @@ Neo.Painter.prototype.__fill = function(x, y, ctx) {
 	this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
+Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
+    var width = this.canvasWidth;
+    for (var x = x0; x <= x1; x++) {
+	stack.push({x:x, y: y})
+    }
+/*
+    while (x0 <= x1) {
+        for (; x0 <= x1; x0++) {
+            if (buf32[y * width + x0] == baseColor) break;
+        }
+        if (x1 < x0) break;
+
+        for (; x0 <= x1; x0++) {
+            if (buf32[y * width + x0] != baseColor) break;
+        }
+        stack.push({x:x0 - 1, y: y})
+    }
+*/
+};
+
 Neo.Painter.prototype.fill = function(x, y, ctx) {
     x = Math.round(x);
     y = Math.round(y);
@@ -2040,27 +2060,33 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
 
     if ((baseColor & 0xff000000) == 0 || (baseColor != fillColor)) {
         while (stack.length > 0) {
+	    if (stack.length > 1000000) {
+		console.log('too much stack')
+		break;
+	    }
+
             var point = stack.pop();
             var x = point.x;
             var y = point.y;
             var x0 = x;
             var x1 = x;
-            if (buf32[y * width + x] == fillColor) break;
+            if (buf32[y * width + x] == fillColor) continue;
+            if (buf32[y * width + x] != baseColor) continue;
 
-            for (; 0 < x0; x0--) {
+	    for (; 0 < x0; x0--) {
                 if (buf32[y * width + (x0 - 1)] != baseColor) break;
-            }
-            for (; x1 < this.canvasWidth - 1; x1++) {
+	    }
+	    for (; x1 < this.canvasWidth - 1; x1++) {
                 if (buf32[y * width + (x1 + 1)] != baseColor) break;
-            }
-            this.fillHorizontalLine(buf32, x0, x1, y);
+	    }
+	    this.fillHorizontalLine(buf32, x0, x1, y);
 
-            if (y + 1 < this.canvasHeight) {
+	    if (y + 1 < this.canvasHeight) {
                 this.scanLine(x0, x1, y + 1, baseColor, buf32, stack);
-            }
-            if (y - 1 >= 0) {
+	    }
+	    if (y - 1 >= 0) {
                 this.scanLine(x0, x1, y - 1, baseColor, buf32, stack);
-            }
+	    }
 	}
     }
     imageData.data.set(buf8);
