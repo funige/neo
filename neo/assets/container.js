@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.1.16";
+Neo.version = "1.2.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -105,10 +105,12 @@ Neo.init2 = function() {
     window.onbeforeunload = function(e) {
         if (!Neo.uploaded) {
             Neo.painter.saveSession();
-	    return 'このページを離れてもよろしいですか？'
-        } else {
+            return (Neo.config.neo_unload_warning && !Neo.isIE()) ?
+                Neo.config.neo_unload_warning : null
+
+	} else {
             Neo.painter.clearSession();
-	    return null
+            return null
         }
     }
     /*
@@ -434,6 +436,18 @@ Neo.start = function(isApp) {
     }
 };
 
+Neo.isIE = function() {
+    var ms = false;
+    if (/MSIE 10/i.test(navigator.userAgent)) {
+        ms = true; // This is internet explorer 10
+    }
+    if (/MSIE 9/i.test(navigator.userAgent) ||
+        /rv:11.0/i.test(navigator.userAgent)) {
+        ms = true; // This is internet explorer 9 or 11
+    }
+    return ms
+}
+
 Neo.showWarning = function() {
     var futaba = location.hostname.match(/2chan.net/i);
     var samplebbs = location.hostname.match(/neo.websozai.jp/i);
@@ -444,14 +458,7 @@ Neo.showWarning = function() {
     var edge = navigator.userAgent.match(/Edge\/(\d+)/i);
     if (edge && edge.length > 1) edge = edge[1];
 
-    var ms = false;
-    if (/MSIE 10/i.test(navigator.userAgent)) {
-        ms = true; // This is internet explorer 10
-    }
-    if (/MSIE 9/i.test(navigator.userAgent) ||
-        /rv:11.0/i.test(navigator.userAgent)) {
-        ms = true; // This is internet explorer 9 or 11
-    }
+    var ms = Neo.isIE();
 
     var str = "";
     if (futaba || samplebbs) {
