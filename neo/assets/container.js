@@ -105,9 +105,6 @@ Neo.init2 = function() {
     window.addEventListener("beforeunload", function(e) { 
 	if (!Neo.uploaded) {
             Neo.painter.saveSession();
-	    if (Neo.config.neo_unload_warning) {
-		e.returnValue = Neo.config.neo_unload_warning
-	    }
         } else {
             Neo.painter.clearSession();
         }
