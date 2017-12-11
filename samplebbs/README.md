@@ -6,15 +6,13 @@ PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）に
 #### 1. 基本的には&lt;head>に２行追加するだけです
 
     <head>
-    <link rel="stylesheet" href="PaintBBS-x.x.x.css" type="text/css" />
-    <script src="PaintBBS-x.x.x.js" charset="UTF-8">
+    <link rel="stylesheet" href="neo.css" type="text/css" />
+    <script src="neo.js" charset="UTF-8">
     ...
     </head>
 
 jsと.cssの2つのファイルは[/dist](https://github.com/funige/neo/tree/master/neo/dist) から最新版をダウンロードしてください。  
-同じフォルダにあるneo.jsとneo.cssは最新版のエイリアスです。
-
-* **以前ダウンロードせずにrawgit.comにリンクする方法を推奨しましたが、不具合出るので廃止します。**
+番号の一番新しいPaintBBS-x.x.x.(css|js)とneo.(css|js)は同じものです。
 
 * 必須ではありませんが、&lt;applet>タグを&lt;applet-dummy>に書き換えると、無駄なjavaアプレットの読み込みがなくなってNEOの起動が早くなります。
 
@@ -76,7 +74,7 @@ POTI-board以外の掲示板スクリプトについては、調べてみない�
   ……今のところ右クリックスポイトの動作しか違わないのですが。
 
 - __&lt;PARAM NAME="neo_unload_warning" VALUE="true">__  
-  他のURLに移動する時に、警告を表示します。
+  他のURLに移動する時に、警告を表示します。  
   色々問題があるのでデフォルトではfalseにしました。
   どうせ戻って来れば途中の絵は保存されていますので。
 

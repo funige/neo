@@ -102,6 +102,7 @@ Neo.init2 = function() {
         }, 1);
     }
 
+    /*
     window.onbeforeunload = function(e) {
         if (!Neo.uploaded) {
             Neo.painter.saveSession();
@@ -113,15 +114,19 @@ Neo.init2 = function() {
             return null
         }
     }
-    /*
+    */
+
     window.addEventListener("beforeunload", function(e) { 
-        if (!Neo.uploaded) {
+	if (!Neo.uploaded) {
             Neo.painter.saveSession();
+	    if (Neo.config.neo_unload_warning && !Neo.isIE()) {
+		e.returnValue = Neo.config.neo_unlaod_warning
+	    }
         } else {
             Neo.painter.clearSession();
         }
     }, false);
-    */
+
 }
 
 Neo.initConfig = function(applet) {
