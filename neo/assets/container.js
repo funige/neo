@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.2.0";
+Neo.version = "1.2.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -824,7 +824,7 @@ Neo.createContainer = function(applet) {
         </div>
         <div id="footerButtons">
             <div id="submit">投稿</div>
-            <div id="copyright">(C)しいちゃん PaintBBS NEO</div>
+            <div id="copyright">(C)しぃちゃん PaintBBS NEO</div>
         </div>
     </div>
 </div>
