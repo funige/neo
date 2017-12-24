@@ -265,7 +265,12 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 	    ref._rollOverHandler(e); });
 	container.addEventListener("pointerout", function(e) {
 	    ref._rollOutHandler(e); });
-	
+
+        //描画中スクロールさせない
+	container.addEventListener("touchmove", function(e) {
+	    e.preventDefault();
+	});
+      
     } else {
 	container.onmousedown = function(e) {ref._mouseDownHandler(e)};
 	container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
