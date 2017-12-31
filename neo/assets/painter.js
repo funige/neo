@@ -287,7 +287,13 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 	container.addEventListener("touchend", function(e) {
             ref._mouseUpHandler(e);
 	}, true);
+
     }
+    
+    //描画中スクロールさせない
+    //container.addEventListener("touchmove", function(e) {
+    //    e.preventDefault();
+    //});
     
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
@@ -918,12 +924,16 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
     ctx.save();
     ctx.fillStyle = "#ffffff";
 
+    var fillWidth = width
+    var fillHeight = height
+    
     if (updateAll) {
 	ctx.fillRect(0, 0, this.destCanvas.width, this.destCanvas.height);
+
     } else {
 	//カーソルの描画ゴミが残るのをごまかすため
-	if (x + width == this.canvasWidth) width++;
-	if (y + height == this.canvasHeight) height++;
+	if (x + width == this.canvasWidth) fillWidth = width + 1;
+	if (y + height == this.canvasHeight) fillHeight = height + 1;
     }
     
     ctx.translate(this.destCanvas.width*.5, this.destCanvas.height*.5);
@@ -933,7 +943,7 @@ Neo.Painter.prototype.updateDestCanvas = function(x, y, width, height, useTemp) 
     ctx.msImageSmoothingEnabled = 0;
 
     if (!updateAll) {
-	ctx.fillRect(x, y, width, height);
+	ctx.fillRect(x, y, fillWidth, fillHeight);
     }
 
     if (this.visible[0]) {

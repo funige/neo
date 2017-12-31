@@ -286,7 +286,7 @@ Neo.DrawToolBase.prototype.drawCursor = function(oe) {
 	  y > -r &&
 	  x < oe.destCanvas.width + r &&
 	  y < oe.destCanvas.height + r)) return;
-    
+
     var ctx = oe.destCanvasCtx;
     ctx.save();
     this.transformForZoom(oe)
