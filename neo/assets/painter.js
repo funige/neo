@@ -254,7 +254,7 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     var container = document.getElementById("container");
 
-    if (window.PointerEvent) {
+    if (0) { //window.PointerEvent) {
 	container.addEventListener("pointerdown", function(e) {
 	    ref._mouseDownHandler(e); });
 	container.addEventListener("pointerup", function(e) {
@@ -287,7 +287,6 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 	container.addEventListener("touchend", function(e) {
             ref._mouseUpHandler(e);
 	}, true);
-
     }
     
     //描画中スクロールさせない
