@@ -38,7 +38,7 @@
 </div>
 
 <!--
-<webview id="webview" src="./test.html" preload="./dist/neo.js" autosize=on></webview>
+<webview id="webview" src="http://localhost/samplebbs" preload="./dist/neo.js" autosize=on></webview>
 -->
 
 <webview id="webview" src="http://jun.2chan.net/oe" preload="./dist/neo.js" autosize=on></webview>
@@ -97,7 +97,7 @@
         document.getElementById("edit").className = "buttonDisabled";
 
         setTimeout(function() {
-            webview.executeJavaScript("document.neo.start(true);");
+            webview.executeJavaScript("try {document.neo.start(true);} catch (e) {document.getElementById('neoWarning').innerHTML = 'アプリと掲示板のNEOが同時に起動しています。アプリ側のNEOを使いたい時は、掲示板の「NEOを使う」設定をオフにしてください。';}");
         }, 500);
    });
 

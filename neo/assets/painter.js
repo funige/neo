@@ -639,10 +639,10 @@ Neo.Painter.prototype.hasUndo = function() {
 };
 
 Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
-	x = (x == undefined) ? 0 : x;
-	y = (y == undefined) ? 0 : y;
-	w = (w == undefined) ? this.canvasWidth : w;
-	h = (h == undefined) ? this.canvasHeight : h;
+	x = (x === undefined) ? 0 : x;
+	y = (y === undefined) ? 0 : y;
+	w = (w === undefined) ? this.canvasWidth : w;
+	h = (h === undefined) ? this.canvasHeight : h;
 	var undoItem = new Neo.UndoItem();
 	undoItem.x = 0;
 	undoItem.y = 0;
@@ -654,10 +654,10 @@ Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
 };
 
 Neo.Painter.prototype._pushRedo = function(x, y, w, h) {
-	x = (x == undefined) ? 0 : x;
-	y = (y == undefined) ? 0 : y;
-	w = (w == undefined) ? this.canvasWidth : w;
-	h = (h == undefined) ? this.canvasHeight : h;
+	x = (x === undefined) ? 0 : x;
+	y = (y === undefined) ? 0 : y;
+	w = (w === undefined) ? this.canvasWidth : w;
+	h = (h === undefined) ? this.canvasHeight : h;
 	var undoItem = new Neo.UndoItem();
 	undoItem.x = 0;
 	undoItem.y = 0;
