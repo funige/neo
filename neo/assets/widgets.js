@@ -1,9 +1,9 @@
 'use strict';
 
 /*
--------------------------------------------------------------------------
-	Button
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Button
+  -------------------------------------------------------------------------
 */
 
 Neo.Button = function() {};
@@ -16,16 +16,16 @@ Neo.Button.prototype.init = function(name, params) {
     
     var ref = this;
     if (window.PointerEvent) {
-	this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
-	this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
-	this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
-	this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+        this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
+        this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
+        this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
+        this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
 
     } else {
-	this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-	this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+        this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+        this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+        this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+        this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
     }
     this.element.className = (!this.params.type == 'fill') ? "button" : "buttonOff";
 
@@ -76,9 +76,9 @@ Neo.Button.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	ColorTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    ColorTip
+  -------------------------------------------------------------------------
 */
 
 Neo.colorTips = [];
@@ -94,16 +94,16 @@ Neo.ColorTip.prototype.init = function(name, params) {
 
     var ref = this;
     if (window.PointerEvent) {
-	this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
-	this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
-	this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
-	this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+        this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
+        this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
+        this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
+        this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
 
     } else {
-	this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-	this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+        this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+        this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+        this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+        this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
     }
     this.element.className = "colorTipOff";
 
@@ -179,9 +179,9 @@ Neo.ColorTip.getCurrent = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	ToolTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    ToolTip
+  -------------------------------------------------------------------------
 */
 
 Neo.toolTips = [];
@@ -202,16 +202,16 @@ Neo.ToolTip.prototype.init = function(name, params) {
 
     var ref = this;
     if (window.PointerEvent) {
-	this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
-	this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
-	this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
-	this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+        this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
+        this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
+        this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
+        this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
 
     } else {
-	this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-	this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-	this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-	this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+        this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+        this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+        this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+        this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
     }
     this.selected = (this.params.type == "pen") ? true : false;
     this.setSelected(this.selected);
@@ -349,9 +349,9 @@ Neo.ToolTip.text = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAA
 Neo.ToolTip.tone = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAO0lEQVRIx+3PIQ4AMAgEwaP//zNVVZUELiQ7CgWstFy8IaVsPhT1Lb/T+fQEAtwIcCPAjQC39QEAgJIL6DQCFhAqsRkAAAAASUVORK5CYII=";
 
 /*
--------------------------------------------------------------------------
-	PenTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    PenTip
+  -------------------------------------------------------------------------
 */
 
 Neo.penTip;
@@ -387,9 +387,9 @@ Neo.PenTip.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Pen2Tip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Pen2Tip
+  -------------------------------------------------------------------------
 */
 
 Neo.pen2Tip;
@@ -402,7 +402,7 @@ Neo.Pen2Tip.prototype.toolStrings = ["トーン",
                                      "覆い焼き", 
                                      "焼き込み"]; 
 Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE, 
-                              Neo.Painter.TOOLTYPE_BLUR,
+                               Neo.Painter.TOOLTYPE_BLUR,
                                Neo.Painter.TOOLTYPE_DODGE,
                                Neo.Painter.TOOLTYPE_BURN];
 
@@ -473,9 +473,9 @@ Neo.Pen2Tip.prototype.drawTone = function() {
 
 
 /*
--------------------------------------------------------------------------
-	EraserTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    EraserTip
+  -------------------------------------------------------------------------
 */
 
 Neo.eraserTip;
@@ -519,9 +519,9 @@ Neo.EraserTip.prototype.draw = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	EffectTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    EffectTip
+  -------------------------------------------------------------------------
 */
 
 Neo.effectTip;
@@ -557,9 +557,9 @@ Neo.EffectTip.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Effect2Tip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Effect2Tip
+  -------------------------------------------------------------------------
 */
 
 Neo.effect2Tip;
@@ -605,9 +605,9 @@ Neo.Effect2Tip.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	MaskTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    MaskTip
+  -------------------------------------------------------------------------
 */
 
 Neo.maskTip;
@@ -655,9 +655,9 @@ Neo.MaskTip.prototype.draw = function(c) {
 };
 
 /*
--------------------------------------------------------------------------
-	DrawTip
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    DrawTip
+  -------------------------------------------------------------------------
 */
 
 Neo.drawTip;
@@ -702,9 +702,9 @@ Neo.DrawTip.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	ColorSlider
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    ColorSlider
+  -------------------------------------------------------------------------
 */
 
 Neo.sliders = [];
@@ -763,6 +763,7 @@ Neo.ColorSlider.prototype.downHandler = function(x, y) {
 
 Neo.ColorSlider.prototype.moveHandler = function(x, y) {
     this.slide(x, y);
+    event.preventDefault();
 };
 
 Neo.ColorSlider.prototype.upHandler = function(x, y) {
@@ -826,15 +827,15 @@ Neo.ColorSlider.prototype.slide = function(x, y) {
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
-	var color = (r<<16 | g<<8 | b);
+        var color = (r<<16 | g<<8 | b);
 
-	var colorTip = Neo.ColorTip.getCurrent()
-	if (colorTip) {
-	    colorTip.setColor(Neo.painter.getColorString(color))
-	}
+        var colorTip = Neo.ColorTip.getCurrent()
+        if (colorTip) {
+            colorTip.setColor(Neo.painter.getColorString(color))
+        }
 
         Neo.painter.setColor(color);
-//      Neo.updateUIColor(true, true);
+        //      Neo.updateUIColor(true, true);
     }
 };
 
@@ -857,9 +858,9 @@ Neo.ColorSlider.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	SizeSlider
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    SizeSlider
+  -------------------------------------------------------------------------
 */
 
 Neo.SizeSlider = function() {};
@@ -898,6 +899,7 @@ Neo.SizeSlider.prototype.downHandler = function(x, y) {
 
 Neo.SizeSlider.prototype.moveHandler = function(x, y) {
     this.slide(x, y);
+    event.preventDefault();
 };
 
 Neo.SizeSlider.prototype.upHandler = function(x, y) {
@@ -973,9 +975,9 @@ Neo.SizeSlider.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	LayerControl
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    LayerControl
+  -------------------------------------------------------------------------
 */
 
 Neo.LayerControl = function() {};
@@ -1032,9 +1034,9 @@ Neo.LayerControl.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	ReserveControl
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    ReserveControl
+  -------------------------------------------------------------------------
 */
 Neo.reserveControls = [];
 
@@ -1060,7 +1062,7 @@ Neo.ReserveControl.prototype.init = function(name, params) {
     Neo.reserveControls.push(this);
     return this;
 };
-  
+
 Neo.ReserveControl.prototype._mouseDownHandler = function(e) {
     if (e.button == 2 || e.ctrlKey || e.altKey) {
         this.save();
@@ -1101,9 +1103,9 @@ Neo.ReserveControl.prototype.update = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	ScrollBarButton
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    ScrollBarButton
+  -------------------------------------------------------------------------
 */
 
 Neo.scrollH;

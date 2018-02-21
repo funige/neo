@@ -103,7 +103,7 @@ Neo.init2 = function() {
     }
 
     window.addEventListener("beforeunload", function(e) { 
-	if (!Neo.uploaded) {
+        if (!Neo.uploaded) {
             Neo.painter.saveSession();
         } else {
             Neo.painter.clearSession();
@@ -416,10 +416,10 @@ Neo.start = function(isApp) {
             ipc.sendToHost('neo-status', 'ok');
 
         } else {
-	  if (document.paintBBSCallback) {
-	    document.paintBBSCallback('start');
-	  }
-	}
+            if (document.paintBBSCallback) {
+                document.paintBBSCallback('start');
+            }
+        }
     }
 };
 
@@ -451,12 +451,12 @@ Neo.showWarning = function() {
     if (futaba || samplebbs) {
         if (ms || (edge && edge < 15)) {
             str = "このブラウザでは<br>投稿に失敗することがあります<br>";
-	}
+        }
     }
 
     // もし<PARAM NAME="neo_warning" VALUE="...">があれば表示する
     if (Neo.config.neo_warning) {
-	str += Neo.config.neo_warning;
+        str += Neo.config.neo_warning;
     }
 
     var warning = document.getElementById("neoWarning")
@@ -465,9 +465,9 @@ Neo.showWarning = function() {
 };
 
 /*
------------------------------------------------------------------------
-UIの更新
------------------------------------------------------------------------
+  -----------------------------------------------------------------------
+    UIの更新
+  -----------------------------------------------------------------------
 */
 
 Neo.updateUI = function() {
@@ -513,9 +513,9 @@ Neo.updateUIColor = function(updateSlider, updateColorTip) {
 };
 
 /*
------------------------------------------------------------------------
-リサイズ対応
------------------------------------------------------------------------
+  -----------------------------------------------------------------------
+    リサイズ対応
+  -----------------------------------------------------------------------
 */
 
 Neo.updateWindow = function() {
@@ -575,9 +575,9 @@ Neo.resizeCanvas = function() {
 };
 
 /*
------------------------------------------------------------------------
-投稿
------------------------------------------------------------------------
+  -----------------------------------------------------------------------
+    投稿
+  -----------------------------------------------------------------------
 */
 
 Neo.clone = function(src) {
@@ -601,7 +601,7 @@ Neo.openURL = function(url) {
         require('electron').shell.openExternal(url);
 
     } else {
-	window.open(url, '_blank');
+        window.open(url, '_blank');
     }
 };
 
@@ -616,10 +616,10 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
             return;
         }
 
-	result = document.paintBBSCallback('header')
-	if (result && typeof result == "string") {
-	    headerString == result;
-	}
+        result = document.paintBBSCallback('header')
+        if (result && typeof result == "string") {
+            headerString == result;
+        }
     }
     if (!headerString) headerString = Neo.config.send_header || "";
 
@@ -706,9 +706,9 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
 };
 
 /*
------------------------------------------------------------------------
-LiveConnect
------------------------------------------------------------------------
+  -----------------------------------------------------------------------
+    LiveConnect
+  -----------------------------------------------------------------------
 */
 
 Neo.getColors = function() {
@@ -716,10 +716,10 @@ Neo.getColors = function() {
     console.log("defaultColors==", Neo.config.colors.join('\n'));
     var array = []
     for (var i = 0; i < 14; i++) {
-	array.push(Neo.colorTips[i].color)
+        array.push(Neo.colorTips[i].color)
     }
     return array.join('\n');
-//  return Neo.config.colors.join('\n');
+    //  return Neo.config.colors.join('\n');
 };
 
 Neo.setColors = function(colors) {
@@ -740,9 +740,9 @@ Neo.pExit = function() {
 Neo.str_header = "";
 
 /*
------------------------------------------------------------------------
-DOMツリーの作成
------------------------------------------------------------------------
+  -----------------------------------------------------------------------
+    DOMツリーの作成
+  -----------------------------------------------------------------------
 */
 
 Neo.createContainer = function(applet) {
@@ -754,79 +754,79 @@ Neo.createContainer = function(applet) {
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
 <div id="pageView" style="width:450px; height:470px; margin:auto;">
-    <div id="container" style="visibility:hidden;">
-        <div id="center">
-            <div id="painterContainer">
-                <div id="painterWrapper">
-                    <div id="upper">
-                        <div id="redo">やり直し</div>
-                        <div id="undo">元に戻す</div>
-                        <div id="fill">塗り潰し</div>
-                    </div>
-                    <div id="painter">
-                        <div id="canvas">
-                            <div id="scrollH"></div>
-                            <div id="scrollV"></div>
-                            <div id="zoomPlusWrapper">
-                                <div id="zoomPlus">+</div>
-                            </div>
-                            <div id="zoomMinusWrapper">
-                                <div id="zoomMinus">-</div>
-                            </div>
-                            <div id="neoWarning"></div>
-                        </div>
-                    </div>
-                    <div id="lower">
-                    </div>
-                </div>
-                <div id="toolsWrapper">
-                    <div id="tools">
-                        <div id="toolSet">
-                            <div id="pen"></div>
-                            <div id="pen2"></div>
-                            <div id="effect"></div>
-                            <div id="effect2"></div>
-                            <div id="eraser"></div>
-                            <div id="draw"></div>
-                            <div id="mask"></div>
+<div id="container" style="visibility:hidden;">
+<div id="center">
+<div id="painterContainer">
+<div id="painterWrapper">
+<div id="upper">
+<div id="redo">やり直し</div>
+<div id="undo">元に戻す</div>
+<div id="fill">塗り潰し</div>
+</div>
+<div id="painter">
+<div id="canvas">
+<div id="scrollH"></div>
+<div id="scrollV"></div>
+<div id="zoomPlusWrapper">
+<div id="zoomPlus">+</div>
+</div>
+<div id="zoomMinusWrapper">
+<div id="zoomMinus">-</div>
+</div>
+<div id="neoWarning"></div>
+</div>
+</div>
+<div id="lower">
+</div>
+</div>
+<div id="toolsWrapper">
+<div id="tools">
+<div id="toolSet">
+<div id="pen"></div>
+<div id="pen2"></div>
+<div id="effect"></div>
+<div id="effect2"></div>
+<div id="eraser"></div>
+<div id="draw"></div>
+<div id="mask"></div>
 
-                            <div class="colorTips">
-                                <div id="color2"></div><div id="color1"></div><br>
-                                <div id="color4"></div><div id="color3"></div><br>
-                                <div id="color6"></div><div id="color5"></div><br>
-                                <div id="color8"></div><div id="color7"></div><br>
-                                <div id="color10"></div><div id="color9"></div><br>
-                                <div id="color12"></div><div id="color11"></div><br>
-                                <div id="color14"></div><div id="color13"></div>
-                            </div>
+<div class="colorTips">
+<div id="color2"></div><div id="color1"></div><br>
+<div id="color4"></div><div id="color3"></div><br>
+<div id="color6"></div><div id="color5"></div><br>
+<div id="color8"></div><div id="color7"></div><br>
+<div id="color10"></div><div id="color9"></div><br>
+<div id="color12"></div><div id="color11"></div><br>
+<div id="color14"></div><div id="color13"></div>
+</div>
 
-                            <div id="sliderRed"></div>
-                            <div id="sliderGreen"></div>
-                            <div id="sliderBlue"></div>
-                            <div id="sliderAlpha"></div>
-                            <div id="sliderSize"></div>
+<div id="sliderRed"></div>
+<div id="sliderGreen"></div>
+<div id="sliderBlue"></div>
+<div id="sliderAlpha"></div>
+<div id="sliderSize"></div>
 
-                            <div class="reserveControl" style="margin-top:4px;">
-                                <div id="reserve1"></div>
-                                <div id="reserve2"></div>
-                                <div id="reserve3"></div>
-                            </div>
-                            <div id="layerControl" style="margin-top:6px;"></div>
+<div class="reserveControl" style="margin-top:4px;">
+<div id="reserve1"></div>
+<div id="reserve2"></div>
+<div id="reserve3"></div>
+</div>
+<div id="layerControl" style="margin-top:6px;"></div>
 
-                            <!--<div id="toolPad" style="height:20px;"></div>-->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="headerButtons">
-            <div id="window">窓</div>
-        </div>
-        <div id="footerButtons">
-            <div id="submit">投稿</div>
-            <div id="copyright">(C)しぃちゃん PaintBBS NEO</div>
-        </div>
-    </div>
+<!--<div id="toolPad" style="height:20px;"></div>-->
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="headerButtons">
+<div id="window">窓</div>
+</div>
+<div id="footerButtons">
+<div id="submit">投稿</div>
+<div id="copyright">(C)しぃちゃん PaintBBS NEO</div>
+</div>
+</div>
 </div>
 
 <div id="windowView" style="display: none;">
@@ -834,13 +834,13 @@ Neo.createContainer = function(applet) {
 </div>
 
 
-*/}).toString().match(/\/\*([^]*)\*\//)[1];
+                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
 
     var parent = applet.parentNode;
     parent.appendChild(neo);
     parent.insertBefore(neo, applet);
 
-//  applet.style.display = "none";
+    //  applet.style.display = "none";
 
     // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
     setTimeout(function() {

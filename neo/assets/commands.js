@@ -7,14 +7,14 @@ Neo.CommandBase.prototype.execute = function() {}
 
 
 /*
----------------------------------------------------
-	ZOOM
----------------------------------------------------
+  ---------------------------------------------------
+    ZOOM
+  ---------------------------------------------------
 */
 Neo.ZoomPlusCommand = function(data) {this.data = data};
 Neo.ZoomPlusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomPlusCommand.prototype.execute = function() {
-	if (this.data.zoom < 12) {
+    if (this.data.zoom < 12) {
         this.data.setZoom(this.data.zoom + 1);
     }
     Neo.resizeCanvas();
@@ -24,7 +24,7 @@ Neo.ZoomPlusCommand.prototype.execute = function() {
 Neo.ZoomMinusCommand = function(data) {this.data = data};
 Neo.ZoomMinusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomMinusCommand.prototype.execute = function() {
-	if (this.data.zoom >= 2) {
+    if (this.data.zoom >= 2) {
         this.data.setZoom(this.data.zoom - 1);
     }
     Neo.resizeCanvas();
@@ -32,28 +32,21 @@ Neo.ZoomMinusCommand.prototype.execute = function() {
 };
 
 /*
----------------------------------------------------
-	UNDO
----------------------------------------------------
+  ---------------------------------------------------
+    UNDO
+  ---------------------------------------------------
 */
 Neo.UndoCommand = function(data) {this.data = data};
 Neo.UndoCommand.prototype = new Neo.CommandBase();
 Neo.UndoCommand.prototype.execute = function() {
-	this.data.undo();
+    this.data.undo();
 };
 
 Neo.RedoCommand = function(data) {this.data = data};
 Neo.RedoCommand.prototype = new Neo.CommandBase();
 Neo.RedoCommand.prototype.execute = function() {
-	this.data.redo();
+    this.data.redo();
 };
-
-
-/*
----------------------------------------------------
----------------------------------------------------
-*/
-
 
 
 Neo.WindowCommand = function(data) {this.data = data};
@@ -83,8 +76,8 @@ Neo.SubmitCommand.prototype.execute = function() {
 Neo.CopyrightCommand = function(data) {this.data = data};
 Neo.CopyrightCommand.prototype = new Neo.CommandBase();
 Neo.CopyrightCommand.prototype.execute = function() {
-//  var url = "http://hp.vector.co.jp/authors/VA016309/";
-//  if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
+    //  var url = "http://hp.vector.co.jp/authors/VA016309/";
+    //  if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
     var url = "http://github.com/funige/neo/";
     if (confirm("PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？" + "\n")) {
         Neo.openURL(url);

@@ -19,7 +19,6 @@ gulp.task('scripts', function() {
             .pipe(concat('neo.js'))
             .pipe(gulp.dest(jsDest))
             .pipe(rename('PaintBBS.js'))
-            .pipe(gulp.dest('../'))
             .pipe(rename(name + '.js'))
             .pipe(gulp.dest(jsDest))
             .pipe(gulp.dest('../samplebbs'));
@@ -30,7 +29,6 @@ gulp.task('scripts2', function() {
             .pipe(concat('neo.css'))
             .pipe(gulp.dest(jsDest))
             .pipe(rename('PaintBBS.css'))
-            .pipe(gulp.dest('../'))
             .pipe(rename(name + '.css'))
             .pipe(gulp.dest(jsDest))
             .pipe(gulp.dest('../samplebbs'));

@@ -9,8 +9,8 @@ Neo.ToolBase.prototype.kill = function(oe) {}
 Neo.ToolBase.prototype.lineType = Neo.Painter.LINETYPE_NONE;
 
 Neo.ToolBase.prototype.downHandler = function(oe) {
-	this.startX = oe.mouseX;
-	this.startY = oe.mouseY;
+    this.startX = oe.mouseX;
+    this.startY = oe.mouseY;
 };
 
 Neo.ToolBase.prototype.upHandler = function(oe) {
@@ -20,10 +20,10 @@ Neo.ToolBase.prototype.moveHandler = function(oe) {
 };
 
 Neo.ToolBase.prototype.transformForZoom = function(oe) {
-	var ctx = oe.destCanvasCtx;
-	ctx.translate(oe.canvasWidth * 0.5, oe.canvasHeight * 0.5);
-	ctx.scale(oe.zoom, oe.zoom);
-	ctx.translate(-oe.zoomX, -oe.zoomY);
+    var ctx = oe.destCanvasCtx;
+    ctx.translate(oe.canvasWidth * 0.5, oe.canvasHeight * 0.5);
+    ctx.scale(oe.zoom, oe.zoom);
+    ctx.translate(-oe.zoomX, -oe.zoomY);
 };
 
 Neo.ToolBase.prototype.getType = function() {
@@ -116,9 +116,9 @@ Neo.ToolBase.prototype.saveStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	DrawToolBase（描画ツールのベースクラス）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    DrawToolBase（描画ツールのベースクラス）
+  -------------------------------------------------------------------------
 */
 
 Neo.DrawToolBase = function() {};
@@ -153,7 +153,7 @@ Neo.DrawToolBase.prototype.upHandler = function(oe) {
     }
 };
 
-Neo.DrawToolBase.prototype.moveHandler = function(oe) {	
+Neo.DrawToolBase.prototype.moveHandler = function(oe) { 
     switch (oe.drawType) {
     case Neo.Painter.DRAWTYPE_FREEHAND:
         this.freeHandMoveHandler(oe); break;
@@ -184,10 +184,10 @@ Neo.DrawToolBase.prototype.keyDownHandler = function(e) {
 
 Neo.DrawToolBase.prototype.rollOverHandler= function(oe) {};
 Neo.DrawToolBase.prototype.rollOutHandler= function(oe) {
-	if (!oe.isMouseDown && !oe.isMouseDownRight){
-		oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
-		oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-	}
+    if (!oe.isMouseDown && !oe.isMouseDownRight){
+        oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
+        oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+    }
 };
 
 Neo.DrawToolBase.prototype.loadStates = function() {
@@ -203,13 +203,13 @@ Neo.DrawToolBase.prototype.loadStates = function() {
 /* FreeHand (手書き) */
 
 Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
-	//Register undo first;
-	oe._pushUndo();
+    //Register undo first;
+    oe._pushUndo();
 
     oe.prepareDrawing();
-	this.isUpMove = false;
-	var ctx = oe.canvasCtx[oe.current];
-	if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
+    this.isUpMove = false;
+    var ctx = oe.canvasCtx[oe.current];
+    if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
         oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
@@ -229,7 +229,7 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
 };
 
 Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
-	oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
+    oe.tempCanvasCtx.clearRect(0,0,oe.canvasWidth, oe.canvasHeight);
 
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
@@ -237,18 +237,18 @@ Neo.DrawToolBase.prototype.freeHandUpHandler = function(oe) {
         oe.cursorRect = null;
     }
 
-//	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-//	this.drawCursor(oe);
+    //  oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+    //  this.drawCursor(oe);
     oe.prevLine = null;
 };
 
 Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
-	var ctx = oe.canvasCtx[oe.current];
+    var ctx = oe.canvasCtx[oe.current];
     var x0 = Math.floor(oe.mouseX);
     var y0 = Math.floor(oe.mouseY);
     var x1 = Math.floor(oe.prevMouseX);
     var y1 = Math.floor(oe.prevMouseY);
-	oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
+    oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
 
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
@@ -283,9 +283,9 @@ Neo.DrawToolBase.prototype.drawCursor = function(oe) {
     var r = d * 0.5 * oe.zoom;
 
     if (!(x > -r &&
-	  y > -r &&
-	  x < oe.destCanvas.width + r &&
-	  y < oe.destCanvas.height + r)) return;
+          y > -r &&
+          x < oe.destCanvas.width + r &&
+          y < oe.destCanvas.height + r)) return;
 
     var ctx = oe.destCanvasCtx;
     ctx.save();
@@ -429,15 +429,15 @@ Neo.DrawToolBase.prototype.bezierKeyDownHandler = function(e) {
 
         var oe = Neo.painter;
         oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-	    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
 };
 
 
 Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
     var ctx = oe.destCanvasCtx;
-//  var x = oe.mouseX; //Math.floor(oe.mouseX);
-//  var y = oe.mouseY; //Math.floor(oe.mouseY);
+    //  var x = oe.mouseX; //Math.floor(oe.mouseX);
+    //  var y = oe.mouseY; //Math.floor(oe.mouseY);
     var stab = oe.getStabilized();
     var x = Math.floor(stab[0]);
     var y = Math.floor(stab[1]);
@@ -459,9 +459,9 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
                   this.x3, this.y3, this.lineType);
 
     ctx.save();
-	ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
-	ctx.scale(oe.zoom, oe.zoom);
-	ctx.translate(-oe.zoomX, -oe.zoomY);
+    ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
+    ctx.scale(oe.zoom, oe.zoom);
+    ctx.translate(-oe.zoomX, -oe.zoomY);
     ctx.drawImage(oe.tempCanvas,
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -471,8 +471,8 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function(oe) {
 
 Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
     var ctx = oe.destCanvasCtx;
-//  var x = oe.mouseX; //Math.floor(oe.mouseX);
-//  var y = oe.mouseY; //Math.floor(oe.mouseY);
+    //  var x = oe.mouseX; //Math.floor(oe.mouseX);
+    //  var y = oe.mouseY; //Math.floor(oe.mouseY);
     var stab = oe.getStabilized();
     var x = Math.floor(stab[0]);
     var y = Math.floor(stab[1]);
@@ -497,9 +497,9 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
                   this.x3, this.y3, this.lineType);
 
     ctx.save();
-	ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
-	ctx.scale(oe.zoom, oe.zoom);
-	ctx.translate(-oe.zoomX, -oe.zoomY);
+    ctx.translate(oe.destCanvas.width*.5, oe.destCanvas.height*.5);
+    ctx.scale(oe.zoom, oe.zoom);
+    ctx.translate(-oe.zoomX, -oe.zoomY);
     ctx.drawImage(oe.tempCanvas,
                   0, 0, oe.canvasWidth, oe.canvasHeight,
                   0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -507,9 +507,9 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function(oe) {
 };
 
 /*
--------------------------------------------------------------------------
-	Pen（鉛筆）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Pen（鉛筆）
+  -------------------------------------------------------------------------
 */
 
 Neo.PenTool = function() {};
@@ -527,9 +527,9 @@ Neo.PenTool.prototype.loadStates = function() {
 }
 
 /*
--------------------------------------------------------------------------
-	Brush（水彩）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Brush（水彩）
+  -------------------------------------------------------------------------
 */
 
 Neo.BrushTool = function() {};
@@ -552,9 +552,9 @@ Neo.BrushTool.prototype.getAlpha = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Tone（トーン）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Tone（トーン）
+  -------------------------------------------------------------------------
 */
 
 Neo.ToneTool = function() {};
@@ -572,9 +572,9 @@ Neo.ToneTool.prototype.loadStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Eraser（消しペン）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Eraser（消しペン）
+  -------------------------------------------------------------------------
 */
 
 Neo.EraserTool = function() {};
@@ -584,9 +584,9 @@ Neo.EraserTool.prototype.lineType = Neo.Painter.LINETYPE_ERASER;
 
 
 /*
--------------------------------------------------------------------------
-	Blur（ぼかし）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Blur（ぼかし）
+  -------------------------------------------------------------------------
 */
 
 Neo.BlurTool = function() {};
@@ -604,9 +604,9 @@ Neo.BlurTool.prototype.loadStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Dodge（覆い焼き）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Dodge（覆い焼き）
+  -------------------------------------------------------------------------
 */
 
 Neo.DodgeTool = function() {};
@@ -624,9 +624,9 @@ Neo.DodgeTool.prototype.loadStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Burn（焼き込み）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Burn（焼き込み）
+  -------------------------------------------------------------------------
 */
 
 Neo.BurnTool = function() {};
@@ -644,9 +644,9 @@ Neo.BurnTool.prototype.loadStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Hand（スクロール）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Hand（スクロール）
+  -------------------------------------------------------------------------
 */
 
 Neo.HandTool = function() {};
@@ -656,11 +656,11 @@ Neo.HandTool.prototype.isUpMove = false;
 Neo.HandTool.prototype.reverse = false;
 
 Neo.HandTool.prototype.downHandler = function(oe) {
-	oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-	this.isDrag = true;
-	this.startX = oe.rawMouseX;
-	this.startY = oe.rawMouseY;
+    this.isDrag = true;
+    this.startX = oe.rawMouseX;
+    this.startY = oe.rawMouseY;
 };
 
 Neo.HandTool.prototype.upHandler = function(oe) {
@@ -668,7 +668,7 @@ Neo.HandTool.prototype.upHandler = function(oe) {
     oe.popTool();
 };
 
-Neo.HandTool.prototype.moveHandler = function(oe) {	
+Neo.HandTool.prototype.moveHandler = function(oe) { 
     if (this.isDrag) {
         var dx = this.startX - oe.rawMouseX;
         var dy = this.startY - oe.rawMouseY;
@@ -700,9 +700,9 @@ Neo.HandTool.prototype.upMoveHandler = function(oe) {}
 Neo.HandTool.prototype.rollOverHandler= function(oe) {}
 
 /*
--------------------------------------------------------------------------
-	Slider（色やサイズのスライダを操作している時）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Slider（色やサイズのスライダを操作している時）
+  -------------------------------------------------------------------------
 */
 
 Neo.SliderTool = function() {};
@@ -714,7 +714,7 @@ Neo.SliderTool.prototype.alt = false;
 Neo.SliderTool.prototype.downHandler = function(oe) {
     if (!oe.isShiftDown) this.isDrag = true;
     
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     var rect = this.target.getBoundingClientRect();
     var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
@@ -732,7 +732,7 @@ Neo.SliderTool.prototype.upHandler = function(oe) {
                                       oe.rawMouseY - rect.top);
 };
 
-Neo.SliderTool.prototype.moveHandler = function(oe) {	
+Neo.SliderTool.prototype.moveHandler = function(oe) {   
     if (this.isDrag) {
         var rect = this.target.getBoundingClientRect();
         var sliderType = (this.alt) ? Neo.SLIDERTYPE_SIZE : this.target['data-slider'];
@@ -746,9 +746,9 @@ Neo.SliderTool.prototype.rollOutHandler= function(oe) {};
 Neo.SliderTool.prototype.rollOverHandler= function(oe) {}
 
 /*
--------------------------------------------------------------------------
-	Fill（塗り潰し）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Fill（塗り潰し）
+  -------------------------------------------------------------------------
 */
 
 Neo.FillTool = function() {};
@@ -766,7 +766,7 @@ Neo.FillTool.prototype.downHandler = function(oe) {
 Neo.FillTool.prototype.upHandler = function(oe) {
 };
 
-Neo.FillTool.prototype.moveHandler = function(oe) {	
+Neo.FillTool.prototype.moveHandler = function(oe) { 
 };
 
 Neo.FillTool.prototype.rollOutHandler= function(oe) {};
@@ -775,9 +775,9 @@ Neo.FillTool.prototype.rollOverHandler= function(oe) {}
 
 
 /*
--------------------------------------------------------------------------
-	EraseAll（全消し）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    EraseAll（全消し）
+  -------------------------------------------------------------------------
 */
 
 Neo.EraseAllTool = function() {};
@@ -789,14 +789,14 @@ Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
 
     oe.prepareDrawing();
-	oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
 
 Neo.EraseAllTool.prototype.upHandler = function(oe) {
 };
 
-Neo.EraseAllTool.prototype.moveHandler = function(oe) {	
+Neo.EraseAllTool.prototype.moveHandler = function(oe) { 
 };
 
 Neo.EraseAllTool.prototype.rollOutHandler= function(oe) {};
@@ -805,9 +805,9 @@ Neo.EraseAllTool.prototype.rollOverHandler= function(oe) {};
 
 
 /*
--------------------------------------------------------------------------
-	EffectToolBase（エフェックトツールのベースクラス）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    EffectToolBase（エフェックトツールのベースクラス）
+  -------------------------------------------------------------------------
 */
 
 Neo.EffectToolBase = function() {};
@@ -848,7 +848,7 @@ Neo.EffectToolBase.prototype.upHandler = function(oe) {
     }
     
     if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
-	    oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+        oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
     }
 };
 
@@ -856,8 +856,8 @@ Neo.EffectToolBase.prototype.moveHandler = function(oe) {
     this.endX = oe.clipMouseX;
     this.endY = oe.clipMouseY;
 
-	oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
-	this.drawCursor(oe);
+    oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+    this.drawCursor(oe);
 };
 
 Neo.EffectToolBase.prototype.rollOutHandler= function(oe) {};
@@ -897,9 +897,9 @@ Neo.EffectToolBase.prototype.loadStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	EraseRect（消し四角）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    EraseRect（消し四角）
+  -------------------------------------------------------------------------
 */
 
 Neo.EraseRectTool = function() {};
@@ -913,9 +913,9 @@ Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	FlipH（左右反転）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    FlipH（左右反転）
+  -------------------------------------------------------------------------
 */
 
 Neo.FlipHTool = function() {};
@@ -929,9 +929,9 @@ Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	FlipV（上下反転）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    FlipV（上下反転）
+  -------------------------------------------------------------------------
 */
 
 Neo.FlipVTool = function() {};
@@ -945,9 +945,9 @@ Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	DodgeRect（角取り）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    DodgeRect（角取り）
+  -------------------------------------------------------------------------
 */
 
 Neo.BlurRectTool = function() {};
@@ -970,9 +970,9 @@ Neo.BlurRectTool.prototype.loadStates = function() {
 }
 
 /*
--------------------------------------------------------------------------
-	Turn（傾け）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Turn（傾け）
+  -------------------------------------------------------------------------
 */
 
 Neo.TurnTool = function() {};
@@ -1000,9 +1000,9 @@ Neo.TurnTool.prototype.upHandler = function(oe) {
 };
 
 /*
--------------------------------------------------------------------------
-	Merge（レイヤー結合）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Merge（レイヤー結合）
+  -------------------------------------------------------------------------
 */
 
 Neo.MergeTool = function() {};
@@ -1016,9 +1016,9 @@ Neo.MergeTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	Copy（コピー）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Copy（コピー）
+  -------------------------------------------------------------------------
 */
 
 Neo.CopyTool = function() {};
@@ -1035,9 +1035,9 @@ Neo.CopyTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	Paste（ペースト）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Paste（ペースト）
+  -------------------------------------------------------------------------
 */
 
 Neo.PasteTool = function() {};
@@ -1054,7 +1054,7 @@ Neo.PasteTool.prototype.upHandler = function(oe) {
     oe._pushUndo();
 
     oe.paste(this.x, this.y, this.width, this.height);
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
 };
@@ -1065,14 +1065,14 @@ Neo.PasteTool.prototype.moveHandler = function(oe) {
     oe.tempX = dx;
     oe.tempY = dy;
 
-	oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-//  this.drawCursor(oe);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    //  this.drawCursor(oe);
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function(e) {
     if (e.keyCode == 27) { //Escでキャンセル
         var oe = Neo.painter;
-	    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
         oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
     }
 };
@@ -1095,9 +1095,9 @@ Neo.PasteTool.prototype.drawCursor = function(oe) {
 };
 
 /*
--------------------------------------------------------------------------
-	Rect（線四角）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Rect（線四角）
+  -------------------------------------------------------------------------
 */
 
 Neo.RectTool = function() {};
@@ -1111,9 +1111,9 @@ Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	RectFill（四角）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    RectFill（四角）
+  -------------------------------------------------------------------------
 */
 
 Neo.RectFillTool = function() {};
@@ -1128,9 +1128,9 @@ Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	Ellipse（線楕円）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Ellipse（線楕円）
+  -------------------------------------------------------------------------
 */
 
 Neo.EllipseTool = function() {};
@@ -1144,9 +1144,9 @@ Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	EllipseFill（楕円）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    EllipseFill（楕円）
+  -------------------------------------------------------------------------
 */
 
 Neo.EllipseFillTool = function() {};
@@ -1161,9 +1161,9 @@ Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 };
 
 /*
--------------------------------------------------------------------------
-	Text（テキスト）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Text（テキスト）
+  -------------------------------------------------------------------------
 */
 
 Neo.TextTool = function() {};
@@ -1207,7 +1207,7 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
         if (text) {
             oe._pushUndo();
             this.drawText(oe);
-		    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+            oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
             text.style.display = "none";
             text.blur();
@@ -1243,9 +1243,9 @@ Neo.TextTool.prototype.loadStates = function() {
 };
 
 /*
--------------------------------------------------------------------------
-	Dummy（何もしない時）
--------------------------------------------------------------------------
+  -------------------------------------------------------------------------
+    Dummy（何もしない時）
+  -------------------------------------------------------------------------
 */
 
 Neo.DummyTool = function() {};
