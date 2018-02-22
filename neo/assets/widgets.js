@@ -359,7 +359,9 @@ Neo.penTip;
 Neo.PenTip = function() {};
 Neo.PenTip.prototype = new Neo.ToolTip();
 
-Neo.PenTip.prototype.toolStrings = ["鉛筆", "水彩", "ﾃｷｽﾄ"]; 
+Neo.PenTip.prototype.toolStrings = [Neo.translate("鉛筆"),
+                                    Neo.translate("水彩"),
+                                    Neo.translate("ﾃｷｽﾄ")]; 
 Neo.PenTip.prototype.tools = [Neo.Painter.TOOLTYPE_PEN,
                               Neo.Painter.TOOLTYPE_BRUSH,
                               Neo.Painter.TOOLTYPE_TEXT];
@@ -397,10 +399,10 @@ Neo.pen2Tip;
 Neo.Pen2Tip = function() {};
 Neo.Pen2Tip.prototype = new Neo.ToolTip();
 
-Neo.Pen2Tip.prototype.toolStrings = ["トーン", 
-                                     "ぼかし", 
-                                     "覆い焼き", 
-                                     "焼き込み"]; 
+Neo.Pen2Tip.prototype.toolStrings = [Neo.translate("トーン"),
+                                     Neo.translate("ぼかし"),
+                                     Neo.translate("覆い焼き"),
+                                     Neo.translate("焼き込み")]; 
 Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE, 
                                Neo.Painter.TOOLTYPE_BLUR,
                                Neo.Painter.TOOLTYPE_DODGE,
@@ -483,7 +485,9 @@ Neo.eraserTip;
 Neo.EraserTip = function() {};
 Neo.EraserTip.prototype = new Neo.ToolTip();
 
-Neo.EraserTip.prototype.toolStrings = ["消しペン", "消し四角", "全消し"];
+Neo.EraserTip.prototype.toolStrings = [Neo.translate("消しペン"),
+                                       Neo.translate("消し四角"),
+                                       Neo.translate("全消し")];
 Neo.EraserTip.prototype.tools = [Neo.Painter.TOOLTYPE_ERASER, 
                                  Neo.Painter.TOOLTYPE_ERASERECT,
                                  Neo.Painter.TOOLTYPE_ERASEALL];
@@ -529,7 +533,10 @@ Neo.effectTip;
 Neo.EffectTip = function() {};
 Neo.EffectTip.prototype = new Neo.ToolTip();
 
-Neo.EffectTip.prototype.toolStrings = ["四角", "線四角", "楕円", "線楕円"];
+Neo.EffectTip.prototype.toolStrings = [Neo.translate("四角"),
+                                       Neo.translate("線四角"),
+                                       Neo.translate("楕円"),
+                                       Neo.translate("線楕円")];
 Neo.EffectTip.prototype.tools = [Neo.Painter.TOOLTYPE_RECTFILL,
                                  Neo.Painter.TOOLTYPE_RECT,
                                  Neo.Painter.TOOLTYPE_ELLIPSEFILL,
@@ -567,9 +574,12 @@ Neo.effect2Tip;
 Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
-Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", 
-                                        "角取り", 
-                                        "左右反転", "上下反転", "傾け"];
+Neo.Effect2Tip.prototype.toolStrings = [Neo.translate("コピー"),
+                                        Neo.translate("ﾚｲﾔ結合"),
+                                        Neo.translate("角取り"),
+                                        Neo.translate("左右反転"),
+                                        Neo.translate("上下反転"),
+                                        Neo.translate("傾け")];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_MERGE,
                                   Neo.Painter.TOOLTYPE_BLURRECT,
@@ -615,7 +625,11 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆ﾏｽｸ", "加算", "逆加算"];
+Neo.MaskTip.prototype.toolStrings = [Neo.translate("通常"),
+                                     Neo.translate("マスク"),
+                                     Neo.translate("逆ﾏｽｸ"),
+                                     Neo.translate("加算"),
+                                     Neo.translate("逆加算")];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;
@@ -665,7 +679,9 @@ Neo.drawTip;
 Neo.DrawTip = function() {};
 Neo.DrawTip.prototype = new Neo.ToolTip();
 
-Neo.DrawTip.prototype.toolStrings = ["手書き", "直線", "BZ曲線"];
+Neo.DrawTip.prototype.toolStrings = [Neo.translate("手書き"),
+                                     Neo.translate("直線"),
+                                     Neo.translate("BZ曲線")];
 
 Neo.DrawTip.prototype.hasTintImage = true;
 Neo.DrawTip.prototype.toolIcons = [Neo.ToolTip.freehand, 

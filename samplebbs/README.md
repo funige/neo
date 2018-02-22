@@ -47,13 +47,11 @@ neo.jsとneo.cssの2つのファイルを[/dist](https://github.com/funige/neo/t
     ＊/
 
 の部分をコメントアウトしています。
-POTI-board以外の掲示板スクリプトについては、調べてみないと何とも言えません……。
 
-(2017/05/11)
+POTI-board以外にも幾つか掲示板スクリプトがありますが、詳細は調べてみないと何とも言えません……。
 
-- BBSNote8.0でも設置できるそうです。
-  https://twitter.com/sapniji/status/861930241559642113
-
+- さとぴあさんのBBSNote8.0での設置例  
+  http://stp.sblo.jp/article/182045577.html  
 
 # NEO独自のパラメータについて
 

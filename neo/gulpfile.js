@@ -6,6 +6,7 @@ var fs = require('fs');
 var json = JSON.parse(fs.readFileSync('./package.json'));
 
 var jsFiles = ["assets/container.js",
+	       "assets/dictionary.js",
                "assets/painter.js",
                "assets/tools.js",
                "assets/commands.js",

@@ -96,7 +96,7 @@ Neo.init2 = function() {
     // 描きかけの画像が見つかったとき
     if (sessionStorage.getItem('timestamp')) {
         setTimeout(function () {
-            if (confirm("以前の編集データを復元しますか？")) {
+            if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
                 Neo.painter.loadSession();
             }
         }, 1);
@@ -450,7 +450,7 @@ Neo.showWarning = function() {
     var str = "";
     if (futaba || samplebbs) {
         if (ms || (edge && edge < 15)) {
-            str = "このブラウザでは<br>投稿に失敗することがあります<br>";
+            str = Neo.translate("このブラウザでは<br>投稿に失敗することがあります<br>");
         }
     }
 
@@ -694,14 +694,6 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
         console.log("timeout");
     };
 
-    if (0) { // データのデバッグのため送信するデータをuint8arrayにコピーしておく
-        var fr = new FileReader();
-        fr.onload = function () {
-            var result = fr.result;
-        }
-        fr.readAsArrayBuffer(body);
-    }
-
     request.send(body);
 };
 
@@ -749,7 +741,7 @@ Neo.createContainer = function(applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    neo.innerHTML = (function() {/*
+    var html = (function() {/*
 
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
@@ -759,9 +751,9 @@ Neo.createContainer = function(applet) {
 <div id="painterContainer">
 <div id="painterWrapper">
 <div id="upper">
-<div id="redo">やり直し</div>
-<div id="undo">元に戻す</div>
-<div id="fill">塗り潰し</div>
+<div id="redo">[やり直し]</div>
+<div id="undo">[元に戻す]</div>
+<div id="fill">[塗り潰し]</div>
 </div>
 <div id="painter">
 <div id="canvas">
@@ -820,11 +812,11 @@ Neo.createContainer = function(applet) {
 </div>
 </div>
 <div id="headerButtons">
-<div id="window">窓</div>
+<div id="window">[窓]</div>
 </div>
 <div id="footerButtons">
-<div id="submit">投稿</div>
-<div id="copyright">(C)しぃちゃん PaintBBS NEO</div>
+<div id="submit">[投稿]</div>
+<div id="copyright">[(C)しぃちゃん PaintBBS NEO]</div>
 </div>
 </div>
 </div>
@@ -836,6 +828,10 @@ Neo.createContainer = function(applet) {
 
                                  */}).toString().match(/\/\*([^]*)\*\//)[1];
 
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+	return Neo.translate(str)
+    })
+    
     var parent = applet.parentNode;
     parent.appendChild(neo);
     parent.insertBefore(neo, applet);

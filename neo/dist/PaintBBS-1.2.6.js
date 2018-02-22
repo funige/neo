@@ -96,7 +96,7 @@ Neo.init2 = function() {
     // 描きかけの画像が見つかったとき
     if (sessionStorage.getItem('timestamp')) {
         setTimeout(function () {
-            if (confirm("以前の編集データを復元しますか？")) {
+            if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
                 Neo.painter.loadSession();
             }
         }, 1);
@@ -450,7 +450,7 @@ Neo.showWarning = function() {
     var str = "";
     if (futaba || samplebbs) {
         if (ms || (edge && edge < 15)) {
-            str = "このブラウザでは<br>投稿に失敗することがあります<br>";
+            str = Neo.translate("このブラウザでは<br>投稿に失敗することがあります<br>");
         }
     }
 
@@ -694,14 +694,6 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
         console.log("timeout");
     };
 
-    if (0) { // データのデバッグのため送信するデータをuint8arrayにコピーしておく
-        var fr = new FileReader();
-        fr.onload = function () {
-            var result = fr.result;
-        }
-        fr.readAsArrayBuffer(body);
-    }
-
     request.send(body);
 };
 
@@ -749,7 +741,7 @@ Neo.createContainer = function(applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    neo.innerHTML = (function() {/*
+    var html = (function() {/*
 
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
@@ -759,9 +751,9 @@ Neo.createContainer = function(applet) {
 <div id="painterContainer">
 <div id="painterWrapper">
 <div id="upper">
-<div id="redo">やり直し</div>
-<div id="undo">元に戻す</div>
-<div id="fill">塗り潰し</div>
+<div id="redo">[やり直し]</div>
+<div id="undo">[元に戻す]</div>
+<div id="fill">[塗り潰し]</div>
 </div>
 <div id="painter">
 <div id="canvas">
@@ -820,11 +812,11 @@ Neo.createContainer = function(applet) {
 </div>
 </div>
 <div id="headerButtons">
-<div id="window">窓</div>
+<div id="window">[窓]</div>
 </div>
 <div id="footerButtons">
-<div id="submit">投稿</div>
-<div id="copyright">(C)しぃちゃん PaintBBS NEO</div>
+<div id="submit">[投稿]</div>
+<div id="copyright">[(C)しぃちゃん PaintBBS NEO]</div>
 </div>
 </div>
 </div>
@@ -836,6 +828,10 @@ Neo.createContainer = function(applet) {
 
                                  */}).toString().match(/\/\*([^]*)\*\//)[1];
 
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+	return Neo.translate(str)
+    })
+    
     var parent = applet.parentNode;
     parent.appendChild(neo);
     parent.insertBefore(neo, applet);
@@ -853,6 +849,67 @@ Neo.createContainer = function(applet) {
     }, 0);
 };
 
+
+'use strict';
+
+Neo.dictionary = {
+    "ja": {},
+    "en": {
+	"やり直し": "Redo",
+	"元に戻す": "Undo",
+	"塗り潰し": "Paint",
+	"窓": "F　",
+	"投稿": "Send",
+	"(C)しぃちゃん PaintBBS NEO": "(C)shi-chan PaintBBS NEO",
+	"鉛筆": "Solid",
+	"水彩": "WaterC",
+	"ﾃｷｽﾄ": "Text",
+        "トーン": "Tone",
+        "ぼかし": "ShadeOff",
+        "覆い焼き": "HLight",
+        "焼き込み": "Dark",
+        "消しペン": "White",
+        "消し四角": "WhiteRect",
+        "全消し": "Clear",
+        "四角": "Rect",
+        "線四角": "LineRect",
+        "楕円": "Oval",
+        "線楕円": "LineOval",
+        "コピー": "Copy",
+        "ﾚｲﾔ結合": "lay-unif",
+        "角取り": "Antialias",
+        "左右反転": "reverseL",
+        "上下反転": "reverseU",
+        "傾け": "lie",
+        "通常": "Normal",
+        "マスク": "Mask",
+        "逆ﾏｽｸ": "ReMask",
+        "加算": "And",
+        "逆加算": "Div",
+        "手書き": "FreeLine",
+        "直線": "Straight",
+        "BZ曲線": "Bezie",
+        "ページビュー？": "Page view?",
+        "ウィンドウビュー？": "Window view?",
+        "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is a HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
+        "以前の編集データを復元しますか？": "Is former data restored?",
+
+        "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
+    },
+};
+
+Neo.translate = function () {
+    var lang = "en";
+    for (var key in Neo.dictionary) {
+	if (navigator.language.indexOf(key) == 0) {
+	    lang = key;
+	    break;
+	}
+    }
+    return function(string) {
+	return Neo.dictionary[lang][string] || string;
+    }
+}();
 
 'use strict';
 
@@ -4572,12 +4629,12 @@ Neo.WindowCommand = function(data) {this.data = data};
 Neo.WindowCommand.prototype = new Neo.CommandBase();
 Neo.WindowCommand.prototype.execute = function() {
     if (Neo.fullScreen) {
-        if (confirm("ページビュー？")) { 
+        if (confirm(Neo.translate("ページビュー？"))) { 
             Neo.fullScreen = false;
             Neo.updateWindow();
         }
     } else {
-        if (confirm("ウィンドウビュー？")) {
+        if (confirm(Neo.translate("ウィンドウビュー？"))) {
             Neo.fullScreen = true;
             Neo.updateWindow();
         }
@@ -4595,10 +4652,8 @@ Neo.SubmitCommand.prototype.execute = function() {
 Neo.CopyrightCommand = function(data) {this.data = data};
 Neo.CopyrightCommand.prototype = new Neo.CommandBase();
 Neo.CopyrightCommand.prototype.execute = function() {
-    //  var url = "http://hp.vector.co.jp/authors/VA016309/";
-    //  if (confirm(url + "\nしぃちゃんのホームページを表示しますか？")) {
     var url = "http://github.com/funige/neo/";
-    if (confirm("PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？" + "\n")) {
+    if (confirm(Neo.translate("PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？") + "\n")) {
         Neo.openURL(url);
     }
 };
@@ -4964,7 +5019,9 @@ Neo.penTip;
 Neo.PenTip = function() {};
 Neo.PenTip.prototype = new Neo.ToolTip();
 
-Neo.PenTip.prototype.toolStrings = ["鉛筆", "水彩", "ﾃｷｽﾄ"]; 
+Neo.PenTip.prototype.toolStrings = [Neo.translate("鉛筆"),
+                                    Neo.translate("水彩"),
+                                    Neo.translate("ﾃｷｽﾄ")]; 
 Neo.PenTip.prototype.tools = [Neo.Painter.TOOLTYPE_PEN,
                               Neo.Painter.TOOLTYPE_BRUSH,
                               Neo.Painter.TOOLTYPE_TEXT];
@@ -5002,10 +5059,10 @@ Neo.pen2Tip;
 Neo.Pen2Tip = function() {};
 Neo.Pen2Tip.prototype = new Neo.ToolTip();
 
-Neo.Pen2Tip.prototype.toolStrings = ["トーン", 
-                                     "ぼかし", 
-                                     "覆い焼き", 
-                                     "焼き込み"]; 
+Neo.Pen2Tip.prototype.toolStrings = [Neo.translate("トーン"),
+                                     Neo.translate("ぼかし"),
+                                     Neo.translate("覆い焼き"),
+                                     Neo.translate("焼き込み")]; 
 Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE, 
                                Neo.Painter.TOOLTYPE_BLUR,
                                Neo.Painter.TOOLTYPE_DODGE,
@@ -5088,7 +5145,9 @@ Neo.eraserTip;
 Neo.EraserTip = function() {};
 Neo.EraserTip.prototype = new Neo.ToolTip();
 
-Neo.EraserTip.prototype.toolStrings = ["消しペン", "消し四角", "全消し"];
+Neo.EraserTip.prototype.toolStrings = [Neo.translate("消しペン"),
+                                       Neo.translate("消し四角"),
+                                       Neo.translate("全消し")];
 Neo.EraserTip.prototype.tools = [Neo.Painter.TOOLTYPE_ERASER, 
                                  Neo.Painter.TOOLTYPE_ERASERECT,
                                  Neo.Painter.TOOLTYPE_ERASEALL];
@@ -5134,7 +5193,10 @@ Neo.effectTip;
 Neo.EffectTip = function() {};
 Neo.EffectTip.prototype = new Neo.ToolTip();
 
-Neo.EffectTip.prototype.toolStrings = ["四角", "線四角", "楕円", "線楕円"];
+Neo.EffectTip.prototype.toolStrings = [Neo.translate("四角"),
+                                       Neo.translate("線四角"),
+                                       Neo.translate("楕円"),
+                                       Neo.translate("線楕円")];
 Neo.EffectTip.prototype.tools = [Neo.Painter.TOOLTYPE_RECTFILL,
                                  Neo.Painter.TOOLTYPE_RECT,
                                  Neo.Painter.TOOLTYPE_ELLIPSEFILL,
@@ -5172,9 +5234,12 @@ Neo.effect2Tip;
 Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
-Neo.Effect2Tip.prototype.toolStrings = ["コピー", "ﾚｲﾔ結合", 
-                                        "角取り", 
-                                        "左右反転", "上下反転", "傾け"];
+Neo.Effect2Tip.prototype.toolStrings = [Neo.translate("コピー"),
+                                        Neo.translate("ﾚｲﾔ結合"),
+                                        Neo.translate("角取り"),
+                                        Neo.translate("左右反転"),
+                                        Neo.translate("上下反転"),
+                                        Neo.translate("傾け")];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_MERGE,
                                   Neo.Painter.TOOLTYPE_BLURRECT,
@@ -5220,7 +5285,11 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = ["通常", "マスク", "逆ﾏｽｸ", "加算", "逆加算"];
+Neo.MaskTip.prototype.toolStrings = [Neo.translate("通常"),
+                                     Neo.translate("マスク"),
+                                     Neo.translate("逆ﾏｽｸ"),
+                                     Neo.translate("加算"),
+                                     Neo.translate("逆加算")];
 
 Neo.MaskTip.prototype.init = function(name, params) {
     this.fixed = true;
@@ -5270,7 +5339,9 @@ Neo.drawTip;
 Neo.DrawTip = function() {};
 Neo.DrawTip.prototype = new Neo.ToolTip();
 
-Neo.DrawTip.prototype.toolStrings = ["手書き", "直線", "BZ曲線"];
+Neo.DrawTip.prototype.toolStrings = [Neo.translate("手書き"),
+                                     Neo.translate("直線"),
+                                     Neo.translate("BZ曲線")];
 
 Neo.DrawTip.prototype.hasTintImage = true;
 Neo.DrawTip.prototype.toolIcons = [Neo.ToolTip.freehand, 

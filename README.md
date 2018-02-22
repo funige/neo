@@ -28,32 +28,48 @@ http://hp.vector.co.jp/authors/VA016309/
 ## <a name="browser">対応ブラウザ</a>
 
 Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
-  ワコムのタブレットを使用している場合は「デジタルインクを使用する」をオフにしないと  
-  不具合が出ることがあります。Edgeでは全く描けないこともあるようです。  
+  Windowsでワコムのタブレットを使用している場合は「デジタルインクを使用する」をオフにしないと  
+  不具合が出ることがあります
   
   IEはサポート対象外です  
   モバイルブラウザでも一応動くのですが、サポート対象外とします
 
-## <a name="samplebbs">サンプル掲示板</a>
+### [**サンプル掲示板**](http://neo.websozai.jp)  
+動作確認にご利用ください。
 
-サンプルとして[**NEOテスト**](http://neo.websozai.jp)をオープンしました  
-動作確認にご利用ください
+## <a name="append">既存の掲示板にNEOを組み込む</a><small>（管理者向け）</small>
+/samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に書きました。  
+不明な点があれば[サンプル掲示板](http://neo.websozai.jp)で聞いてください
 
-掲示板へのNEOの組み込み方法については、/samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に書きました  
-不明な点があればサンプル掲示板で聞いてください
+## <a name="new">NEOを使った新しい掲示板を作る</a><small>（管理者向け）</small>
+基本的には/samplebbsをそのままレンタルサーバーにコピーすればいいのですが、古いPHP5.6用なのでうまく動かないことがあるようです
+http://neo.websozai.jp/potiboard.php?res=356
 
+PHP7に対応したPOTI-boardはサ骨さんのところで公開されています  
+[POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)
+
+さとぴあさんの記事も参考になるかと思います  
+[POTI-board用テンプレート PINK を配布します。 http://stp.sblo.jp/article/182310034.html](http://stp.sblo.jp/article/182310034.html)
 
 ## <a name="app">Mac/Win用アプリについて</a>
-NEOが入っていない掲示板でも、このアプリを使えばNEOを使うことができます  
-Chrome等のブラウザで描きたい掲示板を開いて、アドレスバーからURLをこのアプリにドラッグドロップしてください。
+このアプリはNEO開発のために作られたものです。もうあまり使うことはないと思いますが  
+NEO非対応の掲示板に投稿テストをすることができます  
+
+### インストール方法
 
 1. neo-darwin-x64.zip(Mac)または  
 neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する  
 
 2. 実行ファイル (neo.app または neo.exe) をダブルクリック
 
+ブラウザで描きたい掲示板を開いてから、アドレスバーのURLをこのアプリにドラッグドロップしてください
 
 ## <a name="history">履歴</a>
+
+#### ver1.2.6 (2018/02/22)
+- 既にNEOが組み込まれている掲示板をアプリ版のNEOで開いた時は二重起動の警告を表示するようにしました
+- モバイルでスライダを動かすと全体がスクロールしてしまうバグを修正
+- 日本語以外の環境ではメッセージを英語で表示するように修正
 
 #### ver1.2.3 (2017/12/31)
 - Safari(iOS、MacOS)でキャンバスの右端や下端の描画がおかしくなるバグを修正。
