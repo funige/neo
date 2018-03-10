@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.2.6";
+Neo.version = "1.2.7";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -67,8 +67,8 @@ Neo.init = function() {
         var name = applet.attributes.name.value;
         if (name == "paintbbs") {
             Neo.applet = applet;
-            Neo.createContainer(applet);
             Neo.initConfig(applet);
+            Neo.createContainer(applet);
             Neo.init2();
         }
     }
@@ -127,6 +127,8 @@ Neo.initConfig = function(applet) {
             if (p.name == "image_width") Neo.config.width = parseInt(p.value);
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
+
+        //Neo.config.neo_alt_english = "true";
 
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
@@ -238,6 +240,14 @@ Neo.initSkin = function() {
     Neo.addRule(".NEO .reserveControl", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
     Neo.addRule(".NEO .layerControl", "box-shadow", "0 0 0 1px " + Neo.config.tool_color_frame);
     Neo.addRule(".NEO .reserveControl .reserve", "border", "1px solid " + Neo.config.tool_color_frame);
+
+    if (navigator.language.indexOf("ja") != 0) {
+        var labels = ["Fixed", "On", "Off"];
+        for (var i = 0; i < labels.length; i++) {
+            var selector = ".NEO .toolTip" + labels[i] + " .label";
+            Neo.addRule(selector, "letter-spacing", "0px !important");
+        }
+    }
 };
 
 Neo.addRule = function(selector, styleName, value, sheet) {

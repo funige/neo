@@ -27,22 +27,22 @@ http://hp.vector.co.jp/authors/VA016309/
 
 ## <a name="browser">対応ブラウザ</a>
 
-Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
+Chrome/FireFox/Safari/<s>Edge</s>（最近のバージョンのみ）  
   Windowsでワコムのタブレットを使用している場合は「デジタルインクを使用する」をオフにしないと  
   不具合が出ることがあります
-  
+
   IEはサポート対象外です  
   モバイルブラウザでも一応動くのですが、サポート対象外とします
 
 ### [**サンプル掲示板**](http://neo.websozai.jp)  
 動作確認にご利用ください。
 
-## <a name="append">既存の掲示板にNEOを組み込む</a><small>（管理者向け）</small>
+## <a name="append">既存の掲示板にNEOを組み込むには</a><small>（管理者向け）</small>
 /samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に書きました。  
 不明な点があれば[サンプル掲示板](http://neo.websozai.jp)で聞いてください
 
-## <a name="new">NEOを使った新しい掲示板を作る</a><small>（管理者向け）</small>
-基本的には/samplebbsをそのままレンタルサーバーにコピーすればいいのですが、古いPHP5.6用なのでうまく動かないことがあるようです
+## <a name="new">掲示板を新規作成するには</a><small>（管理者向け）</small>
+基本的には/samplebbsの中身をそのままレンタルサーバーにコピーすればいいのですが、古いPHP5.6用なのでうまく動かないことがあるようです
 http://neo.websozai.jp/potiboard.php?res=356
 
 PHP7に対応したPOTI-boardはサ骨さんのところで公開されています  
@@ -52,8 +52,8 @@ PHP7に対応したPOTI-boardはサ骨さんのところで公開されていま
 [POTI-board用テンプレート PINK を配布します。 http://stp.sblo.jp/article/182310034.html](http://stp.sblo.jp/article/182310034.html)
 
 ## <a name="app">Mac/Win用アプリについて</a>
-このアプリはNEO開発のために作られたものです。もうあまり使うことはないと思いますが  
-NEO非対応の掲示板に投稿テストをすることができます  
+Mac/Win用アプリは組み込み用のNEO開発のために作られたものです  
+もうあまり使うことはないと思いますが、NEO非対応の掲示板に投稿するのに使えます
 
 ### インストール方法
 

@@ -359,9 +359,6 @@ Neo.penTip;
 Neo.PenTip = function() {};
 Neo.PenTip.prototype = new Neo.ToolTip();
 
-Neo.PenTip.prototype.toolStrings = [Neo.translate("鉛筆"),
-                                    Neo.translate("水彩"),
-                                    Neo.translate("ﾃｷｽﾄ")]; 
 Neo.PenTip.prototype.tools = [Neo.Painter.TOOLTYPE_PEN,
                               Neo.Painter.TOOLTYPE_BRUSH,
                               Neo.Painter.TOOLTYPE_TEXT];
@@ -372,6 +369,9 @@ Neo.PenTip.prototype.toolIcons = [Neo.ToolTip.pen,
                                   Neo.ToolTip.text];
 
 Neo.PenTip.prototype.init  = function(name, params) {
+    this.toolStrings = [Neo.translate("鉛筆"),
+                        Neo.translate("水彩"),
+                        Neo.translate("ﾃｷｽﾄ")]; 
     this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
@@ -399,10 +399,6 @@ Neo.pen2Tip;
 Neo.Pen2Tip = function() {};
 Neo.Pen2Tip.prototype = new Neo.ToolTip();
 
-Neo.Pen2Tip.prototype.toolStrings = [Neo.translate("トーン"),
-                                     Neo.translate("ぼかし"),
-                                     Neo.translate("覆い焼き"),
-                                     Neo.translate("焼き込み")]; 
 Neo.Pen2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_TONE, 
                                Neo.Painter.TOOLTYPE_BLUR,
                                Neo.Painter.TOOLTYPE_DODGE,
@@ -415,6 +411,11 @@ Neo.Pen2Tip.prototype.toolIcons = [Neo.ToolTip.tone,
                                    Neo.ToolTip.burn];
 
 Neo.Pen2Tip.prototype.init  = function(name, params) {
+    this.toolStrings = [Neo.translate("トーン"),
+                        Neo.translate("ぼかし"),
+                        Neo.translate("覆い焼き"),
+                        Neo.translate("焼き込み")]; 
+
     this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
@@ -485,14 +486,15 @@ Neo.eraserTip;
 Neo.EraserTip = function() {};
 Neo.EraserTip.prototype = new Neo.ToolTip();
 
-Neo.EraserTip.prototype.toolStrings = [Neo.translate("消しペン"),
-                                       Neo.translate("消し四角"),
-                                       Neo.translate("全消し")];
 Neo.EraserTip.prototype.tools = [Neo.Painter.TOOLTYPE_ERASER, 
                                  Neo.Painter.TOOLTYPE_ERASERECT,
                                  Neo.Painter.TOOLTYPE_ERASEALL];
 
 Neo.EraserTip.prototype.init  = function(name, params) {
+    this.toolStrings = [Neo.translate("消しペン"),
+                        Neo.translate("消し四角"),
+                        Neo.translate("全消し")];
+    
     this.drawOnce = false;
     this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
@@ -533,10 +535,6 @@ Neo.effectTip;
 Neo.EffectTip = function() {};
 Neo.EffectTip.prototype = new Neo.ToolTip();
 
-Neo.EffectTip.prototype.toolStrings = [Neo.translate("四角"),
-                                       Neo.translate("線四角"),
-                                       Neo.translate("楕円"),
-                                       Neo.translate("線楕円")];
 Neo.EffectTip.prototype.tools = [Neo.Painter.TOOLTYPE_RECTFILL,
                                  Neo.Painter.TOOLTYPE_RECT,
                                  Neo.Painter.TOOLTYPE_ELLIPSEFILL,
@@ -549,6 +547,11 @@ Neo.EffectTip.prototype.toolIcons = [Neo.ToolTip.rectfill,
                                      Neo.ToolTip.ellipse];
 
 Neo.EffectTip.prototype.init = function(name, params) {
+    this.toolStrings = [Neo.translate("四角"),
+                        Neo.translate("線四角"),
+                        Neo.translate("楕円"),
+                        Neo.translate("線楕円")];
+
     this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
@@ -574,12 +577,6 @@ Neo.effect2Tip;
 Neo.Effect2Tip = function() {};
 Neo.Effect2Tip.prototype = new Neo.ToolTip();
 
-Neo.Effect2Tip.prototype.toolStrings = [Neo.translate("コピー"),
-                                        Neo.translate("ﾚｲﾔ結合"),
-                                        Neo.translate("角取り"),
-                                        Neo.translate("左右反転"),
-                                        Neo.translate("上下反転"),
-                                        Neo.translate("傾け")];
 Neo.Effect2Tip.prototype.tools = [Neo.Painter.TOOLTYPE_COPY,
                                   Neo.Painter.TOOLTYPE_MERGE,
                                   Neo.Painter.TOOLTYPE_BLURRECT,
@@ -596,6 +593,13 @@ Neo.Effect2Tip.prototype.toolIcons = [Neo.ToolTip.copy,
                                       Neo.ToolTip.flip];
 
 Neo.Effect2Tip.prototype.init = function(name, params) {
+    this.toolStrings = [Neo.translate("コピー"),
+                        Neo.translate("ﾚｲﾔ結合"),
+                        Neo.translate("角取り"),
+                        Neo.translate("左右反転"),
+                        Neo.translate("上下反転"),
+                        Neo.translate("傾け")];
+
     this.isTool = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
 
@@ -625,13 +629,13 @@ Neo.maskTip;
 Neo.MaskTip = function() {};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
-Neo.MaskTip.prototype.toolStrings = [Neo.translate("通常"),
-                                     Neo.translate("マスク"),
-                                     Neo.translate("逆ﾏｽｸ"),
-                                     Neo.translate("加算"),
-                                     Neo.translate("逆加算")];
-
 Neo.MaskTip.prototype.init = function(name, params) {
+    this.toolStrings = [Neo.translate("通常"),
+                        Neo.translate("マスク"),
+                        Neo.translate("逆ﾏｽｸ"),
+                        Neo.translate("加算"),
+                        Neo.translate("逆加算")];
+
     this.fixed = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
@@ -679,16 +683,16 @@ Neo.drawTip;
 Neo.DrawTip = function() {};
 Neo.DrawTip.prototype = new Neo.ToolTip();
 
-Neo.DrawTip.prototype.toolStrings = [Neo.translate("手書き"),
-                                     Neo.translate("直線"),
-                                     Neo.translate("BZ曲線")];
-
 Neo.DrawTip.prototype.hasTintImage = true;
 Neo.DrawTip.prototype.toolIcons = [Neo.ToolTip.freehand, 
                                    Neo.ToolTip.line,
                                    Neo.ToolTip.bezier];
 
 Neo.DrawTip.prototype.init = function(name, params) {
+    this.toolStrings = [Neo.translate("手書き"),
+                        Neo.translate("直線"),
+                        Neo.translate("BZ曲線")];
+    
     this.fixed = true;
     Neo.ToolTip.prototype.init.call(this, name, params);
     return this;
@@ -1008,7 +1012,14 @@ Neo.LayerControl.prototype.init = function(name, params) {
     var mousedown = (window.PointerEvent) ? "onpointerdown" : "onmousedown";
     this.element[mousedown] = function(e) { ref._mouseDownHandler(e); }
     this.element.className = "layerControl";
-    this.element.innerHTML = "<div class='bg'></div><div class='label0'>Layer0</div><div class='label1'>Layer1</div><div class='line1'></div><div class='line0'></div>";
+
+    var layerStrings = [Neo.translate("Layer0"),
+                        Neo.translate("Layer1")];
+    
+    this.element.innerHTML =
+        "<div class='bg'></div><div class='label0'>" + layerStrings[0] +
+        "</div><div class='label1'>" + layerStrings[1] +
+        "</div><div class='line1'></div><div class='line0'></div>";
 
     this.bg = this.element.getElementsByClassName('bg')[0];
     this.label0 = this.element.getElementsByClassName('label0')[0];

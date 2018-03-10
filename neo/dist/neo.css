@@ -276,6 +276,8 @@
     border-bottom: 1px solid #ffffff;
 }
 
+
+
 .NEO .toolTipOff canvas,
 .NEO .toolTipOn canvas,
 .NEO .toolTipFixed canvas {
@@ -294,6 +296,7 @@
     font-weight: 100;
     font-family: 'Arial';
     letter-spacing: -1px;
+    overflow: hidden !important;
 }
 
 .NEO .colorTips {
