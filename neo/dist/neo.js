@@ -128,7 +128,8 @@ Neo.initConfig = function(applet) {
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
 
-        //Neo.config.neo_alt_english = "true";
+        var emulationMode = Neo.config.neo_emulation_mode || "2.22";
+        Neo.config.neo_alt_english = emulationMode.slice(-1).match(/x/i);
 
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
@@ -912,7 +913,7 @@ Neo.dictionary = {
 	"塗り潰し": "Fill",
 	"窓": "Float",
 	"投稿": "Send",
-	"(C)しぃちゃん PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
+	"(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
 	"鉛筆": "Solid",
 	"水彩": "WaterCo",
 	"ﾃｷｽﾄ": "Text",

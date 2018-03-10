@@ -128,7 +128,8 @@ Neo.initConfig = function(applet) {
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
 
-        //Neo.config.neo_alt_english = "true";
+        var emulationMode = Neo.config.neo_emulation_mode || "2.22";
+        Neo.config.neo_alt_english = emulationMode.slice(-1).match(/x/i);
 
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
