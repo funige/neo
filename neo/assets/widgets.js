@@ -15,18 +15,19 @@ Neo.Button.prototype.init = function(name, params) {
     this.isMouseDown = false;
     
     var ref = this;
-    if (window.PointerEvent) {
-        this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
-        this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
-        this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
-        this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+    this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+    this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+    this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+    }, true);
+    this.element.addEventListener("touchend", function(e) {
+        ref._mouseUpHandler(e);
+    }, true);
 
-    } else {
-        this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-        this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-        this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-        this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
-    }
+    
     this.element.className = (!this.params.type == 'fill') ? "button" : "buttonOff";
 
     return this;
@@ -93,18 +94,18 @@ Neo.ColorTip.prototype.init = function(name, params) {
     this.isMouseDown = false;
 
     var ref = this;
-    if (window.PointerEvent) {
-        this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
-        this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
-        this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
-        this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+    this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+    this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+    this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+    }, true);
+    this.element.addEventListener("touchend", function(e) {
+        ref._mouseUpHandler(e);
+    }, true);
 
-    } else {
-        this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-        this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-        this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-        this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
-    }
     this.element.className = "colorTipOff";
 
     var index = parseInt(this.name.slice(5)) - 1;
@@ -201,18 +202,18 @@ Neo.ToolTip.prototype.init = function(name, params) {
     this.isMouseDown = false;
 
     var ref = this;
-    if (window.PointerEvent) {
-        this.element.onpointerdown = function(e) { ref._mouseDownHandler(e); }
-        this.element.onpointerup = function(e) { ref._mouseUpHandler(e); }
-        this.element.onpointerover = function(e) { ref._mouseOverHandler(e); }
-        this.element.onpointerout = function(e) { ref._mouseOutHandler(e); }
+    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+    this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
+    this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
+    this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+    }, true);
+    this.element.addEventListener("touchend", function(e) {
+        ref._mouseUpHandler(e);
+    }, true);
 
-    } else {
-        this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
-        this.element.onmouseup = function(e) { ref._mouseUpHandler(e); }
-        this.element.onmouseover = function(e) { ref._mouseOverHandler(e); }
-        this.element.onmouseout = function(e) { ref._mouseOutHandler(e); }
-    }
     this.selected = (this.params.type == "pen") ? true : false;
     this.setSelected(this.selected);
 
@@ -783,7 +784,7 @@ Neo.ColorSlider.prototype.downHandler = function(x, y) {
 
 Neo.ColorSlider.prototype.moveHandler = function(x, y) {
     this.slide(x, y);
-    event.preventDefault();
+    //event.preventDefault();
 };
 
 Neo.ColorSlider.prototype.upHandler = function(x, y) {
@@ -919,7 +920,7 @@ Neo.SizeSlider.prototype.downHandler = function(x, y) {
 
 Neo.SizeSlider.prototype.moveHandler = function(x, y) {
     this.slide(x, y);
-    event.preventDefault();
+    //event.preventDefault();
 };
 
 Neo.SizeSlider.prototype.upHandler = function(x, y) {
@@ -1009,8 +1010,12 @@ Neo.LayerControl.prototype.init = function(name, params) {
 
     var ref = this;
 
-    var mousedown = (window.PointerEvent) ? "onpointerdown" : "onmousedown";
-    this.element[mousedown] = function(e) { ref._mouseDownHandler(e); }
+    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+    }, true);
+
     this.element.className = "layerControl";
 
     var layerStrings = [Neo.translate("Layer0"),
@@ -1075,8 +1080,12 @@ Neo.ReserveControl.prototype.init = function(name, params) {
 
     var ref = this;
 
-    var mousedown = (window.PointerEvent) ? "onpointerdown" : "onmousedown";
-    this.element[mousedown] = function(e) { ref._mouseDownHandler(e); }
+    this.element.onmousedown = function(e) { ref._mouseDownHandler(e); }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+    }, true);
+
     this.element.className = "reserve";
 
     var index = parseInt(this.name.slice(7)) - 1;

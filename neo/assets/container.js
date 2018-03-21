@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.2.7";
+Neo.version = "1.2.8";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -102,7 +102,7 @@ Neo.init2 = function() {
         }, 1);
     }
 
-    window.addEventListener("beforeunload", function(e) { 
+    window.addEventListener("pagehide", function(e) {
         if (!Neo.uploaded) {
             Neo.painter.saveSession();
         } else {
@@ -212,6 +212,7 @@ Neo.initSkin = function() {
     Neo.addRule(".NEO .buttonOff:active, .NEO .buttonOn", "border-left", "1px solid " + darkBorder);
     Neo.addRule(".NEO .buttonOff:active, .NEO .buttonOn", "box-shadow", "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame);
 
+    
     Neo.addRule(".NEO #canvas", "border", "1px solid " + Neo.config.color_frame);
     Neo.addRule(".NEO #scrollH, .NEO #scrollV", "background-color", Neo.config.color_icon);
     Neo.addRule(".NEO #scrollH, .NEO #scrollV", "box-shadow", "0 0 0 1px white" + ", 0 0 0 2px " + Neo.config.color_frame);

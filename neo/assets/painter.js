@@ -52,6 +52,9 @@ Neo.Painter.prototype.isShiftDown = false;
 Neo.Painter.prototype.isCtrlDown = false;
 Neo.Painter.prototype.isAltDown = false;
 
+Neo.Painter.prototype.touchModifier = null;
+
+
 //Neo.Painter.prototype.onUpdateCanvas;
 Neo.Painter.prototype._roundData = [];
 Neo.Painter.prototype._toneData = [];
@@ -254,46 +257,22 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     var container = document.getElementById("container");
 
-    if (0) { //window.PointerEvent) {
-        container.addEventListener("pointerdown", function(e) {
-            ref._mouseDownHandler(e); });
-        container.addEventListener("pointerup", function(e) {
-            ref._mouseUpHandler(e); });
-        container.addEventListener("pointermove", function(e) {
-            ref._mouseMoveHandler(e); });
-        container.addEventListener("pointerover", function(e) {
-            ref._rollOverHandler(e); });
-        container.addEventListener("pointerout", function(e) {
-            ref._rollOutHandler(e); });
+    container.onmousedown = function(e) {ref._mouseDownHandler(e)};
+    container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
+    container.onmouseup = function(e) {ref._mouseUpHandler(e)};
+    container.onmouseover = function(e) {ref._rollOverHandler(e)};
+    container.onmouseout = function(e) {ref._rollOutHandler(e)};
+    container.addEventListener("touchstart", function(e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+    }, true);
+    container.addEventListener("touchmove", function(e) {
+        ref._mouseMoveHandler(e);
+    }, true);
+    container.addEventListener("touchend", function(e) {
+        ref._mouseUpHandler(e);
+    }, true);
 
-        //描画中スクロールさせない
-        container.addEventListener("touchmove", function(e) {
-            e.preventDefault();
-        });
-      
-    } else {
-        container.onmousedown = function(e) {ref._mouseDownHandler(e)};
-        container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
-        container.onmouseup = function(e) {ref._mouseUpHandler(e)};
-        container.onmouseover = function(e) {ref._rollOverHandler(e)};
-        container.onmouseout = function(e) {ref._rollOutHandler(e)};
-
-        container.addEventListener("touchstart", function(e) {
-            ref._mouseDownHandler(e);
-        }, true);
-        container.addEventListener("touchmove", function(e) {
-            ref._mouseMoveHandler(e);
-        }, true);
-        container.addEventListener("touchend", function(e) {
-            ref._mouseUpHandler(e);
-        }, true);
-    }
-    
-    //描画中スクロールさせない
-    //container.addEventListener("touchmove", function(e) {
-    //    e.preventDefault();
-    //});
-    
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
 
@@ -462,11 +441,23 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
+    //console.warn("painter mouse down", e.type, e)
+    
     if (e.target == Neo.painter.destCanvas) {
         //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
         //http://stackoverflow.com/questions/2745028/chrome-sets-cursor-to-text-while-dragging-why    
         e.preventDefault(); 
     }
+
+    /*
+    if (e.target != Neo.painter.destCanvas && e.type == "touchstart") {
+        if (e.touches && e.touches.length == 1) {
+            this.touchModifier = e.touches[0].identifier;
+            //console.warn("[touch modifier on]", this.touchModifier);
+            return;
+        }
+    }
+    */
 
     if (e.button == 2) {
         this.isMouseDownRight = true;
@@ -516,8 +507,10 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         } else if (this.isWidget(e.target)) {
             this.isMouseDown = false;
             this.pushTool(new Neo.DummyTool());
+
         }
     }
+
     this.tool.downHandler(this);
 
     var ref = this;
@@ -527,34 +520,69 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseUpHandler = function(e) {
+    //console.warn("painter mouse up", e.id, e)
     this.isMouseDown = false;
     this.isMouseDownRight = false;
     this.tool.upHandler(this);
     document.onmouseup = undefined;
+
+    if (e.changedTouches) {
+        for (var i = 0; i < e.changedTouches.length; i++) {
+            var touch = e.changedTouches[i];
+            if (touch.identifier == this.touchModifier) {
+                //console.warn("[touch modifier off]")
+                this.touchModifier = null;
+            }
+        }
+    }
 };
 
 Neo.Painter.prototype._mouseMoveHandler = function(e) {
+    //console.warn("painter mouse move", e.id, e)
+
     this._updateMousePosition(e);
 
     if (this.isMouseDown || this.isMouseDownRight) {
         this.tool.moveHandler(this);
+        
     } else {
         if (this.tool.upMoveHandler) {
             this.tool.upMoveHandler(this);
         }
     }
+
     this.prevMouseX = this.mouseX;
     this.prevMouseY = this.mouseY;
-
-    event.preventDefault();
+    //event.preventDefault();
+    e.preventDefault();
 };
 
 
+Neo.Painter.prototype.getPosition = function(e) {
+    if (e.clientX !== undefined) {
+        return {x: e.clientX,
+                y: e.clientY};
+    } else {
+        for (var i = 0; i < e.touches.length; i++) {
+            var touch = e.touches[i];
+            if (!this.touchModifier || this.touchModifier != touch.identifier) {
+                return {x: touch.clientX,
+                        y: touch.clientY};
+            }
+        }
+        console.log("getPosition error");
+        return {x:0, y:0};
+    }
+}
+
 Neo.Painter.prototype._updateMousePosition = function(e) {
     var rect = this.destCanvas.getBoundingClientRect();
-    var x = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
-    var y = (e.clientY !== undefined) ? e.clientY : e.touches[0].clientY;
-
+//  var x = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
+//  var y = (e.clientY !== undefined) ? e.clientY : e.touches[0].clientY;
+    var pos = this.getPosition(e);
+    var x = pos.x;
+    var y = pos.y;
+    
     if (this.zoom <= 0) this.zoom = 1; //なぜか0になることがあるので
 
     this.mouseX = (x - rect.left) / this.zoom 

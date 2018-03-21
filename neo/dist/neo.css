@@ -55,12 +55,15 @@
     padding: 0 55px 0 0;
     position: relative;
 
-    float:right; /* なぜかChrome55でずれるので対策 */
+    float: right; /* なぜかChrome55でずれるので対策 */
 }
 
 .NEO #upper {
+    position: absolute;
+    right: 0;
+
     height:30px;
-    padding-right: 20px;
+    padding-right: 75px; //20px;
     text-align:right;
 }
 
@@ -71,6 +74,8 @@
 .NEO #painter {
     position: relative;
     padding: 20px 20px 20px 20px;
+
+    margin-top: 30px;
 }
 
 .NEO #canvas {

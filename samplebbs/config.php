@@ -105,7 +105,7 @@ define(UNDO_IN_MG, '45');
 define(IMAGE_SIZE, '600');
 
 //PNGの減色率とJPEGの圧縮率
-define(COMPRESS_LEVEL, '15');
+define(COMPRESS_LEVEL, '90');
 
 //初期レイヤー数［しぃペインターのみ］
 //※お絵かき中にレイヤー増やせるのであまり意味無い
@@ -296,7 +296,7 @@ define(THUMB_Q, '75');
 
 //GD2のImageCopyResampledでサムネイルの画質向上 させる:1 させない:0
 //自動判別なので通常は 1 でOK.不具合がある場合のみ 0 にして下さい
-define(RE_SAMPLED, 0);
+define(RE_SAMPLED, 1);
 
 //強制サムネイル機能を使用する する:1 しない:0
 define(FORCED_THUMB, 0);
