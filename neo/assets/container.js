@@ -758,17 +758,17 @@ Neo.createContainer = function(applet) {
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
 <div id="pageView" style="width:450px; height:470px; margin:auto;">
-<div id="container" style="visibility:hidden;">
-<div id="center">
-<div id="painterContainer">
-<div id="painterWrapper">
-<div id="upper">
+<div id="container" style="visibility:hidden;" class="o">
+<div id="center" class="o">
+<div id="painterContainer" class="o">
+<div id="painterWrapper" class="o">
+<div id="upper" class="o">
 <div id="redo">[やり直し]</div>
 <div id="undo">[元に戻す]</div>
 <div id="fill">[塗り潰し]</div>
 </div>
-<div id="painter">
-<div id="canvas">
+<div id="painter" class="o">
+<div id="canvas" class="o">
 <div id="scrollH"></div>
 <div id="scrollV"></div>
 <div id="zoomPlusWrapper">

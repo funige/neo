@@ -758,17 +758,17 @@ Neo.createContainer = function(applet) {
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
 <div id="pageView" style="width:450px; height:470px; margin:auto;">
-<div id="container" style="visibility:hidden;">
-<div id="center">
-<div id="painterContainer">
-<div id="painterWrapper">
-<div id="upper">
+<div id="container" style="visibility:hidden;" class="o">
+<div id="center" class="o">
+<div id="painterContainer" class="o">
+<div id="painterWrapper" class="o">
+<div id="upper" class="o">
 <div id="redo">[やり直し]</div>
 <div id="undo">[元に戻す]</div>
 <div id="fill">[塗り潰し]</div>
 </div>
-<div id="painter">
-<div id="canvas">
+<div id="painter" class="o">
+<div id="canvas" class="o">
 <div id="scrollH"></div>
 <div id="scrollV"></div>
 <div id="zoomPlusWrapper">
@@ -1414,7 +1414,7 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
-    //console.warn("painter mouse down", e.type, e)
+    console.warn(this.getPosition(e));
     
     if (e.target == Neo.painter.destCanvas) {
         //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
@@ -1422,15 +1422,17 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         e.preventDefault(); 
     }
 
-    /*
-    if (e.target != Neo.painter.destCanvas && e.type == "touchstart") {
+    if (e.target.className == "o") {
+        console.log("[outside canvas]", e.target.id)
+    }
+        
+    /*if (e.target != Neo.painter.destCanvas && e.type == "touchstart") {
         if (e.touches && e.touches.length == 1) {
             this.touchModifier = e.touches[0].identifier;
             //console.warn("[touch modifier on]", this.touchModifier);
             return;
         }
-    }
-    */
+    }*/
 
     if (e.button == 2) {
         this.isMouseDownRight = true;
@@ -1493,7 +1495,8 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseUpHandler = function(e) {
-    //console.warn("painter mouse up", e.id, e)
+    console.warn(this.getPosition(e));
+
     this.isMouseDown = false;
     this.isMouseDownRight = false;
     this.tool.upHandler(this);
@@ -1511,11 +1514,10 @@ Neo.Painter.prototype._mouseUpHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseMoveHandler = function(e) {
-    //console.warn("painter mouse move", e.id, e)
-
     this._updateMousePosition(e);
 
     if (this.isMouseDown || this.isMouseDownRight) {
+        console.warn(this.getPosition(e));
         this.tool.moveHandler(this);
         
     } else {
@@ -1533,14 +1535,13 @@ Neo.Painter.prototype._mouseMoveHandler = function(e) {
 
 Neo.Painter.prototype.getPosition = function(e) {
     if (e.clientX !== undefined) {
-        return {x: e.clientX,
-                y: e.clientY};
+        return {x: e.clientX, y: e.clientY, e: e.type};
+
     } else {
         for (var i = 0; i < e.touches.length; i++) {
             var touch = e.touches[i];
             if (!this.touchModifier || this.touchModifier != touch.identifier) {
-                return {x: touch.clientX,
-                        y: touch.clientY};
+                return {x: touch.clientX, y: touch.clientY, e: e.type};
             }
         }
         console.log("getPosition error");
