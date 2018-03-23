@@ -780,7 +780,7 @@ Neo.createContainer = function(applet) {
 <div id="neoWarning"></div>
 </div>
 </div>
-<div id="lower">
+<div id="lower" class="o">
 </div>
 </div>
 <div id="toolsWrapper">

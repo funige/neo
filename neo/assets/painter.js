@@ -264,7 +264,6 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     container.onmouseout = function(e) {ref._rollOutHandler(e)};
     container.addEventListener("touchstart", function(e) {
         ref._mouseDownHandler(e);
-        e.preventDefault();
     }, true);
     container.addEventListener("touchmove", function(e) {
         ref._mouseMoveHandler(e);
@@ -441,25 +440,11 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
-    console.warn(this.getPosition(e));
-    
     if (e.target == Neo.painter.destCanvas) {
         //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
         //http://stackoverflow.com/questions/2745028/chrome-sets-cursor-to-text-while-dragging-why    
         e.preventDefault(); 
     }
-
-    if (e.target.className == "o") {
-        console.log("[outside canvas]", e.target.id)
-    }
-        
-    /*if (e.target != Neo.painter.destCanvas && e.type == "touchstart") {
-        if (e.touches && e.touches.length == 1) {
-            this.touchModifier = e.touches[0].identifier;
-            //console.warn("[touch modifier on]", this.touchModifier);
-            return;
-        }
-    }*/
 
     if (e.button == 2) {
         this.isMouseDownRight = true;
@@ -512,18 +497,15 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
 
         }
     }
-
     this.tool.downHandler(this);
 
-    var ref = this;
-    document.onmouseup = function(e) {
-        ref._mouseUpHandler(e)
-    };
+//  var ref = this;
+//  document.onmouseup = function(e) {
+//      ref._mouseUpHandler(e)
+//  };
 };
 
 Neo.Painter.prototype._mouseUpHandler = function(e) {
-    console.warn(this.getPosition(e));
-
     this.isMouseDown = false;
     this.isMouseDownRight = false;
     this.tool.upHandler(this);
@@ -533,7 +515,6 @@ Neo.Painter.prototype._mouseUpHandler = function(e) {
         for (var i = 0; i < e.changedTouches.length; i++) {
             var touch = e.changedTouches[i];
             if (touch.identifier == this.touchModifier) {
-                //console.warn("[touch modifier off]")
                 this.touchModifier = null;
             }
         }
@@ -544,7 +525,6 @@ Neo.Painter.prototype._mouseMoveHandler = function(e) {
     this._updateMousePosition(e);
 
     if (this.isMouseDown || this.isMouseDownRight) {
-        console.warn(this.getPosition(e));
         this.tool.moveHandler(this);
         
     } else {
@@ -555,8 +535,11 @@ Neo.Painter.prototype._mouseMoveHandler = function(e) {
 
     this.prevMouseX = this.mouseX;
     this.prevMouseY = this.mouseY;
-    //event.preventDefault();
-    e.preventDefault();
+
+    // 画面外をタップした時スクロール可能にするため
+    if (!(e.target.className == "o" && e.type == "touchmove")) {
+        e.preventDefault();
+    }
 };
 
 
@@ -565,8 +548,8 @@ Neo.Painter.prototype.getPosition = function(e) {
         return {x: e.clientX, y: e.clientY, e: e.type};
 
     } else {
-        for (var i = 0; i < e.touches.length; i++) {
-            var touch = e.touches[i];
+        for (var i = 0; i < e.changedTouches.length; i++) {
+            var touch = e.changedTouches[i];
             if (!this.touchModifier || this.touchModifier != touch.identifier) {
                 return {x: touch.clientX, y: touch.clientY, e: e.type};
             }
