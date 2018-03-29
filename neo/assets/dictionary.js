@@ -40,6 +40,7 @@ Neo.dictionary = {
         "ページビュー？": "Page view?",
         "ウィンドウビュー？": "Window view?",
         "以前の編集データを復元しますか？": "Restore session?",
+	"右": "R&nbsp;",
 
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
@@ -84,6 +85,7 @@ Neo.dictionary = {
         "ページビュー？": "Page view?",
         "ウィンドウビュー？": "Window view?",
         "以前の編集データを復元しますか？": "Restore session?",
+	"右": "Right Click",
 
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",

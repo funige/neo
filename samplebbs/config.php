@@ -330,8 +330,8 @@ define(PMAX_W, '500');	//幅
 define(PMAX_H, '500');	//高さ
 
 //お絵描きデフォルトサイズ
-define(PDEF_W, '300');	//幅
-define(PDEF_H, '300');	//高さ
+define(PDEF_W, '400');	//幅
+define(PDEF_H, '400');	//高さ
 
 //描画時間の表示 する:1 しない:0
 define(DSP_PAINTTIME, 0);

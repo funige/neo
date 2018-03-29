@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.2.8";
+Neo.version = "1.2.9";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -359,8 +359,14 @@ Neo.initButtons = function() {
         new Neo.ZoomMinusCommand(Neo.painter).execute();
     };
 
-    Neo.fillButton = new Neo.Button().init("fill", {type:'fill'});
+    //  Neo.fillButton = new Neo.Button().init("fill", {type:'fill'});
+    Neo.fillButton = new Neo.FillButton().init("fill");
+    Neo.rightButton = new Neo.RightButton().init("right");
 
+    if (Neo.isMobile()) {
+        Neo.rightButton.element.style.display = "block";
+    }
+    
     // toolTip
     Neo.penTip = new Neo.PenTip().init("pen");
     Neo.pen2Tip = new Neo.Pen2Tip().init("pen2");
@@ -445,7 +451,11 @@ Neo.isIE = function() {
         ms = true; // This is internet explorer 9 or 11
     }
     return ms
-}
+};
+
+Neo.isMobile = function() {
+    return navigator.userAgent.match(/Android|iPhone|iPad|iPod/i);
+};
 
 Neo.showWarning = function() {
     var futaba = location.hostname.match(/2chan.net/i);
@@ -767,7 +777,7 @@ Neo.createContainer = function(applet) {
 <div id="undo">[元に戻す]</div>
 <div id="fill">[塗り潰し]</div>
 </div>
-<div id="painter" class="o">
+<div id="painter">
 <div id="canvas" class="o">
 <div id="scrollH"></div>
 <div id="scrollV"></div>
@@ -824,7 +834,7 @@ Neo.createContainer = function(applet) {
 </div>
 </div>
 <div id="headerButtons">
-<div id="window">[窓]</div>
+<div id="window">[窓]</div><div id="right" style="display:none;">[右]</div>
 </div>
 <div id="footerButtons">
 <div id="submit">[投稿]</div>

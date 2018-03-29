@@ -52,8 +52,9 @@ Neo.Painter.prototype.isShiftDown = false;
 Neo.Painter.prototype.isCtrlDown = false;
 Neo.Painter.prototype.isAltDown = false;
 
-Neo.Painter.prototype.touchModifier = null;
-
+//Neo.Painter.prototype.touchModifier = null;
+Neo.Painter.prototype.virtualRight = false;
+Neo.Painter.prototype.virtualShift = false;
 
 //Neo.Painter.prototype.onUpdateCanvas;
 Neo.Painter.prototype._roundData = [];
@@ -446,7 +447,7 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         e.preventDefault(); 
     }
 
-    if (e.button == 2) {
+    if (e.button == 2 || this.virtualRight) {
         this.isMouseDownRight = true;
 
     } else {
@@ -497,7 +498,11 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
 
         }
     }
-    this.tool.downHandler(this);
+
+    //console.warn("-" + e.target.id + "-")
+    if (!(e.target.className == "o" && e.type == "touchdown")) {
+        this.tool.downHandler(this);
+    }
 
 //  var ref = this;
 //  document.onmouseup = function(e) {
@@ -511,14 +516,19 @@ Neo.Painter.prototype._mouseUpHandler = function(e) {
     this.tool.upHandler(this);
     document.onmouseup = undefined;
 
-    if (e.changedTouches) {
-        for (var i = 0; i < e.changedTouches.length; i++) {
-            var touch = e.changedTouches[i];
-            if (touch.identifier == this.touchModifier) {
-                this.touchModifier = null;
-            }
-        }
+    if (e.target.id != "right") {
+        this.virtualRight = false;
+        Neo.RightButton.clear();
     }
+    
+//  if (e.changedTouches) {
+//      for (var i = 0; i < e.changedTouches.length; i++) {
+//          var touch = e.changedTouches[i];
+//          if (touch.identifier == this.touchModifier) {
+//              this.touchModifier = null;
+//          }
+//      }
+//  }
 };
 
 Neo.Painter.prototype._mouseMoveHandler = function(e) {
@@ -537,6 +547,7 @@ Neo.Painter.prototype._mouseMoveHandler = function(e) {
     this.prevMouseY = this.mouseY;
 
     // 画面外をタップした時スクロール可能にするため
+    //console.warn("-" + e.target.id + "-")
     if (!(e.target.className == "o" && e.type == "touchmove")) {
         e.preventDefault();
     }
@@ -548,14 +559,17 @@ Neo.Painter.prototype.getPosition = function(e) {
         return {x: e.clientX, y: e.clientY, e: e.type};
 
     } else {
-        for (var i = 0; i < e.changedTouches.length; i++) {
-            var touch = e.changedTouches[i];
-            if (!this.touchModifier || this.touchModifier != touch.identifier) {
-                return {x: touch.clientX, y: touch.clientY, e: e.type};
-            }
-        }
-        console.log("getPosition error");
-        return {x:0, y:0};
+        var touch = e.changedTouches[0];
+        return {x: touch.clientX, y: touch.clientY, e: e.type};
+
+//      for (var i = 0; i < e.changedTouches.length; i++) {
+//          var touch = e.changedTouches[i];
+//          if (!this.touchModifier || this.touchModifier != touch.identifier) {
+//              return {x: touch.clientX, y: touch.clientY, e: e.type};
+//          }
+//      }
+//      console.log("getPosition error");
+//      return {x:0, y:0};
     }
 }
 

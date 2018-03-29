@@ -97,6 +97,8 @@
     left: 5px;
 }
 
+.NEO #right { float: left; margin-left: 4px; }
+.NEO #window { float: left; }
 
 /*
 -----------------------

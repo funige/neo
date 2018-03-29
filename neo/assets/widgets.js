@@ -1,5 +1,15 @@
 'use strict';
 
+Neo.getModifier = function(e) {
+    if (e.shiftKey) {
+        return 'shift';
+
+    } else if (e.button == 2 || e.ctrlKey || e.altKey || Neo.painter.virtualRight) {
+        return 'right';
+    }
+    return null;
+}
+
 /*
   -------------------------------------------------------------------------
     Button
@@ -28,7 +38,7 @@ Neo.Button.prototype.init = function(name, params) {
     }, true);
 
     
-    this.element.className = (!this.params.type == 'fill') ? "button" : "buttonOff";
+    this.element.className = (!this.params.type == "fill") ? "button" : "buttonOff";
 
     return this;
 };
@@ -75,6 +85,66 @@ Neo.Button.prototype.setSelected = function(selected) {
 
 Neo.Button.prototype.update = function() {
 };
+
+/*
+  -------------------------------------------------------------------------
+    Right Button
+  -------------------------------------------------------------------------
+*/
+
+Neo.RightButton;
+
+Neo.RightButton = function() {};
+Neo.RightButton.prototype = new Neo.Button();
+
+Neo.RightButton.prototype.init = function(name, params) {
+    Neo.Button.prototype.init.call(this, name, params);
+    this.params.type = "right";
+    return this;
+}
+
+Neo.RightButton.prototype._mouseDownHandler = function(e) {
+};
+
+Neo.RightButton.prototype._mouseUpHandler = function(e) {
+    this.setSelected(!this.selected)
+};
+
+Neo.RightButton.prototype._mouseOutHandler = function(e) {
+};
+
+Neo.RightButton.prototype.setSelected = function (selected) {
+    if (selected) {
+        this.element.className = "buttonOn";
+        Neo.painter.virtualRight = true;
+    } else {
+        this.element.className = "buttonOff";
+        Neo.painter.virtualRight = false;
+    }
+    this.selected = selected;
+};
+
+Neo.RightButton.clear = function () {
+    var right = Neo.rightButton;
+    right.setSelected(false);
+};
+
+/*
+  -------------------------------------------------------------------------
+    Fill Button
+  -------------------------------------------------------------------------
+*/
+
+Neo.FillButton;
+
+Neo.FillButton = function() {};
+Neo.FillButton.prototype = new Neo.Button();
+
+Neo.FillButton.prototype.init = function(name, params) {
+    Neo.Button.prototype.init.call(this, name, params);
+    this.params.type = "fill";
+    return this;
+}
 
 /*
   -------------------------------------------------------------------------
@@ -128,11 +198,21 @@ Neo.ColorTip.prototype._mouseDownHandler = function(e) {
     for (var i = 0; i < Neo.colorTips.length; i++) {
         var colorTip = Neo.colorTips[i];
         if (this == colorTip) {
-            if (e.shiftKey) {
+            switch (Neo.getModifier(e)) {
+            case 'shift':
                 this.setColor(Neo.config.colors[this.params.index - 1]);
-            } else if (e.button == 2 || e.ctrlKey || e.altKey) {
+                break;
+            case 'right':
                 this.setColor(Neo.painter.foregroundColor);
+                break;
             }
+
+//          if (e.shiftKey) {
+//              this.setColor(Neo.config.colors[this.params.index - 1]);
+//          } else if (e.button == 2 || e.ctrlKey || e.altKey ||
+//                     Neo.painter.virtualRight) {
+//              this.setColor(Neo.painter.foregroundColor);
+//          }
         }
         colorTip.setSelected(this == colorTip) ? true : false;
     }
@@ -237,9 +317,10 @@ Neo.ToolTip.prototype._mouseDownHandler = function(e) {
 
         } else {
             var length = this.toolStrings.length;
-            if (e.button == 2 || e.ctrlKey || e.altKey) {
+            if (Neo.getModifier(e) == "right") {
                 this.mode--;
                 if (this.mode < 0) this.mode = length - 1;
+
             } else {
                 this.mode++;
                 if (this.mode >= length) this.mode = 0;
@@ -645,7 +726,7 @@ Neo.MaskTip.prototype.init = function(name, params) {
 Neo.MaskTip.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
 
-    if (e.button == 2 || e.ctrlKey || e.altKey) {
+    if (Neo.getModifier(e) == "right") {
         Neo.painter.maskColor = Neo.painter.foregroundColor;
 
     } else {
@@ -703,9 +784,11 @@ Neo.DrawTip.prototype._mouseDownHandler = function(e) {
     this.isMouseDown = true;
 
     var length = this.toolStrings.length;
-    if (e.button == 2 || e.ctrlKey || e.altKey) {
+
+    if (Neo.getModifier(e) == "right") {
         this.mode--;
         if (this.mode < 0) this.mode = length - 1;
+
     } else {
         this.mode++;
         if (this.mode >= length) this.mode = 0;
@@ -1041,7 +1124,7 @@ Neo.LayerControl.prototype.init = function(name, params) {
 };
 
 Neo.LayerControl.prototype._mouseDownHandler = function(e) {
-    if (e.button == 2 || e.ctrlKey || e.altKey) {
+    if (Neo.getModifier(e) == "right") {
         var visible = Neo.painter.visible[Neo.painter.current];
         Neo.painter.visible[Neo.painter.current] = (visible) ? false : true;
 
@@ -1100,7 +1183,7 @@ Neo.ReserveControl.prototype.init = function(name, params) {
 };
 
 Neo.ReserveControl.prototype._mouseDownHandler = function(e) {
-    if (e.button == 2 || e.ctrlKey || e.altKey) {
+    if (Neo.getModifier(e) == 'right') {
         this.save();
     } else {
         this.load();
