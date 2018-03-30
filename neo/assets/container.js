@@ -94,7 +94,8 @@ Neo.init2 = function() {
     }
 
     // 描きかけの画像が見つかったとき
-    if (sessionStorage.getItem('timestamp')) {
+    Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
+    if (Neo.storage.getItem('timestamp')) {
         setTimeout(function () {
             if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
                 Neo.painter.loadSession();

@@ -94,7 +94,8 @@ Neo.init2 = function() {
     }
 
     // 描きかけの画像が見つかったとき
-    if (sessionStorage.getItem('timestamp')) {
+    Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
+    if (Neo.storage.getItem('timestamp')) {
         setTimeout(function () {
             if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
                 Neo.painter.loadSession();
@@ -1250,13 +1251,13 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
     container.onmouseout = function(e) {ref._rollOutHandler(e)};
     container.addEventListener("touchstart", function(e) {
         ref._mouseDownHandler(e);
-    }, true);
+    }, false);
     container.addEventListener("touchmove", function(e) {
         ref._mouseMoveHandler(e);
-    }, true);
+    }, false);
     container.addEventListener("touchend", function(e) {
         ref._mouseUpHandler(e);
-    }, true);
+    }, false);
 
     document.onkeydown = function(e) {ref._keyDownHandler(e)};
     document.onkeyup = function(e) {ref._keyUpHandler(e)};
@@ -1499,7 +1500,7 @@ Neo.Painter.prototype._mouseUpHandler = function(e) {
     this.isMouseDown = false;
     this.isMouseDownRight = false;
     this.tool.upHandler(this);
-    document.onmouseup = undefined;
+//  document.onmouseup = undefined;
 
     if (e.target.id != "right") {
         this.virtualRight = false;
@@ -3293,12 +3294,12 @@ Neo.Painter.prototype.loadImage = function (filename) {
 }
 
 Neo.Painter.prototype.loadSession = function (filename) {
-    if (sessionStorage) {
+    if (Neo.storage) {
         var img0 = new Image();
-        img0.src = sessionStorage.getItem('layer0');
+        img0.src = Neo.storage.getItem('layer0');
         img0.onload = function() {
             var img1 = new Image();
-            img1.src = sessionStorage.getItem('layer1');
+            img1.src = Neo.storage.getItem('layer1');
             img1.onload = function() {
                 var oe = Neo.painter;
                 oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3312,18 +3313,18 @@ Neo.Painter.prototype.loadSession = function (filename) {
 };
 
 Neo.Painter.prototype.saveSession = function() {
-    if (sessionStorage) {
-        sessionStorage.setItem('timestamp', +(new Date()));
-        sessionStorage.setItem('layer0', this.canvas[0].toDataURL('image/png'));
-        sessionStorage.setItem('layer1', this.canvas[1].toDataURL('image/png'));
+    if (Neo.storage) {
+        Neo.storage.setItem('timestamp', +(new Date()));
+        Neo.storage.setItem('layer0', this.canvas[0].toDataURL('image/png'));
+        Neo.storage.setItem('layer1', this.canvas[1].toDataURL('image/png'));
     }
 };
 
 Neo.Painter.prototype.clearSession = function() {
-    if (sessionStorage) {
-        sessionStorage.removeItem('timestamp');
-        sessionStorage.removeItem('layer0');
-        sessionStorage.removeItem('layer1');
+    if (Neo.storage) {
+        Neo.storage.removeItem('timestamp');
+        Neo.storage.removeItem('layer0');
+        Neo.storage.removeItem('layer1');
     }
 };
 
