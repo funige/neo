@@ -97,7 +97,6 @@
     left: 5px;
 }
 
-.NEO #right { float: left; margin-left: 4px; }
 .NEO #window { float: left; }
 
 /*
@@ -251,6 +250,8 @@
     font-smoothing: antialiased;
     margin: 1px;
 }
+
+.NEO #right { display: inline-block; float: right; margin-left: 10px; }
 
 .NEO .toolTipOff,
 .NEO .toolTipFixed {

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.2.9";
+Neo.version = "1.3.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -360,7 +360,6 @@ Neo.initButtons = function() {
         new Neo.ZoomMinusCommand(Neo.painter).execute();
     };
 
-    //  Neo.fillButton = new Neo.Button().init("fill", {type:'fill'});
     Neo.fillButton = new Neo.FillButton().init("fill");
     Neo.rightButton = new Neo.RightButton().init("right");
 
@@ -777,9 +776,10 @@ Neo.createContainer = function(applet) {
 <div id="redo">[やり直し]</div>
 <div id="undo">[元に戻す]</div>
 <div id="fill">[塗り潰し]</div>
+<div id="right" style="display:none;">[右]</div>
 </div>
 <div id="painter">
-<div id="canvas" class="o">
+<div id="canvas"> <!-- class="o">-->
 <div id="scrollH"></div>
 <div id="scrollV"></div>
 <div id="zoomPlusWrapper">
@@ -835,7 +835,7 @@ Neo.createContainer = function(applet) {
 </div>
 </div>
 <div id="headerButtons">
-<div id="window">[窓]</div><div id="right" style="display:none;">[右]</div>
+<div id="window">[窓]</div>
 </div>
 <div id="footerButtons">
 <div id="submit">[投稿]</div>

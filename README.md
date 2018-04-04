@@ -25,11 +25,12 @@ http://hp.vector.co.jp/authors/VA016309/
 
 ----
 
-## <a name="browser">対応ブラウザ</a>
+## <a name="browser">対応環境</a>
 
-Chrome/FireFox/Safari/<s>Edge</s>（最近のバージョンのみ）  
+Chrome/FireFox/Safari/<s>Edge</s>（最近のバージョンのみ）
+iOS(Mobile Safari)
   IEはサポート対象外です  
-  モバイルブラウザでも一応動くのですが、サポート対象外とします
+  Androidでも一応動くのですが、サポート対象外とします
 
   Windowsで線がうまく引けない場合は、以下をお試しください
   - Chromeを使う
@@ -69,6 +70,10 @@ neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する
 ブラウザで描きたい掲示板を開いてから、アドレスバーのURLをこのアプリにドラッグドロップしてください
 
 ## <a name="history">履歴</a>
+
+#### ver1.3.0 (2018/04/04)
+- 対応環境にiOS(Mobile Safari)を追加
+- 「右」ボタンの場所を右側に変更
 
 #### ver1.2.9 (2018/03/30)
 - モバイルで画面左上に「右」ボタンが表示されるようになりました

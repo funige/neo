@@ -447,6 +447,8 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         e.preventDefault(); 
     }
 
+    if (e.type == "touchstart" && e.touches.length > 1) return;
+
     if (e.button == 2 || this.virtualRight) {
         this.isMouseDownRight = true;
 
@@ -499,7 +501,7 @@ Neo.Painter.prototype._mouseDownHandler = function(e) {
         }
     }
 
-    //console.warn("-" + e.target.id + "-")
+//  console.warn("down -" + e.target.id + e.target.className)
     if (!(e.target.className == "o" && e.type == "touchdown")) {
         this.tool.downHandler(this);
     }
@@ -534,6 +536,8 @@ Neo.Painter.prototype._mouseUpHandler = function(e) {
 Neo.Painter.prototype._mouseMoveHandler = function(e) {
     this._updateMousePosition(e);
 
+    if (e.type == "touchmove" && e.touches.length > 1) return;
+
     if (this.isMouseDown || this.isMouseDownRight) {
         this.tool.moveHandler(this);
         
@@ -547,7 +551,7 @@ Neo.Painter.prototype._mouseMoveHandler = function(e) {
     this.prevMouseY = this.mouseY;
 
     // 画面外をタップした時スクロール可能にするため
-    //console.warn("-" + e.target.id + "-")
+//  console.warn("move -" + e.target.id + e.target.className)
     if (!(e.target.className == "o" && e.type == "touchmove")) {
         e.preventDefault();
     }
