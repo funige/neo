@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.3.0";
+Neo.version = "1.3.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -315,7 +315,7 @@ Neo.multColor = function(c, scale) {
 Neo.initComponents = function() {
     document.getElementById("copyright").innerHTML += "v" + Neo.version;
 
-    //アプレットのborderの動作をエミュレート
+    // アプレットのborderの動作をエミュレート
     if (navigator.userAgent.search("FireFox") > -1) {
         var container = document.getElementById("container");
         container.addEventListener("mousedown", function(e) {
@@ -326,6 +326,13 @@ Neo.initComponents = function() {
             container.style.borderColor = 'transparent';
         }, false);
     }
+
+    // ドラッグしたまま画面外に移動した時
+    document.addEventListener("mouseup", function(e) {
+        if (Neo.painter && !Neo.painter.isContainer(e.target)) {
+            Neo.painter.cancelTool(e.target);
+        }
+    }, false);
 
     // 投稿に失敗する可能性があるときは警告を表示する
     Neo.showWarning();

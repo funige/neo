@@ -695,9 +695,9 @@ Neo.HandTool.prototype.moveHandler = function(oe) {
     }
 };
 
-Neo.HandTool.prototype.rollOutHandler= function(oe) {};
 Neo.HandTool.prototype.upMoveHandler = function(oe) {}
 Neo.HandTool.prototype.rollOverHandler= function(oe) {}
+Neo.HandTool.prototype.rollOutHandler= function(oe) {};
 
 /*
   -------------------------------------------------------------------------
@@ -742,8 +742,8 @@ Neo.SliderTool.prototype.moveHandler = function(oe) {
 };
 
 Neo.SliderTool.prototype.upMoveHandler = function(oe) {}
-Neo.SliderTool.prototype.rollOutHandler= function(oe) {};
 Neo.SliderTool.prototype.rollOverHandler= function(oe) {}
+Neo.SliderTool.prototype.rollOutHandler= function(oe) {}
 
 /*
   -------------------------------------------------------------------------

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.3.0";
+Neo.version = "1.3.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -4154,8 +4154,11 @@ Neo.SliderTool.prototype.moveHandler = function(oe) {
 };
 
 Neo.SliderTool.prototype.upMoveHandler = function(oe) {}
-Neo.SliderTool.prototype.rollOutHandler= function(oe) {};
 Neo.SliderTool.prototype.rollOverHandler= function(oe) {}
+
+Neo.SliderTool.prototype.rollOutHandler= function(oe) {
+    console.warn("rollout!!")
+};
 
 /*
   -------------------------------------------------------------------------

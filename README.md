@@ -27,8 +27,8 @@ http://hp.vector.co.jp/authors/VA016309/
 
 ## <a name="browser">対応環境</a>
 
-Chrome/FireFox/Safari/<s>Edge</s>（最近のバージョンのみ）
-iOS(Mobile Safari)
+  Chrome/FireFox/Safari/<s>Edge</s>（最近のバージョンのみ）  
+  iOS(Mobile Safari)  
   IEはサポート対象外です  
   Androidでも一応動くのですが、サポート対象外とします
 
@@ -57,19 +57,22 @@ PHP7に対応したPOTI-boardはサ骨さんのところで公開されていま
 [POTI-board用テンプレート PINK を配布します。 http://stp.sblo.jp/article/182310034.html](http://stp.sblo.jp/article/182310034.html)
 
 ## <a name="app">Mac/Win用アプリについて</a>
-Mac/Win用アプリは組み込み用のNEO開発のために作られたものです  
-もうあまり使うことはないと思いますが、NEO非対応の掲示板に投稿するのに使えます
+Mac/Win用アプリはNEO開発のために作られたものです  
+もうあまり使うことはないと思いますが、今でもNEO非対応の掲示板に投稿するのに使えます
 
-### インストール方法
+**インストール方法**
 
 1. neo-darwin-x64.zip(Mac)または  
 neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する  
 
 2. 実行ファイル (neo.app または neo.exe) をダブルクリック
 
-ブラウザで描きたい掲示板を開いてから、アドレスバーのURLをこのアプリにドラッグドロップしてください
+Chrome等のブラウザで描きたい掲示板を開いてから、アドレスバーのURLをこのアプリにドラッグドロップしてください
 
 ## <a name="history">履歴</a>
+
+#### ver1.3.1 (2018/04/16)
+- 画面外にドラッグした時にいろいろ不具合が出ていたのを修正
 
 #### ver1.3.0 (2018/04/04)
 - 対応環境にiOS(Mobile Safari)を追加

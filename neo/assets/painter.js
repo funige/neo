@@ -2299,6 +2299,28 @@ Neo.Painter.prototype.isWidget = function(element) {
     return  false;
 };
 
+Neo.Painter.prototype.isContainer = function(element) {
+    while (1) {
+        if (element == null) break;
+        if (element.id == "container") return true;
+        element = element.parentNode;
+    }
+    return false;
+};
+
+Neo.Painter.prototype.cancelTool = function(e) {
+    if (this.tool) {
+        this.isMouseDown = false;
+        this.tool.upHandler(this);
+       
+//      switch (this.tool.type) {
+//      case Neo.Painter.TOOLTYPE_HAND:
+//      case Neo.Painter.TOOLTYPE_SLIDER:
+//          this.isMouseDown = false;
+//          this.tool.upHandler(this);
+//      }
+    }
+};
 
 Neo.Painter.prototype.loadImage = function (filename) {
     console.log("loadImage " + filename);
@@ -2309,7 +2331,7 @@ Neo.Painter.prototype.loadImage = function (filename) {
         oe.canvasCtx[0].drawImage(img, 0, 0);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     };
-}
+};
 
 Neo.Painter.prototype.loadSession = function (filename) {
     if (Neo.storage) {
