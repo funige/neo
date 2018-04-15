@@ -48,7 +48,7 @@ iOS(Mobile Safari)
 
 ## <a name="new">掲示板を新規作成するには</a><small>（管理者向け）</small>
 基本的には/samplebbsの中身をそのままレンタルサーバーにコピーすればいいのですが、古いPHP5.6用なのでうまく動かないことがあるようです  
-[http://neo.websozai.jp/potiboard.php?res=356](https://github.com/funige/neo/tree/master/samplebbs/log/356.html)
+[http://neo.websozai.jp/potiboard.php?res=356](http://htmlpreview.github.io/?https://github.com/funige/neo/blob/master/samplebbs/log/356.html)
 
 PHP7に対応したPOTI-boardはサ骨さんのところで公開されています  
 [POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)
