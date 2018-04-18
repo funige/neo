@@ -3,7 +3,7 @@
 PaintBBS NEOを使えば、既存のお絵描き掲示板（しぃPaintBBS）にスクリプトを埋め込んで、javaアプレットの代わりにお絵かき機能を提供することができます。
 
 
-#### 1. 基本的には&lt;head>に２行追加するだけです
+#### 1. 基本的には&lt;head>の先頭に（他のスクリプトやcssより前に）２行追加するだけです
 
     <head>
     <link rel="stylesheet" href="neo.css" type="text/css" />
@@ -77,4 +77,24 @@ POTI-board以外にも幾つか掲示板スクリプトがありますが、詳�
 
   とりあえずNEOでは、バージョンに"x"で終わる文字列が指定されたときは  
   "2.04x"の翻訳を使用するようにしてあります。
+
+# スタイルシートによる色の指定
+
+  アプレットの背景やアイコンの色は&lt;applet>のパラメータで&lt;PARAM NAME="color_bk" VALUE="#ffffff">みたいな感じで指定していますが、スタイルシートでも指定できるようにしました。
+
+  優先順位は、（１）paramで指定した色（２）スタイルシートで指定した色（３）デフォルトの色です。
+  
+    .NEO .color_bk           { color: #ccccff; }
+    .NEO .color_bk2          { color: #bbbbff; }
+    .NEO .color_tool_icon    { color: #e8dfae; }
+    .NEO .color_icon         { color: #ccccff; }
+    .NEO .color_iconselect   { color: #ffaaaa; }
+    .NEO .color_text         { color: #666699; }
+    .NEO .color_bar          { color: #6f6fae; }
+
+    .NEO .tool_color_button  { color: #e8dfae; }
+    .NEO .tool_color_button2 { color: #f8daaa; }
+    .NEO .tool_color_text    { color: #773333; }
+    .NEO .tool_color_bar     { color: #ddddff; }
+    .NEO .tool_color_frame   { color: #000000; }
 
