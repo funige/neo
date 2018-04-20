@@ -271,16 +271,18 @@ Neo.applyStyle = function(name, defaultColor) {
         var sheet = document.styleSheets[i];
         var classes = sheet.rules || sheet.cssRules;
         for (var x = 0; x < classes.length; x++) {
-            var selector = classes[x].selectorText.replace(/^(.NEO\s+)?\./, '')
-
-            if (selector == name) {
-                var css = classes[x].cssText || classes[x].style.cssText;
-                var result = css.match(/color:\s*(.*)\s*;/)
-                if (result) {
-                    var hex = Neo.colorNameToHex(result[1]);
-                    if (hex) {
-                        Neo.config[name] = hex;
-                        return;
+            var selector = classes[x].selectorText
+            if (selector) {
+                selector = selector.replace(/^(.NEO\s+)?\./, '')
+                if (selector == name) {
+                    var css = classes[x].cssText || classes[x].style.cssText;
+                    var result = css.match(/color:\s*(.*)\s*;/)
+                    if (result) {
+                        var hex = Neo.colorNameToHex(result[1]);
+                        if (hex) {
+                            Neo.config[name] = hex;
+                            return;
+                        }
                     }
                 }
             }
