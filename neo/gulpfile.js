@@ -17,22 +17,24 @@ var name = json.name + "-" + json.version;
 
 gulp.task('scripts', function() {
     return gulp.src(jsFiles)
-            .pipe(concat('neo.js'))
-            .pipe(gulp.dest(jsDest))
-            .pipe(rename('PaintBBS.js'))
-            .pipe(rename(name + '.js'))
-            .pipe(gulp.dest(jsDest))
-            .pipe(gulp.dest('../samplebbs'));
+        .pipe(concat('neo.js'))
+        .pipe(gulp.dest(jsDest))
+//      .pipe(gulp.dest('/Users/hogere/tmp/nee'))
+        .pipe(rename('PaintBBS.js'))
+        .pipe(rename(name + '.js'))
+        .pipe(gulp.dest(jsDest))
+        .pipe(gulp.dest('../samplebbs'));
 });
 
 gulp.task('scripts2', function() {
     return gulp.src(cssFiles)
-            .pipe(concat('neo.css'))
-            .pipe(gulp.dest(jsDest))
-            .pipe(rename('PaintBBS.css'))
-            .pipe(rename(name + '.css'))
-            .pipe(gulp.dest(jsDest))
-            .pipe(gulp.dest('../samplebbs'));
+        .pipe(concat('neo.css'))
+        .pipe(gulp.dest(jsDest))
+//      .pipe(gulp.dest('/Users/hogere/tmp/nee'))
+        .pipe(rename('PaintBBS.css'))
+        .pipe(rename(name + '.css'))
+        .pipe(gulp.dest(jsDest))
+        .pipe(gulp.dest('../samplebbs'));
 });
 
 gulp.task('default', function() {
