@@ -290,9 +290,7 @@ Neo.applyStyle = function(name, defaultColor) {
                     }
                 }
             }
-        } catch (e) {
-            console.log(sheet)
-        }
+        } catch (e) {}
     }
     Neo.config[name] = defaultColor;
 };
