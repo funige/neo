@@ -19,6 +19,7 @@ Neo.uploaded = false;
 Neo.config = {
     width: 300,
     height: 300,
+
     colors: [ 
         "#000000", "#FFFFFF",
         "#B47575", "#888888",
@@ -117,6 +118,20 @@ Neo.initConfig = function(applet) {
         var emulationMode = Neo.config.neo_emulation_mode || "2.22";
         Neo.config.neo_alt_english = emulationMode.slice(-1).match(/x/i);
 
+        Neo.applyStyle("color_bk", "#ccccff");
+        Neo.applyStyle("color_bk2", "#bbbbff");
+        Neo.applyStyle("color_tool_icon", "#e8dfae");
+        Neo.applyStyle("color_icon", "#ccccff");
+        Neo.applyStyle("color_iconselect", "#ffaaaa");
+        Neo.applyStyle("color_text", "#666699");
+        Neo.applyStyle("color_bar", "#6f6fae");
+
+        Neo.applyStyle("tool_color_button", "#e8dfae");
+        Neo.applyStyle("tool_color_button2", "#f8daaa");
+        Neo.applyStyle("tool_color_text", "#773333");
+        Neo.applyStyle("tool_color_bar", "#ddddff");
+        Neo.applyStyle("tool_color_frame", "#000000");
+
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
         if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
@@ -161,20 +176,6 @@ Neo.initSkin = function() {
     }
 
     Neo.styleSheet = sheet;
-
-    Neo.applyStyle("color_bk", "#ccccff");
-    Neo.applyStyle("color_bk2", "#bbbbff");
-    Neo.applyStyle("color_tool_icon", "#e8dfae");
-    Neo.applyStyle("color_icon", "#ccccff");
-    Neo.applyStyle("color_iconselect", "#ffaaaa");
-    Neo.applyStyle("color_text", "#666699");
-    Neo.applyStyle("color_bar", "#6f6fae");
-
-    Neo.applyStyle("tool_color_button", "#e8dfae");
-    Neo.applyStyle("tool_color_button2", "#f8daaa");
-    Neo.applyStyle("tool_color_text", "#773333");
-    Neo.applyStyle("tool_color_bar", "#ddddff");
-    Neo.applyStyle("tool_color_frame", "#000000");
 
     var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
     var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
