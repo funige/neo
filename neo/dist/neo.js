@@ -118,6 +118,7 @@ Neo.initConfig = function(applet) {
         var emulationMode = Neo.config.neo_emulation_mode || "2.22";
         Neo.config.neo_alt_english = emulationMode.slice(-1).match(/x/i);
 
+        Neo.readStyles();
         Neo.applyStyle("color_bk", "#ccccff");
         Neo.applyStyle("color_bk2", "#bbbbff");
         Neo.applyStyle("color_tool_icon", "#e8dfae");
@@ -125,7 +126,6 @@ Neo.initConfig = function(applet) {
         Neo.applyStyle("color_iconselect", "#ffaaaa");
         Neo.applyStyle("color_text", "#666699");
         Neo.applyStyle("color_bar", "#6f6fae");
-
         Neo.applyStyle("tool_color_button", "#e8dfae");
         Neo.applyStyle("tool_color_button2", "#f8daaa");
         Neo.applyStyle("tool_color_text", "#773333");
@@ -265,35 +265,44 @@ Neo.addRule = function(selector, styleName, value, sheet) {
     }
 };
 
-Neo.applyStyle = function(name, defaultColor) {
-    if (Neo.config[name] != undefined) return;
-
+Neo.readStyles = function() {
+    Neo.rules = {};
     for (var i = 0; i < document.styleSheets.length; i++) {
-        var sheet = document.styleSheets[i];
+        Neo.readStyle(document.styleSheets[i]);
+    }
+};
 
-        try {
-            var classes = sheet.cssRules;
-            for (var x = 0; x < classes.length; x++) {
-                var selector = classes[x].selectorText
-                if (selector) {
-                    selector = selector.replace(/^(.NEO\s+)?\./, '')
+Neo.readStyle = function(sheet) {
+    try {
+        var rules = sheet.cssRules;
+        for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if (rule.styleSheet) {
+                Neo.readStyle(rule.styleSheet);
+                continue;
+            }
 
-                    if (selector == name) {
-                        var css = classes[x].cssText || classes[x].style.cssText;
-                        var result = css.match(/color:\s*(.*)\s*;/)
-                        if (result) {
-                            var hex = Neo.colorNameToHex(result[1]);
-                            if (hex) {
-                                Neo.config[name] = hex;
-                                return;
-                            }
-                        }
+            var selector = rule.selectorText
+            if (selector) {
+                selector = selector.replace(/^(.NEO\s+)?\./, '')
+
+                var css = rule.cssText || rule.style.cssText;
+                var result = css.match(/color:\s*(.*)\s*;/)
+                if (result) {
+                    var hex = Neo.colorNameToHex(result[1]);
+                    if (hex) {
+                        Neo.rules[selector] = hex;
                     }
                 }
             }
-        } catch (e) {}
+        }
+    } catch (e) {}
+};
+
+Neo.applyStyle = function(name, defaultColor) {
+    if (Neo.config[name] == undefined) {
+        Neo.config[name] = Neo.rules[name] || defaultColor;
     }
-    Neo.config[name] = defaultColor;
 };
 
 Neo.getInheritColor = function(e) {
