@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.3.2";
+Neo.version = "1.3.3";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -115,8 +115,8 @@ Neo.initConfig = function(applet) {
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
 
-        var emulationMode = Neo.config.neo_emulation_mode || "2.22";
-        Neo.config.neo_alt_english = emulationMode.slice(-1).match(/x/i);
+        var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
+        Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
 
         Neo.readStyles();
         Neo.applyStyle("color_bk", "#ccccff");

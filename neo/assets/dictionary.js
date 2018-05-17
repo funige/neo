@@ -90,6 +90,52 @@ Neo.dictionary = {
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
     },
+    "es": {
+	"やり直し": "Rehacer",
+	"元に戻す": "Deshacer",
+	"塗り潰し": "Llenar",
+	"窓": "Ventana",
+	"投稿": "Enviar",
+	"(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
+	"鉛筆": "Lapiz",
+	"水彩": "Acuarela",
+	"ﾃｷｽﾄ": "Texio",
+        "トーン": "Tono",
+        "ぼかし": "Gradacior",
+        "覆い焼き": "Sobreexp.",
+        "焼き込み": "Quemar",
+        "消しペン": "Goma",
+        "消し四角": "Goma",
+        "全消し": "Borrar",
+        "四角": "Cuadrado",
+        "線四角": "Cuadrado",
+        "楕円": "Circuro",
+        "線楕円": "Circuro",
+        "コピー": "Copiar",
+        "ﾚｲﾔ結合": "Unir",
+        "角取り": "Cortar",
+        "左右反転": "Inv.Izq/Der",
+        "上下反転": "Inv.Arr/Aba",
+        "傾け": "Inclinar",
+        "通常": "Normal",
+        "マスク": "Masc.",
+        "逆ﾏｽｸ": "Masc.Inv",
+        "加算": "Adicion",
+        "逆加算": "Subtrac",
+        "手書き": "Libre",
+        "直線": "Linea",
+        "BZ曲線": "Curva",
+        "Layer0": "Capa0",
+        "Layer1": "Capa1",
+        "ページビュー？": "Vista de pagina?",
+        "ウィンドウビュー？": "Vista de ventana?",
+        "以前の編集データを復元しますか？": "Restaurar sesion?",
+	"右": "Clic derecho",
+
+        "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？":
+        "PaintBBS NEO es un puerto para HTML5 de Oekaki Shi-BBS PaintBBS (© 2000-2004 shi-chan). Mostrar la página del proyecto?",
+        "このブラウザでは<br>投稿に失敗することがあります<br>": "Este navegador puede no enviar su imagen.<br>",
+    },
 };
 
 Neo.translate = function () {
@@ -100,9 +146,12 @@ Neo.translate = function () {
 	    break;
 	}
     }
+    
     return function(string) {
-        if (lang == "en" && Neo.config.neo_alt_english) {
-            lang = "enx";
+        if (Neo.config.neo_alt_translation) {
+            if (lang == "en") lang = "enx"
+        } else {
+            if (lang != "ja") lang = "en"
         }
 	return Neo.dictionary[lang][string] || string;
     }
