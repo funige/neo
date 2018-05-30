@@ -1044,7 +1044,7 @@ Neo.dictionary = {
         "覆い焼き": "Sobreexp.",
         "焼き込み": "Quemar",
         "消しペン": "Goma",
-        "消し四角": "Goma",
+        "消し四角": "GomaRect",
         "全消し": "Borrar",
         "四角": "Cuadrado",
         "線四角": "Cuadrado",
@@ -1078,9 +1078,14 @@ Neo.dictionary = {
 };
 
 Neo.translate = function () {
+    var language = (window.navigator.languages && window.navigator.languages[0]) ||
+        window.navigator.language ||
+        window.navigator.userLanguage ||
+        window.navigator.browserLanguage;
+
     var lang = "en";
     for (var key in Neo.dictionary) {
-	if (navigator.language.indexOf(key) == 0) {
+	if (language.indexOf(key) == 0) {
 	    lang = key;
 	    break;
 	}

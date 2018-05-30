@@ -47,7 +47,7 @@ define(MSG031, "記事Noが未入力です");
 define(MSG032, "拒絶されました<br>不正な文字列があります");
 define(MSG033, "削除に失敗しました<br>ユーザーに削除権限がありません");
 define(MSG034, "アップロードに失敗しました<br>規定の画像容量をオーバーしています");
-define(MSG035, "何か日本語で書いてください");
+define(MSG035, "何か日本語で書いてください Comment should have at least some Japanese characters.");
 define(MSG036, "予備");
 define(MSG037, "予備");
 define(MSG038, "予備");

@@ -2388,7 +2388,9 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     ctx.translate(x, y);
 //  ctx.scale(1/this.zoom, 1/this.zoom);
 
-    ctx.font = fontSize + " Arial";
+    var fontFamily = Neo.painter.inputText.style.fontFamily || "Arial";
+    ctx.font = fontSize + " " + fontFamily;
+
     ctx.fillStyle = 0;
     ctx.fillText(string, 0, 0);
     ctx.restore();
