@@ -4,12 +4,12 @@ Htmltemplate for PHP4
 Copyright (C) 2003 Hiroshi Ayukawa
 
 This program is free software; you can redistribute it and/or
-modify it under the terms of the Artistic License version 2.0, 
+modify it under the terms of the Artistic License version 2.0,
 or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the Artistic License version 2.0 for more details.
 
 You should have received a copy of the Artistic License version 2.0
@@ -64,7 +64,7 @@ class TagBasis{
 	var $tostring;
 	var $closestring;
 	var $regardasarray=false;
-	
+
 	function getLabelArray($str){
 		$ans=array();
 		preg_match_all($this->matchregexp,$str,$regans,PREG_SET_ORDER);
@@ -73,11 +73,11 @@ class TagBasis{
 		}
 		return $ans;
 	}
-	
+
 	function parse($str,$multilabels){
 		while(preg_match($this->matchregexp,$str,$match)){
 			$ind=$this->getIndex($match[1],$multilabels);
-			
+
 			$str=str_replace(
 				call_user_func_array("sprintf",array_merge(array($this->fromstring),array_slice($match,1))),
 				call_user_func_array("sprintf",array_merge(array($this->tostring),array($ind),array_slice($match,1))),
@@ -86,7 +86,7 @@ class TagBasis{
 		$str=$this->closeTag($str);
 		return $str;
 	}
-	
+
 	function closeTag($str){
 		if($this->closestring){
 			$str=str_replace($this->closestring,
@@ -97,20 +97,20 @@ class TagBasis{
 		}
 		return $str;
 	}
-	
+
 	function getIndex($m,$multilabels){}
 }
 
 /* the super class of tags which handle non-array data  */
 class DataTag extends TagBasis{
 	 function getIndex($m,$multilabels){
-		$ar=split("/",$m);
+		$ar=explode("/",$m);
 		$ind="";
 		$rui=array();
 		foreach($ar as $x){
 			array_push($rui,$x);
 			$ind.="[\"$x\"]";
-			if(in_array(join("/",$rui),$multilabels)){ 
+			if(in_array(join("/",$rui),$multilabels)){
 				$ind.="[\$cnt[\"".join("/",$rui)."\"]]";
 			}
 		}
@@ -122,7 +122,7 @@ class DataTag extends TagBasis{
  like {each *}  */
 class ArrayTag extends TagBasis{
 	function getIndex($m,$multilabels){
-		$ar=split("/",$m);
+		$ar=explode("/",$m);
 		$ind="";
 		$rui=array();
 		$mattan=0;
@@ -146,22 +146,22 @@ class ArrayTag extends TagBasis{
 /* main definition of parser */
 class TemplateParser{
 	var $tags=array("simple"=>array(),"multi"=>array());
-	
+
 	function add($tag){
 		if($tag->regardasarray) $this->tags["multi"][]=$tag;
 		else $this->tags["simple"][]=$tag;
 		return $this;
 	}
-	
+
 	function remove($tagname){
 		$this->_remove($tagname,$this->tags["multi"]);
 		$this->_remove($tagname,$this->tags["simple"]);
 	}
-	
+
 	function clear(){
 		$this->tags=array("simple"=>array(),"multi"=>array());
 	}
-	
+
 	function _remove($tagname,&$tags){
 		for($i=0;$i<count($tags);$i++){
 			if(get_class($tags[$i])==strtolower($tagname)){
@@ -170,19 +170,19 @@ class TemplateParser{
 			}
 		}
 	}
-	
+
 	function parse($str){
 		reset($this->tags["multi"]);
 		$multilabels=array();
 		foreach($this->tags["multi"] as $x){
 			$multilabels=array_merge($multilabels,$x->getLabelArray($str));
 		}
-		
+
 		reset($this->tags["multi"]);
 		foreach($this->tags["multi"] as $x){
 			$str=$x->parse($str,$multilabels);
 		}
-		
+
 		reset($this->tags["simple"]);
 		foreach($this->tags["simple"] as $x){
 			$str=$x->parse($str,$multilabels);
@@ -252,7 +252,7 @@ class tag_each extends ArrayTag{
 
 /*<!--{comment}--> *** <!--{/comment}-->
 * comment
-* remove all characters between these tags. 
+* remove all characters between these tags.
 */
 class tag_comment extends ArrayTag{
 var $matchregexp='/<!--\{comment\}-->/i';
@@ -285,63 +285,63 @@ class StandardParser extends TemplateParser{
 */
 
 class htmltemplate{
-	var $parser;
-	
+	private $parser;
+
 	// the constructor
-	function htmltemplate(){
+	private function htmltemplate(){
 		$this->parser=new StandardParser();
 	}
-	
+
 	// the static method to get the singleton instance
 	function &getInstance(){
 		static $instance;
 		if(! $instance) $instance=new htmltemplate();
 		return $instance;
 	}
-	
+
 	//  adds tag instance
 	function add($tag){
 		// This method is obsolete.Use addTag() instead.
 		$inst=&htmltemplate::getInstance();
 		$inst->parser->add($tag);
 	}
-	
+
 	// adds a tag class
 	function addTag($tagclassname){
 		$inst=&htmltemplate::getInstance();
 		$inst->parser->add(new $tagclassname());
 	}
-	
+
 	// removes a tag class
 	function removeTag($tagclassname){
 		$inst=&htmltemplate::getInstance();
 		$inst->parser->remove($tagclassname);
 	}
-	
+
 	// remove all tags
 	function removeAllTag(){
 		$inst=&htmltemplate::getInstance();
 		$inst->parser->clear();
 	}
-	
+
 	// sets a parser instance
 	function setParser($parser){
 		$inst=&htmltemplate::getInstance();
 		$inst->parser=$parser;
 	}
-	
+
 	// parses given template string
 	function parse($str){
 		$inst=&htmltemplate::getInstance();
 		return $inst->parser->parse($str);
 	}
-	
+
 	// parses a template file and displays it
 	function t_include($file,&$data){
 		$inst=&htmltemplate::getInstance();
 		print $inst->t_buffer($file,$data);
 	}
-	
+
 	// parses a template file and gives it back
 	function t_buffer($file,&$data){
 		$val=&$data;
@@ -358,7 +358,7 @@ class htmltemplate{
 
 		return $inst->buffer($all,$val);
 	}
-	
+
 	function buffer($template_str,&$val){
 		$inst=&htmltemplate::getInstance();
 		$code=$inst->parse($template_str);

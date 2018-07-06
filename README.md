@@ -74,7 +74,7 @@ Chrome等のブラウザで描きたい掲示板を開いてから、アドレ�
 #### ver1.3.4 (2018/05/30)
 - 裏技ですが、JavaScriptコンソールに  
 
-    Neo.painter.inputText.style.fontFamily="sans-serif"  
+    Neo.painter.inputText.style.fontFamily="serif"  
 
   とか入力してテキストツールのフォントを変更できるようになりました
   （某所で要望があったので……）

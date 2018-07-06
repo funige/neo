@@ -1,443 +1,526 @@
-����������������������������������������������������������������������
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                      POTI-board v1.32 lot.050602
-                 by SakaQ >> http://www.punyu.net/php/
+  POTI-board改 v1.42.1 lot.180605
+  by sakots >> https://sakots.red/poti/
 
-����������������������������������������������������������������������
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-�@���̃X�N���v�g�́u���b�cPHP!�v<http://php.s3.to/>�� gazou.php ������
-�����A�u�ӂ��΁������˂�v<http://www.2chan.net/>�� futaba.php ���A
-����ɂ��G�������ł���悤�ɂ��āAHTML�e���v���[�g�Ńf�U�C���ύX�ł���
-�悤�ɉ����������̂ł��B
+　このスクリプトは「レッツPHP!」<http://php.s3.to/>の gazou.php を改造
+した、「ふたば★ちゃんねる」<http://www.2chan.net/>の futaba.php を、
+さらにお絵かきもできるようにして、HTMLテンプレートでデザイン変更できる
+ように改造した「ぷにゅねっと」<http://www.punyu.net/php/>の POTI-board v1.32 を、さらにphp7に対応させて改造したものです。
 
-�@�uHTML�e���v���[�g�N���X�v<http://hoover.ktplan.ne.jp/kaihatsu/php/>
-�̂������ŁA���R�Ƀf�U�C���ł���悤�ɂȂ��Ă܂��B
+　「HTMLテンプレートクラス」<http://hoover.ktplan.ne.jp/kaihatsu/php/>
+のおかげで、自由にデザインできるようになってます。
 
-�@���Ȃ݂ɁA���O�́@Punyu.net�@Oekaki�@Template�@Image�@�̓����������
-�āuPOTI�v�ł��i��
-
-
-��������
-
-�@�{�݂̂̂ł͎g���܂���B�ʓr�A�e���v���[�g��p�ӂ��ĉ������B
-�@�i�������A���̖{�̂̃o�[�W�����ɑΉ����Ă��镨�ł��邱�Ɓj
-
-�@�l���łł́A�����y�C���^�[�̒ʏ��(res�t�H���_���K�v)���g���Ă܂�����
-�@�����ł���́A�I�[���C�������o�[�W�������g���܂��B�Ԉ��Ȃ��悤�ɂ�
-�@�ĉ������B
+　ちなみに、名前は　Punyu.net　Oekaki　Template　Image　の頭文字を取っ
+て「POTI」らしいです。
 
 
-�@������A���̃X�N���v�g�ɂ�艽�炩�̑��Q���������Ă��A���̐ӔC������
-�@�����܂���B���Ȃ̐ӔC�ŗ��p���ĉ������B
+■ご注意
 
-�@�z�z�����́u���b�cPHP!�v�ɏ����܂��B�����A�Ĕz�z�͎��R�ɂǂ����B
+　本体のみでは使えません。別途、テンプレートを用意して下さい。
+　（ただし、この本体のバージョンに対応している物であること）
 
-�@�摜�̃��T�C�Y�́AGD�ł�repng2jpeg�ł�p�ӂ��Ă��܂��B
-�@����̃`�F�b�N�X�N���v�g�����T�C�g<http://www.punyu.net/php/oekaki.php#check>
-�@�ɂ���܂��̂ŁA����Ń`�F�b�N������ǂ�����g�p���邩���߂ĉ������B
-�@repng2jpeg�ł𗘗p����ɂ́u�����v<http://sugachan.dip.jp/download/>
-�@�� repng2jpeg ���K�v�ł��B���LURL������肵�Ă��������B
+　人柱版では、しぃペインターの通常版(resフォルダが必要)を使ってましたが
+　正式版からは、オールインワンバージョンを使います。間違わないようにし
+　て下さい。
+
+
+　万が一、このスクリプトにより何らかの損害が発生しても、その責任を私は
+　負いません。自己の責任で利用して下さい。
+
+　配布条件は「レッツPHP!」に準じます。改造、再配布は自由にどうぞ。
+
+　画像のリサイズは、GD版とrepng2jpeg版を用意しています。
+　これのチェックスクリプトが当サイト<http://www.punyu.net/php/oekaki.php#check>
+　にありますので、これでチェックした後どちらを使用するか決めて下さい。
+　repng2jpeg版を利用するには「菅処」<http://sugachan.dip.jp/download/>
+　の repng2jpeg が必要です。下記URLから入手してください。
 http://sugachan.dip.jp/download/komono.php#repng2jpeg
 
-�@���̃X�N���v�g�̉��������Ɋւ��鎿��́u���b�cPHP!�v,�u�ӂ��΁������
-�@�˂�v,�u�����v�ɖ₢���킹�Ă������������Ȃ��ꍇ������܂��B
+　このスクリプトの改造部分に関する質問は「レッツPHP!」,「ふたば★ちゃん
+　ねる」,「菅処」に問い合わせても答えが得られない場合があります。
 
-�@������́A<http://www.punyu.net/bbs/ibbs/ibbs.php>�܂łǂ����B
-
-
-���o�[�W�����A�b�v���@�@��POTI-board v1.0�ȍ~���O��
-
-���{��
-�E�𓀂��� config.php ����A�g�p����lot.�ԍ�(=���t)�ȍ~�ɒǉ����ꂽ�ݒ�
-���g�p���� config.php �ɓ\��t���B
-���\��t����ꏊ�́A<?php �` ?>�͈͓̔��B
-
-�E�\��t�������̐ݒ������B
-
-�Ev1.30���A�����R�[�h��UTF-8N�ɂȂ�܂����̂�UTF-8N�ŕۑ��B
-
-�Econfig.php �ȊO�͉𓀂����t�@�C���Œu�������B
-
-���e���v���[�g
-�E�𓀂��� template_ini.php ����A�g�p����lot.�ԍ�(=���t)�ȍ~�ɒǉ�����
-���ݒ���g�p���� template_ini.php �ɓ\��t���B
-���\��t����ꏊ�́A<?php �` ?>�͈͓̔��B
-
-�E�\��t�������̐ݒ������B
-
-�Ev1.30���A�����R�[�h��UTF-8N�ɂȂ�܂����̂�UTF-8N�ŕۑ��B
-
-�Etemplate_ini.php �ȊO�͉𓀂����t�@�C���Œu��������̂������葁�����A
-�e���v���[�g��M���Ă��ꍇ�́A������ŗp�ӂ��Ă���ŐV�̃e���v���[�g��
-�Q�l�ɏC�����ĉ������i�����UTF-8�ŕۑ�����j
-��MONO WHITE�Ȃ�A�����R�����g���e���v���[�g���ɋL�ڂ��Ă���̂ŎQ�l��
-�Ȃ�Ǝv���܂��B
+　ご質問は、<http://www.punyu.net/bbs/ibbs/ibbs.php>までどうぞ。
 
 
-���������o������A�b�v���[�h���āA�Ǘ���ʂ��u���O�X�V�v���s���ĉ������B
+■バージョンアップ方法　※POTI-board v1.0以降が前提
+
+○本体
+・解凍した config.php から、使用中のlot.番号(=日付)以降に追加された設定
+を使用中の config.php に貼り付け。
+※貼り付ける場所は、<?php ～ ?>の範囲内。
+
+・貼り付けた分の設定をする。
+
+・v1.30より、文字コードがUTF-8NになりましたのでUTF-8Nで保存。
+
+・config.php 以外は解凍したファイルで置き換え。
+
+○テンプレート
+・解凍した template_ini.php から、使用中のlot.番号(=日付)以降に追加され
+た設定を使用中の template_ini.php に貼り付け。
+※貼り付ける場所は、<?php ～ ?>の範囲内。
+
+・貼り付けた分の設定をする。
+
+・v1.30より、文字コードがUTF-8NになりましたのでUTF-8Nで保存。
+
+・template_ini.php 以外は解凍したファイルで置き換えるのが手っ取り早いが、
+テンプレートを弄ってた場合は、こちらで用意している最新のテンプレートを
+参考に修正して下さい（これもUTF-8で保存する）
+※MONO WHITEなら、説明コメントをテンプレート内に記載してあるので参考に
+なると思います。
 
 
-
-���ݒu���@
-
-�@�ڂ����͐ݒu�菇��( http://www.punyu.net/php/readme.php?txt=potisetup )
-���䗗�������B
-
-���ȉ��AMONO WHITE���ɊȈՐ���
-
-�@���]�̃f�B���N�g���̃p�[�~�b�V������777�ɂ��܂��B
-�@src�f�B���N�g����thumb�f�B���N�g�������A�p�[�~�b�V������777�ɂ��܂��B
-�@���G�����@�\���g�p����ꍇ�͓��l��tmp�f�B���N�g�������܂��B
-
-�@�ݒ�́Aconfig.php�����������čs���܂��B
-�@�e�t�@�C����u������potiboard.php���u���E�U����ďo���܂�(�K�v�ȃt�@�C
-�@���������ݒ肳��܂�)
-
-�y�f�B���N�g���\���z( )���̓p�[�~�b�V�����l
-./-- ���[�g (777)
-  �bconfig.php       (644)
-  �bhtmltemplate.inc (644)
-  �bpotiboard.php    (644)
-  �bthumbnail_gd.php (644)
-  �bthumbnail_re.php (644)
-  �bloadcookie.js    (644)
-  �b
-  �b��repng2jpeg�� ���g�p����ꍇ�A�ȉ����K�v
-  �brepng2jpeg (755) �o�C�i��
-  �b
-  �b���e���v���[�g�uMONO WHITE�v�i�ʃt�@�C���j
-  �btemplate_ini.php   (644)
-  �bmonow_catalog.html (644)
-  �bmonow_main.html    (644)
-  �bmonow_other.html   (644)
-  �bmonow_paint.html   (644)
-  �bsiihelp.php        (644)
-  �b
-  �{--./src/   (777) �f�B���N�g��
-  �{--./thumb/ (777) �f�B���N�g��
-
-�����G�����@�\���g�p����ꍇ�A���L��ǉ�
-./-- �����[�g
-  �bpicpost.php (644)
-  �bpalette.txt (644)
-  �b
-  �{--./tmp/ (777) �f�B���N�g��
-  �b
-�������ȉ��̃t�@�C���́u�������v�����肵�Ă���������������
-�@�b            <http://shichan.jp/>
-�@�b
-  �bPaintBBS.jar     (644) �o�C�i�� ��PaintBBS���g�p����ꍇ
-  �bspainter_all.jar (644) �o�C�i�� �������y�C���^�[���g�p����ꍇ
-  �bPCHViewer.jar    (644) �o�C�i�� �������y�C���^�[�Ή���
-
-�����[���ʒm�@�\���g�p����ꍇ�A���L��ǉ�
-./-- �����[�g
-  �bnoticemail.inc (644)
-���t�@�C����<http://www.punyu.net/php/>�����肵�Ă�������
-
-
-��thanks!!
-
-�@�@�y����ލH�[<http://www.chomkoubou.com/>��TakeponG�a�z
-�@picpost.cgi ��PHP�����肪�Ƃ��������܂��B����̂������ŊJ������ӗ~��
-�����܂����B
-
-�@�@�yBBS NOTE, PaintBBS(����CGI) ���̑��̂��G�����nCGI�z
-�@���낢��d���Ȃ�d�p�N���܂����B����BBS NOTE�B����ρABBS NOTE�̓X�Q
-�[��B
-
-�@�@�y�����z
-�@�T���l�C���쐬�ł����b�ɂȂ�܂����B�����̃o�C�i����������΂��̃X�N
-���v�g�͓��̖ڂ��݂Ȃ������ł��傤�B
-
-�@�@�y�ӂ��΁������˂�z
-�@�r�o�I�����Ƃ������[���E�E�E�āA���iry
-
-�@�@�y���b�cPHP!�z
-�@�����׋��ɂȂ�܂��B�������������ł�PHP���Ȃ����Ċ����ł��B
-
-�@�@�yBBS�ɏ�������ł������X�z
-�@�s��񍐁A�M�d�Ȉӌ����X�E�E�E�z���g�ɏ������Ă܂��I
+★準備が出来たらアップロードして、管理画面より「ログ更新」を行って下さい。
 
 
 
-�����쌠
+■設置方法
 
-�@POTI-board v1.32                   (C)SakaQ�u�Ղɂ�˂��Ɓv
+　詳しくは設置手順書( http://www.punyu.net/php/readme.php?txt=potisetup )
+を御覧下さい。
 
-�y�I���W�i���X�N���v�g�z
-�@�摜BBS v3.0                       (C)TOR�u���b�cPHP!�v
-�@ + futaba.php v0.8 lot.031015      (C)futaba�u�ӂ��΁������˂�v
+※以下、neeを例に簡易説明
 
-�y�T���l�C�����z
-�@repng2jpeg                         (C)�����u�����v
+　所望のディレクトリのパーミッションを777にします。(さくらでは変更の必要なし)
+　srcディレクトリとthumbディレクトリを作り、パーミッションを777にします。(さくらでは自動で作成されます)
+　お絵かき機能を使用する場合は同様にtmpディレクトリも作ります。(さくらでは自動で作成されます)
 
-�y�e���v���[�g�N���X�z
-�@HTML�e���v���[�g                   (C)����@��
+　設定は、config.phpを書き換えて行います。
+　各ファイルを置いたらpotiboard.phpをブラウザから呼出します(必要なファイ
+　ルが自動設定されます)
 
-�y���G�������z
-�@PaintBBS(test by v2.22_8)
-�@�����y�C���^�[(test by v1.071all)
-�@PCH Viewer(test by v1.12)          (C)���������u�������v
-�@WCS ���I�p���b�g�R���g���[���Z�b�g (C)�̂�l�R�uWonderCatStudio�v
+【ディレクトリ構造】( )内はパーミッション値。変更の必要がない者は省略。
+./-- ルート (動かなければ777)
+  ｜config.php
+  ｜htmltemplate.inc
+  ｜potiboard.php
+  ｜thumbnail_gd.php
+  ｜thumbnail_re.php
+  ｜loadcookie.js
+  ｜
+  ｜※repng2jpeg版 を使用する場合、以下も必要
+  ｜repng2jpeg バイナリ
+  ｜
+  ｜※NEO本体
+  ｜neo.js
+  ｜neo.css
+  ｜
+  ｜※テンプレート「nee」（別ファイル）
+  ｜template_ini.php
+  ｜nee_catalog.html
+  ｜nee_main.html
+  ｜nee_other.html
+  ｜nee_paint.html
+  ｜nee.css
+  ｜nee_main.css
+  ｜nee_main.css.map
+  ｜nee_main.scss
+  ｜siihelp.php
+  ｜meta.php
+  ｜
+  ＋--./src/       (777) ディレクトリ
+  ＋--./thumb/     (777) ディレクトリ
+
+
+※お絵かき機能を使用する場合、下記を追加
+./-- 同ルート
+  ｜picpost.php
+  ｜palette.txt
+  ｜
+  ＋--./tmp/ (777) ディレクトリ
+  ｜
+＝＝＝以下のファイルはしぃちゃんのホームページ（Vector）より入手してください＝＝＝＝
+  ｜            <http://hp.vector.co.jp/authors/VA016309/>
+  ｜
+  ｜PaintBBS.jar     バイナリ ※PaintBBSを使用する場合
+  ｜spainter_all.jar バイナリ ※しぃペインターを使用する場合
+  ｜PCHViewer.jar    バイナリ ※しぃペインター対応版
+  ｜
+＝＝＝NEOを使用する場合以下をfunigeさんのところから入手してください＝＝＝＝
+  ｜           <https://github.com/funige/neo/>
+  ｜
+  ｜neo.js
+  ｜neo.css
+  ｜
+
+※メール通知機能を使用する場合、下記を追加
+./-- 同ルート
+  ｜noticemail.inc (644)
+☆ファイルは<http://www.punyu.net/php/>より入手してください
+→php7対応版を同梱いたしました
+
+
+■thanks!!
+
+　　【ちょむ工房<http://www.chomkoubou.com/>のTakeponG殿】
+　picpost.cgi のPHP化ありがとうございます。これのおかげで開発する意欲が
+沸きました。
+
+　　【BBS NOTE, PaintBBS(藍珠CGI) その他のお絵かき系CGI】
+　いろいろ‥かなり‥パクリました。特にBBS NOTE。やっぱ、BBS NOTEはスゲ
+ーや。
+
+　　【菅処】
+　サムネイル作成でお世話になりました。ここのバイナリが無ければこのスク
+リプトは日の目をみなかったでしょう。
+
+　　【ふたば★ちゃんねる】
+　ビバ！虹裏としあきーず・・・て、ち（ry
+
+　　【レッツPHP!】
+　いつも勉強になります。もうここ無しではPHP作れないって感じです。
+
+　　【BBSに書き込んでくれる方々】
+　不具合報告、貴重な意見等々・・・ホントに助かってます！
+
+
+
+■著作権
+
+　POTI-boaed改                       by sakots「赤原文庫」
+
+　POTI-board v1.32                   (C)SakaQ「ぷにゅねっと」
+
+【オリジナルスクリプト】
+　画像BBS v3.0                       (C)TOR「レッツPHP!」
+　 + futaba.php v0.8 lot.031015      (C)futaba「ふたば★ちゃんねる」
+
+【サムネイル側】
+　repng2jpeg                         (C)すが「菅処」
+
+【テンプレートクラス】
+　HTMLテンプレート                   (C)鮎川　寛
+
+【お絵かき側】
+　PaintBBS(test by v2.22_8)
+　しぃペインター(test by v1.071all)
+　PCH Viewer(test by v1.12)          (C)しぃちゃん「しぃ堂」
+　WCS 動的パレットコントロールセット (C)のらネコ「WonderCatStudio」
                                         <http://wondercatstudio.com/>
 
 
-���ύX����
+　
+■変更履歴
+
+[2018/06/05] v1.42.1 lot.180605
+【障害対応】
+　・軽微ななエラー対応（by さとぴあ）
+
+[2018/05/07] 改 v1.42 lot.180507
+【仕様変更】
+　・削除キーなしで続きを描く機能の仕様変更（by さとぴあ）
+
+[2018/04/23] 改 v1.41.1 lot.180423
+【機能追加】
+　・「指定文字列+本文へのURLの書き込みで拒絶」の設定を追加　→　文法ミスを修正 (by さとぴあ)
+
+[2018/04/20] 改 v1.40 lot.180420
+【仕様変更】
+　・本家1.33bを超えた気がするので満を持してバージョンアップ
+
+[2018/04/20] v1.32.20 lot.180420
+【仕様変更】
+　・本文にURLを書き込めなくする設定を追加 (by さとぴあ)
+　・readme.txtを整理
+
+[2018/01/30] v1.32.12 lot.180130
+【仕様変更】
+　・オートリンクで相手のアクセスログにURLが残らないようにした (by さとぴあ)
+　・拒絶する文字列の指定で大文字小文字の区別をしないように変更 (by さとぴあ)
+　・管理画面の画像へのリンクがおかしかったのを修正 (by さとぴあ)
+
+[2018/01/24] v1.32.11 lot.180124
+【仕様変更】
+　・NEOを使う/使わない選択式のスキンに対応
+　・readme整理
+
+[2018/01/22] v1.32.10 lot.180122
+【仕様改善】
+　・phpの些細なエラーを減らした
+　・githubに公開
+
+[2018/01/16] v1.32.5 lot.180116
+【仕様変更】
+　・オートリンク時のURLにリファラを送信しない、またそれにともなう脆弱性修正
+
+[2018/01/15] v1.32.4 lot.180115
+【障害対応】
+　・コメント無しでイラストのみ投稿した場合に設定問わず弾かれる問題を修正
+【仕様追加】
+　・メール通知クラスphp7対応版を同梱
+
+[2018/01/13] v1.32.3 lot.180113
+【障害対応】
+　・「拒絶する文字列」の設定が効かない問題を修正
+【仕様変更】
+　・バージョン表記の仕方を変更
+
+[2018/01/12] v1.32 lot.050602b
+【障害対応】
+★picpost.php
+　・php7環境で8kB以上の画像が送信できなくなっていた問題を修正
+
+[2018/01/11] v1.32 lot.050602a
+【仕様変更】
+　・php7対応
 
 [2005/06/02] v1.32 lot.050602
-�y�d�l�ύX�z
-�@�E�A���E��d���e�`�F�b�N�����x���������đI���ł���悤�ɂ���
-�@�E�����ݎ��ɉ摜�̗e�ʃ`�F�b�N��ǉ�
-�@���G���[���b�Z�[�WMSG034���g�p���܂��̂ŁAtemplate_ini.php�̕ύX���K�v
-�@�@���b�Z�[�W��F�A�b�v���[�h�Ɏ��s���܂���<br>�K��̉摜�e�ʂ��I�[�o�[���Ă��܂�
-��picpost.php
-�@�E�e�ʈᔽ�E�摜�T�C�Y�ᔽ�E����摜�̃`�F�b�N��ǉ�
-�@���e�ʈᔽ�`�F�b�N��ON/OFF��picpost.php�̒��ł���
+【仕様変更】
+　・連続・二重投稿チェックをレベル分けして選択できるようにした
+　・書込み時に画像の容量チェックを追加
+　※エラーメッセージMSG034を使用しますので、template_ini.phpの変更も必要
+　　メッセージ例：アップロードに失敗しました<br>規定の画像容量をオーバーしています
+★picpost.php
+　・容量違反・画像サイズ違反・拒絶画像のチェックを追加
+　※容量違反チェックのON/OFFはpicpost.phpの中でする
 
 [2005/02/14] v1.31 lot.050214
-�y�d�l�ύX�z
-�@�E���G�����摜���e���ɁA�I�������摜�������̂��ǂ���usercode�y��IP�A
-�@�h���X�ōă`�F�b�N����
-�@�E�R���e�B�j���[�̉摜�����������ɔF���R�[�h���쐬���A�ʂ̉摜�ɍ���
-�@��������̂�h���悤�ɂ����ipicpost.php���ύX�j
-�@�E���łɏo�͎���'&'��'&amp;'�ɓ���
+【仕様変更】
+　・お絵かき画像投稿時に、選択した画像が自分のかどうかusercode及びIPア
+　ドレスで再チェックする
+　・コンティニューの画像差し換え時に認識コードを作成し、別の画像に差し
+　換えられるのを防ぐようにした（picpost.phpも変更）
+　・ついでに出力時の'&'を'&amp;'に統一
 
 [2005/01/17] v1.30 lot.050117
-�y��Q�Ή��z
-�@�E�V�K���G�������e���̕`�掞�Ԃ̕����R�[�h�ϊ���Y��Ă���
+【障害対応】
+　・新規お絵かき投稿時の描画時間の文字コード変換を忘れていた
 
 [2005/01/14] v1.30 lot.050114
-�y�ǉ��z
-�@�E�����R�[�h��I���ł���悤�ɂ���
-�@���ݒ��ς��邾���Ŋe�����R�[�h�ɑΉ��ł��܂��B����ɔ����A�e�\�[�X��
-�@UTF-8�œ���B
-�@�Ejcode.phps �� jcode.php �ɂȂ��Ă����̂ŗ����g����悤�ɑΉ�
-�y�e���v���[�g�z
-������
-�@�E�����R�[�h�ǉ� �c charset
+【追加】
+　・文字コードを選択できるようにした
+　※設定を変えるだけで各文字コードに対応できます。これに伴い、各ソースは
+　UTF-8で統一。
+　・jcode.phps が jcode.php になっていたので両方使えるように対応
+【テンプレート】
+★共通
+　・文字コード追加 … charset
 
 [2004/11/26] v1.3b4 lot.041126
-�y��Q�Ή��z
-�@�E���܂̂��܂܂� mb_language("Japanese"); �����Ă����̂�Y��Ă���
+【障害対応】
+　・いまのいままで mb_language("Japanese"); を入れておくのを忘れていた
 
 [2004/11/22] v1.3b4 lot.041122
-�y�C��(thumbnail_gd.php, thumbnail_re.php)�z
-�@�E������ gif2png �� repng2jpeg �ɓ������Ă����ׁA����ɑΉ�
+【修正(thumbnail_gd.php, thumbnail_re.php)】
+　・菅処で gif2png を repng2jpeg に統合していた為、それに対応
 
 [2004/06/23] v1.3b4 lot.040623
-�y�C���z
-�@�EHTML�e���v���[�g�^�O�undef�v(�ϐ�����̏ꍇ�ɕ\��)�̋������ς������̂�
-�@�P���Ɂudef�v�̋t�����ɕύX�i�ŏ����炱�����Ƃ��΂悩�����E�E�E��|�P|�Q�j
+【修正】
+　・HTMLテンプレートタグ「ndef」(変数が空の場合に表示)の挙動が変だったので
+　単純に「def」の逆条件に変更（最初からこうしとけばよかった・・・○|￣|＿）
 
 [2004/06/22] v1.3b4 lot.040622
-�y�ǉ��z
-�@�E�Ǝ��^�O�@�\�ǉ�
-�@�@�� �Ǝ��^�O���g�p���邩�ǂ����ݒ�\
-�@�@�� �Ǝ��^�O�̒ǉ��폜�����R(�vHTML�m��)
-�@�E���[�U�[�폜������ݒ�\
-�y�ύX�z
-�@�EHTML�e���v���[�g�N���X(htmltemplate.inc)��"htmltemplate_oo 0.3.1"�ɕύX
-�@�@�� �V�KHTML�e���v���[�g�^�O�ǉ�
-�@�@�@<!--{ndef hoge}-->�`<!--{/ndef}--> (hoge����̏ꍇ�Ɂ`������\��)
-�@�@�@<!--{vdef hoge}-->�`<!--{/vdef}--> (hoge����(null,false)�ł͂Ȃ��ꍇ�Ɂ`������\�� ���[���̏ꍇ�ł��\��)
-�@�@�@<!--{ifeq hoge:val}-->�`<!--{/ifeq}--> (hoge  = val �̏ꍇ�Ɂ`������\��)
-�@�@�@<!--{ifne hoge:val}-->�`<!--{/ifne}--> (hoge != val �̏ꍇ�Ɂ`������\��)
-�@�@�@<!--{iflt hoge:val}-->�`<!--{/iflt}--> (hoge <  val �̏ꍇ�Ɂ`������\��)
-�@�@�@<!--{ifgt hoge:val}-->�`<!--{/ifgt}--> (hoge >  val �̏ꍇ�Ɂ`������\��)
-�@�@�@<!--{ifle hoge:val}-->�`<!--{/ifle}--> (hoge <= val �̏ꍇ�Ɂ`������\��)
-�@�@�@<!--{ifge hoge:val}-->�`<!--{/ifge}--> (hoge >= val �̏ꍇ�Ɂ`������\��)
-�@�@�@{?} ('?'�̃G�X�P�[�v�p�B<?xml�`?> �� <?php�`?> �Ȃǂ�)
-�@�@�@<!--(�`)--> (�R�����g�p�B�`�����͏o�͂���܂���)
-�@�E���[�U�[�R�[�h�ɂ��`�F�b�N�@�\��ǉ�(�N�b�L�[�𗘗p)
-�@�@�� �N�b�L�[�Ƀ��[�U�[�R�[�h�𔭍s
-�@�@�� ���e�ҏ��Ƀ��[�U�[�R�[�h��ǉ�(picpost.php�̕ύX)
-�@�@�� ���[�U�[�R�[�h��ID��12���ɂ�������(�E8���܂œ���)
-�@�E�G���[���b�Z�[�W��ϐ��ɒ�`
-�@�E�摜����̑����̂Ƃ��AJPEG�����������`���Ȃ��������AGIF�EPNG�ł�������
-�@�`����悤�ɕύX�B�������AJAVA�Ɉˑ�����(MS������PNG�͓ǂ߂Ȃ�)
-�y�C���z
-�@�EHTTP_CLINT_IP �� HTTP_CLIENT_IP �ɏC��
-�y�e���v���[�g�z
-������
-�@�E���[�U�[�폜�t���O�ǉ� �c userdel (�ݒ�l�����̂܂ܓ���܂�)
-���e�t�H�[������
-�@�E�Ǝ��^�O�g�p�t���O�ǉ� �c potitag
-�����G�������
-�@�E���[�U�[�R�[�h�ϐ��ǉ� �c usercode
-���R���e�B�j���[���
-�@�E�摜����̑����ύX�ɂ��@ctype_jpg �� ctype_img �ɕύX
-���Ǝ��^�O�������
-�@�E�V�K�ǉ��B�ϐ���p�ӂ���̖ʓ|������PHP�X�N���v�g�𒼐ڏ����Ă܂��B
+【追加】
+　・独自タグ機能追加
+　　→ 独自タグを使用するかどうか設定可能
+　　→ 独自タグの追加削除が自由(要HTML知識)
+　・ユーザー削除権限を設定可能
+【変更】
+　・HTMLテンプレートクラス(htmltemplate.inc)を"htmltemplate_oo 0.3.1"に変更
+　　→ 新規HTMLテンプレートタグ追加
+　　　<!--{ndef hoge}-->～<!--{/ndef}--> (hogeが空の場合に～部分を表示)
+　　　<!--{vdef hoge}-->～<!--{/vdef}--> (hogeが空(null,false)ではない場合に～部分を表示 ※ゼロの場合でも表示)
+　　　<!--{ifeq hoge:val}-->～<!--{/ifeq}--> (hoge  = val の場合に～部分を表示)
+　　　<!--{ifne hoge:val}-->～<!--{/ifne}--> (hoge != val の場合に～部分を表示)
+　　　<!--{iflt hoge:val}-->～<!--{/iflt}--> (hoge <  val の場合に～部分を表示)
+　　　<!--{ifgt hoge:val}-->～<!--{/ifgt}--> (hoge >  val の場合に～部分を表示)
+　　　<!--{ifle hoge:val}-->～<!--{/ifle}--> (hoge <= val の場合に～部分を表示)
+　　　<!--{ifge hoge:val}-->～<!--{/ifge}--> (hoge >= val の場合に～部分を表示)
+　　　{?} ('?'のエスケープ用。<?xml～?> や <?php～?> などに)
+　　　<!--(～)--> (コメント用。～部分は出力されません)
+　・ユーザーコードによるチェック機能を追加(クッキーを利用)
+　　→ クッキーにユーザーコードを発行
+　　→ 投稿者情報にユーザーコードを追加(picpost.phpの変更)
+　　→ ユーザーコードはIDを12桁にしたもの(右8桁まで同じ)
+　・エラーメッセージを変数に定義
+　・画像からの続きのとき、JPEGしか続きが描けなかったが、GIF・PNGでも続きが
+　描けるように変更。ただし、JAVAに依存する(MS製だとPNGは読めない)
+【修正】
+　・HTTP_CLINT_IP を HTTP_CLIENT_IP に修正
+【テンプレート】
+★共通
+　・ユーザー削除フラグ追加 … userdel (設定値がそのまま入ります)
+★各フォーム部分
+　・独自タグ使用フラグ追加 … potitag
+★お絵かき画面
+　・ユーザーコード変数追加 … usercode
+★コンティニュー画面
+　・画像からの続き変更により　ctype_jpg を ctype_img に変更
+★独自タグ説明画面
+　・新規追加。変数を用意するの面倒だからPHPスクリプトを直接書いてます。
 
 
 [2004/03/16] v1.3b3
-�y�ǉ��z
-�@�E�����F�I���@�\�ǉ�
-�@�@�� �N�b�L�[�ɑΉ�(JavaScript���ύX)
-�@�@�� �����F�I�����g�p���邩�ǂ����ݒ�\
-�@�Econfig.php�Ɋ�{�I�ȃA�v���b�g�ݒ��ǉ�
-�@�@�� ���G�����e���v���[�g(xxx_paint.html)�Ɋ֘A����ϐ��ǉ�
-�@�E�ۑ��^�C�v�I���@�\�ǉ�
-�@�E���G�����e���v���[�g��UNDO���₻�̑��̐ݒ��ύX���ĕ`��������t�H�[���ǉ�
-�@�E�N�I���e�B�l�ɑΉ�
-�@�E�A�v���b�g�̃Z�L�����e�B�֘A�ݒ�ǉ�
-�@�@�� ������`���Ƃ��̃Z�L�����e�B���ݒ��
-�@�E���X���̉摜�\��t�����͂��G�����\��t���@�\�ǉ�
-�@�@�� ���X�摜�\��(���G�������A��)�������邩�ǂ����ݒ�\
-�@�@�� ���X���摜�̃T���l�C���T�C�Y�w��ǉ�
-�@�@�� ���X���摜��1�X���ŕ\�������錏�����w��\
-�y�ύX�z
-�@�E<br />��<br>�ɂ��ďo��
-�@�Epotiboard.php���A
-�@�@�u���[���ʒm�N���X�̃t�@�C�����v�u�A�v���b�g�w���v�̃t�@�C�����v�̎w����㕔�ɒǉ�
-�y�C���z
-�@�E�N�b�L�[�ɃZ�b�g���閼�O��\���������Ă��Ȃ������̂ŏ�������悤�ɏC��
-�y�e���v���[�g�z
-���e�t�H�[������
-�@�E�����F�I��p�z��ǉ� �c fctable/color , fctable/name
-�@�Eupfile �ŃA�b�v���[�h�\�����f����悤�ɕύX(�t�H�[����������)
-�@�E�A�v���b�g�ݒ�p�ϐ��ǉ� �c undo , undo_in_mg , qualitys(select�^�O�poption�z��)
-�����C�������X
-�@�E�y�C���g�t�H�[���p�� paintform ��ǉ�(���܂܂� notres �ő�p)
-�@�E�e�L���A�F���ǉ� �c oya/fontcolor
-�@�E���X�L���A�摜���E�F���ǉ�
-�@�@oya/res/src , oya/res/srcname , oya/res/size , oya/res/painttime
-�@�@oya/res/pch , oya/res/continue , oya/res/thumb , oya/res/imgsrc
-�@�@oya/res/w , oya/res/h , oya/res/fontcolor
-�����G�������
-�@�E���G�����ݒ�p�ϐ��ǉ�
-�@�@image_jpeg , image_size , compress_level , undo , undo_in_mg
-�@ �� �����y�C���^�[�̂�
-�@�@layer_count , quality
-�@ �� �Z�L�����e�B
-�@�@security , security_click , security_timer , security_url
-�@�E���G�����ݒ�ύX�t�H�[���p�ϐ��ǉ�
-�@�@mode2(���[�h����p) , savetypes(select�^�O�poption�z��)
-�@ �� �ʏ�p
-�@�@newpaint
-�@ �� �R���e�B�j���[���[�h�p
-�@�@no , pch , ctype , type , pwd , applet , usepbbs
-���R���e�B�j���[���
-�@�E�`�掞�ԕϐ��ǉ� �c painttime
+【追加】
+　・文字色選択機能追加
+　　→ クッキーに対応(JavaScript側変更)
+　　→ 文字色選択を使用するかどうか設定可能
+　・config.phpに基本的なアプレット設定を追加
+　　→ お絵かきテンプレート(xxx_paint.html)に関連する変数追加
+　・保存タイプ選択機能追加
+　・お絵かきテンプレートでUNDO数やその他の設定を変更して描き直せるフォーム追加
+　・クオリティ値に対応
+　・アプレットのセキュリティ関連設定追加
+　　→ 続きを描くときのセキュリティも設定可
+　・レス時の画像貼り付け又はお絵かき貼り付け機能追加
+　　→ レス画像貼り(お絵かきも連動)を許可するかどうか設定可能
+　　→ レス側画像のサムネイルサイズ指定追加
+　　→ レス側画像を1スレで表示させる件数を指定可能
+【変更】
+　・<br />を<br>にして出力
+　・potiboard.php内、
+　　「メール通知クラスのファイル名」「アプレットヘルプのファイル名」の指定を上部に追加
+【修正】
+　・クッキーにセットする名前の\を除去していなかったので除去するように修正
+【テンプレート】
+★各フォーム部分
+　・文字色選択用配列追加 … fctable/color , fctable/name
+　・upfile でアップロード可能か判断するように変更(フォーム下説明等)
+　・アプレット設定用変数追加 … undo , undo_in_mg , qualitys(selectタグ用option配列)
+★メイン＆レス
+　・ペイントフォーム用に paintform を追加(いままで notres で代用)
+　・親記事、色情報追加 … oya/fontcolor
+　・レス記事、画像情報・色情報追加
+　　oya/res/src , oya/res/srcname , oya/res/size , oya/res/painttime
+　　oya/res/pch , oya/res/continue , oya/res/thumb , oya/res/imgsrc
+　　oya/res/w , oya/res/h , oya/res/fontcolor
+★お絵かき画面
+　・お絵かき設定用変数追加
+　　image_jpeg , image_size , compress_level , undo , undo_in_mg
+　 → しぃペインターのみ
+　　layer_count , quality
+　 → セキュリティ
+　　security , security_click , security_timer , security_url
+　・お絵かき設定変更フォーム用変数追加
+　　mode2(モード判定用) , savetypes(selectタグ用option配列)
+　 → 通常用
+　　newpaint
+　 → コンティニューモード用
+　　no , pch , ctype , type , pwd , applet , usepbbs
+★コンティニュー画面
+　・描画時間変数追加 … painttime
 
 [2004/02/06] v1.3b2
-�y�C���z
-�@�E�`�掞�ԂƓ��t�̏����ݒ��","���������ꍇ�A"&#44;"�ɕϊ�����悤�ɏC��
-�@�E�g���b�v��ID�ƕҏW�}�[�N�̕ϐ������S�ɃN���A���Ă��Ȃ������̂��C��
-�@�E�p���b�g�f�[�^�̃p���b�g�����e�L�X�g���`����悤�ɏC��
-�@�E�ҏW�}�[�N��''(Null)�ɂ��Ă����ꍇ�̃G���[�ɑΏ�
+【修正】
+　・描画時間と日付の書式設定に","があった場合、"&#44;"に変換するように修正
+　・トリップとIDと編集マークの変数を完全にクリアしていなかったのを修正
+　・パレットデータのパレット名をテキスト整形するように修正
+　・編集マークを''(Null)にしていた場合のエラーに対処
 
 [2004/02/03] v1.3b1
-�y�ύX�z
-�@�E���O�ƃg���b�v�𕪗�
-�@�E���[���A�h���X��ϐ��Ƃ��Ēǉ�(���܂܂ł͖��O�̃����N�ɂȂ��Ă�)
-�@�E���t��ID�ƕҏW�}�[�N�𕪗�
-�@�E�`�掞�Ԃ������ݒ�ł���悤�ɂ���
-�@�E�y�[�W�i���o�[�������ʂɏ����ݒ�ł���悤�ɂ���
-�@�E�u���v�ȍ~�̐F�w����^�O�w��ɂ���
-�@�E��������������̃{�[�_�[���C�����w��ł���悤�ɂ���
-�y�e���v���[�g�z
-�@�����C�������X
-�@�E��L�ύX�ɔ����ϐ��ǉ�
-�@�@oya/trip , oya/email , oya/id , oya/updatemark
-�@�@oya/res/trip , oya/res/email , oya/res/id , oya/res/updatemark
-�@�ETAB���p�� oya/tab ��ǉ�(�ォ��1,2,3�E�E�Ƃ������A�Ԃ�����)
-�@���J�^���O
-�@�E��L�ύX�ɔ����ϐ��ǉ�
-�@�@y/x/trip , y/x/id , y/x/updatemark
+【変更】
+　・名前とトリップを分離
+　・メールアドレスを変数として追加(いままでは名前のリンクになってた)
+　・日付とIDと編集マークを分離
+　・描画時間を書式設定できるようにした
+　・ページナンバー部分を個別に書式設定できるようにした
+　・「＞」以降の色指定をタグ指定にした
+　・もうすぐ消えるのボーダーラインを指定できるようにした
+【テンプレート】
+　★メイン＆レス
+　・上記変更に伴い変数追加
+　　oya/trip , oya/email , oya/id , oya/updatemark
+　　oya/res/trip , oya/res/email , oya/res/id , oya/res/updatemark
+　・TAB順用に oya/tab を追加(上から1,2,3・・といった連番が入る)
+　★カタログ
+　・上記変更に伴い変数追加
+　　y/x/trip , y/x/id , y/x/updatemark
 
 [2004/01/26] v1.21
-�y�@�\�ǉ��z
-�@�E�Ǘ��҂���̓��e�̏ꍇ�̓��[���ʒm���Ȃ��ݒ�ǉ�(config.php�Őݒ�)
+【機能追加】
+　・管理者からの投稿の場合はメール通知しない設定追加(config.phpで設定)
 
 [2004/01/19] v1.2
-�y�@�\�ǉ��z
-�@�E���[���ʒm�@�\�ǉ�
-�@�@�� config.php�ɐݒ荀�ڒǉ�(3��)
-�y��Q�Ή��z
-�@�E���G�����G���e���A���e���ăG���[�ɂȂ����Ƃ��Ƀ��[�N�t�@�C��(.dat)��
-�@�@�����Ă����̂��C��
+【機能追加】
+　・メール通知機能追加
+　　→ config.phpに設定項目追加(3つ)
+【障害対応】
+　・お絵かき絵投稿時、投稿してエラーになったときにワークファイル(.dat)が
+　　消えていたのを修正
 
 [2004/01/09] v1.1
-�y�@�\���P�z
-�@�E�N�b�L�[�̊����R�[�h�ϊ����������ւ���
-�@�@�� IE&Opera�̂Ƃ�UTF-16�ɂ��Ă����̂��u���E�U�Ɋ֌W�Ȃ�UTF-8�ɕϊ�
-�@�@�� JavaScript�����AUTF-8���f�R�[�h���郋�[�`��(loadcookie.js)�ɕύX
-�@�@�� ���܂���iconv�ɑΉ�(�e�X�g���ĂȂ�����)
-�y��Q�Ή��z
-�@�E�u���X���ɃX���薼�����p����v�ݒ�𔽉f�����Ă��Ȃ�����
+【機能改善】
+　・クッキーの漢字コード変換部分を作り替えた
+　　→ IE&OperaのときUTF-16にしていたのをブラウザに関係なくUTF-8に変換
+　　→ JavaScript側を、UTF-8をデコードするルーチン(loadcookie.js)に変更
+　　→ おまけでiconvに対応(テストしてないけど)
+【障害対応】
+　・「レス時にスレ題名を引用する」設定を反映させていなかった
 
 [2004/01/03] v1.1
-�y��Q�Ή��z
-�@�Esage�@�\�����܂������Ă��Ȃ��̂��C��
-�@�E�N�b�L�[�ŃR�[�h�ϊ��o���Ă��Ȃ������Ƃ��ɏo�͂��Ă��Ȃ�����
-�@�@�� mb�֐��g���Ȃ��ꍇ�ׂ̈�TOMO����jcode.phps�ɑΉ�
-�@�@�� �ϊ��o���ĂȂ��Ă��o��
-�@�@�� ���łɕۑ����鍀�ڂ�ǉ����Ղ�����
+【障害対応】
+　・sage機能がうまく働いていないのを修正
+　・クッキーでコード変換出来ていなかったときに出力していなかった
+　　→ mb関数使えない場合の為にTOMO氏のjcode.phpsに対応
+　　→ 変換出来てなくても出力
+　　→ ついでに保存する項目を追加し易くした
 
 [2003/12/24] v1.0
-�@�������łƂ��Č��J�B�����Ă��G������futaba.php�̊J���͏I���ł��B
-�@����ɔ����A�e�t�@�C����POTI-board�ɓ�������܂��B
+　※正式版として公開。そしてお絵かき版futaba.phpの開発は終了です。
+　これに伴い、各ファイルはPOTI-boardに統合されます。
 
-�y�ύX�z
-�@�E���G�����A�v���b�g���瓊�e�����JPEG�摜�ɑΉ�
-�@�EJPEG�摜����̃R���e�B�j���[�Ή�
-�@�E�R���e�B�j���[���A�摜�̍��������Ή�
-�@�E�J�^���O�\���@�\�ǉ�
-�@�EURL���ڂ�ǉ�
-�@�E���[���A�h���X��URL���N�b�L�[�Ή�
-�@�E�u�Ǘ��v�u�폜�v�𖼑O�ɂ����Ɓu"�Ǘ�"�v�u"�폜"�v�ɂȂ�@�\���폜
-�@�E�폜���[�`���̌�����
-�@�E�T���l�C�����[�`�����������ʂł���悤�ɕύX
-�@�E�����T���l�C���@�\�ǉ�
-�@�E�N�I���e�B�l��ݒ�ŕύX�\�ɂ���
-�@�EGD2��ImageCopyResampled�𗘗p���ĉ掿����
-�@�E�����ɂ��poti_ini.php�̍폜
-�y�e���v���[�g�z
-�@�Eoya/url , oya/res/url�@�̒ǉ��i���C�������X�j
-�@�Eurl�@�̒ǉ��i�ҏW�j
-�@�Etmp/tmpfile�@�̍폜�B����� tmp/srcname �𗘗p�i���G�������e���j
-�@�Emode , jpgfile�@�̒ǉ��i���G�����j
-�@�Eshipainter �̍폜�B����� applet , usepbbs �𗘗p�i�R���e�B�j���[�j
-�@�Ectype_pch , ctype_jpg�@�̒ǉ��i�R���e�B�j���[�j
-�@�E�J�^���O�p�ϐ��ǉ�
-�@�@y/x/no , y/x/sub , y/x/name , y/x/now , y/x/imgsrc , y/x/w , y/x/pch
-�@�@y/x/txt , y/x/noimg
+【変更】
+　・お絵かきアプレットから投稿されるJPEG画像に対応
+　・JPEG画像からのコンティニュー対応
+　・コンティニュー時、画像の差し換え対応
+　・カタログ表示機能追加
+　・URL項目を追加
+　・メールアドレス＆URLをクッキー対応
+　・「管理」「削除」を名前にいれると「"管理"」「"削除"」になる機能を削除
+　・削除ルーチンの見直し
+　・サムネイルルーチンを自動判別できるように変更
+　・強制サムネイル機能追加
+　・クオリティ値を設定で変更可能にした
+　・GD2のImageCopyResampledを利用して画質向上
+　・統合によりpoti_ini.phpの削除
+【テンプレート】
+　・oya/url , oya/res/url　の追加（メイン＆レス）
+　・url　の追加（編集）
+　・tmp/tmpfile　の削除。代わりに tmp/srcname を利用（お絵かき投稿時）
+　・mode , jpgfile　の追加（お絵かき）
+　・shipainter の削除。代わりに applet , usepbbs を利用（コンティニュー）
+　・ctype_pch , ctype_jpg　の追加（コンティニュー）
+　・カタログ用変数追加
+　　y/x/no , y/x/sub , y/x/name , y/x/now , y/x/imgsrc , y/x/w , y/x/pch
+　　y/x/txt , y/x/noimg
 
 
 [2003/11/07]
-�@�E�{�Ƃӂ��΂�futaba.php�̏C���Ɠ��������C��
-�@�E�e���|�����̃S�~���������S����Ȃ������̂ŏC��
+　・本家ふたばのfutaba.phpの修正と同じ所を修正
+　・テンポラリのゴミ除去が完全じゃなかったので修正
 
 [2003/10/16]
-�@�E�ҏW�@�\��ǉ�
-�@�E�����������̐ݒ肪�ł���悤�ɂ���
+　・編集機能を追加
+　・制限文字数の設定ができるようにした
 
 [2003/10/05]
-�@�E���쌠�\�L�𐮗�
+　・著作権表記を整理
 
 [2003/10/04]
-�@�E���t�̏����o�O�b��Ή�
+　・日付の書式バグ暫定対応
 
 [2003/10/03]
-�@�E���G������imgboard.php(lot.031003)�Ɠ��l�A�����y�C���^�[�ɑΉ�
+　・お絵かき版imgboard.php(lot.031003)と同様、しぃペインターに対応
 
 [2003/09/30]
-�y�ǉ��z
-�@�E�Ǘ��҂݂̂��V�K���e�@�\
-�y�ύX�z
-�@�E�\�����X���ݒ�ŁA�w�Ǘ��҂݂̂��V�K���e�@�\�x���K�p����Ă���Ƃ�
-�@�� 0 �̓��X��\�����Ȃ�
+【追加】
+　・管理者のみが新規投稿機能
+【変更】
+　・表示レス数設定で、『管理者のみが新規投稿機能』が適用されているとき
+　の 0 はレスを表示しない
 
 [2003/09/27]
-�y�ǉ��z
-�@�E���t�̏����w��
-�@�E�y�[�W���O�̏����w��
-�@�E�Ǘ���ʁi�폜���[�h�j�̕\�̔w�i�F�w��
-�@�E�~�j���X�t�H�[���p�̃t���O�w��
-�y�ύX�z
-�@�E�\�����X���ݒ�ŁA0�ɂ����Ƃ��S���\��
+【追加】
+　・日付の書式指定
+　・ページングの書式指定
+　・管理画面（削除モード）の表の背景色指定
+　・ミニレスフォーム用のフラグ指定
+【変更】
+　・表示レス数設定で、0にしたとき全件表示
 
 [2003/09/24]
-�@�E�l���łƂ��Č��J
+　・人柱版として公開

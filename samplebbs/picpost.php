@@ -1,12 +1,15 @@
 <?php
 //----------------------------------------------------------------------
-// picpost.php lot.050604  by SakaQ >> http://www.punyu.net/php/
+// picpost.php lot.180614  by SakaQ >> http://www.punyu.net/php/
+// & sakots >> https://sakots.red/poti/
 //
 // しぃからPOSTされたお絵かき画像をTEMPに保存
 //
 // このスクリプトはPaintBBS（藍珠CGI）のPNG保存ルーチンを参考に
 // PHP用に作成したものです。
 //----------------------------------------------------------------------
+// 2018/06/14 軽微なエラー修正
+// 2018/01/12 php7対応
 // 2005/06/04 容量違反・画像サイズ違反・拒絶画像のチェックを追加
 // 2005/02/14 差し換え時の認識コードrepcodeを投稿者情報に追加
 // 2004/06/22 ユーザーを識別するusercodeを投稿者情報に追加
@@ -21,7 +24,7 @@
 //設定
 include("config.php");
 //容量違反チェックをする する:1 しない:0
-define(SIZE_CHECK, 1);
+define('SIZE_CHECK', '1');
 
 $time = time();
 $imgfile = $time.substr(microtime(),2,3);	//画像ファイル名
@@ -68,8 +71,9 @@ $u_agent = str_replace("\t", "", $u_agent);
 
 //raw POST データ取得
 ini_set("always_populate_raw_post_data", "1");
-$buffer = $_REQUEST['HTTP_RAW_POST_DATA'];
-if(!$buffer) $buffer = $HTTP_RAW_POST_DATA;
+//$buffer = $_REQUEST['HTTP_RAW_POST_DATA'];
+$buffer = file_get_contents('php://input');
+//if(!$buffer) $buffer = $HTTP_RAW_POST_DATA;
 if(!$buffer){
 	$stdin = @fopen("php://input", "rb");
 	$buffer = @fread($stdin, $_ENV['CONTENT_LENGTH']);
@@ -123,7 +127,7 @@ if($size[0] > PMAX_W || $size[1] > PMAX_H){
 }
 $chk = md5_of_file($full_imgfile);
 foreach($badfile as $value){
-	if(ereg("^$value",$chk)){
+	if(preg_match("/^$value/",$chk)){
 		unlink($full_imgfile);
 		error("拒絶画像を検出しました。画像は保存されません。");
 		exit;
@@ -136,25 +140,21 @@ $pchLength = substr($buffer, 1 + 8 + $headerLength + 8 + 2 + $imgLength, 8);
 $h = substr($buffer, 0, 1);
 // 拡張子設定
 
-//NEOを掲示板の<head>に埋め込んで使う場合、userAgentを偽装して送信することができません。
-//userAgentのチェックを外してください。
-/*
 if($h=='S'){
-	if(!strstr($u_agent,'Shi-Painter/')){
-		unlink($full_imgfile);
-		error("UA error。画像は保存されません。");
-		exit;
-	}
+//	if(!strstr($u_agent,'Shi-Painter/')){
+//		unlink($full_imgfile);
+//		error("UA error。画像は保存されません。");
+//		exit;
+//	}
 	$ext = '.spch';
 }else{
-	if(!strstr($u_agent,'PaintBBS/')){
-		unlink($full_imgfile);
-		error("UA error。画像は保存されません。");
-		exit;
-	}
+//	if(!strstr($u_agent,'PaintBBS/')){
+//		unlink($full_imgfile);
+//		error("UA error。画像は保存されません。");
+//		exit;
+//	}
 	$ext = '.pch';
 }
-*/
 
 if($pchLength!=0){
 	// PCHイメージを取り出す

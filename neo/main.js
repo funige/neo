@@ -1,7 +1,12 @@
 'use strict';
 
 const {shell, app, BrowserWindow} = require('electron');
+
+const http = require('http');
+const nodeStatic = require('node-static');
 const fs = require('fs');
+
+//const file = new nodeStatic.Server(__dirname + '/web');
 
 let win;
 

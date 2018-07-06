@@ -1,11 +1,13 @@
 <?php
 /*
   *
-  * POTI-board v1.32 lot.050602
-  *   (C)SakaQ >> http://www.punyu.net/php/
+  * POTI-board改 v1.42.2 lot.180614
+  *   (C)sakots >> https://sakots.red/poti/
   *
   *----------------------------------------------------------------------------------
-  * ORIGINAL SCRIPT :
+  * ORIGINAL SCRIPT
+  *   POTI-board v1.32
+  *     (C)SakaQ >> http://www.punyu.net/php/
   *   futaba.php v0.8 lot.031015 (gazou.php v3.0 CUSTOM)
   *     (C)futaba >> http://www.2chan.net/ ((C)ToR >> http://php.s3.to/)
   *
@@ -13,7 +15,7 @@
   *   PaintBBS   (test by v2.22_8)
   *   ShiPainter (test by v1.071all)
   *   PCHViewer  (test by v1.12)
-  *     (C)shi-chan >> http://shichan.jp/
+  *     (C)shi-chan >> http://hp.vector.co.jp/authors/VA016309/
   *
   * USE FUNCTION :
   *   HTML template         (C)H.Ayukawa >> http://hoover.ktplan.ne.jp/kaihatsu/php/
@@ -23,22 +25,27 @@
 
 このスクリプトは「レッツPHP!」<http://php.s3.to/>のgazou.phpを改造した、
 「ふたば★ちゃんねる」<http://www.2chan.net/>のfutaba.phpを
-さらにお絵かきもできるようにして、HTMLテンプレートでデザイン変更できるように改造したものです。
+さらにお絵かきもできるようにして、HTMLテンプレートでデザイン変更できるように改造した
+「ぷにゅねっと」<http://www.punyu.net/php/>のPOTI-boardを、
+さらにphp7で動くように改造したものです。
 
 配布条件はレッツPHP!に準じます。改造、再配布は自由にどうぞ。
 
 このスクリプトの改造部分に関する質問は「レッツPHP!」,
-「ふたば★ちゃんねる」に問い合わせないでください。
-ご質問は、<http://www.punyu.net/bbs/ibbs/ibbs.php>までどうぞ。
+「ふたば★ちゃんねる」「ぷにゅねっと」に問い合わせないでください。
+ご質問は、<https://sakots.red/nee/>までどうぞ。
 */
-
 if(phpversion()>="4.1.0"){
 	extract($_POST);
 	extract($_GET);
 	extract($_COOKIE);
 	extract($_SERVER);
-	$upfile_name=$_FILES["upfile"]["name"];
-	$upfile=$_FILES["upfile"]["tmp_name"];
+	if (isset($_FILES["upfile"]["name"])) {
+		$upfile_name=$_FILES["upfile"]["name"];
+	}
+	if (isset($_FILES["upfile"]["tmp_name"])) {
+		$upfile=$_FILES["upfile"]["tmp_name"];
+	}
 }
 //設定の読み込み
 require("config.php");
@@ -58,16 +65,16 @@ if((THUMB_SELECT==0 && gd_check()) || THUMB_SELECT==1){
 }
 
 //MB関数を使うか？ 使う:1 使わない:0
-define(USE_MB , 1);
+define('USE_MB' , '1');
 
 //バージョン
-define(POTI_VER   , 'v1.32');
-define(POTI_VERLOT, 'v1.32 lot.050602');
+define('POTI_VER' , '改 v1.42.2');
+define('POTI_VERLOT' , '改 v1.42.2 lot.180614');
 
 //メール通知クラスのファイル名
-define(NOTICEMAIL_FILE , 'noticemail.inc');
+define('NOTICEMAIL_FILE' , 'noticemail.inc');
 //アプレットヘルプのファイル名
-define(SIIHELP_FILE , 'siihelp.php');
+define('SIIHELP_FILE' , 'siihelp.php');
 
 switch(CHARSET_OUT){
 	case 1 : $charset="EUC-JP";break;
@@ -76,7 +83,7 @@ switch(CHARSET_OUT){
 	case 4 : $charset="UTF-8";break;
 	default : $charset=CHARSET_OUT;
 }
-define(CHARSET_HTML, $charset);
+define('CHARSET_HTML', $charset);
 
 //----------htmltemplateタグ定義
 //{$hoge}
@@ -271,7 +278,7 @@ function form(&$dat,$resno,$admin="",$tmp=""){
 		$dat['palette'] = '';
 		$lines = file(PALETTEFILE);
 		foreach ( $lines as $line ) {
-			$line=ereg_replace("[\t\r\n]","",$line);
+			$line=preg_replace("/[\t\r\n]/","",$line);
 			list($pid,$pname,) = explode(",", $line);
 			$dat['palette'] .= '<option value="'.$pid.'">'.CleanStr($pname)."</option>\n";
 		}
@@ -313,7 +320,7 @@ function form(&$dat,$resno,$admin="",$tmp=""){
 				$psec -= $H*3600;
 			}
 			if($psec >= 60){
-				$M = intval($psec/60); 
+				$M = intval($psec/60);
 				$ptime .= $M.PTIME_M;
 				$psec -= $M*60;
 			}
@@ -328,9 +335,7 @@ function form(&$dat,$resno,$admin="",$tmp=""){
 	$dat['usename'] = USE_NAME ? ' *' : '';
 	$dat['usesub']  = USE_SUB ? ' *' : '';
 	if(USE_COM||$resno) $dat['usecom'] = ' *';
-
-    if((!$resno && !$tmp) || (RES_UPLOAD && !$tmp)) $dat['upfile'] = true;
-
+	if((!$resno && !$tmp) || (RES_UPLOAD && !$tmp)) $dat['upfile'] = true;
 	$dat['maxkb']   = MAX_KB;
 	$dat['maxw']    = $resno ? MAX_RESW : MAX_W;
 	$dat['maxh']    = $resno ? MAX_RESH : MAX_H;
@@ -397,7 +402,7 @@ function updatelog($resno=0){
 			//if($email) $name = "<a href=\"mailto:$email\">$name</a>";
 			if(AUTOLINK) $com = auto_link($com);
 			// '>'色設定
-			$com = eregi_replace("(^|>)((&gt;|＞)[^<]*)", "\\1".RE_START."\\2".RE_END, $com);
+			$com = preg_replace("/(^|>)((&gt;|＞)[^<]*)/i", "\\1".RE_START."\\2".RE_END, $com);
 			// 画像ファイル名
 			$img = $path.$time.$ext;
 			// 画像系変数セット
@@ -467,9 +472,9 @@ function updatelog($resno=0){
 				$dat['resub'] = $resub; //レス画面用
 			}
 			//日付とIDを分離
-			if(ereg("( ID:)(.*)",$now,$regs)){
+			if(preg_match("/( ID:)(.*)/",$now,$regs)){
 				$id=$regs[2];
-				$now=ereg_replace("( ID:.*)","",$now);
+				$now=preg_replace("/( ID:.*)/","",$now);
 			}else{$id='';}
 			//日付と編集マークを分離
 			$updatemark='';
@@ -481,16 +486,16 @@ function updatelog($resno=0){
 			}
 			//名前とトリップを分離
 			$name=strip_tags($name);//タグ除去
-			if(ereg("(◆.*)",$name,$regs)){
+			if(preg_match("/(◆.*)/",$name,$regs)){
 				$trip=$regs[1];
-				$name=ereg_replace("(◆.*)","",$name);
+				$name=preg_replace("/(◆.*)/","",$name);
 			}else{$trip='';}
 			//TAB
 			$tab=$oya+1;
 			//文字色
 			$fontcolor = $fcolor ? $fcolor : DEF_FONTCOLOR;
 			//<br />を<br>へ
-			$com = eregi_replace("<br( *)/>","<br>",$com);
+			$com = preg_replace("{<br( *)/>}i","<br>",$com);
 			//独自タグ変換
 			if(USE_POTITAG) $com = potitag($com);
 
@@ -510,7 +515,7 @@ function updatelog($resno=0){
 				//if($email) $name = "<a href=\"mailto:$email\">$name</a>";
 				if(AUTOLINK) $com = auto_link($com);
 				// '>'色設定
-				$com = eregi_replace("(^|>)((&gt;|＞)[^<]*)", "\\1".RE_START."\\2".RE_END, $com);
+				$com = preg_replace("/(^|>)((&gt;|＞)[^<]*)/i", "\\1".RE_START."\\2".RE_END, $com);
 
 				// ---------- レス画像対応 ----------
 				// 画像ファイル名
@@ -545,9 +550,9 @@ function updatelog($resno=0){
 				}
 
 				//日付とIDを分離
-				if(ereg("( ID:)(.*)",$now,$regs)){
+				if(preg_match("/( ID:)(.*)/",$now,$regs)){
 					$id=$regs[2];
-					$now=ereg_replace("( ID:.*)","",$now);
+					$now=preg_replace("/( ID:.*)/","",$now);
 				}else{$id='';}
 				//日付と編集マークを分離
 				$updatemark='';
@@ -559,14 +564,14 @@ function updatelog($resno=0){
 				}
 				//名前とトリップを分離
 				$name=strip_tags($name);//タグ除去
-				if(ereg("(◆.*)",$name,$regs)){
+				if(preg_match("/(◆.*)/",$name,$regs)){
 					$trip=$regs[1];
-					$name=ereg_replace("(◆.*)","",$name);
+					$name=preg_replace("/(◆.*)/","",$name);
 				}else{$trip='';}
 				//文字色
 				$fontcolor = $fcolor ? $fcolor : DEF_FONTCOLOR;
 				//<br />を<br>へ
-				$com = eregi_replace("<br( *)/>","<br>",$com);
+				$com = preg_replace("{<br( *)/>}i","<br>",$com);
 				//独自タグ変換
 				if(USE_POTITAG) $com = potitag($com);
 
@@ -642,7 +647,7 @@ function updatelog($resno=0){
 
 /* オートリンク */
 function auto_link($proto){
-	$proto = ereg_replace("(https?|ftp|news)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)","<a href=\"\\1\\2\" target=\"_blank\">\\1\\2</a>",$proto);
+	$proto = preg_replace("{(https?|ftp|news)(://[[:alnum:]\+\$\;\?\.%,!#~*/:@&=_-]+)}","<a href=\"\\1\\2\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">\\1\\2</a>",$proto);
 	return $proto;
 }
 
@@ -679,7 +684,7 @@ function similar_str($str1,$str2){
 
 /* 記事書き込み */
 function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pictmp,$picfile){
-	global $path,$badstring,$badfile,$badip,$pwdc,$textonly;
+	global $path,$badstring,$badstring_and_url,$badfile,$badip,$pwdc,$textonly;
 	global $REQUEST_METHOD,$temppath,$ptime;
 	global $fcolor,$usercode;
 
@@ -722,7 +727,7 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 		$size = getimagesize($dest);
 		if(!is_array($size)) error(MSG004,$dest);
 		$chk = md5_of_file($dest);
-		foreach($badfile as $value){if(ereg("^$value",$chk)){
+		foreach($badfile as $value){if(preg_match("/^$value/",$chk)){
 			error(MSG005,$dest); //拒絶画像
 		}}
 		@chmod($dest,0666);
@@ -730,7 +735,7 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 		$H = $size[1];
 
 		switch ($size[2]) {
-			//case 1 : $ext=".gif";break;
+//			case 1 : $ext=".gif";break;
 			case 2 : $ext=".jpg";break;
 			case 3 : $ext=".png";break;
 			default : error(MSG004,$dest);
@@ -756,17 +761,19 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	$url   = charconvert($url  ,CHARSET_IN);
 	$ptime = charconvert($ptime,CHARSET_IN);
 
-	foreach($badstring as $value){if(ereg($value,$com)||ereg($value,$sub)||ereg($value,$name)||ereg($value,$email)){error(MSG032,$dest);};}
+	foreach($badstring as $value){if(preg_match("/$value/i",$com)||preg_match("/$value/i",$sub)||preg_match("/$value/i",$name)||preg_match("/$value/i",$email)){error(MSG032,$dest);};}
 	if($REQUEST_METHOD != "POST") error(MSG006,$dest);
 
-	// フォーム内容をチェック
-	if(!$name||ereg("^[ |　|]*$",$name)) $name="";
-	if(!$com||ereg("^[ |　|\t]*$",$com)) $com="";
-	if(!$sub||ereg("^[ |　|]*$",$sub))   $sub="";
-	if(!$url||ereg("^[ |　|]*$",$url))   $url="";
+//指定文字列+本文へのURL書き込みで拒絶
+	foreach($badstring_and_url as $value){if(preg_match("/$value/i",$com) && preg_match('/:\/\//i', $com)||preg_match("/$value/i",$sub) && preg_match('/:\/\//i', $com) > '0'){error(MSG032,$dest);};}
 
-	//if(!$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest); //荒らし対策。画像無し投稿を禁止
-	if(!$resto&&!@is_file($dest)) error(MSG007,$dest);
+	// フォーム内容をチェック
+	if(!$name||preg_match("/^[ |　|]*$/",$name)) $name="";
+	if(!$com||preg_match("/^[ |　|\t]*$/",$com)) $com="";
+	if(!$sub||preg_match("/^[ |　|]*$/",$sub))   $sub="";
+	if(!$url||preg_match("/^[ |　|]*$/",$url))   $url="";
+
+	if(!$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
 	if(RES_UPLOAD&&$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
 	if(!$com&&!@is_file($dest)) error(MSG008,$dest);
 
@@ -774,8 +781,8 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(USE_COM&&!$com) error(MSG008,$dest);
 	if(USE_SUB&&!$sub) error(MSG010,$dest);
 
-	//$name=ereg_replace("管理","\"管理\"",$name);
-	//$name=ereg_replace("削除","\"削除\"",$name);
+	//$name=preg_replace("/管理/","\"管理\"",$name);
+	//$name=preg_replace("/削除/","\"削除\"",$name);
 
 	if(strlen($com) > MAX_COM) error(MSG011,$dest);
 	if(strlen($name) > MAX_NAME) error(MSG012,$dest);
@@ -784,30 +791,32 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(strlen($resto) > 10) error(MSG015,$dest);
 
 	//本文に日本語がなければ拒絶
-	if(strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest);
+	if(USE_COM&&strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest);
+	//本文へのURLの書き込みを禁止
+	if(DENY_COMMENTS_URL && preg_match('/:\/\/|\.co|\.ly|\.gl|\.net|\.org|\.cc|\.ru|\.su|\.ua|\.gd/i', $com) > '0' ) error(MSG036,$dest);
 
 	//ホスト取得
 	$host = gethostbyaddr(getenv("REMOTE_ADDR"));
 
 	foreach($badip as $value){ //拒絶host
-		if(eregi("$value$",$host)) error(MSG016,$dest);
+		if(preg_match("/$value$/i",$host)) error(MSG016,$dest);
 	}
-	if(eregi("^mail",$host)
-	|| eregi("^ns",$host)
-	|| eregi("^dns",$host)
-	|| eregi("^ftp",$host)
-	|| eregi("^prox",$host)
-	|| eregi("^pc",$host)
-	|| eregi("^[^\.]\.[^\.]$",$host)){
+	if(preg_match("/^mail/i",$host)
+	|| preg_match("/^ns/i",$host)
+	|| preg_match("/^dns/i",$host)
+	|| preg_match("/^ftp/i",$host)
+	|| preg_match("/^prox/i",$host)
+	|| preg_match("/^pc/i",$host)
+	|| preg_match("/^[^\.]\.[^\.]$/i",$host)){
 		$pxck = "on";
 	}
-	if(eregi("ne\\.jp$",$host)
-	|| eregi("ad\\.jp$",$host)
-	|| eregi("bbtec\\.net$",$host)
-	|| eregi("aol\\.com$",$host)
-	|| eregi("uu\\.net$",$host)
-	|| eregi("asahi-net\\.or\\.jp$",$host)
-	|| eregi("rim\\.or\\.jp$",$host)){
+	if(preg_match("/ne\\.jp$/i",$host)
+	|| preg_match("/ad\\.jp$/i",$host)
+	|| preg_match("/bbtec\\.net$/i",$host)
+	|| preg_match("/aol\\.com$/i",$host)
+	|| preg_match("/uu\\.net$/i",$host)
+	|| preg_match("/asahi-net\\.or\\.jp$/i",$host)
+	|| preg_match("/rim\\.or\\.jp$/i",$host)){
 		$pxck = "off";
 	}else{
 		$pxck = "on";
@@ -845,36 +854,36 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	$now = str_replace(",", "&#44;", $now);
 	$ptime = str_replace(",", "&#44;", $ptime);
 	//テキスト整形
-	$email= CleanStr($email); $email=ereg_replace("[\r\n]","",$email);
-	$sub  = CleanStr($sub);   $sub  =ereg_replace("[\r\n]","",$sub);
-	$resto= CleanStr($resto); $resto=ereg_replace("[\r\n]","",$resto);
-	$url  = CleanStr($url);   $url  =ereg_replace("[\r\n]","",$url);
+	$email= CleanStr($email); $email=preg_replace("/[\r\n]/","",$email);
+	$sub  = CleanStr($sub);   $sub  =preg_replace("/[\r\n]/","",$sub);
+	$resto= CleanStr($resto); $resto=preg_replace("/[\r\n]/","",$resto);
+	$url  = CleanStr($url);   $url  =preg_replace("/[\r\n]/","",$url);
 	$url  = str_replace(" ", "", $url);
 	$com  = CleanStr($com);
-	// 改行文字の統一。 
+	// 改行文字の統一。
 	$com = str_replace("\r\n", "\n", $com);
 	$com = str_replace("\r", "\n", $com);
 	// 連続する空行を一行
-	$com = ereg_replace("\n((　| )*\n){3,}","\n",$com);
+	$com = preg_replace("/\n((　| )*\n){3,}/","\n",$com);
 	if(!BR_CHECK || substr_count($com,"\n")<BR_CHECK){
 		$com = nl2br($com);		//改行文字の前に<br>を代入する
 	}
 	$com = str_replace("\n", "", $com);	//\nを文字列から消す
 
-	$name=ereg_replace("◆","◇",$name);
-	$name=ereg_replace("[\r\n]","",$name);
+	$name=preg_replace("/◆/","◇",$name);
+	$name=preg_replace("/[\r\n]/","",$name);
 	$names=$name;
 	if (get_magic_quotes_gpc()) {//￥を削除
 		$names = stripslashes($names);
 	}
 	$name=CleanStr($name);
-	if(ereg("(#|＃)(.*)",$names,$regs)){
+	if(preg_match("/(#|＃)(.*)/",$names,$regs)){
 		$cap = $regs[2];
 		$cap=strtr($cap,"&amp;", "&");
 		$cap=strtr($cap,"&#44;", ",");
-		$name=ereg_replace("(#|＃)(.*)","",$name);
+		$name=preg_replace("/(#|＃)(.*)/","",$name);
 		$salt=substr($cap."H.",1,2);
-		$salt=ereg_replace("[^\.-z]",".",$salt);
+		$salt=preg_replace("/[^\.-z]/",".",$salt);
 		$salt=strtr($salt,":;<=>?@[\\]^_`","ABCDEFGabcdef");
 		$name.="◆".substr(crypt($cap,$salt),-10);
 	}
@@ -931,7 +940,9 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 				$pchk=1;
 		}
 		if($pchk){
-			if(strlen($ltime)>10){$ltime=substr($ltime,0,-3);}
+//			if(strlen($ltime)>10){$ltime=substr($ltime,0,-3);}
+//KASIRAが入らない10桁のUNIX timeを取り出す
+			if(strlen($ltime)>10){$ltime=substr($ltime,-13,-3);}
 			if(RENZOKU && $time - $ltime < RENZOKU){error(MSG020,$dest);}
 			if(RENZOKU2 && $time - $ltime < RENZOKU2 && $upfile_name){error(MSG021,$dest);}
 			if(isset($com)){
@@ -1089,23 +1100,23 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	&& !(NOTICE_NOADMIN && $pwd == ADMIN_PASS)){//管理者の投稿の場合メール出さない
 		require_once(NOTICEMAIL_FILE);
 
-		$data[to] = TO_MAIL;
-		$data[name] = $name;
-		$data[email] = $email;
-		$data[option][] = 'URL,'.$url;
-		$data[option][] = '記事題名,'.$sub;
-		if(@file_exists($path.$tim.$ext)) $data[option][] = '投稿画像,'.ROOT_URL.IMG_DIR.$tim.$ext;
-		if(@file_exists(THUMB_DIR.$tim.'s.jpg')) $data[option][] = 'サムネイル画像,'.ROOT_URL.THUMB_DIR.$tim.'s.jpg';
-		if(@file_exists(PCH_DIR.$tim.'.pch')) $data[option][] = 'アニメファイル,'.ROOT_URL.PCH_DIR.$tim.'.pch';
-		if(@file_exists(PCH_DIR.$tim.'.spch')) $data[option][] = 'アニメファイル,'.ROOT_URL.PCH_DIR.$tim.'.spch';
+		$data['to'] = TO_MAIL;
+		$data['name'] = $name;
+		$data['email'] = $email;
+		$data['option'][] = 'URL,'.$url;
+		$data['option'][] = '記事題名,'.$sub;
+		if(@file_exists($path.$tim.$ext)) $data['option'][] = '投稿画像,'.ROOT_URL.IMG_DIR.$tim.$ext;
+		if(@file_exists(THUMB_DIR.$tim.'s.jpg')) $data['option'][] = 'サムネイル画像,'.ROOT_URL.THUMB_DIR.$tim.'s.jpg';
+		if(@file_exists(PCH_DIR.$tim.'.pch')) $data['option'][] = 'アニメファイル,'.ROOT_URL.PCH_DIR.$tim.'.pch';
+		if(@file_exists(PCH_DIR.$tim.'.spch')) $data['option'][] = 'アニメファイル,'.ROOT_URL.PCH_DIR.$tim.'.spch';
 		if($resto){
-			$data[subject] = '['.TITLE.'] No.'.$resto.'へのレスがありました';
-			$data[option][] = "\n記事URL,".ROOT_URL.PHP_SELF.'?res='.$resto;
+			$data['subject'] = '['.TITLE.'] No.'.$resto.'へのレスがありました';
+			$data['option'][] = "\n記事URL,".ROOT_URL.PHP_SELF.'?res='.$resto;
 		}else{
-			$data[subject] = '['.TITLE.'] 新規投稿がありました';
-			$data[option][] = "\n記事URL,".ROOT_URL.PHP_SELF.'?res='.$no;
+			$data['subject'] = '['.TITLE.'] 新規投稿がありました';
+			$data['option'][] = "\n記事URL,".ROOT_URL.PHP_SELF.'?res='.$no;
 		}
-		if(SEND_COM) $data[comment] = eregi_replace("<br(( *)|( *)/)>","\n", $com);
+		if(SEND_COM) $data['comment'] = preg_replace("#<br(( *)|( *)/)>#i","\n", $com);
 
 		noticemail::send($data,USE_MB);
 	}
@@ -1158,8 +1169,8 @@ function treedel($delno){
 				}else{//レス削除
 					$treeline[$j]='';
 					$line[$i]=implode(',', $treeline);
-					$line[$i]=ereg_replace(",,",",",$line[$i]);
-					$line[$i]=ereg_replace(",$","",$line[$i]);
+					$line[$i]=preg_replace("/,,/",",",$line[$i]);
+					$line[$i]=preg_replace("/,$/","",$line[$i]);
 					$line[$i].="\n";
 				}
 				$find=true;
@@ -1305,21 +1316,21 @@ function admindel($pass){
 		list($no,$now,$name,$email,$sub,$com,$url,
 			 $host,$pw,$ext,$w,$h,$time,$chk,) = explode(",",charconvert($line[$j],CHARSET_IN));
 		// フォーマット
-		//$now=ereg_replace('.{2}/(.*)$','\1',$now);
-		//$now=ereg_replace('\(.*\)',' ',$now);
-		$now  = ereg_replace("( ID:.*)","",$now);//ID以降除去
+		//$now=preg_replace('#.{2}/(.*)$#','\1',$now);
+		//$now=preg_replace('/\(.*\)/',' ',$now);
+		$now  = preg_replace("/( ID:.*)/","",$now);//ID以降除去
 		$name = strip_tags($name);//タグ除去
 		if(strlen($name) > 10) $name = substr($name,0,9).".";
 		if(strlen($sub) > 10) $sub = substr($sub,0,9).".";
 		if($email) $name="<a href=\"mailto:$email\">$name</a>";
-		$com = eregi_replace("<br(( *)|( *)/)>"," ",$com);
+		$com = preg_replace("{<br(( *)|( *)/)>}i"," ",$com);
 		//$com = str_replace("<br />"," ",$com);
 		$com = htmlspecialchars($com);
 		if(strlen($com) > 20) $com = substr($com,0,18) . ".";
 		// 画像があるときはリンク
 		if($ext && @is_file($path.$time.$ext)){
 			$img_flag = TRUE;
-			$clip = "<a href=\"".IMG_DIR.$time.$ext."\" target=_blank>".$time.$ext."</a><br>";
+			$clip = "<a href=\"".IMG_DIR.$time.$ext."\" target=\"_blank\" rel=\"noopener\">".$time.$ext."</a><br>";
 			$size = filesize($path.$time.$ext);
 			$all += $size;	//合計計算
 			$chk= substr($chk,0,10);
@@ -1381,8 +1392,8 @@ function paintform($picw,$pich,$palette,$anime,$pch=""){
 	global $admin,$shi,$ctype,$type,$no,$pwd,$ext;
 	global $resto,$mode,$savetype,$quality,$qualitys,$usercode;
 
-    global $useneo; //NEOを使う
-    if ($useneo) $dat['useneo'] = true; //NEOを使う
+	global $useneo; //NEOを使う
+	if ($useneo) $dat['useneo'] = true; //NEOを使う
 
 	if($picw < 100) $picw = 100;
 	if($pich < 100) $pich = 100;
@@ -1461,7 +1472,7 @@ function paintform($picw,$pich,$palette,$anime,$pch=""){
 	$p_cnt=1;
 	$lines = file(PALETTEFILE);
 	foreach ( $lines as $line ) {
-		$line=ereg_replace("[\t\r\n]","",$line);
+		$line=preg_replace("/[\t\r\n]/","",$line);
 		list($pid,$pname,$pal[0],$pal[2],$pal[4],$pal[6],$pal[8],$pal[10],$pal[1],$pal[3],$pal[5],$pal[7],$pal[9],$pal[11],$pal[12],$pal[13]) = explode(",", $line);
 		$DynP[]=CleanStr($pname);
 		$palettes = 'Palettes['.$p_cnt.'] = "#'.$pal[0];
@@ -1569,7 +1580,7 @@ function paintcom($resto=''){
 			$userdata = fread($fp, 1024);
 			fclose($fp);
 			list($uip,$uhost,$uagent,$imgext,$ucode,) = explode("\t", rtrim($userdata));
-			$file_name = eregi_replace("\.(dat)$","",$file);
+			$file_name = preg_replace("/\.(dat)$/i","",$file);
 			if(@file_exists(TEMP_DIR.$file_name.$imgext)) //画像があればリストに追加
 				$tmplist[] = $ucode."\t".$uip."\t".$file_name.$imgext;
 		}
@@ -1686,7 +1697,11 @@ function incontinue($no){
 
 	$dat['continue_mode'] = true;
 	head($dat);
-	if(CONTINUE_PASS) $dat['passflag'] = true;
+//	if(CONTINUE_PASS) $dat['passflag'] = true;
+//コンティニュー時は削除キーを常に表示
+	$dat['passflag'] = true;
+//新規投稿で削除キー不要の時 true
+	if(! CONTINUE_PASS) $dat['newpost_nopassword'] = true;
 	$dat['picfile'] = IMG_DIR.$ctim.$cext;
 	$size = getimagesize($dat['picfile']);
 	$dat['picw'] = $size[0];
@@ -1713,7 +1728,7 @@ function incontinue($no){
 
 	$lines = file(PALETTEFILE);
 	foreach ( $lines as $line ) {
-		$line=ereg_replace("[\t\r\n]","",$line);
+		$line=preg_replace("/[\t\r\n]/","",$line);
 		list($pid,$pname,) = explode(",", $line);
 		$dat['palette'] .= '<option value="'.$pid.'">'.CleanStr($pname)."</option>\n";
 	}
@@ -1776,7 +1791,7 @@ function editform($del,$pwd){
 		$dat['name'] = strip_tags($name);
 		$dat['email'] = $email;
 		$dat['sub'] = $sub;
-		$com = eregi_replace("<br(( *)|( *)/)>","\n",$com); // <br>または<br />を改行へ戻す
+		$com = preg_replace("{<br(( *)|( *)/)>}i","\n",$com); // <br>または<br />を改行へ戻す
 		$dat['com'] = $com;
 		$dat['url'] = $url;
 		$dat['pwd'] = $pwd;
@@ -1797,7 +1812,7 @@ function editform($del,$pwd){
 
 /* 記事上書き */
 function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
-	global $badstring,$badip;
+	global $badstring,$badstring_and_url,$badip;
 	global $REQUEST_METHOD;
 	global $fcolor;
 
@@ -1810,48 +1825,51 @@ function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
 	$email = charconvert($email,CHARSET_IN);
 	$url   = charconvert($url  ,CHARSET_IN);
 
-	foreach($badstring as $value){if(ereg($value,$com)||ereg($value,$sub)||ereg($value,$name)||ereg($value,$email)){error(MSG032,$dest);};}
+	foreach($badstring as $value){if(preg_match("/$value/i",$com)||preg_match("/$value/i",$sub)||preg_match("/$value/i",$name)||preg_match("/$value/i",$email)){error(MSG032,$dest);};}
 	if($REQUEST_METHOD != "POST") error(MSG006);
 
-	// フォーム内容をチェック
-	if(!$name||ereg("^[ |　|]*$",$name)) $name="";
-	if(!$com||ereg("^[ |　|\t]*$",$com)) $com="";
-	if(!$sub||ereg("^[ |　|]*$",$sub))   $sub="";
-	if(!$url||ereg("^[ |　|]*$",$url))   $url="";
+//指定文字列+本文へのURL書き込みで拒絶
+	foreach($badstring_and_url as $value){if(preg_match("/$value/i",$com) && preg_match('/:\/\//i', $com)||preg_match("/$value/i",$sub) && preg_match('/:\/\//i', $com) > '0'){error(MSG032,$dest);};}
 
-	//$name=ereg_replace("管理","\"管理\"",$name);
-	//$name=ereg_replace("削除","\"削除\"",$name);
+	// フォーム内容をチェック
+	if(!$name||preg_match("/^[ |　|]*$/",$name)) $name="";
+	if(!$com||preg_match("/^[ |　|\t]*$/",$com)) $com="";
+	if(!$sub||preg_match("/^[ |　|]*$/",$sub))   $sub="";
+	if(!$url||preg_match("/^[ |　|]*$/",$url))   $url="";
+
+	//$name=preg_replace("/管理/","\"管理\"",$name);
+	//$name=preg_replace("/削除/","\"削除\"",$name);
 
 	if(strlen($com) > MAX_COM) error(MSG011);
 	if(strlen($name) > MAX_NAME) error(MSG012);
 	if(strlen($email) > MAX_EMAIL) error(MSG013);
 	if(strlen($sub) > MAX_SUB) error(MSG014);
 
-	//本文に日本語がなければ拒絶
-	if(strlen($com) == mb_strlen($com,'utf8')) error(MSG035);
+	//本文へのURLの書き込みを禁止
+	if(DENY_COMMENTS_URL && preg_match('/:\/\/|\.co|\.ly|\.gl|\.net|\.org|\.cc|\.ru|\.su|\.ua|\.gd/i', $com) > '0' ) error(MSG036,$dest);
 
 	//ホスト取得
 	$host = gethostbyaddr(getenv("REMOTE_ADDR"));
 
 	foreach($badip as $value){ //拒絶host
-		if(eregi("$value$",$host)) error(MSG016);
+		if(preg_match("/$value$/i",$host)) error(MSG016);
 	}
-	if(eregi("^mail",$host)
-	|| eregi("^ns",$host)
-	|| eregi("^dns",$host)
-	|| eregi("^ftp",$host)
-	|| eregi("^prox",$host)
-	|| eregi("^pc",$host)
-	|| eregi("^[^\.]\.[^\.]$",$host)){
+	if(preg_match("/^mail/i",$host)
+	|| preg_match("/^ns/i",$host)
+	|| preg_match("/^dns/i",$host)
+	|| preg_match("/^ftp/i",$host)
+	|| preg_match("/^prox/i",$host)
+	|| preg_match("/^pc/i",$host)
+	|| preg_match("/^[^\.]\.[^\.]$/i",$host)){
 		$pxck = "on";
 	}
-	if(eregi("ne\\.jp$",$host)
-	|| eregi("ad\\.jp$",$host)
-	|| eregi("bbtec\\.net$",$host)
-	|| eregi("aol\\.com$",$host)
-	|| eregi("uu\\.net$",$host)
-	|| eregi("asahi-net\\.or\\.jp$",$host)
-	|| eregi("rim\\.or\\.jp$",$host)){
+	if(preg_match("/ne\\.jp$/i",$host)
+	|| preg_match("/bbtec\\.net$/i",$host)
+	|| preg_match("/ad\\.jp$/i",$host)
+	|| preg_match("/aol\\.com$/i",$host)
+	|| preg_match("/uu\\.net$/i",$host)
+	|| preg_match("/asahi-net\\.or\\.jp$/i",$host)
+	|| preg_match("/rim\\.or\\.jp$/i",$host)){
 		$pxck = "off";
 	}else{
 		$pxck = "on";
@@ -1878,32 +1896,32 @@ function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
 	}
 	$now = str_replace(",", "&#44;", $now);//カンマを変換
 	//テキスト整形
-	$email= CleanStr($email);  $email=ereg_replace("[\r\n]","",$email);
-	$sub  = CleanStr($sub);    $sub  =ereg_replace("[\r\n]","",$sub);
-	$url  = CleanStr($url);    $url  =ereg_replace("[\r\n]","",$url);
+	$email= CleanStr($email);  $email=preg_replace("/[\r\n]/","",$email);
+	$sub  = CleanStr($sub);    $sub  =preg_replace("/[\r\n]/","",$sub);
+	$url  = CleanStr($url);    $url  =preg_replace("/[\r\n]/","",$url);
 	$url  = str_replace(" ", "", $url);
 	$com  = CleanStr($com);
-	// 改行文字の統一。 
+	// 改行文字の統一。
 	$com = str_replace("\r\n", "\n", $com);
 	$com = str_replace("\r", "\n", $com);
 	// 連続する空行を一行
-	$com = ereg_replace("\n((　| )*\n){3,}","\n",$com);
+	$com = preg_replace("#\n((　| )*\n){3,}#","\n",$com);
 	if(!BR_CHECK || substr_count($com,"\n")<BR_CHECK){
 		$com = nl2br($com);		//改行文字の前に<br>を代入する
 	}
 	$com = str_replace("\n", "", $com);	//\nを文字列から消す
 
-	$name=ereg_replace("◆","◇",$name);
-	$name=ereg_replace("[\r\n]","",$name);
+	$name=preg_replace("/◆/","◇",$name);
+	$name=preg_replace("/[\r\n]/","",$name);
 	$names=$name;
 	$name = CleanStr($name);
-	if(ereg("(#|＃)(.*)",$names,$regs)){
+	if(preg_match("/(#|＃)(.*)/",$names,$regs)){
 		$cap = $regs[2];
 		$cap=strtr($cap,"&amp;", "&");
 		$cap=strtr($cap,"&#44;", ",");
-		$name=ereg_replace("(#|＃)(.*)","",$name);
+		$name=preg_replace("/(#|＃)(.*)/","",$name);
 		$salt=substr($cap."H.",1,2);
-		$salt=ereg_replace("[^\.-z]",".",$salt);
+		$salt=preg_replace("/[^\.-z]/",".",$salt);
 		$salt=strtr($salt,":;<=>?@[\\]^_`","ABCDEFGabcdef");
 		$name.="◆".substr(crypt($cap,$salt),-10);
 	}
@@ -1963,24 +1981,24 @@ function replace($no,$pwd,$stime){
 	$host = gethostbyaddr(getenv("REMOTE_ADDR"));
 
 	foreach($badip as $value){ //拒絶host
-		if(eregi("$value$",$host)) error(MSG016);
+		if(preg_match("/$value$/i",$host)) error(MSG016);
 	}
-	if(eregi("^mail",$host)
-	|| eregi("^ns",$host)
-	|| eregi("^dns",$host)
-	|| eregi("^ftp",$host)
-	|| eregi("^prox",$host)
-	|| eregi("^pc",$host)
-	|| eregi("^[^\.]\.[^\.]$",$host)){
+	if(preg_match("/^mail/i",$host)
+	|| preg_match("/^ns/i",$host)
+	|| preg_match("/^dns/i",$host)
+	|| preg_match("/^ftp/i",$host)
+	|| preg_match("/^prox/i",$host)
+	|| preg_match("/^pc/i",$host)
+	|| preg_match("/^[^\.]\.[^\.]$/i",$host)){
 		$pxck = "on";
 	}
-	if(eregi("ne\\.jp$",$host)
-	|| eregi("ad\\.jp$",$host)
-	|| eregi("bbtec\\.net$",$host)
-	|| eregi("aol\\.com$",$host)
-	|| eregi("uu\\.net$",$host)
-	|| eregi("asahi-net\\.or\\.jp$",$host)
-	|| eregi("rim\\.or\\.jp$",$host)){
+	if(preg_match("/ne\\.jp$/i",$host)
+	|| preg_match("/ad\\.jp$/i",$host)
+	|| preg_match("/bbtec\\.net$/i",$host)
+	|| preg_match("/aol\\.com$/i",$host)
+	|| preg_match("/uu\\.net$/i",$host)
+	|| preg_match("/asahi-net\\.or\\.jp$/i",$host)
+	|| preg_match("/rim\\.or\\.jp$/i",$host)){
 		$pxck = "off";
 	}else{
 		$pxck = "on";
@@ -2003,7 +2021,7 @@ function replace($no,$pwd,$stime){
 			$userdata = fread($fp, 1024);
 			fclose($fp);
 			list($uip,$uhost,$uagent,$imgext,$ucode,$urepcode) = explode("\t", rtrim($userdata));
-			$file_name = eregi_replace("\.(dat)$","",$file);
+			$file_name = preg_replace("/\.(dat)$/i","",$file);
 			//画像があり、認識コードがhitすれば抜ける
 			if(@file_exists(TEMP_DIR.$file_name.$imgext) && $urepcode == $repcode){$find=true;break;}
 		}
@@ -2039,7 +2057,7 @@ function replace($no,$pwd,$stime){
 				$psec -= $H*3600;
 			}
 			if($psec >= 60){
-				$M = intval($psec/60); 
+				$M = intval($psec/60);
 				$ptime .= $M.PTIME_M;
 				$psec -= $M*60;
 			}
@@ -2072,7 +2090,7 @@ function replace($no,$pwd,$stime){
 			$size = getimagesize($dest);
 			if(!is_array($size)) error(MSG004,$dest);
 			$chk = md5_of_file($dest);
-			foreach($badfile as $value){if(ereg("^$value",$chk)){
+			foreach($badfile as $value){if(preg_match("/^$value/",$chk)){
 				error(MSG005,$dest); //拒絶画像
 			}}
 			@chmod($dest,0666);
@@ -2195,9 +2213,9 @@ function catalog(){
 				}
 			}else{$txt=true;}
 			//日付とIDを分離
-			if(ereg("( ID:)(.*)",$now,$regs)){
+			if(preg_match("/( ID:)(.*)/",$now,$regs)){
 				$id=$regs[2];
-				$now=ereg_replace("( ID:.*)","",$now);
+				$now=preg_replace("/( ID:.*)/","",$now);
 			}else{$id='';}
 			//日付と編集マークを分離
 			$updatemark='';
@@ -2209,9 +2227,9 @@ function catalog(){
 			}
 			//名前とトリップを分離
 			$name=strip_tags($name);//タグ除去
-			if(ereg("(◆.*)",$name,$regs)){
+			if(preg_match("/(◆.*)/",$name,$regs)){
 				$trip=$regs[1];
-				$name=ereg_replace("(◆.*)","",$name);
+				$name=preg_replace("/(◆.*)/","",$name);
 			}else{$trip='';}
 
 			// 記事格納
@@ -2265,10 +2283,10 @@ function potitag($str){
 
 		foreach($base_tags as $base_tag){
 			$base_tag = trim($base_tag);
-			if(ereg('^F',$base_tag)){
-				if(ereg('s\(([^\)]+)\)',$base_tag,$m)){$size = $m[1];}
-				if(ereg('c\(([^\)]+)\)',$base_tag,$m)){$color = $m[1];}
-				if(ereg('f\(([^\)]+)\)',$base_tag,$m)){
+			if(preg_match('/^F/',$base_tag)){
+				if(preg_match('/s\(([^\)]+)\)/',$base_tag,$m)){$size = $m[1];}
+				if(preg_match('/c\(([^\)]+)\)/',$base_tag,$m)){$color = $m[1];}
+				if(preg_match('/f\(([^\)]+)\)/',$base_tag,$m)){
 					$face = $m[1];
 					for($i = 0; $i < count($ryfont1); $i++){
 						if($face == $ryfont1[$i]){$face = $ryfont2[$i];}
@@ -2284,7 +2302,7 @@ function potitag($str){
 				for($i = 0; $i < count($tags1); $i++){
 					if($base_tag==$tags1[$i]){
 						array_push($tag_ex,'<'.$tags2[$i].'>');
-						$endtag = ereg_replace("^([[:alpha:]]+)(.*)",'\\1',$tags2[$i]);
+						$endtag = preg_replace("/^([[:alpha:]]+)(.*)/",'\\1',$tags2[$i]);
 						array_push($tag_ed,'</'.$endtag.'>');
 						break;
 					}
@@ -2430,7 +2448,9 @@ switch($mode){
 		incontinue($no);
 		break;
 	case 'contpaint':
-		if(CONTINUE_PASS) usrchk($no,$pwd);
+//		if(CONTINUE_PASS) usrchk($no,$pwd);
+//差し換えの時には削除キーが必要
+		if(CONTINUE_PASS||$type=='rep') usrchk($no,$pwd);
 		if(ADMIN_NEWPOST) $admin=$pwd;
 		paintform($picw,$pich,$palette,$anime,$pch);
 		break;
