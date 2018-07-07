@@ -735,7 +735,7 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 		$H = $size[1];
 
 		switch ($size[2]) {
-//			case 1 : $ext=".gif";break;
+//			case 1 : $ext=".gif";break; // samplebbs
 			case 2 : $ext=".jpg";break;
 			case 3 : $ext=".png";break;
 			default : error(MSG004,$dest);
@@ -791,7 +791,9 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(strlen($resto) > 10) error(MSG015,$dest);
 
 	//本文に日本語がなければ拒絶
-	if(USE_COM&&strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest);
+//	if(USE_COM&&strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest);
+        if(strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest); // samplebbs
+
 	//本文へのURLの書き込みを禁止
 	if(DENY_COMMENTS_URL && preg_match('/:\/\/|\.co|\.ly|\.gl|\.net|\.org|\.cc|\.ru|\.su|\.ua|\.gd/i', $com) > '0' ) error(MSG036,$dest);
 
