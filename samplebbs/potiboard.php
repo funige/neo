@@ -791,7 +791,6 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(strlen($resto) > 10) error(MSG015,$dest);
 
 	//本文に日本語がなければ拒絶
-//	if(USE_COM&&strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest);
         if(strlen($com) > 0 && strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest); // samplebbs
         
 	//本文へのURLの書き込みを禁止
@@ -1847,7 +1846,10 @@ function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
 	if(strlen($email) > MAX_EMAIL) error(MSG013);
 	if(strlen($sub) > MAX_SUB) error(MSG014);
 
-	//本文へのURLの書き込みを禁止
+	//本文に日本語がなければ拒絶
+        if(strlen($com) > 0 && strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest); // samplebbs
+
+//本文へのURLの書き込みを禁止
 	if(DENY_COMMENTS_URL && preg_match('/:\/\/|\.co|\.ly|\.gl|\.net|\.org|\.cc|\.ru|\.su|\.ua|\.gd/i', $com) > '0' ) error(MSG036,$dest);
 
 	//ホスト取得
