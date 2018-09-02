@@ -1,7 +1,7 @@
 <?php
 /*
   *
-  * POTI-board改 v1.42.2 lot.180614
+  * POTI-board改 v1.43 lot.180713
   *   (C)sakots >> https://sakots.red/poti/
   *
   *----------------------------------------------------------------------------------
@@ -68,8 +68,8 @@ if((THUMB_SELECT==0 && gd_check()) || THUMB_SELECT==1){
 define('USE_MB' , '1');
 
 //バージョン
-define('POTI_VER' , '改 v1.42.2');
-define('POTI_VERLOT' , '改 v1.42.2 lot.180614');
+define('POTI_VER' , '改 v1.43');
+define('POTI_VERLOT' , '改 v1.43 lot.180713');
 
 //メール通知クラスのファイル名
 define('NOTICEMAIL_FILE' , 'noticemail.inc');
@@ -735,7 +735,7 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 		$H = $size[1];
 
 		switch ($size[2]) {
-//			case 1 : $ext=".gif";break; // samplebbs
+			case 1 : $ext=".gif";break;
 			case 2 : $ext=".jpg";break;
 			case 3 : $ext=".png";break;
 			default : error(MSG004,$dest);
@@ -791,8 +791,11 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(strlen($resto) > 10) error(MSG015,$dest);
 
 	//本文に日本語がなければ拒絶
-        if(strlen($com) > 0 && strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest); // samplebbs
-        
+        if (USE_JAPANESEFILTER) {
+                mb_regex_encoding("UTF-8");
+                if (strlen($com) > 0 && !preg_match("/[ぁ-んァ-ヶー一-龠]+/u",$com)) error(MSG035,$dest);
+        }
+
 	//本文へのURLの書き込みを禁止
 	if(DENY_COMMENTS_URL && preg_match('/:\/\/|\.co|\.ly|\.gl|\.net|\.org|\.cc|\.ru|\.su|\.ua|\.gd/i', $com) > '0' ) error(MSG036,$dest);
 
@@ -1123,8 +1126,9 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	}
 
 	header("Content-type: text/html; charset=".CHARSET_HTML);
-	$str = "<html><head><META HTTP-EQUIV=\"refresh\" content=\"1;URL=".PHP_SELF2."\">\n";
-	$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str = "<!DOCTYPE html>\n<html><head><META HTTP-EQUIV=\"refresh\" content=\"1;URL=".PHP_SELF2."\">\n";
+//	$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str.= "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,minimum-scale=1.0\">\n<meta charset=\"".CHARSET_HTML."\"></head>\n";
 	$str.= "<body>$mes 画面を切り替えます</body></html>";
 	echo charconvert($str,CHARSET_OUT);
 }
@@ -1351,6 +1355,7 @@ function admindel($pass){
 }
 
 function init(){
+	$err=''; //未定義変数エラー対策
 	$chkfile=array(LOGFILE,TREEFILE);
 	if(!is_writable(realpath("./")))error("カレントディレクトリに書けません<br>");
 	foreach($chkfile as $value){
@@ -1404,8 +1409,11 @@ function paintform($picw,$pich,$palette,$anime,$pch=""){
 	$h = $pich + 170;
 	if($w < 400){$w = 400;}
 	if($h < 420){$h = 420;}
-	if($w < 500 && $shi){$w = 500;}
-	if($h < 500 && $shi==2){$h = 500;}
+//	if($w < 500 && $shi){$w = 500;}
+//	if($h < 500 && $shi==2){$h = 500;}
+//NEOを使う時はPaintBBSの設定
+	if($w < 500 && !$useneo && $shi){$w = 500;}
+	if($h < 500 && !$useneo && $shi==2){$h = 500;}
 
 	$dat['paint_mode'] = true;
 	head($dat);
@@ -1463,8 +1471,12 @@ function paintform($picw,$pich,$palette,$anime,$pch=""){
 	$dat['compress_level'] = COMPRESS_LEVEL;
 	$dat['layer_count'] = LAYER_COUNT;
 	if($shi) $dat['quality'] = $quality ? $quality : $qualitys[0];
-	if($shi==1){ $dat['normal'] = true; }
-	elseif($shi==2){ $dat['pro'] = true; }
+//	if($shi==1){ $dat['normal'] = true; }
+//	elseif($shi==2){ $dat['pro'] = true; }
+//	else{ $dat['paintbbs'] = true; }
+//NEOを使う時はPaintBBSの設定
+	if(!$useneo && $shi==1){ $dat['normal'] = true; }
+	elseif(!$useneo && $shi==2){ $dat['pro'] = true; }
 	else{ $dat['paintbbs'] = true; }
 
 	$dat['palettes'][0] = 'Palettes[0] = "#000000\n#FFFFFF\n#B47575\n#888888\n#FA9696\n#C096C0\n#FFB6FF\n#8080FF\n#25C7C9\n#E7E58D\n#E7962D\n#99CB7B\n#FCECE2\n#F9DDCF";'."\n";
@@ -1685,7 +1697,8 @@ function incontinue($no){
 	global $addinfo;
 
 	$lines = file(LOGFILE);
-	$countline=count($line);
+//コンティニューの処理に関わっていない
+//	$countline=count($line);
 	$flag = FALSE;
 	foreach($lines as $line){
 		list($cno,,,,,,,,,$cext,$picw,$pich,$ctim,,$cptime,) = explode(",", rtrim(charconvert($line,CHARSET_IN)));
@@ -1741,7 +1754,7 @@ function incontinue($no){
 /* コンティニュー認証 */
 function usrchk($no,$pwd){
 	$lines = file(LOGFILE);
-	$countline=count($line);
+//	$countline=count($line);
 	$flag = FALSE;
 	foreach($lines as $line){
 		list($cno,,,,,,,,$cpwd,) = explode(",", charconvert($line,CHARSET_IN));
@@ -1812,7 +1825,7 @@ function editform($del,$pwd){
 }
 
 /* 記事上書き */
-function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
+function rewrite($no,$name,$email,$sub,$com,$url,$pwd,&$admin =''){
 	global $badstring,$badstring_and_url,$badip;
 	global $REQUEST_METHOD;
 	global $fcolor;
@@ -1846,10 +1859,7 @@ function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
 	if(strlen($email) > MAX_EMAIL) error(MSG013);
 	if(strlen($sub) > MAX_SUB) error(MSG014);
 
-	//本文に日本語がなければ拒絶
-        if(strlen($com) > 0 && strlen($com) == mb_strlen($com,'utf8')) error(MSG035,$dest); // samplebbs
-
-//本文へのURLの書き込みを禁止
+	//本文へのURLの書き込みを禁止
 	if(DENY_COMMENTS_URL && preg_match('/:\/\/|\.co|\.ly|\.gl|\.net|\.org|\.cc|\.ru|\.su|\.ua|\.gd/i', $com) > '0' ) error(MSG036,$dest);
 
 	//ホスト取得
@@ -1971,8 +1981,9 @@ function rewrite($no,$name,$email,$sub,$com,$url,$pwd,$admin){
 	updatelog();
 
 	header("Content-type: text/html; charset=".CHARSET_HTML);
-	$str = "<html><head><META HTTP-EQUIV=\"refresh\" content=\"1;URL=".PHP_SELF2."\">\n";
-	$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str = "<!DOCTYPE html>\n<html><head><META HTTP-EQUIV=\"refresh\" content=\"1;URL=".PHP_SELF2."\">\n";
+	//	$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str.= "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,minimum-scale=1.0\">\n<meta charset=\"".CHARSET_HTML."\"></head>\n";
 	$str.= "<body>$mes 画面を切り替えます</body></html>";
 	echo charconvert($str,CHARSET_OUT);
 }
@@ -2033,9 +2044,10 @@ function replace($no,$pwd,$stime){
 	closedir($handle);
 	if(!$find){
 		header("Content-type: text/html; charset=".CHARSET_HTML);
-		$str = "<html><head><title>画像が見当たりません</title>\n";
-		$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
-		$str.= '<body>画像が見当たりません。数秒待ってリロードしてください。<BR><BR>リロードしてもこの画面がでるなら投稿に失敗している可能性があります。<BR>※諦める前に「<A href="'.PHP_SELF.'?mode=piccom">アップロード途中の画像</A>」を見ましょう。もしかしたら画像が見つかるかもしれません。</body></html>';
+		$str = "<!DOCTYPE html>\n<html><head><title>画像が見当たりません</title>\n";
+	//$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str.= "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,minimum-scale=1.0\">\n<meta charset=\"".CHARSET_HTML."\"></head>\n";
+	$str.= '<body>画像が見当たりません。数秒待ってリロードしてください。<BR><BR>リロードしてもこの画面がでるなら投稿に失敗している可能性があります。<BR>※諦める前に「<A href="'.PHP_SELF.'?mode=piccom">アップロード途中の画像</A>」を見ましょう。もしかしたら画像が見つかるかもしれません。</body></html>';
 		echo charconvert($str,CHARSET_OUT);
 		exit;
 	}
@@ -2161,8 +2173,9 @@ function replace($no,$pwd,$stime){
 	updatelog();
 
 	header("Content-type: text/html; charset=".CHARSET_HTML);
-	$str = "<html><head><META HTTP-EQUIV=\"refresh\" content=\"1;URL=".PHP_SELF2."\">\n";
-	$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str = "<!DOCTYPE html>\n<html><head><META HTTP-EQUIV=\"refresh\" content=\"1;URL=".PHP_SELF2."\">\n";
+	//$str.= "<META HTTP-EQUIV=\"Content-type\" CONTENT=\"text/html; charset=".CHARSET_HTML."\"></head>\n";
+	$str.= "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0,minimum-scale=1.0\">\n<meta charset=\"".CHARSET_HTML."\"></head>\n";
 	$str.= "<body>$mes 画面を切り替えます</body></html>";
 	echo charconvert($str,CHARSET_OUT);
 }
@@ -2408,6 +2421,7 @@ if(!isset($usercode)){
 }
 setcookie("usercode", $usercode, time()+86400*365);//1年間
 
+if (isset($mode)){//未定義エラー対策
 switch($mode){
 	case 'regist':
 		if(ADMIN_NEWPOST && !$resto){
@@ -2487,4 +2501,14 @@ switch($mode){
 			echo "<META HTTP-EQUIV=\"refresh\" content=\"0;URL=".PHP_SELF2."\">";
 		}
 }
+}
+//default:で処理していた箇所
+else {
+	if($res){
+			updatelog($res);
+		}else{
+			echo "<meta http-equiv=\"refresh\" content=\"0;URL=".PHP_SELF2."\">";
+		}
+	 }
+
 ?>
