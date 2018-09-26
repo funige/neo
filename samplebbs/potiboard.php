@@ -773,8 +773,10 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 	if(!$sub||preg_match("/^[ |　|]*$/",$sub))   $sub="";
 	if(!$url||preg_match("/^[ |　|]*$/",$url))   $url="";
 
-	if(!$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
-	if(RES_UPLOAD&&$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
+//	if(!$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
+//	if(RES_UPLOAD&&$resto&&!$textonly&&!@is_file($dest)) error(MSG007,$dest);
+	if(!$resto&&!@is_file($dest)) error(MSG007,$dest);
+
 	if(!$com&&!@is_file($dest)) error(MSG008,$dest);
 
 	if(USE_NAME&&!$name) error(MSG009,$dest);

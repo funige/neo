@@ -10,6 +10,7 @@ var jsFiles = ["assets/container.js",
                "assets/painter.js",
                "assets/tools.js",
                "assets/commands.js",
+               "assets/actions.js",
                "assets/widgets.js"];
 var jsDest = "dist";
 var cssFiles = ["neo.css"]

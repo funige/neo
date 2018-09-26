@@ -2,10 +2,12 @@
 
 Neo.Painter = function() {
     this._undoMgr = new Neo.UndoManager(50);
+    this._actionMgr = new Neo.ActionManager();
 };
 
 Neo.Painter.prototype.container;
 Neo.Painter.prototype._undoMgr;
+Neo.Painter.prototype._actionMgr;
 Neo.Painter.prototype.tool;
 Neo.Painter.prototype.inputText;
 
@@ -648,8 +650,11 @@ Neo.Painter.prototype.getStabilized = function() {
 
 Neo.Painter.prototype.undo = function() {
     var undoItem = this._undoMgr.popUndo();
+    
     if (undoItem) {
         this._pushRedo();
+        this._actionMgr.back();
+
         this.canvasCtx[0].putImageData(undoItem.data[0], undoItem.x,undoItem.y);
         this.canvasCtx[1].putImageData(undoItem.data[1], undoItem.x,undoItem.y);
         this.updateDestCanvas(undoItem.x, undoItem.y, undoItem.width, undoItem.height);
@@ -658,7 +663,10 @@ Neo.Painter.prototype.undo = function() {
 
 Neo.Painter.prototype.redo = function() {
     var undoItem = this._undoMgr.popRedo();
+    
     if (undoItem) {
+        this._actionMgr.forward();
+        
         this._pushUndo(0,0,this.canvasWidth, this.canvasHeight, true);
         this.canvasCtx[0].putImageData(undoItem.data[0], undoItem.x,undoItem.y);
         this.canvasCtx[1].putImageData(undoItem.data[1], undoItem.x,undoItem.y);
@@ -666,9 +674,9 @@ Neo.Painter.prototype.redo = function() {
     }
 };
 
-Neo.Painter.prototype.hasUndo = function() {
-    return true;
-};
+//Neo.Painter.prototype.hasUndo = function() {
+//    return true;
+//};
 
 Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
     x = (x === undefined) ? 0 : x;
@@ -683,6 +691,10 @@ Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
     undoItem.data = [this.canvasCtx[0].getImageData(x, y, w, h),
                      this.canvasCtx[1].getImageData(x, y, w, h)];
     this._undoMgr.pushUndo(undoItem, holdRedo);
+
+    if (!holdRedo) {
+        this._actionMgr.step();
+    }
 };
 
 Neo.Painter.prototype._pushRedo = function(x, y, w, h) {
@@ -719,6 +731,7 @@ Neo.UndoManager.prototype._undoItems;
 //アクションをしてUndo情報を更新
 Neo.UndoManager.prototype.pushUndo = function(undoItem, holdRedo) {
     this._undoItems.push(undoItem);
+    
     if (this._undoItems.length > this._maxStep) {
         this._undoItems.shift();
     }
@@ -930,10 +943,12 @@ Neo.Painter.prototype.clearCanvas = function(doConfirm) {
     if (!doConfirm || confirm("全消しします")) {
         //Register undo first;
         this._pushUndo();
-        
+        this._actionMgr.clearCanvas();
+/*        
         this.canvasCtx[0].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.canvasCtx[1].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+*/
     }
 };
 
@@ -1022,7 +1037,7 @@ Neo.Painter.prototype.getColor = function(c) {
     var g = parseInt(c.substr(3, 2), 16);
     var b = parseInt(c.substr(5, 2), 16);
     var a = Math.floor(this.alpha * 255);
-    return a <<24 | b<<16 | g<<8 | r;
+    return a<<24 | b<<16 | g<<8 | r;
 };
 
 Neo.Painter.prototype.getColorString = function(c) {
@@ -2164,10 +2179,6 @@ Neo.Painter.prototype.turn = function(x, y, width, height) {
 };
 
 Neo.Painter.prototype.doFill = function(ctx, x, y, width, height, maskFunc) {
-    if (Math.round(x) != x) console.log("*");
-    if (Math.round(width) != width) console.log("*");
-    if (Math.round(height) != height) console.log("*");
-
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -2375,20 +2386,18 @@ Neo.Painter.prototype.sortColor = function(r0, g0, b0) {
     return [min, mid, max];
 };
 
-Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
+Neo.Painter.prototype.doText = function(layer, x, y,
+                                        color, alpha,
+                                        string, fontSize, fontFamily) {
     //テキスト描画
+    if (string.length <= 0) return;
+
     //描画位置がずれるので適当に調整
     var offset = parseInt(fontSize, 10);
-//  y -= Math.round((5.0 + offset/8) / this.zoom);
-//  x += Math.round(2.0 / this.zoom);
-
     var ctx = this.tempCanvasCtx;
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.save();
     ctx.translate(x, y);
-//  ctx.scale(1/this.zoom, 1/this.zoom);
-
-    var fontFamily = Neo.painter.inputText.style.fontFamily || "Arial";
     ctx.font = fontSize + " " + fontFamily;
 
     ctx.fillStyle = 0;
@@ -2396,11 +2405,10 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     ctx.restore();
 
     // 適当に二値化
-    var c = this.getColor();
-    var r = c & 0xff;
-    var g = (c & 0xff00) >> 8;
-    var b = (c & 0xff0000) >> 16;
-    var a = Math.round(this.alpha * 255.0);
+    var r = color & 0xff;
+    var g = (color & 0xff00) >> 8;
+    var b = (color & 0xff0000) >> 16;
+    var a = Math.round(alpha * 255.0);
 
     var imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -2426,7 +2434,7 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     ctx.putImageData(imageData, 0, 0);
 
     //キャンバスに貼り付け
-    ctx = this.canvasCtx[this.current];
+    ctx = this.canvasCtx[layer];
     ctx.globalAlpha = 1.0;
     ctx.drawImage(this.tempCanvas,
                   0, 0, this.canvasWidth, this.canvasHeight,
@@ -2447,3 +2455,12 @@ Neo.Painter.prototype.isUIPaused = function() {
 Neo.Painter.prototype.getEmulationMode = function() {
     return parseFloat(Neo.config.neo_emulation_mode || 2.22)
 };
+
+Neo.Painter.prototype.play = function() {
+    if (this._actionMgr) {
+        this._actionMgr.clearCanvas();
+        this._actionMgr._head = 0;
+        this._actionMgr.play();
+    }
+};
+

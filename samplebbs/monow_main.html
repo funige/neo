@@ -161,7 +161,7 @@ small { font-size:9pt }
 <!--{def upfile}-->
  <tr>
   <td><b>添付File</b></td>
-  <td><input type=file name=upfile size="35">[<label><input type=checkbox name=textonly value=on<!--{def resno}--> checked<!--{/def}-->>画像なし</label>]</td>
+  <td><input type=file name=upfile size="35"></td>
  </tr>
 <!--(
 // レス時は画像なしにデフォでチェックする(文字レス優先)
@@ -175,9 +175,6 @@ small { font-size:9pt }
   <td colspan=2><small>
 <!--(========== ファイルアップロード時の説明 ==========)-->
 <!--{def upfile}-->
-<!--{def resno}-->
-<LI>画像を添付する場合は、画像なしのチェックを外して下さい。
-<!--{/def}-->
 <LI>添付可能ファイル：JPG, PNG ブラウザによっては正常に添付できないことがあります。
 <LI>画像は横 {$maxw}ピクセル、縦 {$maxh}ピクセルを超えると縮小表示されます。
 <!--{/def}-->
@@ -297,7 +294,7 @@ small { font-size:9pt }
 // oya/res/continue…コンティニュー用引数(フラグ兼用)
 // oya/res/thumb…サムネイルがあるとき true が入る
 )-->
-     <a href="{$oya/res/src}" target=_blank><img src="{$oya/res/imgsrc}" border=0 <!--{def oya/res/w}--> width={$oya/res/w}<!--{/def}--><!--{def oya/res/h}--> height={$oya/res/h}<!--{/def}--> hspace=10 vspace=5 alt="{$oya/res/srcname} ({$oya/res/size} B)"<!--{ifle oya/res/w:100}--> align=left<!--{/ifle}-->></a><BR>
+     <a href="{$oya/res/src}" target=_blank style="background-color:white;"><img src="{$oya/res/imgsrc}" border=0 <!--{def oya/res/w}--> width={$oya/res/w}<!--{/def}--><!--{def oya/res/h}--> height={$oya/res/h}<!--{/def}--> hspace=10 vspace=5 alt="{$oya/res/srcname} ({$oya/res/size} B)"<!--{ifle oya/res/w:100}--> align=left<!--{/ifle}-->></a><BR>
 <!--(
 // oya/res/imgsrc…サムネイルがあるとき、サムネイルURL。サムネイルがないとき、画像URL
 // oya/res/w…画像サイズ(横)

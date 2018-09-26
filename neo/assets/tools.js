@@ -1207,7 +1207,8 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
         if (text) {
             oe._pushUndo();
             this.drawText(oe);
-            oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+
+            //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
             text.style.display = "none";
             text.blur();
@@ -1222,15 +1223,17 @@ Neo.TextTool.prototype.kill = function(oe) {
 Neo.TextTool.prototype.drawText = function(oe) {
     var text = oe.inputText;
 
-    // unescape entities
-    //var tmp = document.createElement("textarea");
-    //tmp.innerHTML = text.innerHTML;
-    //var string = tmp.value;
-
     var string = text.textContent || text.innerText;
-    
-    if (string.length <= 0) return;
-    oe.doText(this.startX, this.startY, string, text.style.fontSize);
+    var size = text.style.fontSize;
+    var family = text.style.fontFamily || "Arial";
+    var layer = oe.current;
+    var color = oe.getColor();
+    var alpha = oe.alpha;
+    var x = this.startX;
+    var y = this.startY;
+    //oe.doText(layer, this.startX, this.startY, color, string, size, family);
+    oe._actionMgr.doText(layer, this.startX, this.startY,
+                         color, alpha, string, size, family);
 };
 
 Neo.TextTool.prototype.loadStates = function() {
@@ -1241,6 +1244,7 @@ Neo.TextTool.prototype.loadStates = function() {
         Neo.updateUI();
     };
 };
+
 
 /*
   -------------------------------------------------------------------------
