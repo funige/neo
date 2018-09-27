@@ -2445,9 +2445,21 @@ Neo.Painter.prototype.getEmulationMode = function() {
 
 /*
 -------------------------------------------------------------------------
-    Animation保存テスト
+    Recorder Test
 -------------------------------------------------------------------------
 */
+
+Neo.Painter.prototype.play = function() {
+    this.saveSnapshot();
+
+    if (this._actionMgr) {
+        this._actionMgr.clearCanvas();
+        this._actionMgr._head = 0;
+        this.prevLine = null;
+
+        this._actionMgr.play();
+    }
+};
 
 Neo.Painter.prototype.snapshot = [];
 Neo.Painter.prototype.saveSnapshot = function() {
@@ -2462,15 +2474,4 @@ Neo.Painter.prototype.loadSnapshot = function() {
     this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
 };
 
-Neo.Painter.prototype.play = function() {
-    this.saveSnapshot();
-
-    if (this._actionMgr) {
-        this._actionMgr.clearCanvas();
-        this._actionMgr._head = 0;
-        this.prevLine = null;
-
-        this._actionMgr.play();
-    }
-};
 
