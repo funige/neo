@@ -1209,11 +1209,23 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
 
         var oe = Neo.painter;
         var text = oe.inputText;
+
         if (text) {
             oe._pushUndo();
-            this.drawText(oe);
-
+            //this.drawText(oe);
             //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+
+            var string = text.textContent || text.innerText;
+            var size = text.style.fontSize;
+            var family = text.style.fontFamily || "Arial";
+            var layer = oe.current;
+            var color = oe.getColor();
+            var alpha = oe.alpha;
+            var x = this.startX;
+            var y = this.startY;
+            //oe.doText(layer, this.startX, this.startY, color, string, size, family);
+            oe._actionMgr.doText(layer, this.startX, this.startY,
+                                 color, alpha, string, size, family);
 
             text.style.display = "none";
             text.blur();
@@ -1225,6 +1237,7 @@ Neo.TextTool.prototype.kill = function(oe) {
     Neo.painter.hideInputText();
 };
 
+/*
 Neo.TextTool.prototype.drawText = function(oe) {
     var text = oe.inputText;
 
@@ -1240,6 +1253,7 @@ Neo.TextTool.prototype.drawText = function(oe) {
     oe._actionMgr.doText(layer, this.startX, this.startY,
                          color, alpha, string, size, family);
 };
+*/
 
 Neo.TextTool.prototype.loadStates = function() {
     var reserve = this.getReserve();

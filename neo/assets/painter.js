@@ -1100,6 +1100,7 @@ Neo.Painter.prototype.prepareDrawing = function () {
 
     this._currentColor = [r, g, b, a];
     this._currentMask = [maskR, maskG, maskB];
+    this._currentWidth = this.lineWidth;
 };
 
 Neo.Painter.prototype.isMasked = function (buf8, index) {
@@ -1215,7 +1216,7 @@ Neo.Painter.prototype.setPoint = function(buf8, bufWidth, x0, y0, left, top, typ
 
 
 Neo.Painter.prototype.setPenPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -1268,7 +1269,7 @@ Neo.Painter.prototype.setPenPoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -1321,16 +1322,13 @@ Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setTonePoint = function(buf8, width, x, y, x0, y0) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
 
     x -= r0;
     y -= r0;
     x0 -= r0;
     y0 -= r0;
-//  x -= r0;
-//  y -= r0;
-//  if (r0%2) { x0++; y0++; } //なぜか模様がずれるので
    
     var shape = this._roundData[d];
     var shapeIndex = 0;
@@ -1360,7 +1358,7 @@ Neo.Painter.prototype.setTonePoint = function(buf8, width, x, y, x0, y0) {
 };
 
 Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -1384,7 +1382,7 @@ Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -1436,7 +1434,7 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
 };
 
 Neo.Painter.prototype.setDodgePoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -1488,7 +1486,7 @@ Neo.Painter.prototype.setDodgePoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBurnPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -1589,7 +1587,8 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
 
     var width = Math.abs(x1 - x0);
     var height = Math.abs(y1 - y0);
-    var r = Math.ceil(this.lineWidth / 2);
+    var r = Math.ceil(this._currentWidth / 2);
+//  var r = Math.ceil(this.lineWidth / 2);
 
     var left = ((x0 < x1) ? x0 : x1) - r;
     var top = ((y0 < y1) ? y0 : y1) - r;
@@ -2223,7 +2222,8 @@ Neo.Painter.prototype.rectFillMask = function(x, y, width, height) {
 };
 
 Neo.Painter.prototype.rectMask = function(x, y, width, height) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
+//  var d = this.lineWidth;
     return (x < d || x > width - 1 - d || 
             y < d || y > height - 1 - d) ? true : false;
 };
@@ -2238,7 +2238,8 @@ Neo.Painter.prototype.ellipseFillMask = function(x, y, width, height) {
 }
 
 Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
+//  var d = this.lineWidth;
     var cx = (width - 1) / 2.0;
     var cy = (height - 1) / 2.0;
 
@@ -2442,10 +2443,33 @@ Neo.Painter.prototype.getEmulationMode = function() {
     return parseFloat(Neo.config.neo_emulation_mode || 2.22)
 };
 
+/*
+-------------------------------------------------------------------------
+    Animation保存テスト
+-------------------------------------------------------------------------
+*/
+
+Neo.Painter.prototype.snapshot = [];
+Neo.Painter.prototype.saveSnapshot = function() {
+    var width = this.canvasWidth;
+    var height = this.canvasHeight;
+    this.snapshot = [this.canvasCtx[0].getImageData(0, 0, width, height),
+                     this.canvasCtx[1].getImageData(0, 0, width, height)];
+};
+
+Neo.Painter.prototype.loadSnapshot = function() {
+    this.canvasCtx[0].putImageData(this.snapshot[0], 0, 0);
+    this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
+};
+
 Neo.Painter.prototype.play = function() {
+    this.saveSnapshot();
+
     if (this._actionMgr) {
         this._actionMgr.clearCanvas();
         this._actionMgr._head = 0;
+        this.prevLine = null;
+
         this._actionMgr.play();
     }
 };
