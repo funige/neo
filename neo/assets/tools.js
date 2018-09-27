@@ -759,8 +759,12 @@ Neo.FillTool.prototype.isUpMove = false;
 Neo.FillTool.prototype.downHandler = function(oe) {
     var x = Math.floor(oe.mouseX);
     var y = Math.floor(oe.mouseY);
+    var layer = oe.current;
+    var color = oe.getColor();
+    
     oe._pushUndo();
-    oe.fill(x, y, oe.canvasCtx[oe.current]);
+    //oe.doFloodFill(layer, x, y, color);
+    oe._actionMgr.doFloodFill(layer, x, y, color);
 };
 
 Neo.FillTool.prototype.upHandler = function(oe) {
@@ -787,10 +791,11 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-
-    oe.prepareDrawing();
+    oe._actionMgr.doEraseAll(oe.current);
+    
+    /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 };
 
 Neo.EraseAllTool.prototype.upHandler = function(oe) {

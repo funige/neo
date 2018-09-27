@@ -3117,11 +3117,10 @@ Neo.Painter.prototype.pickColor = function(x, y) {
     }
 };
 
-Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y) {
+Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y, color) {
     var index = y * this.canvasWidth + x0;
-    var fillColor = this.getColor();
     for (var x = x0; x <= x1; x++) {
-        buf32[index++] = fillColor;
+        buf32[index++] = color;
     }
 };
 
@@ -3130,25 +3129,13 @@ Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     for (var x = x0; x <= x1; x++) {
         stack.push({x:x, y: y})
     }
-/*
-    while (x0 <= x1) {
-        for (; x0 <= x1; x0++) {
-            if (buf32[y * width + x0] == baseColor) break;
-        }
-        if (x1 < x0) break;
-
-        for (; x0 <= x1; x0++) {
-            if (buf32[y * width + x0] != baseColor) break;
-        }
-        stack.push({x:x0 - 1, y: y})
-    }
-*/
 };
 
-Neo.Painter.prototype.fill = function(x, y, ctx) {
+Neo.Painter.prototype.doFloodFill = function(layer, x, y, fillColor) {
     x = Math.round(x);
     y = Math.round(y);
-
+    var ctx = this.canvasCtx[layer];
+    
     if (x < 0 || x >= this.canvasWidth || y < 0 || y >= this.canvasHeight) {
         return;
     }
@@ -3160,7 +3147,6 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     var stack = [{x: x, y: y}];
 
     var baseColor = buf32[y * width + x];
-    var fillColor = this.getColor();
 
     if ((baseColor & 0xff000000) == 0 || (baseColor != fillColor)) {
         while (stack.length > 0) {
@@ -3182,7 +3168,7 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
             for (; x1 < this.canvasWidth - 1; x1++) {
                 if (buf32[y * width + (x1 + 1)] != baseColor) break;
             }
-            this.fillHorizontalLine(buf32, x0, x1, y);
+            this.fillHorizontalLine(buf32, x0, x1, y, fillColor);
 
             if (y + 1 < this.canvasHeight) {
                 this.scanLine(x0, x1, y + 1, baseColor, buf32, stack);
@@ -3194,7 +3180,7 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
-    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+//  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
 Neo.Painter.prototype.copy = function(x, y, width, height) {
@@ -4330,8 +4316,12 @@ Neo.FillTool.prototype.isUpMove = false;
 Neo.FillTool.prototype.downHandler = function(oe) {
     var x = Math.floor(oe.mouseX);
     var y = Math.floor(oe.mouseY);
+    var layer = oe.current;
+    var color = oe.getColor();
+    
     oe._pushUndo();
-    oe.fill(x, y, oe.canvasCtx[oe.current]);
+    //oe.doFloodFill(layer, x, y, color);
+    oe._actionMgr.doFloodFill(layer, x, y, color);
 };
 
 Neo.FillTool.prototype.upHandler = function(oe) {
@@ -4358,10 +4348,11 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-
-    oe.prepareDrawing();
+    oe._actionMgr.doEraseAll(oe.current);
+    
+    /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 };
 
 Neo.EraseAllTool.prototype.upHandler = function(oe) {
@@ -5019,8 +5010,45 @@ Neo.ActionManager.prototype.clearCanvas = function() {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doText = function(
-    layer,
+Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
+    if (typeof layer != "object") {
+        var head = this._items[this._head - 1];
+        head.push('doFloodFill');
+        head.push(layer);
+        head.push(x);
+        head.push(y);
+        head.push(color);
+
+    } else {
+        var item = layer;
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        color = item[4];
+    }
+
+    var oe = Neo.painter;
+    oe.doFloodFill(layer, x, y, color);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+}
+
+Neo.ActionManager.prototype.doEraseAll = function(layer) {
+    if (typeof layer != "object") {
+        var head = this._items[this._head - 1];
+        head.push('doEraseAll');
+        head.push(layer);
+
+    } else {
+        var item = layer;
+        layer = item[1];
+    }
+
+    var oe = Neo.painter;
+    oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doText = function(layer,
     x, y,
     color,
     alpha,
@@ -5028,7 +5056,7 @@ Neo.ActionManager.prototype.doText = function(
     size,
     family)
 {
-    if (typeof arguments[0] != "object") {
+    if (typeof layer != "object") {
         var head = this._items[this._head - 1];
         head.push('doText');
         head.push(layer);
@@ -5041,7 +5069,7 @@ Neo.ActionManager.prototype.doText = function(
         head.push(family);
 
     } else {
-        var item = arguments[0]
+        var item = layer
         layer = item[1];
         x = item[2];
         y = item[3];

@@ -93,8 +93,45 @@ Neo.ActionManager.prototype.clearCanvas = function() {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doText = function(
-    layer,
+Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
+    if (typeof layer != "object") {
+        var head = this._items[this._head - 1];
+        head.push('doFloodFill');
+        head.push(layer);
+        head.push(x);
+        head.push(y);
+        head.push(color);
+
+    } else {
+        var item = layer;
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        color = item[4];
+    }
+
+    var oe = Neo.painter;
+    oe.doFloodFill(layer, x, y, color);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+}
+
+Neo.ActionManager.prototype.doEraseAll = function(layer) {
+    if (typeof layer != "object") {
+        var head = this._items[this._head - 1];
+        head.push('doEraseAll');
+        head.push(layer);
+
+    } else {
+        var item = layer;
+        layer = item[1];
+    }
+
+    var oe = Neo.painter;
+    oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doText = function(layer,
     x, y,
     color,
     alpha,
@@ -102,7 +139,7 @@ Neo.ActionManager.prototype.doText = function(
     size,
     family)
 {
-    if (typeof arguments[0] != "object") {
+    if (typeof layer != "object") {
         var head = this._items[this._head - 1];
         head.push('doText');
         head.push(layer);
@@ -115,7 +152,7 @@ Neo.ActionManager.prototype.doText = function(
         head.push(family);
 
     } else {
-        var item = arguments[0]
+        var item = layer
         layer = item[1];
         x = item[2];
         y = item[3];

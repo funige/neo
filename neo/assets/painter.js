@@ -2013,11 +2013,10 @@ Neo.Painter.prototype.pickColor = function(x, y) {
     }
 };
 
-Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y) {
+Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y, color) {
     var index = y * this.canvasWidth + x0;
-    var fillColor = this.getColor();
     for (var x = x0; x <= x1; x++) {
-        buf32[index++] = fillColor;
+        buf32[index++] = color;
     }
 };
 
@@ -2026,25 +2025,13 @@ Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     for (var x = x0; x <= x1; x++) {
         stack.push({x:x, y: y})
     }
-/*
-    while (x0 <= x1) {
-        for (; x0 <= x1; x0++) {
-            if (buf32[y * width + x0] == baseColor) break;
-        }
-        if (x1 < x0) break;
-
-        for (; x0 <= x1; x0++) {
-            if (buf32[y * width + x0] != baseColor) break;
-        }
-        stack.push({x:x0 - 1, y: y})
-    }
-*/
 };
 
-Neo.Painter.prototype.fill = function(x, y, ctx) {
+Neo.Painter.prototype.doFloodFill = function(layer, x, y, fillColor) {
     x = Math.round(x);
     y = Math.round(y);
-
+    var ctx = this.canvasCtx[layer];
+    
     if (x < 0 || x >= this.canvasWidth || y < 0 || y >= this.canvasHeight) {
         return;
     }
@@ -2056,7 +2043,6 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     var stack = [{x: x, y: y}];
 
     var baseColor = buf32[y * width + x];
-    var fillColor = this.getColor();
 
     if ((baseColor & 0xff000000) == 0 || (baseColor != fillColor)) {
         while (stack.length > 0) {
@@ -2078,7 +2064,7 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
             for (; x1 < this.canvasWidth - 1; x1++) {
                 if (buf32[y * width + (x1 + 1)] != baseColor) break;
             }
-            this.fillHorizontalLine(buf32, x0, x1, y);
+            this.fillHorizontalLine(buf32, x0, x1, y, fillColor);
 
             if (y + 1 < this.canvasHeight) {
                 this.scanLine(x0, x1, y + 1, baseColor, buf32, stack);
@@ -2090,7 +2076,7 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
-    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+//  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
 Neo.Painter.prototype.copy = function(x, y, width, height) {
