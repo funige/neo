@@ -2157,7 +2157,7 @@ Neo.Painter.prototype.setColor = function(c) {
 };
 
 Neo.Painter.prototype.getAlpha = function(type) {
-    var a1 = this.alpha;
+    var a1 = this._currentColor[3] / 255.0; //this.alpha;
 
     switch (type) {
     case Neo.Painter.ALPHATYPE_PEN:
@@ -3578,7 +3578,21 @@ Neo.Painter.prototype.loadSnapshot = function() {
     this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
 };
 
+Neo.Painter.prototype.setCurrent = function(item) {
+    var color = this._currentColor;
+    var mask = this._currentMask;
+    var width = this._currentWidth;
 
+    item.push(color[0], color[1], color[2], color[3]);
+    item.push(mask[0], mask[1], mask[2]);
+    item.push(width);
+};
+
+Neo.Painter.prototype.getCurrent = function(item) {
+    this._currentColor = [item[2], item[3], item[4], item[5]];
+    this._currentMask = [item[6], item[7], item[8]];
+    this._currentWidth = item[9];
+};
 
 'use strict';
 
@@ -3794,7 +3808,8 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
+        oe._actionMgr.doFreeHand(x0, y0, this.lineType);
+//      oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
     }
 
     if (oe.cursorRect) {
@@ -3830,7 +3845,8 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
     var y0 = Math.floor(oe.mouseY);
     var x1 = Math.floor(oe.prevMouseX);
     var y1 = Math.floor(oe.prevMouseY);
-    oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
+//  oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
+    oe._actionMgr.doFreeHandMove(x0, y0, x1, y1, this.lineType);
 
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
@@ -3896,11 +3912,17 @@ Neo.DrawToolBase.prototype.lineUpHandler = function(oe) {
 
         oe._pushUndo();
         oe.prepareDrawing();
+        var x0 = Math.floor(oe.mouseX);
+        var y0 = Math.floor(oe.mouseY);
+        oe._actionMgr.doLine(x0, y0, this.startX, this.startY, this.lineType)
+        
+        /*
         var ctx = oe.canvasCtx[oe.current];
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
         oe.drawLine(ctx, x0, y0, this.startX, this.startY, this.lineType);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        */
     }
 };
 
@@ -3966,12 +3988,15 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         this.y2 = Math.floor(oe.mouseY);
 
         oe._pushUndo();
-        oe.drawBezier(oe.canvasCtx[oe.current],
+        oe._actionMgr.doBezier(this.x0, this.y0,this.x1, this.y1,
+                               this.x2, this.y2, this.x3, this.y3, this.lineType);
+        oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+        
+        /*oe.drawBezier(oe.canvasCtx[oe.current],
                       this.x0, this.y0, this.x1, this.y1,
                       this.x2, this.y2, this.x3, this.y3, this.lineType);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 
-        oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
         this.step = 0;
         break;
 
@@ -4345,8 +4370,9 @@ Neo.FillTool.prototype.downHandler = function(oe) {
     var color = oe.getColor();
     
     oe._pushUndo();
-    //oe.doFloodFill(layer, x, y, color);
     oe._actionMgr.doFloodFill(layer, x, y, color);
+
+    //oe.doFloodFill(layer, x, y, color);
 };
 
 Neo.FillTool.prototype.upHandler = function(oe) {
@@ -5012,7 +5038,8 @@ Neo.ActionManager.prototype.forward = function() {
 Neo.ActionManager.prototype.play = function() {
     if (this._head < this._items.length) {
         var item = this._items[this._head];
-        console.log("play", item[0], this._head, this._items.length);
+
+        //console.log("play", item[0], this._head, this._items.length);
         if (item[0] && this[item[0]]) {
             (this[item[0]])(item);
         }
@@ -5020,7 +5047,7 @@ Neo.ActionManager.prototype.play = function() {
 
         setTimeout(function() {
             Neo.painter._actionMgr.play();
-        }, 1000);
+        }, 100);
     }
 }
 
@@ -5084,6 +5111,153 @@ Neo.ActionManager.prototype.doEraseAll = function(layer) {
 
     var oe = Neo.painter;
     oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+
+        head.push('doFreeHand');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(lineType);
+        head.push(x0, y0, x0, y0);
+        
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
+
+    } else {
+        var item = arguments[0];
+        var length = item.length;
+        
+        layer = item[1];
+        oe.getCurrent(item);
+
+        lineType = item[10];
+        x0 = item[11];
+        y0 = item[12];
+        var x1, y1;
+
+        for (var i = 13; i + 2 < length; i += 2) {
+            x1 = x0;
+            y1 = y0;
+            x0 = item[i + 0]
+            y0 = item[i + 1]
+            oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        }
+        oe.prevLine = null;
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }
+}
+
+Neo.ActionManager.prototype.doFreeHandMove = function(x0, y0, x1, y1, lineType) {
+    if (arguments.length > 1) {
+        var oe = Neo.painter;
+        var layer = oe.current;
+        var head = this._items[this._head - 1];
+        if (head.length == 0) {
+            head.push('doFreeHand')
+            head.push(layer)
+            oe.setCurrent(head);
+
+            head.push(lineType);
+            head.push(x1, y1, x0, y0);
+
+        } else {
+            head.push(x0, y0);
+
+            // 記録漏れがないか確認
+            var x = head[head.length - 4]
+            var y = head[head.length - 3]
+            if (x1 != head[head.length - 4] ||
+                y1 != head[head.length - 3] ||
+                lineType != head[10]) {
+                console.log('eror in doFreeHandMove???', x, y, lineType, head)
+            }
+        }
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        
+    } else {
+        console.log('error in doFreeHandMove: called from recorder', head);
+    }
+}
+
+Neo.ActionManager.prototype.doLine = function(
+    x0, y0,
+    x1, y1,
+    lineType)
+{
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doLine');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(lineType);
+        head.push(x0, y0, x1, y1);
+
+    } else {
+        var item = arguments[0];
+
+        layer = item[1];
+        oe.getCurrent(item);
+
+        lineType = item[10];
+        x0 = item[11];
+        y0 = item[12];
+        x1 = item[13];
+        y1 = item[14];
+    }
+    oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doBezier = function(
+    x0, y0,
+    x1, y1,
+    x2, y2,
+    x3, y3,
+    lineType)
+{
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+        
+        head.push('doBezier');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(lineType);
+        head.push(x0, y0, x1, y1, x2, y2, x3, y3);
+
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        oe.getCurrent(item);
+        
+        lineType = item[10];
+        x0 = item[11];
+        y0 = item[12];
+        x1 = item[13];
+        y1 = item[14];
+        x2 = item[15];
+        y2 = item[16];
+        x3 = item[17];
+        y3 = item[18];
+    }
+    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 

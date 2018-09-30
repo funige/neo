@@ -1053,7 +1053,7 @@ Neo.Painter.prototype.setColor = function(c) {
 };
 
 Neo.Painter.prototype.getAlpha = function(type) {
-    var a1 = this.alpha;
+    var a1 = this._currentColor[3] / 255.0; //this.alpha;
 
     switch (type) {
     case Neo.Painter.ALPHATYPE_PEN:
@@ -2474,4 +2474,18 @@ Neo.Painter.prototype.loadSnapshot = function() {
     this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
 };
 
+Neo.Painter.prototype.setCurrent = function(item) {
+    var color = this._currentColor;
+    var mask = this._currentMask;
+    var width = this._currentWidth;
 
+    item.push(color[0], color[1], color[2], color[3]);
+    item.push(mask[0], mask[1], mask[2]);
+    item.push(width);
+};
+
+Neo.Painter.prototype.getCurrent = function(item) {
+    this._currentColor = [item[2], item[3], item[4], item[5]];
+    this._currentMask = [item[6], item[7], item[8]];
+    this._currentWidth = item[9];
+};

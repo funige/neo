@@ -56,7 +56,8 @@ Neo.ActionManager.prototype.forward = function() {
 Neo.ActionManager.prototype.play = function() {
     if (this._head < this._items.length) {
         var item = this._items[this._head];
-        console.log("play", item[0], this._head, this._items.length);
+
+        //console.log("play", item[0], this._head, this._items.length);
         if (item[0] && this[item[0]]) {
             (this[item[0]])(item);
         }
@@ -64,7 +65,7 @@ Neo.ActionManager.prototype.play = function() {
 
         setTimeout(function() {
             Neo.painter._actionMgr.play();
-        }, 1000);
+        }, 100);
     }
 }
 
@@ -128,6 +129,153 @@ Neo.ActionManager.prototype.doEraseAll = function(layer) {
 
     var oe = Neo.painter;
     oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+
+        head.push('doFreeHand');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(lineType);
+        head.push(x0, y0, x0, y0);
+        
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
+
+    } else {
+        var item = arguments[0];
+        var length = item.length;
+        
+        layer = item[1];
+        oe.getCurrent(item);
+
+        lineType = item[10];
+        x0 = item[11];
+        y0 = item[12];
+        var x1, y1;
+
+        for (var i = 13; i + 2 < length; i += 2) {
+            x1 = x0;
+            y1 = y0;
+            x0 = item[i + 0]
+            y0 = item[i + 1]
+            oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        }
+        oe.prevLine = null;
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }
+}
+
+Neo.ActionManager.prototype.doFreeHandMove = function(x0, y0, x1, y1, lineType) {
+    if (arguments.length > 1) {
+        var oe = Neo.painter;
+        var layer = oe.current;
+        var head = this._items[this._head - 1];
+        if (head.length == 0) {
+            head.push('doFreeHand')
+            head.push(layer)
+            oe.setCurrent(head);
+
+            head.push(lineType);
+            head.push(x1, y1, x0, y0);
+
+        } else {
+            head.push(x0, y0);
+
+            // 記録漏れがないか確認
+            var x = head[head.length - 4]
+            var y = head[head.length - 3]
+            if (x1 != head[head.length - 4] ||
+                y1 != head[head.length - 3] ||
+                lineType != head[10]) {
+                console.log('eror in doFreeHandMove???', x, y, lineType, head)
+            }
+        }
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        
+    } else {
+        console.log('error in doFreeHandMove: called from recorder', head);
+    }
+}
+
+Neo.ActionManager.prototype.doLine = function(
+    x0, y0,
+    x1, y1,
+    lineType)
+{
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doLine');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(lineType);
+        head.push(x0, y0, x1, y1);
+
+    } else {
+        var item = arguments[0];
+
+        layer = item[1];
+        oe.getCurrent(item);
+
+        lineType = item[10];
+        x0 = item[11];
+        y0 = item[12];
+        x1 = item[13];
+        y1 = item[14];
+    }
+    oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doBezier = function(
+    x0, y0,
+    x1, y1,
+    x2, y2,
+    x3, y3,
+    lineType)
+{
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+        
+        head.push('doBezier');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(lineType);
+        head.push(x0, y0, x1, y1, x2, y2, x3, y3);
+
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        oe.getCurrent(item);
+        
+        lineType = item[10];
+        x0 = item[11];
+        y0 = item[12];
+        x1 = item[13];
+        y1 = item[14];
+        x2 = item[15];
+        y2 = item[16];
+        x3 = item[17];
+        y3 = item[18];
+    }
+    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
