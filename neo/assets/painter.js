@@ -1858,7 +1858,8 @@ Neo.Painter.prototype.flipV = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.merge = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.merge = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -1873,7 +1874,7 @@ Neo.Painter.prototype.merge = function(ctx, x, y, width, height) {
         buf8[i] = new Uint8ClampedArray(imageData[i].data.buffer);
     }
 
-    var dst = this.current;
+    var dst = layer;
     var src = (dst == 1) ? 0 : 1;
     var size = width * height;
     var index = 0; 
@@ -2163,7 +2164,20 @@ Neo.Painter.prototype.turn = function(x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.doFill = function(ctx, x, y, width, height, maskFunc) {
+Neo.Painter.prototype.getMaskFunc = function(type) {
+    switch (type) {
+    case Neo.Painter.TOOLTYPE_RECT: return this.rectMask;
+    case Neo.Painter.TOOLTYPE_RECTFILL: return this.rectFillMask;
+    case Neo.Painter.TOOLTYPE_ELLIPSE: return this.ellipseMask;
+    case Neo.Painter.TOOLTYPE_ELLIPSEFILL: return this.ellipseFillMask;
+    }
+    return null;
+};
+
+Neo.Painter.prototype.doFill = function(layer, x, y, width, height, type) {
+    var ctx = this.canvasCtx[layer];
+    var maskFunc = this.getMaskFunc(type);
+    
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);

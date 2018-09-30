@@ -1027,9 +1027,10 @@ Neo.MergeTool.prototype = new Neo.EffectToolBase();
 Neo.MergeTool.prototype.type = Neo.Painter.TOOLTYPE_MERGE;
 
 Neo.MergeTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.merge(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.merge(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doMerge(x, y, width, height);
 };
 
 /*
@@ -1122,9 +1123,10 @@ Neo.RectTool.prototype = new Neo.EffectToolBase();
 Neo.RectTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
 
 Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.rectMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFill(x, y, width, height, this.type);
 };
 
 /*
@@ -1139,9 +1141,10 @@ Neo.RectFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECTFILL;
 
 Neo.RectFillTool.prototype.isFill = true;
 Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.rectFillMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectFillMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFill(x, y, width, height, this.type);
 };
 
 /*
@@ -1155,9 +1158,10 @@ Neo.EllipseTool.prototype = new Neo.EffectToolBase();
 Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSE;
 Neo.EllipseTool.prototype.isEllipse = true;
 Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.ellipseMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFill(x, y, width, height, this.type);
 };
 
 /*
@@ -1172,9 +1176,10 @@ Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
 Neo.EllipseFillTool.prototype.isEllipse = true;
 Neo.EllipseFillTool.prototype.isFill = true;
 Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.ellipseFillMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseFillMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFill(x, y, width, height, this.type);
 };
 
 /*

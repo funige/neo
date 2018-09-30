@@ -279,6 +279,61 @@ Neo.ActionManager.prototype.doBezier = function(
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
+Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doFill');
+        head.push(layer);
+        oe.setCurrent(head);
+
+        head.push(x, y, width, height);
+        head.push(type);
+
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        oe.getCurrent(item);
+
+        x = item[10];
+        y = item[11];
+        width = item[12];
+        height = item[13];
+        type = item[14];
+    }
+    oe.doFill(layer, x, y, width, height, type);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doMerge');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.merge(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
 Neo.ActionManager.prototype.doText = function(layer,
     x, y,
     color,
