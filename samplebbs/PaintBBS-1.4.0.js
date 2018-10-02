@@ -2015,6 +2015,7 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
+        console.log("animation!");
         return new Blob([]); //animationには対応していないのでダミーデータを返す
     }
 };
@@ -2883,7 +2884,8 @@ Neo.Painter.prototype.drawXORLine = function(ctx, x0, y0, x1, y1, c) {
 };
 
 
-Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.eraseRect = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2914,7 +2916,8 @@ Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.flipH = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.flipH = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2938,7 +2941,8 @@ Neo.Painter.prototype.flipH = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.flipV = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.flipV = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -3015,7 +3019,8 @@ Neo.Painter.prototype.merge = function(layer, x, y, width, height) {
     }
 };
 
-Neo.Painter.prototype.blurRect = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.blurRect = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -3183,12 +3188,12 @@ Neo.Painter.prototype.doFloodFill = function(layer, x, y, fillColor) {
 //  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype.copy = function(x, y, width, height) {
+Neo.Painter.prototype.copy = function(layer, x, y, width, height) {
     this.tempX = 0;
     this.tempY = 0;
     this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
+    var imageData = this.canvasCtx[layer].getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     this.temp = new Uint32Array(buf32.length);
@@ -3212,18 +3217,18 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
 };
 
 
-Neo.Painter.prototype.paste = function(x, y, width, height) {
-    var ctx = this.canvasCtx[this.current];
+Neo.Painter.prototype.paste = function(layer, x, y, width, height, dx, dy) {
+    var ctx = this.canvasCtx[layer];
 //  console.log(this.tempX, this.tempY);
 
-    var imageData = ctx.getImageData(x + this.tempX, y + this.tempY, width, height);
+    var imageData = ctx.getImageData(x + dx, y + dy, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     for (var i = 0; i < buf32.length; i++) {
         buf32[i] = this.temp[i];
     }
     imageData.data.set(buf8);
-    ctx.putImageData(imageData, x + this.tempX, y + this.tempY);
+    ctx.putImageData(imageData, x + dx, y + dy);
 
     this.temp = null;
     this.tempX = 0;
@@ -3231,8 +3236,8 @@ Neo.Painter.prototype.paste = function(x, y, width, height) {
     this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype.turn = function(x, y, width, height) {
-    var ctx = this.canvasCtx[this.current];
+Neo.Painter.prototype.turn = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     
     // 傾けツールのバグを再現するため一番上のラインで対象領域を埋める
     var imageData = ctx.getImageData(x, y, width, height);
@@ -4413,7 +4418,7 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-    oe._actionMgr.doEraseAll(oe.current);
+    oe._actionMgr.doEraseAll();
     
     /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -4534,9 +4539,10 @@ Neo.EraseRectTool.prototype = new Neo.EffectToolBase();
 Neo.EraseRectTool.prototype.type = Neo.Painter.TOOLTYPE_ERASERECT;
 
 Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.eraseRect(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.eraseRect(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doEraseRect(x, y, width, height);
 };
 
 /*
@@ -4550,9 +4556,10 @@ Neo.FlipHTool.prototype = new Neo.EffectToolBase();
 Neo.FlipHTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_H;
 
 Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.flipH(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.flipH(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFlipH(x, y, width, height);
 };
 
 /*
@@ -4566,9 +4573,10 @@ Neo.FlipVTool.prototype = new Neo.EffectToolBase();
 Neo.FlipVTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_V;
 
 Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.flipV(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.flipV(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFlipV(x, y, width, height);
 };
 
 /*
@@ -4582,9 +4590,10 @@ Neo.BlurRectTool.prototype = new Neo.EffectToolBase();
 Neo.BlurRectTool.prototype.type = Neo.Painter.TOOLTYPE_BLURRECT;
 
 Neo.BlurRectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.blurRect(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.blurRect(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doBlurRect(x, y, width, height);
 };
 
 Neo.BlurRectTool.prototype.loadStates = function() {
@@ -4621,8 +4630,9 @@ Neo.TurnTool.prototype.upHandler = function(oe) {
 
     if (width > 0 && height > 0) {
         oe._pushUndo();
-        oe.turn(x, y, width, height);
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//      oe.turn(x, y, width, height);
+//      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe._actionMgr.doTurn(x, y, width, height);
     }
 };
 
@@ -4654,7 +4664,8 @@ Neo.CopyTool.prototype = new Neo.EffectToolBase();
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function(oe, x, y, width, height) {
-    oe.copy(x, y, width, height);
+//  oe.copy(oe.current, x, y, width, height);
+    oe._actionMgr.doCopy(x, y, width, height);
     oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
     oe.tool.x = x;
     oe.tool.y = y;
@@ -4681,8 +4692,11 @@ Neo.PasteTool.prototype.downHandler = function(oe) {
 Neo.PasteTool.prototype.upHandler = function(oe) {
     oe._pushUndo();
 
-    oe.paste(this.x, this.y, this.width, this.height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    var dx = oe.tempX;
+    var dy = oe.tempY;
+//  oe.paste(oe.current, this.x, this.y, this.width, this.height, dx, dy);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doPaste(this.x, this.y, this.width, this.height, dx, dy);
 
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
 };
@@ -5070,11 +5084,6 @@ Neo.ActionManager.prototype.play = function() {
     }
 }
 
-Neo.ActionManager.prototype.apply = function(item) {
-    if (Neo.ActionManager.prototype[item[0]]) {
-        (Neo.ActionManager.prototype[item[0]])(item);
-    }
-}
 
 /*
 -------------------------------------------------------------------------
@@ -5117,7 +5126,10 @@ Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doEraseAll = function(layer) {
+Neo.ActionManager.prototype.doEraseAll = function() {
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
     if (typeof layer != "object") {
         var head = this._items[this._head - 1];
         head.push('doEraseAll');
@@ -5310,6 +5322,56 @@ Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
+Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doFlipH');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.flipH(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doFlipV');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.flipV(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
 Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
@@ -5332,6 +5394,141 @@ Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
         height = item[5];
     }
     oe.merge(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doBlurRect');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.blurRect(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doEraseRect');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.eraseRect(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doCopy');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+
+    oe.copy(layer, x, y, width, height);
+    oe.tool.x = x;
+    oe.tool.y = y;
+    oe.tool.width = width;
+    oe.tool.height = height;
+
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doPaste');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        head.push(dx, dy);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+        dx = item[6];
+        dy = item[7];
+    }
+
+    oe.paste(layer, x, y, width, height, dx, dy);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
+    var layer;
+    var oe = Neo.painter;
+
+    if (arguments.length > 1) {
+        var head = this._items[this._head - 1];
+        layer = oe.current;
+
+        head.push('doTurn');
+        head.push(layer);
+
+        head.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.turn(layer, x, y, width, height);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 

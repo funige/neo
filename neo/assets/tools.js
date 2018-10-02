@@ -803,7 +803,7 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-    oe._actionMgr.doEraseAll(oe.current);
+    oe._actionMgr.doEraseAll();
     
     /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -924,9 +924,10 @@ Neo.EraseRectTool.prototype = new Neo.EffectToolBase();
 Neo.EraseRectTool.prototype.type = Neo.Painter.TOOLTYPE_ERASERECT;
 
 Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.eraseRect(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.eraseRect(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doEraseRect(x, y, width, height);
 };
 
 /*
@@ -940,9 +941,10 @@ Neo.FlipHTool.prototype = new Neo.EffectToolBase();
 Neo.FlipHTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_H;
 
 Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.flipH(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.flipH(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFlipH(x, y, width, height);
 };
 
 /*
@@ -956,9 +958,10 @@ Neo.FlipVTool.prototype = new Neo.EffectToolBase();
 Neo.FlipVTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_V;
 
 Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.flipV(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.flipV(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doFlipV(x, y, width, height);
 };
 
 /*
@@ -972,9 +975,10 @@ Neo.BlurRectTool.prototype = new Neo.EffectToolBase();
 Neo.BlurRectTool.prototype.type = Neo.Painter.TOOLTYPE_BLURRECT;
 
 Neo.BlurRectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.blurRect(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.blurRect(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doBlurRect(x, y, width, height);
 };
 
 Neo.BlurRectTool.prototype.loadStates = function() {
@@ -1011,8 +1015,9 @@ Neo.TurnTool.prototype.upHandler = function(oe) {
 
     if (width > 0 && height > 0) {
         oe._pushUndo();
-        oe.turn(x, y, width, height);
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//      oe.turn(x, y, width, height);
+//      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe._actionMgr.doTurn(x, y, width, height);
     }
 };
 
@@ -1044,7 +1049,8 @@ Neo.CopyTool.prototype = new Neo.EffectToolBase();
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function(oe, x, y, width, height) {
-    oe.copy(x, y, width, height);
+//  oe.copy(oe.current, x, y, width, height);
+    oe._actionMgr.doCopy(x, y, width, height);
     oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
     oe.tool.x = x;
     oe.tool.y = y;
@@ -1071,8 +1077,11 @@ Neo.PasteTool.prototype.downHandler = function(oe) {
 Neo.PasteTool.prototype.upHandler = function(oe) {
     oe._pushUndo();
 
-    oe.paste(this.x, this.y, this.width, this.height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    var dx = oe.tempX;
+    var dy = oe.tempY;
+//  oe.paste(oe.current, this.x, this.y, this.width, this.height, dx, dy);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.doPaste(this.x, this.y, this.width, this.height, dx, dy);
 
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
 };

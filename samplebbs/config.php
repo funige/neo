@@ -357,10 +357,10 @@ define('DSP_PAINTTIME', '0');
 define('PALETTEFILE', 'palette.txt');
 
 //動画機能を使用する する:1 しない:0
-define('USE_ANIME', '0');
+define('USE_ANIME', '1');
 
 //動画記録デフォルトスイッチ ON:1 OFF:0
-define('DEF_ANIME', '0');
+define('DEF_ANIME', '1');
 
 //動画(PCH)保存ディレクトリ
 define('PCH_DIR', 'src/');

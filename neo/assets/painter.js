@@ -911,6 +911,7 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
+        console.log("animation!");
         return new Blob([]); //animationには対応していないのでダミーデータを返す
     }
 };
@@ -1779,7 +1780,8 @@ Neo.Painter.prototype.drawXORLine = function(ctx, x0, y0, x1, y1, c) {
 };
 
 
-Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.eraseRect = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -1810,7 +1812,8 @@ Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.flipH = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.flipH = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -1834,7 +1837,8 @@ Neo.Painter.prototype.flipH = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.flipV = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.flipV = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -1911,7 +1915,8 @@ Neo.Painter.prototype.merge = function(layer, x, y, width, height) {
     }
 };
 
-Neo.Painter.prototype.blurRect = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.blurRect = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2079,12 +2084,12 @@ Neo.Painter.prototype.doFloodFill = function(layer, x, y, fillColor) {
 //  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype.copy = function(x, y, width, height) {
+Neo.Painter.prototype.copy = function(layer, x, y, width, height) {
     this.tempX = 0;
     this.tempY = 0;
     this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
+    var imageData = this.canvasCtx[layer].getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     this.temp = new Uint32Array(buf32.length);
@@ -2108,18 +2113,18 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
 };
 
 
-Neo.Painter.prototype.paste = function(x, y, width, height) {
-    var ctx = this.canvasCtx[this.current];
+Neo.Painter.prototype.paste = function(layer, x, y, width, height, dx, dy) {
+    var ctx = this.canvasCtx[layer];
 //  console.log(this.tempX, this.tempY);
 
-    var imageData = ctx.getImageData(x + this.tempX, y + this.tempY, width, height);
+    var imageData = ctx.getImageData(x + dx, y + dy, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     for (var i = 0; i < buf32.length; i++) {
         buf32[i] = this.temp[i];
     }
     imageData.data.set(buf8);
-    ctx.putImageData(imageData, x + this.tempX, y + this.tempY);
+    ctx.putImageData(imageData, x + dx, y + dy);
 
     this.temp = null;
     this.tempX = 0;
@@ -2127,8 +2132,8 @@ Neo.Painter.prototype.paste = function(x, y, width, height) {
     this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype.turn = function(x, y, width, height) {
-    var ctx = this.canvasCtx[this.current];
+Neo.Painter.prototype.turn = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     
     // 傾けツールのバグを再現するため一番上のラインで対象領域を埋める
     var imageData = ctx.getImageData(x, y, width, height);
