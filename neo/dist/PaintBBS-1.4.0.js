@@ -75,18 +75,22 @@ Neo.init2 = function() {
     Neo.container.oncontextmenu = function() {return false;};
 
     // 続きから描く
-    if (Neo.config.image_canvas) {
+    if (Neo.config.pch_file) {
+        Neo.painter.loadAnimation(Neo.config.pch_file)
+        
+    } else if (Neo.config.image_canvas) {
         Neo.painter.loadImage(Neo.config.image_canvas);
-    }
 
-    // 描きかけの画像が見つかったとき
-    Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
-    if (Neo.storage.getItem('timestamp')) {
-        setTimeout(function () {
-            if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
-                Neo.painter.loadSession();
-            }
-        }, 1);
+    } else {
+        // 描きかけの画像が見つかったとき
+        Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
+        if (Neo.storage.getItem('timestamp')) {
+            setTimeout(function () {
+                if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
+                    Neo.painter.loadSession();
+                }
+            }, 1);
+        }
     }
 
     window.addEventListener("pagehide", function(e) {
@@ -1922,12 +1926,22 @@ Neo.Painter.prototype.submit = function(board) {
     var thumbnail = null;
     var thumbnail2 = null;
 
+    if (Neo.config.thumbnail_type == "animation" || this.useThumbnail()) {
+        thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
+    }
+
+    if (Neo.config.thumbnail_type2 && this.useThumbnail()) {
+        thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2)
+    }
+
+    /*
     if (this.useThumbnail()) {
         thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
         if (Neo.config.thumbnail_type2) {
             thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
         }
-    }
+    }*/
+
     Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
 };
 
@@ -1992,6 +2006,7 @@ Neo.Painter.prototype.getPNG = function() {
 };
 
 Neo.Painter.prototype.getThumbnail = function(type) {
+    console.log('getThumnail', type);
     if (type != "animation") {
         var thumbnailWidth = this.getThumbnailWidth();
         var thumbnailHeight = this.getThumbnailHeight();
@@ -2015,8 +2030,8 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
-        console.log("animation!");
-        return new Blob([]); //animationには対応していないのでダミーデータを返す
+        return new Blob([JSON.stringify(this._actionMgr._items)]);
+//      return new Blob([]);
     }
 };
 
@@ -3444,6 +3459,10 @@ Neo.Painter.prototype.cancelTool = function(e) {
 };
 
 Neo.Painter.prototype.loadImage = function (filename) {
+    if (filename.slice(-3).toLowerCase == ".pch") {
+        return this.loadAnimation(filename);
+    }
+    
     console.log("loadImage " + filename);
     var img = new Image();
     img.src = filename;
@@ -3452,6 +3471,19 @@ Neo.Painter.prototype.loadImage = function (filename) {
         oe.canvasCtx[0].drawImage(img, 0, 0);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     };
+};
+
+Neo.Painter.prototype.loadAnimation = function (filename) {
+    console.log("loadAnimation " + filename);
+
+    var request = new XMLHttpRequest();
+    request.open("GET", filename, true);
+    request.responseType = "text";
+    request.onload = function() {
+        Neo.painter._actionMgr._items = JSON.parse(request.response);
+        Neo.painter._actionMgr.play();
+    };
+    request.send();
 };
 
 Neo.Painter.prototype.loadSession = function (filename) {

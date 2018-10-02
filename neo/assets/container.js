@@ -75,18 +75,22 @@ Neo.init2 = function() {
     Neo.container.oncontextmenu = function() {return false;};
 
     // 続きから描く
-    if (Neo.config.image_canvas) {
+    if (Neo.config.pch_file) {
+        Neo.painter.loadAnimation(Neo.config.pch_file)
+        
+    } else if (Neo.config.image_canvas) {
         Neo.painter.loadImage(Neo.config.image_canvas);
-    }
 
-    // 描きかけの画像が見つかったとき
-    Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
-    if (Neo.storage.getItem('timestamp')) {
-        setTimeout(function () {
-            if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
-                Neo.painter.loadSession();
-            }
-        }, 1);
+    } else {
+        // 描きかけの画像が見つかったとき
+        Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
+        if (Neo.storage.getItem('timestamp')) {
+            setTimeout(function () {
+                if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
+                    Neo.painter.loadSession();
+                }
+            }, 1);
+        }
     }
 
     window.addEventListener("pagehide", function(e) {

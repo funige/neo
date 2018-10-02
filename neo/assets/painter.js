@@ -818,12 +818,22 @@ Neo.Painter.prototype.submit = function(board) {
     var thumbnail = null;
     var thumbnail2 = null;
 
+    if (Neo.config.thumbnail_type == "animation" || this.useThumbnail()) {
+        thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
+    }
+
+    if (Neo.config.thumbnail_type2 && this.useThumbnail()) {
+        thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2)
+    }
+
+    /*
     if (this.useThumbnail()) {
         thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
         if (Neo.config.thumbnail_type2) {
             thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
         }
-    }
+    }*/
+
     Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
 };
 
@@ -888,6 +898,7 @@ Neo.Painter.prototype.getPNG = function() {
 };
 
 Neo.Painter.prototype.getThumbnail = function(type) {
+    console.log('getThumnail', type);
     if (type != "animation") {
         var thumbnailWidth = this.getThumbnailWidth();
         var thumbnailHeight = this.getThumbnailHeight();
@@ -911,8 +922,8 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
-        console.log("animation!");
-        return new Blob([]); //animationには対応していないのでダミーデータを返す
+        return new Blob([JSON.stringify(this._actionMgr._items)]);
+//      return new Blob([]);
     }
 };
 
@@ -2340,6 +2351,10 @@ Neo.Painter.prototype.cancelTool = function(e) {
 };
 
 Neo.Painter.prototype.loadImage = function (filename) {
+    if (filename.slice(-3).toLowerCase == ".pch") {
+        return this.loadAnimation(filename);
+    }
+    
     console.log("loadImage " + filename);
     var img = new Image();
     img.src = filename;
@@ -2348,6 +2363,19 @@ Neo.Painter.prototype.loadImage = function (filename) {
         oe.canvasCtx[0].drawImage(img, 0, 0);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     };
+};
+
+Neo.Painter.prototype.loadAnimation = function (filename) {
+    console.log("loadAnimation " + filename);
+
+    var request = new XMLHttpRequest();
+    request.open("GET", filename, true);
+    request.responseType = "text";
+    request.onload = function() {
+        Neo.painter._actionMgr._items = JSON.parse(request.response);
+        Neo.painter._actionMgr.play();
+    };
+    request.send();
 };
 
 Neo.Painter.prototype.loadSession = function (filename) {
