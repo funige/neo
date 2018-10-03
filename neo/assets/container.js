@@ -8,10 +8,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-
 var Neo = function() {};
 
-Neo.version = "1.4.0";
+Neo.version = "1.4.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -51,7 +50,9 @@ Neo.init = function() {
     for (var i = 0; i < applets.length; i++) {
         var applet = applets[i];
         var name = applet.attributes.name.value;
-        if (name == "paintbbs") {
+
+        console.log("NAME=", name);
+        if (name == "paintbbs" || name == "pch") {
             Neo.applet = applet;
             Neo.initConfig(applet);
             Neo.createContainer(applet);
@@ -74,6 +75,9 @@ Neo.init2 = function() {
 
     Neo.container.oncontextmenu = function() {return false;};
 
+    // 動画記録
+    Neo.animation = (Neo.config.thumbnail_type == "animation");
+    
     // 続きから描く
     if (Neo.config.pch_file) {
         Neo.painter.loadAnimation(Neo.config.pch_file)

@@ -922,7 +922,8 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
-        return new Blob([JSON.stringify(this._actionMgr._items)]);
+        var data = LZString.compressToUTF16(JSON.stringify(this._actionMgr._items))
+        return new Blob(["NEO " + data]);
 //      return new Blob([]);
     }
 };
@@ -1113,6 +1114,7 @@ Neo.Painter.prototype.prepareDrawing = function () {
     this._currentColor = [r, g, b, a];
     this._currentMask = [maskR, maskG, maskB];
     this._currentWidth = this.lineWidth;
+    this._currentMaskType = this.maskType;
 };
 
 Neo.Painter.prototype.isMasked = function (buf8, index) {
@@ -1135,7 +1137,7 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
         b0 = 0xff;
     }
 
-    var type = this.maskType;
+    var type = this._currentMaskType; //this.maskType;
 
     //TODO
     //いろいろ試したのですが半透明で描画するときの加算・逆加算を再現する方法がわかりません。
@@ -2209,7 +2211,7 @@ Neo.Painter.prototype.doFill = function(layer, x, y, width, height, type) {
         for (var i = 0; i < width; i++) {
             if (maskFunc && maskFunc.call(this, i, j, width, height)) {
                 //なぜか加算逆加算は適用されない
-                if (this.maskType >= Neo.Painter.MASKTYPE_ADD || 
+                if (this._currentMaskType >= Neo.Painter.MASKTYPE_ADD || 
                     !this.isMasked(buf8, index)) {
                     var r0 = buf8[index + 0];
                     var g0 = buf8[index + 1];
@@ -2367,12 +2369,12 @@ Neo.Painter.prototype.loadImage = function (filename) {
 
 Neo.Painter.prototype.loadAnimation = function (filename) {
     console.log("loadAnimation " + filename);
-
     var request = new XMLHttpRequest();
     request.open("GET", filename, true);
     request.responseType = "text";
     request.onload = function() {
-        Neo.painter._actionMgr._items = JSON.parse(request.response);
+        var data = LZString.decompressFromUTF16(request.response.slice(4));
+        Neo.painter._actionMgr._items = JSON.parse(data);
         Neo.painter._actionMgr.play();
     };
     request.send();
@@ -2525,14 +2527,17 @@ Neo.Painter.prototype.setCurrent = function(item) {
     var color = this._currentColor;
     var mask = this._currentMask;
     var width = this._currentWidth;
+    var type = this._currentMaskType;
 
     item.push(color[0], color[1], color[2], color[3]);
     item.push(mask[0], mask[1], mask[2]);
     item.push(width);
+    item.push(type);
 };
 
 Neo.Painter.prototype.getCurrent = function(item) {
     this._currentColor = [item[2], item[3], item[4], item[5]];
     this._currentMask = [item[6], item[7], item[8]];
     this._currentWidth = item[9];
+    this._currentMaskType = item[10];
 };

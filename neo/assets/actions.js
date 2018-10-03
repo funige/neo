@@ -1,23 +1,5 @@
 'use strict';
 
-Neo.Action = function() {
-};
-
-Neo.Action.play = function(item) {
-    if (Neo.Action[item.type]) {
-        Neo.Action[item.type](item)
-    }
-}
-
-Neo.Action.undo = function(item) {
-    console.log('[undo]')
-}
-
-/*
--------------------------------------------------------------------------
-    Recorder
--------------------------------------------------------------------------
-*/
 
 Neo.ActionManager = function() {
     this._items = [];
@@ -25,33 +7,30 @@ Neo.ActionManager = function() {
 }
 
 Neo.ActionManager.prototype.step = function() {
+    if (!Neo.animation) return;
+    
     if (this._items.length > this._head) {
         this._items.length = this._head;
     }
     this._items.push([]);
     this._head++;
-    console.log("step")
 }
 
 Neo.ActionManager.prototype.back = function() {
+    if (!Neo.animation) return;
+
     if (this._head > 0) {
         this._head--;
     }
-    console.log("back", this._items.length, this._head);
 }
 
 Neo.ActionManager.prototype.forward = function() {
+    if (!Neo.animation) return;
+
     if (this._head < this._items.length) {
         this._head++;
     }
-    console.log("forward", this._items.length, this._head);
 }
-
-/*
--------------------------------------------------------------------------
-    Player
--------------------------------------------------------------------------
-*/
 
 Neo.ActionManager.prototype.play = function() {
     if (this._head < this._items.length) {
@@ -65,7 +44,7 @@ Neo.ActionManager.prototype.play = function() {
 
         setTimeout(function() {
             Neo.painter._actionMgr.play();
-        }, 100);
+        }, 10);
     }
 }
 
@@ -80,7 +59,6 @@ Neo.ActionManager.prototype.clearCanvas = function() {
     if (typeof arguments[0] != "object") {
         var head = this._items[this._head - 1]
         head.push('clearCanvas')
-    } else {
     }
     
     var oe = Neo.painter;
@@ -89,10 +67,10 @@ Neo.ActionManager.prototype.clearCanvas = function() {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
+Neo.ActionManager.prototype.floodFill = function(layer, x, y, color) {
     if (typeof layer != "object") {
         var head = this._items[this._head - 1];
-        head.push('doFloodFill');
+        head.push('floodFill');
         head.push(layer);
         head.push(x);
         head.push(y);
@@ -111,13 +89,13 @@ Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doEraseAll = function() {
+Neo.ActionManager.prototype.eraseAll = function() {
     var oe = Neo.painter;
     var layer = oe.current;
     
     if (typeof layer != "object") {
         var head = this._items[this._head - 1];
-        head.push('doEraseAll');
+        head.push('eraseAll');
         head.push(layer);
 
     } else {
@@ -130,14 +108,14 @@ Neo.ActionManager.prototype.doEraseAll = function() {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
+Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
     var oe = Neo.painter;
     var layer = oe.current;
     
     if (arguments.length > 1) {
         var head = this._items[this._head - 1];
 
-        head.push('doFreeHand');
+        head.push('freeHand');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -153,12 +131,12 @@ Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
         layer = item[1];
         oe.getCurrent(item);
 
-        lineType = item[10];
-        x0 = item[11];
-        y0 = item[12];
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
         var x1, y1;
 
-        for (var i = 13; i + 2 < length; i += 2) {
+        for (var i = 14; i + 2 < length; i += 2) {
             x1 = x0;
             y1 = y0;
             x0 = item[i + 0]
@@ -170,13 +148,13 @@ Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
     }
 }
 
-Neo.ActionManager.prototype.doFreeHandMove = function(x0, y0, x1, y1, lineType) {
+Neo.ActionManager.prototype.freeHandMove = function(x0, y0, x1, y1, lineType) {
     if (arguments.length > 1) {
         var oe = Neo.painter;
         var layer = oe.current;
         var head = this._items[this._head - 1];
         if (head.length == 0) {
-            head.push('doFreeHand')
+            head.push('freeHand')
             head.push(layer)
             oe.setCurrent(head);
 
@@ -191,18 +169,18 @@ Neo.ActionManager.prototype.doFreeHandMove = function(x0, y0, x1, y1, lineType) 
             var y = head[head.length - 3]
             if (x1 != head[head.length - 4] ||
                 y1 != head[head.length - 3] ||
-                lineType != head[10]) {
-                console.log('eror in doFreeHandMove???', x, y, lineType, head)
+                lineType != head[11]) {
+                console.log('eror in freeHandMove?', x, y, lineType, head)
             }
         }
         oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
         
     } else {
-        console.log('error in doFreeHandMove: called from recorder', head);
+        console.log('error in freeHandMove: called from recorder', head);
     }
 }
 
-Neo.ActionManager.prototype.doLine = function(
+Neo.ActionManager.prototype.line = function(
     x0, y0,
     x1, y1,
     lineType)
@@ -214,7 +192,7 @@ Neo.ActionManager.prototype.doLine = function(
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doLine');
+        head.push('line');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -227,17 +205,17 @@ Neo.ActionManager.prototype.doLine = function(
         layer = item[1];
         oe.getCurrent(item);
 
-        lineType = item[10];
-        x0 = item[11];
-        y0 = item[12];
-        x1 = item[13];
-        y1 = item[14];
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        x1 = item[14];
+        y1 = item[15];
     }
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doBezier = function(
+Neo.ActionManager.prototype.bezier = function(
     x0, y0,
     x1, y1,
     x2, y2,
@@ -251,7 +229,7 @@ Neo.ActionManager.prototype.doBezier = function(
         var head = this._items[this._head - 1];
         layer = oe.current;
         
-        head.push('doBezier');
+        head.push('bezier');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -263,21 +241,21 @@ Neo.ActionManager.prototype.doBezier = function(
         layer = item[1];
         oe.getCurrent(item);
         
-        lineType = item[10];
-        x0 = item[11];
-        y0 = item[12];
-        x1 = item[13];
-        y1 = item[14];
-        x2 = item[15];
-        y2 = item[16];
-        x3 = item[17];
-        y3 = item[18];
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        x1 = item[14];
+        y1 = item[15];
+        x2 = item[16];
+        y2 = item[17];
+        x3 = item[18];
+        y3 = item[19];
     }
     oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
+Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
     var layer;
     var oe = Neo.painter;
 
@@ -285,7 +263,7 @@ Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doFill');
+        head.push('fill');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -297,17 +275,17 @@ Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
         layer = item[1];
         oe.getCurrent(item);
 
-        x = item[10];
-        y = item[11];
-        width = item[12];
-        height = item[13];
-        type = item[14];
+        x = item[11];
+        y = item[12];
+        width = item[13];
+        height = item[14];
+        type = item[15];
     }
     oe.doFill(layer, x, y, width, height, type);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
+Neo.ActionManager.prototype.flipH = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -315,7 +293,7 @@ Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doFlipH');
+        head.push('flipH');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -332,7 +310,7 @@ Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
+Neo.ActionManager.prototype.flipV = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -340,7 +318,7 @@ Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doFlipV');
+        head.push('flipV');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -357,7 +335,7 @@ Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
+Neo.ActionManager.prototype.merge = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -365,7 +343,7 @@ Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doMerge');
+        head.push('merge');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -382,7 +360,7 @@ Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
+Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -390,7 +368,7 @@ Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doBlurRect');
+        head.push('blurRect');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -407,7 +385,7 @@ Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
+Neo.ActionManager.prototype.eraseRect = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -415,7 +393,7 @@ Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doEraseRect');
+        head.push('eraseRect');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -432,7 +410,7 @@ Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
+Neo.ActionManager.prototype.copy = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -440,7 +418,7 @@ Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doCopy');
+        head.push('copy');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -459,11 +437,10 @@ Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
     oe.tool.y = y;
     oe.tool.width = width;
     oe.tool.height = height;
-
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
+Neo.ActionManager.prototype.paste = function(x, y, width, height, dx, dy) {
     var layer;
     var oe = Neo.painter;
 
@@ -471,7 +448,7 @@ Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doPaste');
+        head.push('paste');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -492,7 +469,7 @@ Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
+Neo.ActionManager.prototype.turn = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -500,7 +477,7 @@ Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doTurn');
+        head.push('turn');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -517,7 +494,7 @@ Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doText = function(layer,
+Neo.ActionManager.prototype.text = function(
     x, y,
     color,
     alpha,
@@ -525,9 +502,14 @@ Neo.ActionManager.prototype.doText = function(layer,
     size,
     family)
 {
-    if (typeof layer != "object") {
+    var layer;
+    var oe = Neo.painter;
+    
+    if (arguments.length > 1) {
         var head = this._items[this._head - 1];
-        head.push('doText');
+        layer = oe.current;
+        
+        head.push('text');
         head.push(layer);
         head.push(x);
         head.push(y);
@@ -538,7 +520,8 @@ Neo.ActionManager.prototype.doText = function(layer,
         head.push(family);
 
     } else {
-        var item = layer
+        var item = arguments[0];
+        
         layer = item[1];
         x = item[2];
         y = item[3];
@@ -548,8 +531,6 @@ Neo.ActionManager.prototype.doText = function(layer,
         size = item[7];
         family = item[8];
     }
-
-    var oe = Neo.painter;
     oe.doText(layer, x, y, color, alpha, string, size, family);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }

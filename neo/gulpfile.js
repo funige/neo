@@ -11,7 +11,8 @@ var jsFiles = ["assets/container.js",
                "assets/tools.js",
                "assets/commands.js",
                "assets/actions.js",
-               "assets/widgets.js"];
+               "assets/widgets.js",
+               "assets/lz-string.js"];
 var jsDest = "dist";
 var cssFiles = ["neo.css"]
 var name = json.name + "-" + json.version;

@@ -70,21 +70,23 @@ small { font-size:9pt }
 // pdefw…お絵かきデフォルトサイズ(横)
 // pdefh…お絵かきデフォルトサイズ(縦)
 )-->
+<!--
 保存タイプ<select name=savetype>
 <option value='AUTO'>AUTO</option>
 <option value='PNG'>PNG</option>
 <option value='JPEG'>JPEG</option>
 </select>
-
+-->
 <!-- NEOを使う -->
 <label><input type=checkbox name=useneo checked=checked /><b>NEOを使う</b></label>
 
-<input type=submit value="お絵かきする">
 <!--{def anime}--><input type=checkbox value="true" name=anime{$animechk}>動画記録<!--{/def}-->
 <!--(
 // anime…動画記録機能を使用するとき true が入る
 // animechk…動画記録をデフォルトでチェックするとき ' checked' が入る
 )-->
+<p><input type=submit value="お絵かきする">
+
 <!--{def resno}--><input type=hidden name=resto value="{$resno}"><!--{/def}-->
 <input type=hidden name=mode value=paint></form>
 <a href="{$self}?mode=piccom<!--{def resno}-->&resto={$resno}<!--{/def}-->">アップロード途中の画像</a><BR>

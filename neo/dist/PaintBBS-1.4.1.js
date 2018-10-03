@@ -8,10 +8,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-
 var Neo = function() {};
 
-Neo.version = "1.4.0";
+Neo.version = "1.4.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -51,7 +50,9 @@ Neo.init = function() {
     for (var i = 0; i < applets.length; i++) {
         var applet = applets[i];
         var name = applet.attributes.name.value;
-        if (name == "paintbbs") {
+
+        console.log("NAME=", name);
+        if (name == "paintbbs" || name == "pch") {
             Neo.applet = applet;
             Neo.initConfig(applet);
             Neo.createContainer(applet);
@@ -74,6 +75,9 @@ Neo.init2 = function() {
 
     Neo.container.oncontextmenu = function() {return false;};
 
+    // 動画記録
+    Neo.animation = (Neo.config.thumbnail_type == "animation");
+    
     // 続きから描く
     if (Neo.config.pch_file) {
         Neo.painter.loadAnimation(Neo.config.pch_file)
@@ -2030,7 +2034,8 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
-        return new Blob([JSON.stringify(this._actionMgr._items)]);
+        var data = LZString.compressToUTF16(JSON.stringify(this._actionMgr._items))
+        return new Blob(["NEO " + data]);
 //      return new Blob([]);
     }
 };
@@ -2221,6 +2226,7 @@ Neo.Painter.prototype.prepareDrawing = function () {
     this._currentColor = [r, g, b, a];
     this._currentMask = [maskR, maskG, maskB];
     this._currentWidth = this.lineWidth;
+    this._currentMaskType = this.maskType;
 };
 
 Neo.Painter.prototype.isMasked = function (buf8, index) {
@@ -2243,7 +2249,7 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
         b0 = 0xff;
     }
 
-    var type = this.maskType;
+    var type = this._currentMaskType; //this.maskType;
 
     //TODO
     //いろいろ試したのですが半透明で描画するときの加算・逆加算を再現する方法がわかりません。
@@ -3317,7 +3323,7 @@ Neo.Painter.prototype.doFill = function(layer, x, y, width, height, type) {
         for (var i = 0; i < width; i++) {
             if (maskFunc && maskFunc.call(this, i, j, width, height)) {
                 //なぜか加算逆加算は適用されない
-                if (this.maskType >= Neo.Painter.MASKTYPE_ADD || 
+                if (this._currentMaskType >= Neo.Painter.MASKTYPE_ADD || 
                     !this.isMasked(buf8, index)) {
                     var r0 = buf8[index + 0];
                     var g0 = buf8[index + 1];
@@ -3475,12 +3481,12 @@ Neo.Painter.prototype.loadImage = function (filename) {
 
 Neo.Painter.prototype.loadAnimation = function (filename) {
     console.log("loadAnimation " + filename);
-
     var request = new XMLHttpRequest();
     request.open("GET", filename, true);
     request.responseType = "text";
     request.onload = function() {
-        Neo.painter._actionMgr._items = JSON.parse(request.response);
+        var data = LZString.decompressFromUTF16(request.response.slice(4));
+        Neo.painter._actionMgr._items = JSON.parse(data);
         Neo.painter._actionMgr.play();
     };
     request.send();
@@ -3633,16 +3639,19 @@ Neo.Painter.prototype.setCurrent = function(item) {
     var color = this._currentColor;
     var mask = this._currentMask;
     var width = this._currentWidth;
+    var type = this._currentMaskType;
 
     item.push(color[0], color[1], color[2], color[3]);
     item.push(mask[0], mask[1], mask[2]);
     item.push(width);
+    item.push(type);
 };
 
 Neo.Painter.prototype.getCurrent = function(item) {
     this._currentColor = [item[2], item[3], item[4], item[5]];
     this._currentMask = [item[6], item[7], item[8]];
     this._currentWidth = item[9];
+    this._currentMaskType = item[10];
 };
 
 'use strict';
@@ -3859,7 +3868,7 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe._actionMgr.doFreeHand(x0, y0, this.lineType);
+        oe._actionMgr.freeHand(x0, y0, this.lineType);
 //      oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
     }
 
@@ -3897,7 +3906,7 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
     var x1 = Math.floor(oe.prevMouseX);
     var y1 = Math.floor(oe.prevMouseY);
 //  oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
-    oe._actionMgr.doFreeHandMove(x0, y0, x1, y1, this.lineType);
+    oe._actionMgr.freeHandMove(x0, y0, x1, y1, this.lineType);
 
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
@@ -3965,7 +3974,7 @@ Neo.DrawToolBase.prototype.lineUpHandler = function(oe) {
         oe.prepareDrawing();
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe._actionMgr.doLine(x0, y0, this.startX, this.startY, this.lineType)
+        oe._actionMgr.line(x0, y0, this.startX, this.startY, this.lineType)
         
         /*
         var ctx = oe.canvasCtx[oe.current];
@@ -4039,7 +4048,7 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         this.y2 = Math.floor(oe.mouseY);
 
         oe._pushUndo();
-        oe._actionMgr.doBezier(this.x0, this.y0,this.x1, this.y1,
+        oe._actionMgr.bezier(this.x0, this.y0,this.x1, this.y1,
                                this.x2, this.y2, this.x3, this.y3, this.lineType);
         oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
         
@@ -4421,8 +4430,7 @@ Neo.FillTool.prototype.downHandler = function(oe) {
     var color = oe.getColor();
     
     oe._pushUndo();
-    oe._actionMgr.doFloodFill(layer, x, y, color);
-
+    oe._actionMgr.floodFill(layer, x, y, color);
     //oe.doFloodFill(layer, x, y, color);
 };
 
@@ -4450,7 +4458,7 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-    oe._actionMgr.doEraseAll();
+    oe._actionMgr.eraseAll();
     
     /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -4574,7 +4582,7 @@ Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.eraseRect(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doEraseRect(x, y, width, height);
+    oe._actionMgr.eraseRect(x, y, width, height);
 };
 
 /*
@@ -4591,7 +4599,7 @@ Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.flipH(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFlipH(x, y, width, height);
+    oe._actionMgr.flipH(x, y, width, height);
 };
 
 /*
@@ -4608,7 +4616,7 @@ Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.flipV(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFlipV(x, y, width, height);
+    oe._actionMgr.flipV(x, y, width, height);
 };
 
 /*
@@ -4625,7 +4633,7 @@ Neo.BlurRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.blurRect(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doBlurRect(x, y, width, height);
+    oe._actionMgr.blurRect(x, y, width, height);
 };
 
 Neo.BlurRectTool.prototype.loadStates = function() {
@@ -4664,7 +4672,7 @@ Neo.TurnTool.prototype.upHandler = function(oe) {
         oe._pushUndo();
 //      oe.turn(x, y, width, height);
 //      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-        oe._actionMgr.doTurn(x, y, width, height);
+        oe._actionMgr.turn(x, y, width, height);
     }
 };
 
@@ -4682,7 +4690,7 @@ Neo.MergeTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.merge(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doMerge(x, y, width, height);
+    oe._actionMgr.merge(x, y, width, height);
 };
 
 /*
@@ -4697,7 +4705,7 @@ Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  oe.copy(oe.current, x, y, width, height);
-    oe._actionMgr.doCopy(x, y, width, height);
+    oe._actionMgr.copy(x, y, width, height);
     oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
     oe.tool.x = x;
     oe.tool.y = y;
@@ -4728,7 +4736,7 @@ Neo.PasteTool.prototype.upHandler = function(oe) {
     var dy = oe.tempY;
 //  oe.paste(oe.current, this.x, this.y, this.width, this.height, dx, dy);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doPaste(this.x, this.y, this.width, this.height, dx, dy);
+    oe._actionMgr.paste(this.x, this.y, this.width, this.height, dx, dy);
 
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
 };
@@ -4782,7 +4790,7 @@ Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4800,7 +4808,7 @@ Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectFillMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4817,7 +4825,7 @@ Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4835,7 +4843,7 @@ Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseFillMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4897,8 +4905,8 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
             var x = this.startX;
             var y = this.startY;
             //oe.doText(layer, this.startX, this.startY, color, string, size, family);
-            oe._actionMgr.doText(layer, this.startX, this.startY,
-                                 color, alpha, string, size, family);
+            oe._actionMgr.text(this.startX, this.startY,
+                               color, alpha, string, size, family);
 
             text.style.display = "none";
             text.blur();
@@ -5047,24 +5055,6 @@ Neo.CopyrightCommand.prototype.execute = function() {
 
 'use strict';
 
-Neo.Action = function() {
-};
-
-Neo.Action.play = function(item) {
-    if (Neo.Action[item.type]) {
-        Neo.Action[item.type](item)
-    }
-}
-
-Neo.Action.undo = function(item) {
-    console.log('[undo]')
-}
-
-/*
--------------------------------------------------------------------------
-    Recorder
--------------------------------------------------------------------------
-*/
 
 Neo.ActionManager = function() {
     this._items = [];
@@ -5072,33 +5062,30 @@ Neo.ActionManager = function() {
 }
 
 Neo.ActionManager.prototype.step = function() {
+    if (!Neo.animation) return;
+    
     if (this._items.length > this._head) {
         this._items.length = this._head;
     }
     this._items.push([]);
     this._head++;
-    console.log("step")
 }
 
 Neo.ActionManager.prototype.back = function() {
+    if (!Neo.animation) return;
+
     if (this._head > 0) {
         this._head--;
     }
-    console.log("back", this._items.length, this._head);
 }
 
 Neo.ActionManager.prototype.forward = function() {
+    if (!Neo.animation) return;
+
     if (this._head < this._items.length) {
         this._head++;
     }
-    console.log("forward", this._items.length, this._head);
 }
-
-/*
--------------------------------------------------------------------------
-    Player
--------------------------------------------------------------------------
-*/
 
 Neo.ActionManager.prototype.play = function() {
     if (this._head < this._items.length) {
@@ -5112,7 +5099,7 @@ Neo.ActionManager.prototype.play = function() {
 
         setTimeout(function() {
             Neo.painter._actionMgr.play();
-        }, 100);
+        }, 10);
     }
 }
 
@@ -5127,7 +5114,6 @@ Neo.ActionManager.prototype.clearCanvas = function() {
     if (typeof arguments[0] != "object") {
         var head = this._items[this._head - 1]
         head.push('clearCanvas')
-    } else {
     }
     
     var oe = Neo.painter;
@@ -5136,10 +5122,10 @@ Neo.ActionManager.prototype.clearCanvas = function() {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
+Neo.ActionManager.prototype.floodFill = function(layer, x, y, color) {
     if (typeof layer != "object") {
         var head = this._items[this._head - 1];
-        head.push('doFloodFill');
+        head.push('floodFill');
         head.push(layer);
         head.push(x);
         head.push(y);
@@ -5158,13 +5144,13 @@ Neo.ActionManager.prototype.doFloodFill = function(layer, x, y, color) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 }
 
-Neo.ActionManager.prototype.doEraseAll = function() {
+Neo.ActionManager.prototype.eraseAll = function() {
     var oe = Neo.painter;
     var layer = oe.current;
     
     if (typeof layer != "object") {
         var head = this._items[this._head - 1];
-        head.push('doEraseAll');
+        head.push('eraseAll');
         head.push(layer);
 
     } else {
@@ -5177,14 +5163,14 @@ Neo.ActionManager.prototype.doEraseAll = function() {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
+Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
     var oe = Neo.painter;
     var layer = oe.current;
     
     if (arguments.length > 1) {
         var head = this._items[this._head - 1];
 
-        head.push('doFreeHand');
+        head.push('freeHand');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -5200,12 +5186,12 @@ Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
         layer = item[1];
         oe.getCurrent(item);
 
-        lineType = item[10];
-        x0 = item[11];
-        y0 = item[12];
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
         var x1, y1;
 
-        for (var i = 13; i + 2 < length; i += 2) {
+        for (var i = 14; i + 2 < length; i += 2) {
             x1 = x0;
             y1 = y0;
             x0 = item[i + 0]
@@ -5217,13 +5203,13 @@ Neo.ActionManager.prototype.doFreeHand = function(x0, y0, lineType) {
     }
 }
 
-Neo.ActionManager.prototype.doFreeHandMove = function(x0, y0, x1, y1, lineType) {
+Neo.ActionManager.prototype.freeHandMove = function(x0, y0, x1, y1, lineType) {
     if (arguments.length > 1) {
         var oe = Neo.painter;
         var layer = oe.current;
         var head = this._items[this._head - 1];
         if (head.length == 0) {
-            head.push('doFreeHand')
+            head.push('freeHand')
             head.push(layer)
             oe.setCurrent(head);
 
@@ -5238,18 +5224,18 @@ Neo.ActionManager.prototype.doFreeHandMove = function(x0, y0, x1, y1, lineType) 
             var y = head[head.length - 3]
             if (x1 != head[head.length - 4] ||
                 y1 != head[head.length - 3] ||
-                lineType != head[10]) {
-                console.log('eror in doFreeHandMove???', x, y, lineType, head)
+                lineType != head[11]) {
+                console.log('eror in freeHandMove?', x, y, lineType, head)
             }
         }
         oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
         
     } else {
-        console.log('error in doFreeHandMove: called from recorder', head);
+        console.log('error in freeHandMove: called from recorder', head);
     }
 }
 
-Neo.ActionManager.prototype.doLine = function(
+Neo.ActionManager.prototype.line = function(
     x0, y0,
     x1, y1,
     lineType)
@@ -5261,7 +5247,7 @@ Neo.ActionManager.prototype.doLine = function(
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doLine');
+        head.push('line');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -5274,17 +5260,17 @@ Neo.ActionManager.prototype.doLine = function(
         layer = item[1];
         oe.getCurrent(item);
 
-        lineType = item[10];
-        x0 = item[11];
-        y0 = item[12];
-        x1 = item[13];
-        y1 = item[14];
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        x1 = item[14];
+        y1 = item[15];
     }
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doBezier = function(
+Neo.ActionManager.prototype.bezier = function(
     x0, y0,
     x1, y1,
     x2, y2,
@@ -5298,7 +5284,7 @@ Neo.ActionManager.prototype.doBezier = function(
         var head = this._items[this._head - 1];
         layer = oe.current;
         
-        head.push('doBezier');
+        head.push('bezier');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -5310,21 +5296,21 @@ Neo.ActionManager.prototype.doBezier = function(
         layer = item[1];
         oe.getCurrent(item);
         
-        lineType = item[10];
-        x0 = item[11];
-        y0 = item[12];
-        x1 = item[13];
-        y1 = item[14];
-        x2 = item[15];
-        y2 = item[16];
-        x3 = item[17];
-        y3 = item[18];
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        x1 = item[14];
+        y1 = item[15];
+        x2 = item[16];
+        y2 = item[17];
+        x3 = item[18];
+        y3 = item[19];
     }
     oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
+Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
     var layer;
     var oe = Neo.painter;
 
@@ -5332,7 +5318,7 @@ Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doFill');
+        head.push('fill');
         head.push(layer);
         oe.setCurrent(head);
 
@@ -5344,17 +5330,17 @@ Neo.ActionManager.prototype.doFill = function(x, y, width, height, type) {
         layer = item[1];
         oe.getCurrent(item);
 
-        x = item[10];
-        y = item[11];
-        width = item[12];
-        height = item[13];
-        type = item[14];
+        x = item[11];
+        y = item[12];
+        width = item[13];
+        height = item[14];
+        type = item[15];
     }
     oe.doFill(layer, x, y, width, height, type);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
+Neo.ActionManager.prototype.flipH = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5362,7 +5348,7 @@ Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doFlipH');
+        head.push('flipH');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5379,7 +5365,7 @@ Neo.ActionManager.prototype.doFlipH = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
+Neo.ActionManager.prototype.flipV = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5387,7 +5373,7 @@ Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doFlipV');
+        head.push('flipV');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5404,7 +5390,7 @@ Neo.ActionManager.prototype.doFlipV = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
+Neo.ActionManager.prototype.merge = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5412,7 +5398,7 @@ Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doMerge');
+        head.push('merge');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5429,7 +5415,7 @@ Neo.ActionManager.prototype.doMerge = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
+Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5437,7 +5423,7 @@ Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doBlurRect');
+        head.push('blurRect');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5454,7 +5440,7 @@ Neo.ActionManager.prototype.doBlurRect = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
+Neo.ActionManager.prototype.eraseRect = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5462,7 +5448,7 @@ Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doEraseRect');
+        head.push('eraseRect');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5479,7 +5465,7 @@ Neo.ActionManager.prototype.doEraseRect = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
+Neo.ActionManager.prototype.copy = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5487,7 +5473,7 @@ Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doCopy');
+        head.push('copy');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5506,11 +5492,10 @@ Neo.ActionManager.prototype.doCopy = function(x, y, width, height) {
     oe.tool.y = y;
     oe.tool.width = width;
     oe.tool.height = height;
-
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
+Neo.ActionManager.prototype.paste = function(x, y, width, height, dx, dy) {
     var layer;
     var oe = Neo.painter;
 
@@ -5518,7 +5503,7 @@ Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doPaste');
+        head.push('paste');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5539,7 +5524,7 @@ Neo.ActionManager.prototype.doPaste = function(x, y, width, height, dx, dy) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
+Neo.ActionManager.prototype.turn = function(x, y, width, height) {
     var layer;
     var oe = Neo.painter;
 
@@ -5547,7 +5532,7 @@ Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
         var head = this._items[this._head - 1];
         layer = oe.current;
 
-        head.push('doTurn');
+        head.push('turn');
         head.push(layer);
 
         head.push(x, y, width, height);
@@ -5564,7 +5549,7 @@ Neo.ActionManager.prototype.doTurn = function(x, y, width, height) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 
-Neo.ActionManager.prototype.doText = function(layer,
+Neo.ActionManager.prototype.text = function(
     x, y,
     color,
     alpha,
@@ -5572,9 +5557,14 @@ Neo.ActionManager.prototype.doText = function(layer,
     size,
     family)
 {
-    if (typeof layer != "object") {
+    var layer;
+    var oe = Neo.painter;
+    
+    if (arguments.length > 1) {
         var head = this._items[this._head - 1];
-        head.push('doText');
+        layer = oe.current;
+        
+        head.push('text');
         head.push(layer);
         head.push(x);
         head.push(y);
@@ -5585,7 +5575,8 @@ Neo.ActionManager.prototype.doText = function(layer,
         head.push(family);
 
     } else {
-        var item = layer
+        var item = arguments[0];
+        
         layer = item[1];
         x = item[2];
         y = item[3];
@@ -5595,8 +5586,6 @@ Neo.ActionManager.prototype.doText = function(layer,
         size = item[7];
         family = item[8];
     }
-
-    var oe = Neo.painter;
     oe.doText(layer, x, y, color, alpha, string, size, family);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
@@ -6866,3 +6855,510 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
     }
 };
 
+
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function() {
+
+// private property
+var f = String.fromCharCode;
+var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+var baseReverseDic = {};
+
+function getBaseValue(alphabet, character) {
+  if (!baseReverseDic[alphabet]) {
+    baseReverseDic[alphabet] = {};
+    for (var i=0 ; i<alphabet.length ; i++) {
+      baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+    }
+  }
+  return baseReverseDic[alphabet][character];
+}
+
+var LZString = {
+  compressToBase64 : function (input) {
+    if (input == null) return "";
+    var res = LZString._compress(input, 6, function(a){return keyStrBase64.charAt(a);});
+    switch (res.length % 4) { // To produce valid Base64
+    default: // When could this happen ?
+    case 0 : return res;
+    case 1 : return res+"===";
+    case 2 : return res+"==";
+    case 3 : return res+"=";
+    }
+  },
+
+  decompressFromBase64 : function (input) {
+    if (input == null) return "";
+    if (input == "") return null;
+    return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+  },
+
+  compressToUTF16 : function (input) {
+    if (input == null) return "";
+    return LZString._compress(input, 15, function(a){return f(a+32);}) + " ";
+  },
+
+  decompressFromUTF16: function (compressed) {
+    if (compressed == null) return "";
+    if (compressed == "") return null;
+    return LZString._decompress(compressed.length, 16384, function(index) { return compressed.charCodeAt(index) - 32; });
+  },
+
+  //compress into uint8array (UCS-2 big endian format)
+  compressToUint8Array: function (uncompressed) {
+    var compressed = LZString.compress(uncompressed);
+    var buf=new Uint8Array(compressed.length*2); // 2 bytes per character
+
+    for (var i=0, TotalLen=compressed.length; i<TotalLen; i++) {
+      var current_value = compressed.charCodeAt(i);
+      buf[i*2] = current_value >>> 8;
+      buf[i*2+1] = current_value % 256;
+    }
+    return buf;
+  },
+
+  //decompress from uint8array (UCS-2 big endian format)
+  decompressFromUint8Array:function (compressed) {
+    if (compressed===null || compressed===undefined){
+        return LZString.decompress(compressed);
+    } else {
+        var buf=new Array(compressed.length/2); // 2 bytes per character
+        for (var i=0, TotalLen=buf.length; i<TotalLen; i++) {
+          buf[i]=compressed[i*2]*256+compressed[i*2+1];
+        }
+
+        var result = [];
+        buf.forEach(function (c) {
+          result.push(f(c));
+        });
+        return LZString.decompress(result.join(''));
+
+    }
+
+  },
+
+
+  //compress into a string that is already URI encoded
+  compressToEncodedURIComponent: function (input) {
+    if (input == null) return "";
+    return LZString._compress(input, 6, function(a){return keyStrUriSafe.charAt(a);});
+  },
+
+  //decompress from an output of compressToEncodedURIComponent
+  decompressFromEncodedURIComponent:function (input) {
+    if (input == null) return "";
+    if (input == "") return null;
+    input = input.replace(/ /g, "+");
+    return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+  },
+
+  compress: function (uncompressed) {
+    return LZString._compress(uncompressed, 16, function(a){return f(a);});
+  },
+  _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+    if (uncompressed == null) return "";
+    var i, value,
+        context_dictionary= {},
+        context_dictionaryToCreate= {},
+        context_c="",
+        context_wc="",
+        context_w="",
+        context_enlargeIn= 2, // Compensate for the first entry which should not count
+        context_dictSize= 3,
+        context_numBits= 2,
+        context_data=[],
+        context_data_val=0,
+        context_data_position=0,
+        ii;
+
+    for (ii = 0; ii < uncompressed.length; ii += 1) {
+      context_c = uncompressed.charAt(ii);
+      if (!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)) {
+        context_dictionary[context_c] = context_dictSize++;
+        context_dictionaryToCreate[context_c] = true;
+      }
+
+      context_wc = context_w + context_c;
+      if (Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)) {
+        context_w = context_wc;
+      } else {
+        if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+          if (context_w.charCodeAt(0)<256) {
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<8 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          } else {
+            value = 1;
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1) | value;
+              if (context_data_position ==bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = 0;
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<16 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn == 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          delete context_dictionaryToCreate[context_w];
+        } else {
+          value = context_dictionary[context_w];
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+
+
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        // Add wc to the dictionary.
+        context_dictionary[context_wc] = context_dictSize++;
+        context_w = String(context_c);
+      }
+    }
+
+    // Output the code for w.
+    if (context_w !== "") {
+      if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+        if (context_w.charCodeAt(0)<256) {
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<8 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        } else {
+          value = 1;
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | value;
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = 0;
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<16 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        delete context_dictionaryToCreate[context_w];
+      } else {
+        value = context_dictionary[context_w];
+        for (i=0 ; i<context_numBits ; i++) {
+          context_data_val = (context_data_val << 1) | (value&1);
+          if (context_data_position == bitsPerChar-1) {
+            context_data_position = 0;
+            context_data.push(getCharFromInt(context_data_val));
+            context_data_val = 0;
+          } else {
+            context_data_position++;
+          }
+          value = value >> 1;
+        }
+
+
+      }
+      context_enlargeIn--;
+      if (context_enlargeIn == 0) {
+        context_enlargeIn = Math.pow(2, context_numBits);
+        context_numBits++;
+      }
+    }
+
+    // Mark the end of the stream
+    value = 2;
+    for (i=0 ; i<context_numBits ; i++) {
+      context_data_val = (context_data_val << 1) | (value&1);
+      if (context_data_position == bitsPerChar-1) {
+        context_data_position = 0;
+        context_data.push(getCharFromInt(context_data_val));
+        context_data_val = 0;
+      } else {
+        context_data_position++;
+      }
+      value = value >> 1;
+    }
+
+    // Flush the last char
+    while (true) {
+      context_data_val = (context_data_val << 1);
+      if (context_data_position == bitsPerChar-1) {
+        context_data.push(getCharFromInt(context_data_val));
+        break;
+      }
+      else context_data_position++;
+    }
+    return context_data.join('');
+  },
+
+  decompress: function (compressed) {
+    if (compressed == null) return "";
+    if (compressed == "") return null;
+    return LZString._decompress(compressed.length, 32768, function(index) { return compressed.charCodeAt(index); });
+  },
+
+  _decompress: function (length, resetValue, getNextValue) {
+    var dictionary = [],
+        next,
+        enlargeIn = 4,
+        dictSize = 4,
+        numBits = 3,
+        entry = "",
+        result = [],
+        i,
+        w,
+        bits, resb, maxpower, power,
+        c,
+        data = {val:getNextValue(0), position:resetValue, index:1};
+
+    for (i = 0; i < 3; i += 1) {
+      dictionary[i] = i;
+    }
+
+    bits = 0;
+    maxpower = Math.pow(2,2);
+    power=1;
+    while (power!=maxpower) {
+      resb = data.val & data.position;
+      data.position >>= 1;
+      if (data.position == 0) {
+        data.position = resetValue;
+        data.val = getNextValue(data.index++);
+      }
+      bits |= (resb>0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+
+    switch (next = bits) {
+      case 0:
+          bits = 0;
+          maxpower = Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 1:
+          bits = 0;
+          maxpower = Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 2:
+        return "";
+    }
+    dictionary[3] = c;
+    w = c;
+    result.push(c);
+    while (true) {
+      if (data.index > length) {
+        return "";
+      }
+
+      bits = 0;
+      maxpower = Math.pow(2,numBits);
+      power=1;
+      while (power!=maxpower) {
+        resb = data.val & data.position;
+        data.position >>= 1;
+        if (data.position == 0) {
+          data.position = resetValue;
+          data.val = getNextValue(data.index++);
+        }
+        bits |= (resb>0 ? 1 : 0) * power;
+        power <<= 1;
+      }
+
+      switch (c = bits) {
+        case 0:
+          bits = 0;
+          maxpower = Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 1:
+          bits = 0;
+          maxpower = Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 2:
+          return result.join('');
+      }
+
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+
+      if (dictionary[c]) {
+        entry = dictionary[c];
+      } else {
+        if (c === dictSize) {
+          entry = w + w.charAt(0);
+        } else {
+          return null;
+        }
+      }
+      result.push(entry);
+
+      // Add w+entry[0] to the dictionary.
+      dictionary[dictSize++] = w + entry.charAt(0);
+      enlargeIn--;
+
+      w = entry;
+
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+
+    }
+  }
+};
+  return LZString;
+})();
+
+if (typeof define === 'function' && define.amd) {
+  define(function () { return LZString; });
+} else if( typeof module !== 'undefined' && module != null ) {
+  module.exports = LZString
+} else if( typeof angular !== 'undefined' && angular != null ) {
+  angular.module('LZString', [])
+  .factory('LZString', function () {
+    return LZString;
+  });
+}

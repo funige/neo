@@ -212,7 +212,7 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe._actionMgr.doFreeHand(x0, y0, this.lineType);
+        oe._actionMgr.freeHand(x0, y0, this.lineType);
 //      oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
     }
 
@@ -250,7 +250,7 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
     var x1 = Math.floor(oe.prevMouseX);
     var y1 = Math.floor(oe.prevMouseY);
 //  oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
-    oe._actionMgr.doFreeHandMove(x0, y0, x1, y1, this.lineType);
+    oe._actionMgr.freeHandMove(x0, y0, x1, y1, this.lineType);
 
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
@@ -318,7 +318,7 @@ Neo.DrawToolBase.prototype.lineUpHandler = function(oe) {
         oe.prepareDrawing();
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe._actionMgr.doLine(x0, y0, this.startX, this.startY, this.lineType)
+        oe._actionMgr.line(x0, y0, this.startX, this.startY, this.lineType)
         
         /*
         var ctx = oe.canvasCtx[oe.current];
@@ -392,7 +392,7 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         this.y2 = Math.floor(oe.mouseY);
 
         oe._pushUndo();
-        oe._actionMgr.doBezier(this.x0, this.y0,this.x1, this.y1,
+        oe._actionMgr.bezier(this.x0, this.y0,this.x1, this.y1,
                                this.x2, this.y2, this.x3, this.y3, this.lineType);
         oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
         
@@ -774,8 +774,7 @@ Neo.FillTool.prototype.downHandler = function(oe) {
     var color = oe.getColor();
     
     oe._pushUndo();
-    oe._actionMgr.doFloodFill(layer, x, y, color);
-
+    oe._actionMgr.floodFill(layer, x, y, color);
     //oe.doFloodFill(layer, x, y, color);
 };
 
@@ -803,7 +802,7 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-    oe._actionMgr.doEraseAll();
+    oe._actionMgr.eraseAll();
     
     /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -927,7 +926,7 @@ Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.eraseRect(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doEraseRect(x, y, width, height);
+    oe._actionMgr.eraseRect(x, y, width, height);
 };
 
 /*
@@ -944,7 +943,7 @@ Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.flipH(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFlipH(x, y, width, height);
+    oe._actionMgr.flipH(x, y, width, height);
 };
 
 /*
@@ -961,7 +960,7 @@ Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.flipV(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFlipV(x, y, width, height);
+    oe._actionMgr.flipV(x, y, width, height);
 };
 
 /*
@@ -978,7 +977,7 @@ Neo.BlurRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.blurRect(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doBlurRect(x, y, width, height);
+    oe._actionMgr.blurRect(x, y, width, height);
 };
 
 Neo.BlurRectTool.prototype.loadStates = function() {
@@ -1017,7 +1016,7 @@ Neo.TurnTool.prototype.upHandler = function(oe) {
         oe._pushUndo();
 //      oe.turn(x, y, width, height);
 //      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-        oe._actionMgr.doTurn(x, y, width, height);
+        oe._actionMgr.turn(x, y, width, height);
     }
 };
 
@@ -1035,7 +1034,7 @@ Neo.MergeTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.merge(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doMerge(x, y, width, height);
+    oe._actionMgr.merge(x, y, width, height);
 };
 
 /*
@@ -1050,7 +1049,7 @@ Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  oe.copy(oe.current, x, y, width, height);
-    oe._actionMgr.doCopy(x, y, width, height);
+    oe._actionMgr.copy(x, y, width, height);
     oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
     oe.tool.x = x;
     oe.tool.y = y;
@@ -1081,7 +1080,7 @@ Neo.PasteTool.prototype.upHandler = function(oe) {
     var dy = oe.tempY;
 //  oe.paste(oe.current, this.x, this.y, this.width, this.height, dx, dy);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doPaste(this.x, this.y, this.width, this.height, dx, dy);
+    oe._actionMgr.paste(this.x, this.y, this.width, this.height, dx, dy);
 
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
 };
@@ -1135,7 +1134,7 @@ Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -1153,7 +1152,7 @@ Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectFillMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -1170,7 +1169,7 @@ Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -1188,7 +1187,7 @@ Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseFillMask);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.doFill(x, y, width, height, this.type);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -1250,8 +1249,8 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
             var x = this.startX;
             var y = this.startY;
             //oe.doText(layer, this.startX, this.startY, color, string, size, family);
-            oe._actionMgr.doText(layer, this.startX, this.startY,
-                                 color, alpha, string, size, family);
+            oe._actionMgr.text(this.startX, this.startY,
+                               color, alpha, string, size, family);
 
             text.style.display = "none";
             text.blur();
