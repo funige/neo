@@ -3,17 +3,18 @@
 document.addEventListener("DOMContentLoaded", function() {
     Neo.init();
 
-    if (!navigator.userAgent.match("Electron")) {
+    if (!navigator.userAgent.match("Electron") && !Neo.viewer) {
         Neo.start();
     }
 });
 
 var Neo = function() {};
 
-Neo.version = "1.4.1";
+Neo.version = "1.4.3";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
+Neo.viewer = false;
 
 Neo.config = {
     width: 300,
@@ -51,12 +52,30 @@ Neo.init = function() {
         var applet = applets[i];
         var name = applet.attributes.name.value;
 
-        console.log("NAME=", name);
         if (name == "paintbbs" || name == "pch") {
             Neo.applet = applet;
             Neo.initConfig(applet);
-            Neo.createContainer(applet);
-            Neo.init2();
+
+            if (name == "paintbbs") {
+                Neo.createContainer(applet);
+                Neo.init2();
+
+            } else {
+                var pch = Neo.getPCH(function(pch) {
+                    if (pch) {
+                        console.log('pch:', pch);
+                        Neo.viewer = true;
+                        Neo.createViewer(applet);
+                        Neo.config.width = pch.width;
+                        Neo.config.height = pch.height;
+
+                        Neo.initViewer();
+                        
+                        applet.parentNode.removeChild(applet)
+                    }
+                });
+            }
+            break;
         }
     }
 };
@@ -79,6 +98,23 @@ Neo.init2 = function() {
     Neo.animation = (Neo.config.thumbnail_type == "animation");
     
     // 続きから描く
+
+    // 描きかけの画像が見つかったとき
+    setTimeout(function () {
+        Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
+        if (Neo.storage.getItem('timestamp') &&
+            confirm(Neo.translate("以前の編集データを復元しますか？"))) {
+            Neo.painter.loadSession();
+        } else {
+            if (Neo.config.pch_file) {
+                Neo.painter.loadAnimation(Neo.config.pch_file)
+        
+            } else if (Neo.config.image_canvas) {
+                Neo.painter.loadImage(Neo.config.image_canvas);
+            }
+        }
+    }, 1);
+    /*
     if (Neo.config.pch_file) {
         Neo.painter.loadAnimation(Neo.config.pch_file)
         
@@ -96,7 +132,8 @@ Neo.init2 = function() {
             }, 1);
         }
     }
-
+    */
+    
     window.addEventListener("pagehide", function(e) {
         if (!Neo.uploaded) {
             Neo.painter.saveSession();
@@ -378,7 +415,8 @@ Neo.colorNameToHex = function(name) {
 };
 
 Neo.initComponents = function() {
-    document.getElementById("copyright").innerHTML += "v" + Neo.version;
+    var copyright = document.getElementById("copyright")
+    if (copyright) copyright.innerHTML += "v" + Neo.version;
 
     // アプレットのborderの動作をエミュレート
     if (navigator.userAgent.search("FireFox") > -1) {
@@ -554,8 +592,10 @@ Neo.showWarning = function() {
     }
 
     var warning = document.getElementById("neoWarning")
-    warning.innerHTML = str;
-    setTimeout(function() { warning.style.opacity = "0"; }, 15000);
+    if (warning) {
+        warning.innerHTML = str;
+        setTimeout(function() { warning.style.opacity = "0"; }, 15000);
+    }        
 };
 
 /*
@@ -653,15 +693,17 @@ Neo.resizeCanvas = function() {
     Neo.canvas.style.width = width + "px";
     Neo.canvas.style.height = height + "px";
 
-    var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
-    Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
+    if (Neo.toolsWrapper) {
+        var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
+        Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
 
-    if (top < 0) {
-        var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
-        Neo.toolsWrapper.style.transform =
-            "translate(0, " + top + "px) scale(1," + s + ")";
-    } else {
-        Neo.toolsWrapper.style.transform = "";
+        if (top < 0) {
+            var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
+            Neo.toolsWrapper.style.transform =
+                "translate(0, " + top + "px) scale(1," + s + ")";
+        } else {
+            Neo.toolsWrapper.style.transform = "";
+        }
     }
     
     Neo.painter.setZoom(Neo.painter.zoom);
@@ -944,3 +986,124 @@ Neo.createContainer = function(applet) {
     }, 0);
 };
 
+/*
+  -----------------------------------------------------------------------
+    動画表示モード
+  -----------------------------------------------------------------------
+*/
+
+Neo.createViewer = function(applet) {
+    var neo = document.createElement("div");
+    neo.className = "NEO";
+    neo.id = "NEO";
+    var html = (function() {/*
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<div id="pageView" style="margin:auto;">
+<div id="container" style="visibility:visible;" class="o">
+
+<div id="painter" style="background-color:blue;">
+<div id="canvas" style="background-color:green;">
+</div>
+</div>
+
+</div>
+</div>
+                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
+
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+	return Neo.translate(str)
+    })
+    
+    var parent = applet.parentNode;
+    parent.appendChild(neo);
+    parent.insertBefore(neo, applet);
+
+    // applet.style.display = "none";
+
+    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
+    setTimeout(function() {
+        var tmp = document.getElementsByClassName("NEO");
+        if (tmp.length > 1) {
+            for (var i = 1; i < tmp.length; i++) {
+                tmp[i].style.display = "none";
+            }
+        }
+    }, 0);
+};
+
+Neo.initViewer = function() {
+    var pageview = document.getElementById("pageView");
+    var pageWidth = Neo.config.applet_width;
+    var pageHeight = Neo.config.applet_height;
+    pageview.style.width = pageWidth + "px";
+    pageview.style.height = pageHeight + "px";
+    
+    Neo.canvas = document.getElementById("canvas");
+    Neo.container = document.getElementById("container");
+//  Neo.container.style.backgroundColor = Neo.config.color_bk;
+    Neo.container.style.border = "0";
+
+    var dx = (pageWidth - Neo.config.width) / 2;
+    var dy = (pageHeight - Neo.config.height - 26) / 2;
+    
+    var painter = document.getElementById("painter");
+
+    painter.style.marginTop = "0";
+    painter.style.position = "absolute";
+    painter.style.padding = "0";
+    painter.style.bottom = (dy + 26) + "px";
+    painter.style.left = (dx) + "px";
+
+
+    Neo.canvas.style.width = Neo.config.width + "px";
+    Neo.canvas.style.height = Neo.config.height + "px";
+    
+    Neo.painter = new Neo.Painter();
+    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
+    
+    Neo.container.oncontextmenu = function() {return false;};
+
+    if (Neo.config.pch_file) {
+        Neo.painter.loadAnimation(Neo.config.pch_file, 100)
+    }        
+};
+
+Neo.getPCH = function(callback) {
+    var filename = Neo.config.pch_file || Neo.config.image_canvas;
+    if (!filename || filename.slice(-4).toLowerCase() != ".pch") {
+        return;
+    }
+
+    var request = new XMLHttpRequest();
+    request.open("GET", filename, true);
+    request.responseType = "text";
+    request.onload = function() {
+        var response = request.response;
+        var header = response.slice(0, 12);
+        if (header.slice(0, 3) == "NEO") {
+            var width = parseInt(header.slice(4, 8));
+            var height = parseInt(header.slice(8, 12));
+            console.log('NEO animation:', width, 'x', height);
+            if (callback) {
+                callback({
+                    width:width,
+                    height:height,
+                    data:JSON.parse(LZString.decompressFromUTF16(response.slice(12)))
+                });
+            }
+            
+        } else {
+            console.log('not a NEO animation:');
+        }
+/*        
+        if (callback) callback(request.response);
+        
+        var data = LZString.decompressFromUTF16(request.response.slice(4));
+        Neo.painter._actionMgr._items = JSON.parse(data);
+        Neo.painter._actionMgr.play();
+        };
+*/
+    }
+    request.send();
+};

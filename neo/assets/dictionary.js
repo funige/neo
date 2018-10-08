@@ -44,6 +44,7 @@ Neo.dictionary = {
 
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
+        "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
     },
     "enx": {
 	"やり直し": "Redo",
@@ -89,6 +90,7 @@ Neo.dictionary = {
 
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
+        "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
     },
     "es": {
 	"やり直し": "Rehacer",
@@ -135,6 +137,7 @@ Neo.dictionary = {
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？":
         "PaintBBS NEO es una versión para HTML5 de Oekaki Shi-BBS PaintBBS (© 2000-2004 shi-chan). ¿Mostrar la página del proyecto?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "Este navegador podría no enviar su imagen.<br>",
+        "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
     },
 };
 

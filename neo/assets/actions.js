@@ -32,7 +32,18 @@ Neo.ActionManager.prototype.forward = function() {
     }
 }
 
-Neo.ActionManager.prototype.play = function() {
+Neo.ActionManager.prototype.push = function() {
+    if (!Neo.animation) return;
+
+    var head = this._items[this._head - 1];
+    for (var i = 0; i < arguments.length; i++) {
+        head.push(arguments[i]);
+    }
+}
+
+Neo.ActionManager.prototype.play = function(wait) {
+    if (!wait) wait = 0;
+    
     if (this._head < this._items.length) {
         var item = this._items[this._head];
 
@@ -41,10 +52,16 @@ Neo.ActionManager.prototype.play = function() {
             (this[item[0]])(item);
         }
         this._head++;
+        if (!Neo.viewer) {
+            Neo.painter._pushUndo(0, 0,
+                                  Neo.painter.canvasWidth,
+                                  Neo.painter.canvasHeight,
+                                  true);
+        }
 
         setTimeout(function() {
-            Neo.painter._actionMgr.play();
-        }, 10);
+            Neo.painter._actionMgr.play(wait);
+        }, wait);
     }
 }
 

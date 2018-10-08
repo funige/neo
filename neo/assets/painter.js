@@ -922,9 +922,13 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
-        var data = LZString.compressToUTF16(JSON.stringify(this._actionMgr._items))
-        return new Blob(["NEO " + data]);
-//      return new Blob([]);
+        var data = LZString.compressToUTF16(JSON.stringify(this._actionMgr._items));
+        var magic = "NEO";
+        var version = " ";
+        var width = ("0000" + this.canvasWidth).slice(-4);
+        var height = ("0000" + this.canvasHeight).slice(-4);
+        
+        return new Blob([magic + version + width + height + data]);
     }
 };
 
@@ -2367,15 +2371,22 @@ Neo.Painter.prototype.loadImage = function (filename) {
     };
 };
 
-Neo.Painter.prototype.loadAnimation = function (filename) {
+Neo.Painter.prototype.loadAnimation = function (filename, wait) {
     console.log("loadAnimation " + filename);
     var request = new XMLHttpRequest();
     request.open("GET", filename, true);
     request.responseType = "text";
     request.onload = function() {
-        var data = LZString.decompressFromUTF16(request.response.slice(4));
-        Neo.painter._actionMgr._items = JSON.parse(data);
-        Neo.painter._actionMgr.play();
+        var response = request.response;
+        var header = response.slice(0, 12);
+        if (header.slice(0, 3) == "NEO") {
+            var data = LZString.decompressFromUTF16(response.slice(12));
+            Neo.painter._actionMgr._items = JSON.parse(data);
+            Neo.painter._actionMgr.play(wait);
+
+        } else {
+            alert(Neo.translate("PaintBBS NEOではこの動画の続きを描くことはできません"));
+        }
     };
     request.send();
 };
@@ -2498,7 +2509,7 @@ Neo.Painter.prototype.getEmulationMode = function() {
 -------------------------------------------------------------------------
 */
 
-Neo.Painter.prototype.play = function() {
+Neo.Painter.prototype.play = function(wait) {
     this.saveSnapshot();
 
     if (this._actionMgr) {
@@ -2506,7 +2517,7 @@ Neo.Painter.prototype.play = function() {
         this._actionMgr._head = 0;
         this.prevLine = null;
 
-        this._actionMgr.play();
+        this._actionMgr.play(wait);
     }
 };
 
