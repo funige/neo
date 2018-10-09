@@ -100,9 +100,11 @@ Neo.init2 = function() {
     // 続きから描く
 
     // 描きかけの画像が見つかったとき
+    /*
     setTimeout(function () {
         Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
         if (Neo.storage.getItem('timestamp') &&
+            (window.performance && performance.navigation.type == 1) &&
             confirm(Neo.translate("以前の編集データを復元しますか？"))) {
             Neo.painter.loadSession();
         } else {
@@ -114,7 +116,8 @@ Neo.init2 = function() {
             }
         }
     }, 1);
-    /*
+    */
+
     if (Neo.config.pch_file) {
         Neo.painter.loadAnimation(Neo.config.pch_file)
         
@@ -132,7 +135,7 @@ Neo.init2 = function() {
             }, 1);
         }
     }
-    */
+
     
     window.addEventListener("pagehide", function(e) {
         if (!Neo.uploaded) {
@@ -1002,8 +1005,8 @@ Neo.createViewer = function(applet) {
 <div id="pageView" style="margin:auto;">
 <div id="container" style="visibility:visible;" class="o">
 
-<div id="painter" style="background-color:blue;">
-<div id="canvas" style="background-color:green;">
+<div id="painter" style="background-color:white;">
+<div id="canvas" style="background-color:white;">
 </div>
 </div>
 
@@ -3657,14 +3660,14 @@ Neo.Painter.prototype.loadAnimation = function (filename, wait) {
     request.onload = function() {
         var response = request.response;
         var header = response.slice(0, 12);
-        if (header.slice(0, 3) == "NEO") {
+//      if (header.slice(0, 3) == "NEO") {
             var data = LZString.decompressFromUTF16(response.slice(12));
             Neo.painter._actionMgr._items = JSON.parse(data);
             Neo.painter._actionMgr.play(wait);
 
-        } else {
-            alert(Neo.translate("PaintBBS NEOではこの動画の続きを描くことはできません"));
-        }
+//      } else {
+//          alert(Neo.translate("PaintBBS NEOではこの動画の続きを描くことはできません"));
+//      }
     };
     request.send();
 };
@@ -5271,7 +5274,33 @@ Neo.ActionManager.prototype.push = function() {
     for (var i = 0; i < arguments.length; i++) {
         head.push(arguments[i]);
     }
-}
+};
+
+Neo.ActionManager.prototype.pushCurrent = function() {
+    if (!Neo.animation) return;
+
+    var oe = Neo.painter;
+    var head = this._items[this._head - 1];
+
+    var color = oe._currentColor;
+    var mask = oe._currentMask;
+    var width = oe._currentWidth;
+    var type = oe._currentMaskType;
+
+    head.push(color[0], color[1], color[2], color[3]);
+    head.push(mask[0], mask[1], mask[2]);
+    head.push(width);
+    head.push(type);
+};
+
+Neo.ActionManager.prototype.getCurrent = function(item) {
+    var oe = Neo.painter;
+
+    oe._currentColor = [item[2], item[3], item[4], item[5]];
+    oe._currentMask = [item[6], item[7], item[8]];
+    oe._currentWidth = item[9];
+    oe._currentMaskType = item[10];
+};
 
 Neo.ActionManager.prototype.play = function(wait) {
     if (!wait) wait = 0;
@@ -5306,8 +5335,9 @@ Neo.ActionManager.prototype.play = function(wait) {
 
 Neo.ActionManager.prototype.clearCanvas = function() {
     if (typeof arguments[0] != "object") {
-        var head = this._items[this._head - 1]
-        head.push('clearCanvas')
+        this.push('clearCanvas');
+//      var head = this._items[this._head - 1]
+//      head.push('clearCanvas')
     }
     
     var oe = Neo.painter;
@@ -5318,12 +5348,13 @@ Neo.ActionManager.prototype.clearCanvas = function() {
 
 Neo.ActionManager.prototype.floodFill = function(layer, x, y, color) {
     if (typeof layer != "object") {
-        var head = this._items[this._head - 1];
-        head.push('floodFill');
-        head.push(layer);
-        head.push(x);
-        head.push(y);
-        head.push(color);
+        this.push('floodFill', layer, x, y, color);
+//      var head = this._items[this._head - 1];
+//      head.push('floodFill');
+//      head.push(layer);
+//      head.push(x);
+//      head.push(y);
+//      head.push(color);
 
     } else {
         var item = layer;
@@ -5343,9 +5374,10 @@ Neo.ActionManager.prototype.eraseAll = function() {
     var layer = oe.current;
     
     if (typeof layer != "object") {
-        var head = this._items[this._head - 1];
-        head.push('eraseAll');
-        head.push(layer);
+        this.push('eraseAll', layer);
+//      var head = this._items[this._head - 1];
+//      head.push('eraseAll');
+//      head.push(layer);
 
     } else {
         var item = layer;
@@ -5362,14 +5394,17 @@ Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
     var layer = oe.current;
     
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
+        this.push('freeHand', layer);
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x0, y0);
+        
+//      var head = this._items[this._head - 1];
+//      head.push('freeHand');
+//      head.push(layer);
+//      oe.setCurrent(head);
 
-        head.push('freeHand');
-        head.push(layer);
-        oe.setCurrent(head);
-
-        head.push(lineType);
-        head.push(x0, y0, x0, y0);
+//      head.push(lineType);
+//      head.push(x0, y0, x0, y0);
         
         oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
 
@@ -5378,7 +5413,8 @@ Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
         var length = item.length;
         
         layer = item[1];
-        oe.getCurrent(item);
+        //oe.getCurrent(item);
+        this.getCurrent(item);
 
         lineType = item[11];
         x0 = item[12];
@@ -5402,15 +5438,19 @@ Neo.ActionManager.prototype.freeHandMove = function(x0, y0, x1, y1, lineType) {
         var oe = Neo.painter;
         var layer = oe.current;
         var head = this._items[this._head - 1];
-        if (head.length == 0) {
-            head.push('freeHand')
-            head.push(layer)
-            oe.setCurrent(head);
+        if (head && head.length == 0) {
+            this.push('freeHand', layer);
+            this.pushCurrent();
+            this.push(lineType, x1, y1, x0, y0);
 
-            head.push(lineType);
-            head.push(x1, y1, x0, y0);
+//          head.push('freeHand')
+//          head.push(layer)
+//          oe.setCurrent(head);
 
-        } else {
+//          head.push(lineType);
+//          head.push(x1, y1, x0, y0);
+nn
+        } else if (Neo.animation) {
             head.push(x0, y0);
 
             // 記録漏れがないか確認
@@ -5434,25 +5474,29 @@ Neo.ActionManager.prototype.line = function(
     x1, y1,
     lineType)
 {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
+//      layer = oe.current;
+//      var head = this._items[this._head - 1];
+//      head.push('line');
+//      head.push(layer);
+//      oe.setCurrent(head);
+//
+//      head.push(lineType);
+//      head.push(x0, y0, x1, y1);
 
-        head.push('line');
-        head.push(layer);
-        oe.setCurrent(head);
-
-        head.push(lineType);
-        head.push(x0, y0, x1, y1);
+        this.push('line', layer);
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x1, y1);
 
     } else {
         var item = arguments[0];
 
         layer = item[1];
-        oe.getCurrent(item);
+//      oe.getCurrent(item);
+        this.getCurrent(item);
 
         lineType = item[11];
         x0 = item[12];
@@ -5471,24 +5515,29 @@ Neo.ActionManager.prototype.bezier = function(
     x3, y3,
     lineType)
 {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
+        this.push('bezier', layer)
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x1, y1, x2, y2, x3, y3);
         
-        head.push('bezier');
-        head.push(layer);
-        oe.setCurrent(head);
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+        
+//      head.push('bezier');
+//      head.push(layer);
+//      oe.setCurrent(head);
 
-        head.push(lineType);
-        head.push(x0, y0, x1, y1, x2, y2, x3, y3);
+//      head.push(lineType);  
+//      head.push(x0, y0, x1, y1, x2, y2, x3, y3);
 
     } else {
         var item = arguments[0];
         layer = item[1];
-        oe.getCurrent(item);
+        this.getCurrent(item);
+//      oe.getCurrent(item);
         
         lineType = item[11];
         x0 = item[12];
@@ -5505,24 +5554,30 @@ Neo.ActionManager.prototype.bezier = function(
 }
 
 Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
+        this.push('fill', layer);
+        this.pushCurrent();
+        this.push(x, y, width, height, type);
+        
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
 
-        head.push('fill');
-        head.push(layer);
-        oe.setCurrent(head);
+//      head.push('fill');
+//      head.push(layer);
+//      oe.setCurrent(head);
 
-        head.push(x, y, width, height);
-        head.push(type);
+//      head.push(x, y, width, height);
+//      head.push(type);
 
     } else {
         var item = arguments[0];
         layer = item[1];
-        oe.getCurrent(item);
+        this.getCurrent(item);
+        
+//      oe.getCurrent(item);
 
         x = item[11];
         y = item[12];
@@ -5535,17 +5590,17 @@ Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
 }
 
 Neo.ActionManager.prototype.flipH = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
-
-        head.push('flipH');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+        this.push('flipH', layer, x, y, width, height);
+        
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('flipH');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5560,17 +5615,17 @@ Neo.ActionManager.prototype.flipH = function(x, y, width, height) {
 }
 
 Neo.ActionManager.prototype.flipV = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
-
+    var layer = oe.current;
+    
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
-
-        head.push('flipV');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+        this.push('flipV', layer, x, y, width, height);
+        
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('flipV');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5585,17 +5640,17 @@ Neo.ActionManager.prototype.flipV = function(x, y, width, height) {
 }
 
 Neo.ActionManager.prototype.merge = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
-
-        head.push('merge');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+        this.push('merge', layer, x, y, width, height);
+        
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('merge');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5610,17 +5665,17 @@ Neo.ActionManager.prototype.merge = function(x, y, width, height) {
 }
 
 Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
-
-        head.push('blurRect');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+        this.push('blurRect', layer, x, y, width, height);
+        
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('blurRect');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5635,17 +5690,17 @@ Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
 }
 
 Neo.ActionManager.prototype.eraseRect = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
-
-        head.push('eraseRect');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+        this.push('eraseRect', layer, x, y, width, height);
+        
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('eraseRect');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5660,17 +5715,17 @@ Neo.ActionManager.prototype.eraseRect = function(x, y, width, height) {
 }
 
 Neo.ActionManager.prototype.copy = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
+        this.push('copy', layer, x, y, width, height);
 
-        head.push('copy');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('copy');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5690,18 +5745,18 @@ Neo.ActionManager.prototype.copy = function(x, y, width, height) {
 }
 
 Neo.ActionManager.prototype.paste = function(x, y, width, height, dx, dy) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
+        this.push('paste', layer, x, y, width, height, dx, dy);
 
-        head.push('paste');
-        head.push(layer);
-
-        head.push(x, y, width, height);
-        head.push(dx, dy);
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('paste');
+//      head.push(layer);
+//      head.push(x, y, width, height);
+//      head.push(dx, dy);
         
     } else {
         var item = arguments[0];
@@ -5719,17 +5774,17 @@ Neo.ActionManager.prototype.paste = function(x, y, width, height, dx, dy) {
 }
 
 Neo.ActionManager.prototype.turn = function(x, y, width, height) {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
 
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
+        this.push('turn', layer, x, y, width, height);
 
-        head.push('turn');
-        head.push(layer);
-
-        head.push(x, y, width, height);
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('turn');
+//      head.push(layer);
+//      head.push(x, y, width, height);
         
     } else {
         var item = arguments[0];
@@ -5751,22 +5806,23 @@ Neo.ActionManager.prototype.text = function(
     size,
     family)
 {
-    var layer;
     var oe = Neo.painter;
+    var layer = oe.current;
     
     if (arguments.length > 1) {
-        var head = this._items[this._head - 1];
-        layer = oe.current;
-        
-        head.push('text');
-        head.push(layer);
-        head.push(x);
-        head.push(y);
-        head.push(color);
-        head.push(alpha);
-        head.push(string);
-        head.push(size);
-        head.push(family);
+        this.push('text', layer, x, y, color, alpha, string, size, family);
+
+//      var head = this._items[this._head - 1];
+//      layer = oe.current;
+//      head.push('text');
+//      head.push(layer);
+//      head.push(x);
+//      head.push(y);
+//      head.push(color);
+//      head.push(alpha);
+//      head.push(string);
+//      head.push(size);
+//      head.push(family);
 
     } else {
         var item = arguments[0];

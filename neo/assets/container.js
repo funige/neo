@@ -100,9 +100,11 @@ Neo.init2 = function() {
     // 続きから描く
 
     // 描きかけの画像が見つかったとき
+    /*
     setTimeout(function () {
         Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
         if (Neo.storage.getItem('timestamp') &&
+            (window.performance && performance.navigation.type == 1) &&
             confirm(Neo.translate("以前の編集データを復元しますか？"))) {
             Neo.painter.loadSession();
         } else {
@@ -114,7 +116,8 @@ Neo.init2 = function() {
             }
         }
     }, 1);
-    /*
+    */
+
     if (Neo.config.pch_file) {
         Neo.painter.loadAnimation(Neo.config.pch_file)
         
@@ -132,7 +135,7 @@ Neo.init2 = function() {
             }, 1);
         }
     }
-    */
+
     
     window.addEventListener("pagehide", function(e) {
         if (!Neo.uploaded) {
@@ -1002,8 +1005,8 @@ Neo.createViewer = function(applet) {
 <div id="pageView" style="margin:auto;">
 <div id="container" style="visibility:visible;" class="o">
 
-<div id="painter" style="background-color:blue;">
-<div id="canvas" style="background-color:green;">
+<div id="painter" style="background-color:white;">
+<div id="canvas" style="background-color:white;">
 </div>
 </div>
 

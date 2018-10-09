@@ -2379,14 +2379,14 @@ Neo.Painter.prototype.loadAnimation = function (filename, wait) {
     request.onload = function() {
         var response = request.response;
         var header = response.slice(0, 12);
-        if (header.slice(0, 3) == "NEO") {
+//      if (header.slice(0, 3) == "NEO") {
             var data = LZString.decompressFromUTF16(response.slice(12));
             Neo.painter._actionMgr._items = JSON.parse(data);
             Neo.painter._actionMgr.play(wait);
 
-        } else {
-            alert(Neo.translate("PaintBBS NEOではこの動画の続きを描くことはできません"));
-        }
+//      } else {
+//          alert(Neo.translate("PaintBBS NEOではこの動画の続きを描くことはできません"));
+//      }
     };
     request.send();
 };
