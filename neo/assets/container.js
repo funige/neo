@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.3";
+Neo.version = "1.4.4";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -98,47 +98,33 @@ Neo.init2 = function() {
     Neo.animation = (Neo.config.thumbnail_type == "animation");
     
     // 続きから描く
+    Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
 
-    // 描きかけの画像が見つかったとき
-    /*
-    setTimeout(function () {
-        Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
-        if (Neo.storage.getItem('timestamp') &&
-            (window.performance && performance.navigation.type == 1) &&
-            confirm(Neo.translate("以前の編集データを復元しますか？"))) {
-            Neo.painter.loadSession();
+    var filename = Neo.getFilename();
+    var message = (!filename || filename.slice(-4).toLowerCase() != ".pch") ?
+        "描きかけの画像があります。復元しますか？" :
+        "描きかけの画像があります。動画の読み込みを中止して復元しますか？";
+    
+    if (Neo.storage.getItem('timestamp') && confirm(Neo.translate(message))) {
+        var oe = Neo.painter;
+        setTimeout(function () {
+            oe.loadSession(function () {
+                oe._pushUndo();
+                oe._actionMgr.restore();
+            })
+        }, 1);
+        
+    } else if (filename) {
+        if (filename.slice(-4).toLowerCase() == ".pch") {
+            Neo.painter.loadAnimation(filename)
+        
         } else {
-            if (Neo.config.pch_file) {
-                Neo.painter.loadAnimation(Neo.config.pch_file)
-        
-            } else if (Neo.config.image_canvas) {
-                Neo.painter.loadImage(Neo.config.image_canvas);
-            }
-        }
-    }, 1);
-    */
-
-    if (Neo.config.pch_file) {
-        Neo.painter.loadAnimation(Neo.config.pch_file)
-        
-    } else if (Neo.config.image_canvas) {
-        Neo.painter.loadImage(Neo.config.image_canvas);
-
-    } else {
-        // 描きかけの画像が見つかったとき
-        Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
-        if (Neo.storage.getItem('timestamp')) {
-            setTimeout(function () {
-                if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
-                    Neo.painter.loadSession();
-                }
-            }, 1);
+            Neo.painter.loadImage(filename);
         }
     }
-
     
     window.addEventListener("pagehide", function(e) {
-        if (!Neo.uploaded) {
+        if (!Neo.uploaded && Neo.painter.isDirty()) {
             Neo.painter.saveSession();
         } else {
             Neo.painter.clearSession();
@@ -1068,16 +1054,18 @@ Neo.initViewer = function() {
     Neo.container.oncontextmenu = function() {return false;};
 
     if (Neo.config.pch_file) {
-        Neo.painter.loadAnimation(Neo.config.pch_file, 100)
+        Neo.painter.loadAnimation(Neo.config.pch_file, 10)
     }        
 };
 
-Neo.getPCH = function(callback) {
-    var filename = Neo.config.pch_file || Neo.config.image_canvas;
-    if (!filename || filename.slice(-4).toLowerCase() != ".pch") {
-        return;
-    }
+Neo.getFilename = function() {
+    return Neo.config.pch_file || Neo.config.image_canvas;
+};
 
+Neo.getPCH = function(callback) {
+    var filename = Neo.getFilename();
+    if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
+    
     var request = new XMLHttpRequest();
     request.open("GET", filename, true);
     request.responseType = "text";

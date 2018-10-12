@@ -70,6 +70,7 @@ Neo.Painter.prototype._currentColor = [];
 Neo.Painter.prototype._currentMask = [];
 
 Neo.Painter.prototype.aerr;
+Neo.Painter.prototype.dirty = false;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -695,6 +696,7 @@ Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
     if (!holdRedo) {
         this._actionMgr.step();
     }
+    this.dirty = true;
 };
 
 Neo.Painter.prototype._pushRedo = function(x, y, w, h) {
@@ -2379,19 +2381,15 @@ Neo.Painter.prototype.loadAnimation = function (filename, wait) {
     request.onload = function() {
         var response = request.response;
         var header = response.slice(0, 12);
-//      if (header.slice(0, 3) == "NEO") {
-            var data = LZString.decompressFromUTF16(response.slice(12));
-            Neo.painter._actionMgr._items = JSON.parse(data);
-            Neo.painter._actionMgr.play(wait);
 
-//      } else {
-//          alert(Neo.translate("PaintBBS NEOではこの動画の続きを描くことはできません"));
-//      }
+        var data = LZString.decompressFromUTF16(response.slice(12));
+        Neo.painter._actionMgr._items = JSON.parse(data);
+        Neo.painter._actionMgr.play(wait);
     };
     request.send();
 };
 
-Neo.Painter.prototype.loadSession = function (filename) {
+Neo.Painter.prototype.loadSession = function (callback) {
     if (Neo.storage) {
         var img0 = new Image();
         img0.src = Neo.storage.getItem('layer0');
@@ -2405,6 +2403,8 @@ Neo.Painter.prototype.loadSession = function (filename) {
                 oe.canvasCtx[0].drawImage(img0, 0, 0);
                 oe.canvasCtx[1].drawImage(img1, 0, 0);
                 oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+
+                if (callback) callback();
             }
         }
     }
@@ -2551,4 +2551,8 @@ Neo.Painter.prototype.getCurrent = function(item) {
     this._currentMask = [item[6], item[7], item[8]];
     this._currentWidth = item[9];
     this._currentMaskType = item[10];
+};
+
+Neo.Painter.prototype.isDirty = function() {
+    return this.dirty;
 };
