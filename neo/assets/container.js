@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.4";
+Neo.version = "1.4.5";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1068,33 +1068,29 @@ Neo.getPCH = function(callback) {
     
     var request = new XMLHttpRequest();
     request.open("GET", filename, true);
-    request.responseType = "text";
+    request.responseType = "arraybuffer";
     request.onload = function() {
-        var response = request.response;
-        var header = response.slice(0, 12);
-        if (header.slice(0, 3) == "NEO") {
-            var width = parseInt(header.slice(4, 8));
-            var height = parseInt(header.slice(8, 12));
+        var byteArray = new Uint8Array(request.response);
+        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+        var header = byteArray.slice(0, 12);
+
+        if ((header[0] == "N".charCodeAt(0)) &&
+            (header[1] == "E".charCodeAt(0)) &&
+            (header[2] == "O".charCodeAt(0))) {
+            var width = header[4] + header[5] * 0x100
+            var height = header[6] + header[7] * 0x100
             console.log('NEO animation:', width, 'x', height);
             if (callback) {
                 callback({
                     width:width,
                     height:height,
-                    data:JSON.parse(LZString.decompressFromUTF16(response.slice(12)))
+                    data:JSON.parse(data)
                 });
             }
             
         } else {
             console.log('not a NEO animation:');
         }
-/*        
-        if (callback) callback(request.response);
-        
-        var data = LZString.decompressFromUTF16(request.response.slice(4));
-        Neo.painter._actionMgr._items = JSON.parse(data);
-        Neo.painter._actionMgr.play();
-        };
-*/
     }
     request.send();
 };
