@@ -1391,7 +1391,7 @@ Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
     var shape = this._roundData[d];
     var shapeIndex = 0;
     var index = (y * width + x) * 4;
-    var a = Math.floor(this.alpha * 255);
+    var a = Math.floor(this._currentColor[3]); //this.alpha * 255);
 
     for (var i = 0; i < d; i++) {
         for (var j = 0; j < d; j++) {
@@ -1417,7 +1417,8 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
     var height = buf8.length / (width * 4);
 
 //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
-    var a1 = this.alpha / 12;
+//  var a1 = this.alpha / 12;
+    var a2 = (this._currentColor[3] / 255.0) / 12;
     if (a1 == 0) return;
     var blur = a1;
 
@@ -1817,7 +1818,7 @@ Neo.Painter.prototype.eraseRect = function(layer, x, y, width, height) {
 
     var index = 0;
 
-    var a = 1.0 - this.alpha;
+    var a = 1.0 - (this._currentColor[3] / 255.0) //this.alpha;
     if (a != 0) {
         a = Math.ceil(2.0 / a);
     } else {
@@ -1954,7 +1955,7 @@ Neo.Painter.prototype.blurRect = function(layer, x, y, width, height) {
     for (var i = 0; i < buf8.length; i++) tmp[i] = buf8[i];
 
     var index = 0;
-    var a1 = this.alpha / 12;
+    var a1 = (this._currentColor[3] / 255.0) / 12; //this.alpha / 12;
     var blur = a1;
 
     for (var j = 0; j < height; j++) {
@@ -2364,10 +2365,6 @@ Neo.Painter.prototype.cancelTool = function(e) {
 };
 
 Neo.Painter.prototype.loadImage = function (filename) {
-    if (filename.slice(-3).toLowerCase == ".pch") {
-        return this.loadAnimation(filename);
-    }
-    
     console.log("loadImage " + filename);
     var img = new Image();
     img.src = filename;
@@ -2386,11 +2383,10 @@ Neo.Painter.prototype.loadAnimation = function (filename, wait) {
     request.onload = function() {
         var byteArray = new Uint8Array(request.response);
         var header = byteArray.slice(0, 12);
-        console.log('header..', header);
         var data = LZString.decompressFromUint8Array(byteArray.slice(12));
-        console.log('body...', data);
-        data = JSON.parse(data);
-        Neo.painter._actionMgr._items = data;
+
+        var items = JSON.parse(data);
+        Neo.painter._actionMgr._items = Neo.fixPCH(JSON.parse(data));
         Neo.painter._actionMgr.play(wait);
     };
     request.send();

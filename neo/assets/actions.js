@@ -80,7 +80,9 @@ Neo.ActionManager.prototype.play = function(wait) {
                                   true);
         }
 
-        console.log("play", item[0], this._head, this._items.length);
+        if (Neo.viewer) {
+            console.log("play", item[0], this._head, this._items.length);
+        }
 
         if (item[0] != "restore") {
             // sync
@@ -147,11 +149,11 @@ Neo.ActionManager.prototype.eraseAll = function() {
     var oe = Neo.painter;
     var layer = oe.current;
     
-    if (typeof layer != "object") {
+    if (typeof arguments[0] != "object") {
         this.push('eraseAll', layer);
 
     } else {
-        var item = layer;
+        var item = arguments[0];
         layer = item[1];
     }
 

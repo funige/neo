@@ -1,11 +1,12 @@
 {
   "name": "PaintBBS",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "main": "main.js",
   "scripts": {
     "hello": "echo 'hello'"
   },
   "dependencies": {
+    "node-static": "^0.7.11",
     "request": "^2.86.0"
   },
   "devDependencies": {
