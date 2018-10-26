@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.7";
+Neo.version = "1.4.8";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -518,7 +518,7 @@ Neo.start = function(isApp) {
 
     Neo.initSkin();
     Neo.initComponents();
-    
+
     Neo.initButtons();
 
     Neo.isApp = isApp;
@@ -998,7 +998,8 @@ Neo.createViewer = function(applet) {
 </div>
 </div>
 
-<div id="viewerButtons" style="display:none;">
+<div style="backgrond-color: red; padding:5px;">
+<div id="viewerButtons">
 <div id="viewerPlay" class="buttonOff">...</div>
 <div id="viewerStop" class="buttonOff">...</div>
 
@@ -1008,7 +1009,7 @@ Neo.createViewer = function(applet) {
 <div id="viewerZoomMinus" class="buttonOff">-</div>
 <div id="viewerBar" class="buttonOff" style="display:inline-block; width: 30%;">...</div>
 
-</div>
+</div></div>
 
 </div>
 </div>
@@ -2742,7 +2743,7 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
 
 //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
 //  var a1 = this.alpha / 12;
-    var a2 = (this._currentColor[3] / 255.0) / 12;
+    var a1 = (this._currentColor[3] / 255.0) / 12;
     if (a1 == 0) return;
     var blur = a1;
 

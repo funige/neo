@@ -1418,7 +1418,7 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
 
 //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
 //  var a1 = this.alpha / 12;
-    var a2 = (this._currentColor[3] / 255.0) / 12;
+    var a1 = (this._currentColor[3] / 255.0) / 12;
     if (a1 == 0) return;
     var blur = a1;
 
