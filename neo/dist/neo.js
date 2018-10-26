@@ -4812,7 +4812,7 @@ Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.eraseRect(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.eraseRect(x, y, width, height);
+    oe._actionMgr.eraseRect2(x, y, width, height);
 };
 
 /*
@@ -5671,6 +5671,29 @@ Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
         height = item[5];
     }
     oe.blurRect(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.eraseRect2 = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('eraseRect2', layer);
+        this.pushCurrent();
+        this.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        this.getCurrent(item);
+        
+        x = item[11];
+        y = item[12];
+        width = item[13];
+        height = item[14];
+    }
+    oe.eraseRect(layer, x, y, width, height);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 

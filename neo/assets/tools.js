@@ -926,7 +926,7 @@ Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
 //  var ctx = oe.canvasCtx[oe.current];
 //  oe.eraseRect(ctx, x, y, width, height);
 //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe._actionMgr.eraseRect(x, y, width, height);
+    oe._actionMgr.eraseRect2(x, y, width, height);
 };
 
 /*
