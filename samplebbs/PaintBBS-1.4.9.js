@@ -996,7 +996,7 @@ Neo.createViewer = function(applet) {
 </div>
 
 
-<div id="viewerButtons">
+<div id="viewerButtons" style="display:none;">
 <div id="viewerPlay" class="buttonOff"></div>
 <div id="viewerStop" class="buttonOff"></div>
 
