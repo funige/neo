@@ -3,36 +3,22 @@
 document.addEventListener("DOMContentLoaded", function() {
     Neo.init();
 
-    if (!navigator.userAgent.match("Electron")) {
+    if (!navigator.userAgent.match("Electron") && !Neo.viewer) {
         Neo.start();
     }
 });
 
-
 var Neo = function() {};
 
-Neo.version = "1.3.1";
+Neo.version = "1.4.9";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
+Neo.viewer = false;
 
 Neo.config = {
     width: 300,
     height: 300,
-
-    color_bk: "#ccccff",
-    color_bk2: "#bbbbff",
-    color_tool_icon: "#e8dfae",
-    color_icon: "#ccccff",
-    color_iconselect: "#ffaaaa",
-    color_text: "#666699",
-    color_bar: "#6f6fae",
-
-    tool_color_button: "#e8dfae",
-    tool_color_button2: "#f8daaa",
-    tool_color_text: "#773333",
-    tool_color_bar: "#ddddff",
-    tool_color_frame: "#000000",
 
     colors: [ 
         "#000000", "#FFFFFF",
@@ -65,11 +51,29 @@ Neo.init = function() {
     for (var i = 0; i < applets.length; i++) {
         var applet = applets[i];
         var name = applet.attributes.name.value;
-        if (name == "paintbbs") {
+
+        if (name == "paintbbs" || name == "pch") {
             Neo.applet = applet;
             Neo.initConfig(applet);
-            Neo.createContainer(applet);
-            Neo.init2();
+
+            if (name == "paintbbs") {
+                Neo.createContainer(applet);
+                Neo.init2();
+
+            } else {
+                var pch = Neo.getPCH(function(pch) {
+                    if (pch) {
+                        Neo.viewer = true;
+                        Neo.createViewer(applet);
+                        Neo.config.width = pch.width;
+                        Neo.config.height = pch.height;
+                        Neo.initViewer(pch);
+                        
+                        applet.parentNode.removeChild(applet)
+                    }
+                });
+            }
+            break;
         }
     }
 };
@@ -88,23 +92,37 @@ Neo.init2 = function() {
 
     Neo.container.oncontextmenu = function() {return false;};
 
+    // 動画記録
+    Neo.animation = (Neo.config.thumbnail_type == "animation");
+    
     // 続きから描く
-    if (Neo.config.image_canvas) {
-        Neo.painter.loadImage(Neo.config.image_canvas);
-    }
-
-    // 描きかけの画像が見つかったとき
     Neo.storage = (Neo.isMobile()) ? localStorage : sessionStorage;
-    if (Neo.storage.getItem('timestamp')) {
-        setTimeout(function () {
-            if (confirm(Neo.translate("以前の編集データを復元しますか？"))) {
-                Neo.painter.loadSession();
-            }
-        }, 1);
-    }
 
+    var filename = Neo.getFilename();
+    var message = (!filename || filename.slice(-4).toLowerCase() != ".pch") ?
+        "描きかけの画像があります。復元しますか？" :
+        "描きかけの画像があります。動画の読み込みを中止して復元しますか？";
+    
+    if (Neo.storage.getItem('timestamp') && confirm(Neo.translate(message))) {
+        var oe = Neo.painter;
+        setTimeout(function () {
+            oe.loadSession(function () {
+                oe._pushUndo();
+                oe._actionMgr.restore();
+            })
+        }, 1);
+        
+    } else if (filename) {
+        if (filename.slice(-4).toLowerCase() == ".pch") {
+            Neo.painter.loadAnimation(filename)
+        
+        } else {
+            Neo.painter.loadImage(filename);
+        }
+    }
+    
     window.addEventListener("pagehide", function(e) {
-        if (!Neo.uploaded) {
+        if (!Neo.uploaded && Neo.painter.isDirty()) {
             Neo.painter.saveSession();
         } else {
             Neo.painter.clearSession();
@@ -129,8 +147,22 @@ Neo.initConfig = function(applet) {
             if (p.name == "image_height") Neo.config.height = parseInt(p.value);
         }
 
-        var emulationMode = Neo.config.neo_emulation_mode || "2.22";
-        Neo.config.neo_alt_english = emulationMode.slice(-1).match(/x/i);
+        var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
+        Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
+
+        Neo.readStyles();
+        Neo.applyStyle("color_bk", "#ccccff");
+        Neo.applyStyle("color_bk2", "#bbbbff");
+        Neo.applyStyle("color_tool_icon", "#e8dfae");
+        Neo.applyStyle("color_icon", "#ccccff");
+        Neo.applyStyle("color_iconselect", "#ffaaaa");
+        Neo.applyStyle("color_text", "#666699");
+        Neo.applyStyle("color_bar", "#6f6fae");
+        Neo.applyStyle("tool_color_button", "#e8dfae");
+        Neo.applyStyle("tool_color_button2", "#f8daaa");
+        Neo.applyStyle("tool_color_text", "#773333");
+        Neo.applyStyle("tool_color_bar", "#ddddff");
+        Neo.applyStyle("tool_color_frame", "#000000");
 
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
@@ -181,7 +213,7 @@ Neo.initSkin = function() {
     var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
     var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
     var darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
-    var bgImage = Neo.backgroundImage();
+    var bgImage = Neo.painter ? Neo.backgroundImage() : "";
 
     Neo.addRule(".NEO #container", "background-image", "url(" + bgImage + ")");
     Neo.addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
@@ -265,6 +297,46 @@ Neo.addRule = function(selector, styleName, value, sheet) {
     }
 };
 
+Neo.readStyles = function() {
+    Neo.rules = {};
+    for (var i = 0; i < document.styleSheets.length; i++) {
+        Neo.readStyle(document.styleSheets[i]);
+    }
+};
+
+Neo.readStyle = function(sheet) {
+    try {
+        var rules = sheet.cssRules;
+        for (var i = 0; i < rules.length; i++) {
+            var rule = rules[i];
+            if (rule.styleSheet) {
+                Neo.readStyle(rule.styleSheet);
+                continue;
+            }
+
+            var selector = rule.selectorText
+            if (selector) {
+                selector = selector.replace(/^(.NEO\s+)?\./, '')
+
+                var css = rule.cssText || rule.style.cssText;
+                var result = css.match(/color:\s*(.*)\s*;/)
+                if (result) {
+                    var hex = Neo.colorNameToHex(result[1]);
+                    if (hex) {
+                        Neo.rules[selector] = hex;
+                    }
+                }
+            }
+        }
+    } catch (e) {}
+};
+
+Neo.applyStyle = function(name, defaultColor) {
+    if (Neo.config[name] == undefined) {
+        Neo.config[name] = Neo.rules[name] || defaultColor;
+    }
+};
+
 Neo.getInheritColor = function(e) {
     var result = "#000000";
     while (e && e.style) {
@@ -312,8 +384,26 @@ Neo.multColor = function(c, scale) {
     return '#' + r + g + b;
 };
 
+Neo.colorNameToHex = function(name) {
+    var colors = {"aliceblue":"#f0f8ff", "antiquewhite":"#faebd7", "aqua":"#00ffff","aquamarine":"#7fffd4", "azure":"#f0ffff", "beige":"#f5f5dc", "bisque":"#ffe4c4", "black":"#000000", "blanchedalmond":"#ffebcd", "blue":"#0000ff", "blueviolet":"#8a2be2", "brown":"#a52a2a", "burlywood":"#deb887", "cadetblue":"#5f9ea0", "chartreuse":"#7fff00", "chocolate":"#d2691e", "coral":"#ff7f50", "cornflowerblue":"#6495ed", "cornsilk":"#fff8dc", "crimson":"#dc143c", "cyan":"#00ffff", "darkblue":"#00008b", "darkcyan":"#008b8b", "darkgoldenrod":"#b8860b", "darkgray":"#a9a9a9", "darkgreen":"#006400", "darkkhaki":"#bdb76b", "darkmagenta":"#8b008b", "darkolivegreen":"#556b2f", "darkorange":"#ff8c00", "darkorchid":"#9932cc", "darkred":"#8b0000", "darksalmon":"#e9967a", "darkseagreen":"#8fbc8f", "darkslateblue":"#483d8b", "darkslategray":"#2f4f4f", "darkturquoise":"#00ced1", "darkviolet":"#9400d3", "deeppink":"#ff1493", "deepskyblue":"#00bfff", "dimgray":"#696969", "dodgerblue":"#1e90ff", "firebrick":"#b22222", "floralwhite":"#fffaf0", "forestgreen":"#228b22", "fuchsia":"#ff00ff", "gainsboro":"#dcdcdc", "ghostwhite":"#f8f8ff", "gold":"#ffd700", "goldenrod":"#daa520", "gray":"#808080", "green":"#008000", "greenyellow":"#adff2f", "honeydew":"#f0fff0", "hotpink":"#ff69b4", "indianred ":"#cd5c5c", "indigo":"#4b0082", "ivory":"#fffff0", "khaki":"#f0e68c", "lavender":"#e6e6fa", "lavenderblush":"#fff0f5", "lawngreen":"#7cfc00", "lemonchiffon":"#fffacd", "lightblue":"#add8e6", "lightcoral":"#f08080", "lightcyan":"#e0ffff", "lightgoldenrodyellow":"#fafad2", "lightgrey":"#d3d3d3", "lightgreen":"#90ee90", "lightpink":"#ffb6c1", "lightsalmon":"#ffa07a", "lightseagreen":"#20b2aa", "lightskyblue":"#87cefa", "lightslategray":"#778899", "lightsteelblue":"#b0c4de", "lightyellow":"#ffffe0", "lime":"#00ff00", "limegreen":"#32cd32", "linen":"#faf0e6", "magenta":"#ff00ff", "maroon":"#800000", "mediumaquamarine":"#66cdaa", "mediumblue":"#0000cd", "mediumorchid":"#ba55d3", "mediumpurple":"#9370d8", "mediumseagreen":"#3cb371", "mediumslateblue":"#7b68ee", "mediumspringgreen":"#00fa9a", "mediumturquoise":"#48d1cc", "mediumvioletred":"#c71585", "midnightblue":"#191970", "mintcream":"#f5fffa", "mistyrose":"#ffe4e1", "moccasin":"#ffe4b5", "navajowhite":"#ffdead", "navy":"#000080", "oldlace":"#fdf5e6", "olive":"#808000", "olivedrab":"#6b8e23", "orange":"#ffa500", "orangered":"#ff4500", "orchid":"#da70d6", "palegoldenrod":"#eee8aa", "palegreen":"#98fb98", "paleturquoise":"#afeeee", "palevioletred":"#d87093", "papayawhip":"#ffefd5", "peachpuff":"#ffdab9", "peru":"#cd853f", "pink":"#ffc0cb", "plum":"#dda0dd", "powderblue":"#b0e0e6", "purple":"#800080", "rebeccapurple":"#663399", "red":"#ff0000", "rosybrown":"#bc8f8f", "royalblue":"#4169e1", "saddlebrown":"#8b4513", "salmon":"#fa8072", "sandybrown":"#f4a460", "seagreen":"#2e8b57", "seashell":"#fff5ee", "sienna":"#a0522d", "silver":"#c0c0c0", "skyblue":"#87ceeb", "slateblue":"#6a5acd", "slategray":"#708090", "snow":"#fffafa", "springgreen":"#00ff7f", "steelblue":"#4682b4", "tan":"#d2b48c", "teal":"#008080", "thistle":"#d8bfd8", "tomato":"#ff6347", "turquoise":"#40e0d0", "violet":"#ee82ee", "wheat":"#f5deb3", "white":"#ffffff", "whitesmoke":"#f5f5f5", "yellow":"#ffff00", "yellowgreen":"#9acd32"};
+
+    var rgb = name.toLowerCase().match(/rgb\((.*),(.*),(.*)\)/);
+    if (rgb) {
+        var r = ("0" + parseInt(rgb[1]).toString(16)).slice(-2)
+        var g = ("0" + parseInt(rgb[2]).toString(16)).slice(-2)
+        var b = ("0" + parseInt(rgb[3]).toString(16)).slice(-2)
+        return "#" + r + g + b
+    }
+
+    if (typeof colors[name.toLowerCase()] != 'undefined') {
+        return colors[name.toLowerCase()];
+    }
+    return false;
+};
+
 Neo.initComponents = function() {
-    document.getElementById("copyright").innerHTML += "v" + Neo.version;
+    var copyright = document.getElementById("copyright")
+    if (copyright) copyright.innerHTML += "v" + Neo.version;
 
     // アプレットのborderの動作をエミュレート
     if (navigator.userAgent.search("FireFox") > -1) {
@@ -422,9 +512,10 @@ Neo.initButtons = function() {
 
 Neo.start = function(isApp) {
     if (!Neo.painter) return;
-    
+
     Neo.initSkin();
     Neo.initComponents();
+
     Neo.initButtons();
 
     Neo.isApp = isApp;
@@ -489,8 +580,10 @@ Neo.showWarning = function() {
     }
 
     var warning = document.getElementById("neoWarning")
-    warning.innerHTML = str;
-    setTimeout(function() { warning.style.opacity = "0"; }, 15000);
+    if (warning) {
+        warning.innerHTML = str;
+        setTimeout(function() { warning.style.opacity = "0"; }, 15000);
+    }        
 };
 
 /*
@@ -588,15 +681,17 @@ Neo.resizeCanvas = function() {
     Neo.canvas.style.width = width + "px";
     Neo.canvas.style.height = height + "px";
 
-    var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
-    Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
+    if (Neo.toolsWrapper) {
+        var top  = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
+        Neo.toolsWrapper.style.top = ((top > 0) ? top : 0) + "px";
 
-    if (top < 0) {
-        var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
-        Neo.toolsWrapper.style.transform =
-            "translate(0, " + top + "px) scale(1," + s + ")";
-    } else {
-        Neo.toolsWrapper.style.transform = "";
+        if (top < 0) {
+            var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
+            Neo.toolsWrapper.style.transform =
+                "translate(0, " + top + "px) scale(1," + s + ")";
+        } else {
+            Neo.toolsWrapper.style.transform = "";
+        }
     }
     
     Neo.painter.setZoom(Neo.painter.zoom);
@@ -879,6 +974,179 @@ Neo.createContainer = function(applet) {
     }, 0);
 };
 
+/*
+  -----------------------------------------------------------------------
+    動画表示モード
+  -----------------------------------------------------------------------
+*/
+
+Neo.createViewer = function(applet) {
+    var neo = document.createElement("div");
+    neo.className = "NEO";
+    neo.id = "NEO";
+    var html = (function() {/*
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<div id="pageView" style="margin:auto;">
+<div id="container" style="visibility:visible;" class="o">
+
+<div id="painter" style="background-color:white;">
+<div id="canvas" style="background-color:white;">
+</div>
+</div>
+
+
+<div id="viewerButtons">
+<div id="viewerPlay" class="buttonOff"></div>
+<div id="viewerStop" class="buttonOff"></div>
+
+<div id="viewerRewind" class="buttonOff"></div>
+<div id="viewerSpeed" class="buttonOff" style="padding-left:2px;">既</div>
+<div id="viewerZoomPlus" class="buttonOff"></div>
+<div id="viewerZoomMinus" class="buttonOff"></div>
+<div id="viewerBar" class="buttonOff" style="display:inline-block;"></div>
+
+</div>
+
+</div>
+</div>
+                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
+
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+	return Neo.translate(str)
+    })
+    
+    var parent = applet.parentNode;
+    parent.appendChild(neo);
+    parent.insertBefore(neo, applet);
+
+    // applet.style.display = "none";
+
+    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
+    setTimeout(function() {
+        var tmp = document.getElementsByClassName("NEO");
+        if (tmp.length > 1) {
+            for (var i = 1; i < tmp.length; i++) {
+                tmp[i].style.display = "none";
+            }
+        }
+    }, 0);
+};
+
+Neo.initViewer = function(pch) {
+    var pageview = document.getElementById("pageView");
+    var pageWidth = Neo.config.applet_width;
+    var pageHeight = Neo.config.applet_height;
+    pageview.style.width = pageWidth + "px";
+    pageview.style.height = pageHeight + "px";
+    
+    Neo.canvas = document.getElementById("canvas");
+    Neo.container = document.getElementById("container");
+    Neo.container.style.backgroundColor = Neo.config.color_back;
+    Neo.container.style.border = "0";
+
+    var dx = (pageWidth - Neo.config.width) / 2;
+    var dy = (pageHeight - Neo.config.height - 26) / 2;
+    
+    var painter = document.getElementById("painter");
+
+    painter.style.marginTop = "0";
+    painter.style.position = "absolute";
+    painter.style.padding = "0";
+    painter.style.bottom = (dy + 26) + "px";
+    painter.style.left = (dx) + "px";
+
+    var viewerButtons = document.getElementById("viewerButtons");
+    viewerButtons.style.width = (pageWidth - 2) + "px";
+    
+    var viewerBar = document.getElementById("viewerBar");
+    viewerBar.style.width = (pageWidth - (24 * 6) - 6) + "px"; 
+    
+    Neo.canvas.style.width = Neo.config.width + "px";
+    Neo.canvas.style.height = Neo.config.height + "px";
+    
+    Neo.painter = new Neo.Painter();
+    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
+    
+    Neo.container.oncontextmenu = function() {return false;};
+
+    if (pch) {//Neo.config.pch_file) {
+        Neo.painter._actionMgr._items = pch.data;
+        Neo.painter._actionMgr.play(10);
+    }
+};
+
+Neo.startViewer = function() {
+    console.log("start viewer...");
+
+    new Neo.Button().init("viewerPlay").onmouseup = function() {
+        console.log("init viewerPlay");
+    };
+    new Neo.Button().init("viewerStop").onmouseup = function() {
+        console.log("init viewerStop");
+    };
+    new Neo.Button().init("viewerRewind").onmouseup = function() {
+        console.log("init viewerRewind");
+    };
+    new Neo.Button().init("viewerSpeed").onmouseup = function() {
+        console.log("init viewerSpeed");
+    };
+};
+
+Neo.getFilename = function() {
+    return Neo.config.pch_file || Neo.config.image_canvas;
+};
+
+Neo.getPCH = function(callback) {
+    var filename = Neo.getFilename();
+    if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
+    
+    var request = new XMLHttpRequest();
+    request.open("GET", filename, true);
+    request.responseType = "arraybuffer";
+    request.onload = function() {
+        var byteArray = new Uint8Array(request.response);
+        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+        var header = byteArray.slice(0, 12);
+
+        if ((header[0] == "N".charCodeAt(0)) &&
+            (header[1] == "E".charCodeAt(0)) &&
+            (header[2] == "O".charCodeAt(0))) {
+            var width = header[4] + header[5] * 0x100
+            var height = header[6] + header[7] * 0x100
+            console.log('NEO animation:', width, 'x', height);
+            if (callback) {
+                var items = Neo.fixPCH(JSON.parse(data))
+                callback({
+                    width:width,
+                    height:height,
+                    data:items
+                });
+            }
+            
+        } else {
+            console.log('not a NEO animation:');
+        }
+    }
+    request.send();
+};
+
+Neo.fixPCH = function(items) {
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+
+        var index = item.indexOf('eraseAll');
+        if (index > 0) {
+            var tmp = item.slice(index);
+            var tmp2 = item.slice(0, index);
+            console.log("fix eraseAll", tmp2, tmp);
+
+            items[i] = tmp2;
+            items.splice(i, 0, tmp)
+        }
+    }
+    return items;
+};
 
 'use strict';
 
@@ -921,11 +1189,15 @@ Neo.dictionary = {
         "BZ曲線": "Bezie",
         "ページビュー？": "Page view?",
         "ウィンドウビュー？": "Window view?",
-        "以前の編集データを復元しますか？": "Restore session?",
+        "描きかけの画像があります。復元しますか？": "Restore session?",
 	"右": "Right Click",
 
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
+
+        "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
+//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
+        "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "Discard animation data and restore session?",
     },
     "enx": {
 	"やり直し": "Redo",
@@ -966,25 +1238,87 @@ Neo.dictionary = {
         "Layer1": "LayerFG",
         "ページビュー？": "Page view?",
         "ウィンドウビュー？": "Window view?",
-        "以前の編集データを復元しますか？": "Restore session?",
+        "描きかけの画像があります。復元しますか？": "Restore session?",
 	"右": "Right Click",
 
         "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (©2000-2004 shi-chan). Show the project page?",
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
+
+        "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "Send this picture and end session?",
+//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
+        "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "Discard animation data and restore session?",
+    },
+    "es": {
+	"やり直し": "Rehacer",
+	"元に戻す": "Deshacer",
+	"塗り潰し": "Llenar",
+	"窓": "Ventana",
+	"投稿": "Enviar",
+	"(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
+	"鉛筆": "Lápiz",
+	"水彩": "Acuarela",
+	"ﾃｷｽﾄ": "Texto",
+        "トーン": "Tono",
+        "ぼかし": "Gradación",
+        "覆い焼き": "Sobreexp.",
+        "焼き込み": "Quemar",
+        "消しペン": "Goma",
+        "消し四角": "GomaRect",
+        "全消し": "Borrar",
+        "四角": "Rect",
+        "線四角": "LíneaRect",
+        "楕円": "Óvalo",
+        "線楕円": "LíneaÓvalo",
+        "コピー": "Copiar",
+        "ﾚｲﾔ結合": "UnirCapa",
+        "角取り": "Antialias",
+        "左右反転": "Inv.Izq/Der",
+        "上下反転": "Inv.Arr/Aba",
+        "傾け": "Inclinar",
+        "通常": "Normal",
+        "マスク": "Masc.",
+        "逆ﾏｽｸ": "Masc.Inv",
+        "加算": "Adición",
+        "逆加算": "Subtrac",
+        "手書き": "Libre",
+        "直線": "Línea",
+        "BZ曲線": "Curva",
+        "Layer0": "Capa0",
+        "Layer1": "Capa1",
+        "ページビュー？": "¿Vista de página?",
+        "ウィンドウビュー？": "¿Vista de ventana?",
+        "描きかけの画像があります。復元しますか？": "¿Restaurar sesión anterior?",
+	"右": "Clic derecho",
+
+        "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？":
+        "PaintBBS NEO es una versión para HTML5 de Oekaki Shi-BBS PaintBBS (© 2000-2004 shi-chan). ¿Mostrar la página del proyecto?",
+        "このブラウザでは<br>投稿に失敗することがあります<br>": "Este navegador podría no enviar su imagen.<br>",
+
+        "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "¿Enviar esta imagen y finalizar sesión?",
+//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO no puede analizar estos datos de animación.",
+        "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "¿Desechar datos de animación y restaurar sesión?",
     },
 };
 
 Neo.translate = function () {
+    var language = (window.navigator.languages && window.navigator.languages[0]) ||
+        window.navigator.language ||
+        window.navigator.userLanguage ||
+        window.navigator.browserLanguage;
+
     var lang = "en";
     for (var key in Neo.dictionary) {
-	if (navigator.language.indexOf(key) == 0) {
+	if (language.indexOf(key) == 0) {
 	    lang = key;
 	    break;
 	}
     }
+    
     return function(string) {
-        if (lang == "en" && Neo.config.neo_alt_english) {
-            lang = "enx";
+        if (Neo.config.neo_alt_translation) {
+            if (lang == "en") lang = "enx"
+        } else {
+            if (lang != "ja") lang = "en"
         }
 	return Neo.dictionary[lang][string] || string;
     }
@@ -995,10 +1329,12 @@ Neo.translate = function () {
 
 Neo.Painter = function() {
     this._undoMgr = new Neo.UndoManager(50);
+    this._actionMgr = new Neo.ActionManager();
 };
 
 Neo.Painter.prototype.container;
 Neo.Painter.prototype._undoMgr;
+Neo.Painter.prototype._actionMgr;
 Neo.Painter.prototype.tool;
 Neo.Painter.prototype.inputText;
 
@@ -1061,6 +1397,7 @@ Neo.Painter.prototype._currentColor = [];
 Neo.Painter.prototype._currentMask = [];
 
 Neo.Painter.prototype.aerr;
+Neo.Painter.prototype.dirty = false;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -1249,26 +1586,28 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     var ref = this;
 
-    var container = document.getElementById("container");
+    if (!Neo.viewer) {
+        var container = document.getElementById("container");
 
-    container.onmousedown = function(e) {ref._mouseDownHandler(e)};
-    container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
-    container.onmouseup = function(e) {ref._mouseUpHandler(e)};
-    container.onmouseover = function(e) {ref._rollOverHandler(e)};
-    container.onmouseout = function(e) {ref._rollOutHandler(e)};
-    container.addEventListener("touchstart", function(e) {
-        ref._mouseDownHandler(e);
-    }, false);
-    container.addEventListener("touchmove", function(e) {
-        ref._mouseMoveHandler(e);
-    }, false);
-    container.addEventListener("touchend", function(e) {
-        ref._mouseUpHandler(e);
-    }, false);
+        container.onmousedown = function(e) {ref._mouseDownHandler(e)};
+        container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
+        container.onmouseup = function(e) {ref._mouseUpHandler(e)};
+        container.onmouseover = function(e) {ref._rollOverHandler(e)};
+        container.onmouseout = function(e) {ref._rollOutHandler(e)};
+        container.addEventListener("touchstart", function(e) {
+            ref._mouseDownHandler(e);
+        }, false);
+        container.addEventListener("touchmove", function(e) {
+            ref._mouseMoveHandler(e);
+        }, false);
+        container.addEventListener("touchend", function(e) {
+            ref._mouseUpHandler(e);
+        }, false);
 
-    document.onkeydown = function(e) {ref._keyDownHandler(e)};
-    document.onkeyup = function(e) {ref._keyUpHandler(e)};
-
+        document.onkeydown = function(e) {ref._keyDownHandler(e)};
+        document.onkeyup = function(e) {ref._keyUpHandler(e)};
+    }
+    
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
@@ -1641,8 +1980,11 @@ Neo.Painter.prototype.getStabilized = function() {
 
 Neo.Painter.prototype.undo = function() {
     var undoItem = this._undoMgr.popUndo();
+    
     if (undoItem) {
         this._pushRedo();
+        this._actionMgr.back();
+
         this.canvasCtx[0].putImageData(undoItem.data[0], undoItem.x,undoItem.y);
         this.canvasCtx[1].putImageData(undoItem.data[1], undoItem.x,undoItem.y);
         this.updateDestCanvas(undoItem.x, undoItem.y, undoItem.width, undoItem.height);
@@ -1651,7 +1993,10 @@ Neo.Painter.prototype.undo = function() {
 
 Neo.Painter.prototype.redo = function() {
     var undoItem = this._undoMgr.popRedo();
+    
     if (undoItem) {
+        this._actionMgr.forward();
+        
         this._pushUndo(0,0,this.canvasWidth, this.canvasHeight, true);
         this.canvasCtx[0].putImageData(undoItem.data[0], undoItem.x,undoItem.y);
         this.canvasCtx[1].putImageData(undoItem.data[1], undoItem.x,undoItem.y);
@@ -1659,9 +2004,9 @@ Neo.Painter.prototype.redo = function() {
     }
 };
 
-Neo.Painter.prototype.hasUndo = function() {
-    return true;
-};
+//Neo.Painter.prototype.hasUndo = function() {
+//    return true;
+//};
 
 Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
     x = (x === undefined) ? 0 : x;
@@ -1676,6 +2021,11 @@ Neo.Painter.prototype._pushUndo = function(x, y, w, h, holdRedo) {
     undoItem.data = [this.canvasCtx[0].getImageData(x, y, w, h),
                      this.canvasCtx[1].getImageData(x, y, w, h)];
     this._undoMgr.pushUndo(undoItem, holdRedo);
+
+    if (!holdRedo) {
+        this._actionMgr.step();
+    }
+    this.dirty = true;
 };
 
 Neo.Painter.prototype._pushRedo = function(x, y, w, h) {
@@ -1712,6 +2062,7 @@ Neo.UndoManager.prototype._undoItems;
 //アクションをしてUndo情報を更新
 Neo.UndoManager.prototype.pushUndo = function(undoItem, holdRedo) {
     this._undoItems.push(undoItem);
+    
     if (this._undoItems.length > this._maxStep) {
         this._undoItems.shift();
     }
@@ -1798,12 +2149,22 @@ Neo.Painter.prototype.submit = function(board) {
     var thumbnail = null;
     var thumbnail2 = null;
 
+    if (Neo.config.thumbnail_type == "animation" || this.useThumbnail()) {
+        thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
+    }
+
+    if (Neo.config.thumbnail_type2 && this.useThumbnail()) {
+        thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2)
+    }
+
+    /*
     if (this.useThumbnail()) {
         thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
         if (Neo.config.thumbnail_type2) {
             thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
         }
-    }
+    }*/
+
     Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
 };
 
@@ -1868,6 +2229,7 @@ Neo.Painter.prototype.getPNG = function() {
 };
 
 Neo.Painter.prototype.getThumbnail = function(type) {
+    console.log('getThumnail', type);
     if (type != "animation") {
         var thumbnailWidth = this.getThumbnailWidth();
         var thumbnailHeight = this.getThumbnailHeight();
@@ -1891,7 +2253,18 @@ Neo.Painter.prototype.getThumbnail = function(type) {
         return this.dataURLtoBlob(dataURL);
         
     } else {
-        return new Blob([]); //animationには対応していないのでダミーデータを返す
+        var data = JSON.stringify(this._actionMgr._items);
+        data = LZString.compressToUint8Array(data);
+
+        var magic = "NEO ";
+        var w = this.canvasWidth;
+        var h = this.canvasHeight;
+        
+        return new Blob([magic,
+                         new Uint8Array([w % 0x100, Math.floor(w / 0x100)]),
+                         new Uint8Array([h % 0x100, Math.floor(h / 0x100)]),
+                         new Uint8Array(4),
+                         data]);
     }
 };
 
@@ -1923,10 +2296,12 @@ Neo.Painter.prototype.clearCanvas = function(doConfirm) {
     if (!doConfirm || confirm("全消しします")) {
         //Register undo first;
         this._pushUndo();
-        
+        this._actionMgr.clearCanvas();
+/*        
         this.canvasCtx[0].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.canvasCtx[1].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+*/
     }
 };
 
@@ -2015,7 +2390,7 @@ Neo.Painter.prototype.getColor = function(c) {
     var g = parseInt(c.substr(3, 2), 16);
     var b = parseInt(c.substr(5, 2), 16);
     var a = Math.floor(this.alpha * 255);
-    return a <<24 | b<<16 | g<<8 | r;
+    return a<<24 | b<<16 | g<<8 | r;
 };
 
 Neo.Painter.prototype.getColorString = function(c) {
@@ -2031,7 +2406,7 @@ Neo.Painter.prototype.setColor = function(c) {
 };
 
 Neo.Painter.prototype.getAlpha = function(type) {
-    var a1 = this.alpha;
+    var a1 = this._currentColor[3] / 255.0; //this.alpha;
 
     switch (type) {
     case Neo.Painter.ALPHATYPE_PEN:
@@ -2078,6 +2453,8 @@ Neo.Painter.prototype.prepareDrawing = function () {
 
     this._currentColor = [r, g, b, a];
     this._currentMask = [maskR, maskG, maskB];
+    this._currentWidth = this.lineWidth;
+    this._currentMaskType = this.maskType;
 };
 
 Neo.Painter.prototype.isMasked = function (buf8, index) {
@@ -2100,7 +2477,7 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
         b0 = 0xff;
     }
 
-    var type = this.maskType;
+    var type = this._currentMaskType; //this.maskType;
 
     //TODO
     //いろいろ試したのですが半透明で描画するときの加算・逆加算を再現する方法がわかりません。
@@ -2193,7 +2570,7 @@ Neo.Painter.prototype.setPoint = function(buf8, bufWidth, x0, y0, left, top, typ
 
 
 Neo.Painter.prototype.setPenPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -2246,7 +2623,7 @@ Neo.Painter.prototype.setPenPoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -2299,16 +2676,13 @@ Neo.Painter.prototype.setBrushPoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setTonePoint = function(buf8, width, x, y, x0, y0) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
 
     x -= r0;
     y -= r0;
     x0 -= r0;
     y0 -= r0;
-//  x -= r0;
-//  y -= r0;
-//  if (r0%2) { x0++; y0++; } //なぜか模様がずれるので
    
     var shape = this._roundData[d];
     var shapeIndex = 0;
@@ -2338,7 +2712,7 @@ Neo.Painter.prototype.setTonePoint = function(buf8, width, x, y, x0, y0) {
 };
 
 Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -2346,7 +2720,7 @@ Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
     var shape = this._roundData[d];
     var shapeIndex = 0;
     var index = (y * width + x) * 4;
-    var a = Math.floor(this.alpha * 255);
+    var a = Math.floor(this._currentColor[3]); //this.alpha * 255);
 
     for (var i = 0; i < d; i++) {
         for (var j = 0; j < d; j++) {
@@ -2362,7 +2736,7 @@ Neo.Painter.prototype.setEraserPoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -2372,7 +2746,8 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
     var height = buf8.length / (width * 4);
 
 //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
-    var a1 = this.alpha / 12;
+//  var a1 = this.alpha / 12;
+    var a1 = (this._currentColor[3] / 255.0) / 12;
     if (a1 == 0) return;
     var blur = a1;
 
@@ -2414,7 +2789,7 @@ Neo.Painter.prototype.setBlurPoint = function(buf8, width, x, y, x0, y0) {
 };
 
 Neo.Painter.prototype.setDodgePoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -2466,7 +2841,7 @@ Neo.Painter.prototype.setDodgePoint = function(buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBurnPoint = function(buf8, width, x, y) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
     var r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
@@ -2538,16 +2913,19 @@ Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y
 
 var nmax = 1;
 
-Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
+Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type, isReplay) {
     var xmax = Math.max(x0, x1, x2, x3);
     var xmin = Math.min(x0, x1, x2, x3);
     var ymax = Math.max(y0, y1, y2, y3);
     var ymin = Math.min(y0, y1, y2, y3);
     var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 2.5);
 
-    if (n > nmax) {
-        n = (n < nmax * 2) ? n : nmax * 2;
-        nmax = n;
+    // 最初にベジェを使う時ここで処理落ちするため
+    if (!isReplay) {
+        if (n > nmax) {
+            n = (n < nmax * 2) ? n : nmax * 2;
+            nmax = n;
+        }
     }
 
     for (var i = 0; i < n; i++) {
@@ -2567,7 +2945,8 @@ Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
 
     var width = Math.abs(x1 - x0);
     var height = Math.abs(y1 - y0);
-    var r = Math.ceil(this.lineWidth / 2);
+    var r = Math.ceil(this._currentWidth / 2);
+//  var r = Math.ceil(this.lineWidth / 2);
 
     var left = ((x0 < x1) ? x0 : x1) - r;
     var top = ((y0 < y1) ? y0 : y1) - r;
@@ -2758,7 +3137,8 @@ Neo.Painter.prototype.drawXORLine = function(ctx, x0, y0, x1, y1, c) {
 };
 
 
-Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.eraseRect = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2770,7 +3150,7 @@ Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
 
     var index = 0;
 
-    var a = 1.0 - this.alpha;
+    var a = 1.0 - (this._currentColor[3] / 255.0) //this.alpha;
     if (a != 0) {
         a = Math.ceil(2.0 / a);
     } else {
@@ -2789,7 +3169,8 @@ Neo.Painter.prototype.eraseRect = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.flipH = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.flipH = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2813,7 +3194,8 @@ Neo.Painter.prototype.flipH = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.flipV = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.flipV = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2837,7 +3219,8 @@ Neo.Painter.prototype.flipV = function(ctx, x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.merge = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.merge = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2852,7 +3235,7 @@ Neo.Painter.prototype.merge = function(ctx, x, y, width, height) {
         buf8[i] = new Uint8ClampedArray(imageData[i].data.buffer);
     }
 
-    var dst = this.current;
+    var dst = layer;
     var src = (dst == 1) ? 0 : 1;
     var size = width * height;
     var index = 0; 
@@ -2889,7 +3272,8 @@ Neo.Painter.prototype.merge = function(ctx, x, y, width, height) {
     }
 };
 
-Neo.Painter.prototype.blurRect = function(ctx, x, y, width, height) {
+Neo.Painter.prototype.blurRect = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
@@ -2903,7 +3287,7 @@ Neo.Painter.prototype.blurRect = function(ctx, x, y, width, height) {
     for (var i = 0; i < buf8.length; i++) tmp[i] = buf8[i];
 
     var index = 0;
-    var a1 = this.alpha / 12;
+    var a1 = (this._currentColor[3] / 255.0) / 12; //this.alpha / 12;
     var blur = a1;
 
     for (var j = 0; j < height; j++) {
@@ -2991,11 +3375,10 @@ Neo.Painter.prototype.pickColor = function(x, y) {
     }
 };
 
-Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y) {
+Neo.Painter.prototype.fillHorizontalLine = function(buf32, x0, x1, y, color) {
     var index = y * this.canvasWidth + x0;
-    var fillColor = this.getColor();
     for (var x = x0; x <= x1; x++) {
-        buf32[index++] = fillColor;
+        buf32[index++] = color;
     }
 };
 
@@ -3004,25 +3387,13 @@ Neo.Painter.prototype.scanLine = function(x0, x1, y, baseColor, buf32, stack) {
     for (var x = x0; x <= x1; x++) {
         stack.push({x:x, y: y})
     }
-/*
-    while (x0 <= x1) {
-        for (; x0 <= x1; x0++) {
-            if (buf32[y * width + x0] == baseColor) break;
-        }
-        if (x1 < x0) break;
-
-        for (; x0 <= x1; x0++) {
-            if (buf32[y * width + x0] != baseColor) break;
-        }
-        stack.push({x:x0 - 1, y: y})
-    }
-*/
 };
 
-Neo.Painter.prototype.fill = function(x, y, ctx) {
+Neo.Painter.prototype.doFloodFill = function(layer, x, y, fillColor) {
     x = Math.round(x);
     y = Math.round(y);
-
+    var ctx = this.canvasCtx[layer];
+    
     if (x < 0 || x >= this.canvasWidth || y < 0 || y >= this.canvasHeight) {
         return;
     }
@@ -3034,7 +3405,6 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     var stack = [{x: x, y: y}];
 
     var baseColor = buf32[y * width + x];
-    var fillColor = this.getColor();
 
     if ((baseColor & 0xff000000) == 0 || (baseColor != fillColor)) {
         while (stack.length > 0) {
@@ -3056,7 +3426,7 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
             for (; x1 < this.canvasWidth - 1; x1++) {
                 if (buf32[y * width + (x1 + 1)] != baseColor) break;
             }
-            this.fillHorizontalLine(buf32, x0, x1, y);
+            this.fillHorizontalLine(buf32, x0, x1, y, fillColor);
 
             if (y + 1 < this.canvasHeight) {
                 this.scanLine(x0, x1, y + 1, baseColor, buf32, stack);
@@ -3068,15 +3438,15 @@ Neo.Painter.prototype.fill = function(x, y, ctx) {
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
-    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+//  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype.copy = function(x, y, width, height) {
+Neo.Painter.prototype.copy = function(layer, x, y, width, height) {
     this.tempX = 0;
     this.tempY = 0;
     this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-    var imageData = this.canvasCtx[this.current].getImageData(x, y, width, height);
+    var imageData = this.canvasCtx[layer].getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     this.temp = new Uint32Array(buf32.length);
@@ -3100,18 +3470,18 @@ Neo.Painter.prototype.copy = function(x, y, width, height) {
 };
 
 
-Neo.Painter.prototype.paste = function(x, y, width, height) {
-    var ctx = this.canvasCtx[this.current];
+Neo.Painter.prototype.paste = function(layer, x, y, width, height, dx, dy) {
+    var ctx = this.canvasCtx[layer];
 //  console.log(this.tempX, this.tempY);
 
-    var imageData = ctx.getImageData(x + this.tempX, y + this.tempY, width, height);
+    var imageData = ctx.getImageData(x + dx, y + dy, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
     for (var i = 0; i < buf32.length; i++) {
         buf32[i] = this.temp[i];
     }
     imageData.data.set(buf8);
-    ctx.putImageData(imageData, x + this.tempX, y + this.tempY);
+    ctx.putImageData(imageData, x + dx, y + dy);
 
     this.temp = null;
     this.tempX = 0;
@@ -3119,8 +3489,8 @@ Neo.Painter.prototype.paste = function(x, y, width, height) {
     this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
-Neo.Painter.prototype.turn = function(x, y, width, height) {
-    var ctx = this.canvasCtx[this.current];
+Neo.Painter.prototype.turn = function(layer, x, y, width, height) {
+    var ctx = this.canvasCtx[layer];
     
     // 傾けツールのバグを再現するため一番上のラインで対象領域を埋める
     var imageData = ctx.getImageData(x, y, width, height);
@@ -3156,11 +3526,20 @@ Neo.Painter.prototype.turn = function(x, y, width, height) {
     ctx.putImageData(imageData, x, y);
 };
 
-Neo.Painter.prototype.doFill = function(ctx, x, y, width, height, maskFunc) {
-    if (Math.round(x) != x) console.log("*");
-    if (Math.round(width) != width) console.log("*");
-    if (Math.round(height) != height) console.log("*");
+Neo.Painter.prototype.getMaskFunc = function(type) {
+    switch (type) {
+    case Neo.Painter.TOOLTYPE_RECT: return this.rectMask;
+    case Neo.Painter.TOOLTYPE_RECTFILL: return this.rectFillMask;
+    case Neo.Painter.TOOLTYPE_ELLIPSE: return this.ellipseMask;
+    case Neo.Painter.TOOLTYPE_ELLIPSEFILL: return this.ellipseFillMask;
+    }
+    return null;
+};
 
+Neo.Painter.prototype.doFill = function(layer, x, y, width, height, type) {
+    var ctx = this.canvasCtx[layer];
+    var maskFunc = this.getMaskFunc(type);
+    
     var imageData = ctx.getImageData(x, y, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -3176,7 +3555,7 @@ Neo.Painter.prototype.doFill = function(ctx, x, y, width, height, maskFunc) {
         for (var i = 0; i < width; i++) {
             if (maskFunc && maskFunc.call(this, i, j, width, height)) {
                 //なぜか加算逆加算は適用されない
-                if (this.maskType >= Neo.Painter.MASKTYPE_ADD || 
+                if (this._currentMaskType >= Neo.Painter.MASKTYPE_ADD || 
                     !this.isMasked(buf8, index)) {
                     var r0 = buf8[index + 0];
                     var g0 = buf8[index + 1];
@@ -3219,7 +3598,8 @@ Neo.Painter.prototype.rectFillMask = function(x, y, width, height) {
 };
 
 Neo.Painter.prototype.rectMask = function(x, y, width, height) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
+//  var d = this.lineWidth;
     return (x < d || x > width - 1 - d || 
             y < d || y > height - 1 - d) ? true : false;
 };
@@ -3234,7 +3614,8 @@ Neo.Painter.prototype.ellipseFillMask = function(x, y, width, height) {
 }
 
 Neo.Painter.prototype.ellipseMask = function(x, y, width, height) {
-    var d = this.lineWidth;
+    var d = this._currentWidth;
+//  var d = this.lineWidth;
     var cx = (width - 1) / 2.0;
     var cy = (height - 1) / 2.0;
 
@@ -3326,7 +3707,24 @@ Neo.Painter.prototype.loadImage = function (filename) {
     };
 };
 
-Neo.Painter.prototype.loadSession = function (filename) {
+Neo.Painter.prototype.loadAnimation = function (filename, wait) {
+    console.log("loadAnimation " + filename);
+    var request = new XMLHttpRequest();
+    request.open("GET", filename, true);
+    request.responseType = "arraybuffer";
+    request.onload = function() {
+        var byteArray = new Uint8Array(request.response);
+        var header = byteArray.slice(0, 12);
+        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+
+        var items = JSON.parse(data);
+        Neo.painter._actionMgr._items = Neo.fixPCH(JSON.parse(data));
+        Neo.painter._actionMgr.play(wait);
+    };
+    request.send();
+};
+
+Neo.Painter.prototype.loadSession = function (callback) {
     if (Neo.storage) {
         var img0 = new Image();
         img0.src = Neo.storage.getItem('layer0');
@@ -3340,6 +3738,8 @@ Neo.Painter.prototype.loadSession = function (filename) {
                 oe.canvasCtx[0].drawImage(img0, 0, 0);
                 oe.canvasCtx[1].drawImage(img1, 0, 0);
                 oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+
+                if (callback) callback();
             }
         }
     }
@@ -3368,30 +3768,29 @@ Neo.Painter.prototype.sortColor = function(r0, g0, b0) {
     return [min, mid, max];
 };
 
-Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
+Neo.Painter.prototype.doText = function(layer, x, y,
+                                        color, alpha,
+                                        string, fontSize, fontFamily) {
     //テキスト描画
+    if (string.length <= 0) return;
+
     //描画位置がずれるので適当に調整
     var offset = parseInt(fontSize, 10);
-//  y -= Math.round((5.0 + offset/8) / this.zoom);
-//  x += Math.round(2.0 / this.zoom);
-
     var ctx = this.tempCanvasCtx;
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.save();
     ctx.translate(x, y);
-//  ctx.scale(1/this.zoom, 1/this.zoom);
+    ctx.font = fontSize + " " + fontFamily;
 
-    ctx.font = fontSize + " Arial";
     ctx.fillStyle = 0;
     ctx.fillText(string, 0, 0);
     ctx.restore();
 
     // 適当に二値化
-    var c = this.getColor();
-    var r = c & 0xff;
-    var g = (c & 0xff00) >> 8;
-    var b = (c & 0xff0000) >> 16;
-    var a = Math.round(this.alpha * 255.0);
+    var r = color & 0xff;
+    var g = (color & 0xff00) >> 8;
+    var b = (color & 0xff0000) >> 16;
+    var a = Math.round(alpha * 255.0);
 
     var imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -3417,7 +3816,7 @@ Neo.Painter.prototype.doText = function(x, y, string, fontSize) {
     ctx.putImageData(imageData, 0, 0);
 
     //キャンバスに貼り付け
-    ctx = this.canvasCtx[this.current];
+    ctx = this.canvasCtx[layer];
     ctx.globalAlpha = 1.0;
     ctx.drawImage(this.tempCanvas,
                   0, 0, this.canvasWidth, this.canvasHeight,
@@ -3437,6 +3836,60 @@ Neo.Painter.prototype.isUIPaused = function() {
 
 Neo.Painter.prototype.getEmulationMode = function() {
     return parseFloat(Neo.config.neo_emulation_mode || 2.22)
+};
+
+/*
+-------------------------------------------------------------------------
+    Recorder Test
+-------------------------------------------------------------------------
+*/
+
+Neo.Painter.prototype.play = function(wait) {
+    this.saveSnapshot();
+
+    if (this._actionMgr) {
+        this._actionMgr.clearCanvas();
+        this._actionMgr._head = 0;
+        this.prevLine = null;
+
+        this._actionMgr.play(wait);
+    }
+};
+
+Neo.Painter.prototype.snapshot = [];
+Neo.Painter.prototype.saveSnapshot = function() {
+    var width = this.canvasWidth;
+    var height = this.canvasHeight;
+    this.snapshot = [this.canvasCtx[0].getImageData(0, 0, width, height),
+                     this.canvasCtx[1].getImageData(0, 0, width, height)];
+};
+
+Neo.Painter.prototype.loadSnapshot = function() {
+    this.canvasCtx[0].putImageData(this.snapshot[0], 0, 0);
+    this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
+};
+
+Neo.Painter.prototype.setCurrent = function(item) {
+    var color = this._currentColor;
+    var mask = this._currentMask;
+    var width = this._currentWidth;
+    var type = this._currentMaskType;
+
+    item.push(color[0], color[1], color[2], color[3]);
+    item.push(mask[0], mask[1], mask[2]);
+    item.push(width);
+    item.push(type);
+};
+
+Neo.Painter.prototype.getCurrent = function(item) {
+    this._currentColor = [item[2], item[3], item[4], item[5]];
+    this._currentMask = [item[6], item[7], item[8]];
+    this._currentWidth = item[9];
+    this._currentMaskType = item[10];
+};
+
+Neo.Painter.prototype.isDirty = function() {
+    return this.dirty;
 };
 
 'use strict';
@@ -3653,7 +4106,8 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function(oe) {
     if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
-        oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
+        oe._actionMgr.freeHand(x0, y0, this.lineType);
+//      oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
     }
 
     if (oe.cursorRect) {
@@ -3689,7 +4143,8 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function(oe) {
     var y0 = Math.floor(oe.mouseY);
     var x1 = Math.floor(oe.prevMouseX);
     var y1 = Math.floor(oe.prevMouseY);
-    oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
+//  oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
+    oe._actionMgr.freeHandMove(x0, y0, x1, y1, this.lineType);
 
     if (oe.cursorRect) {
         var rect = oe.cursorRect;
@@ -3755,11 +4210,17 @@ Neo.DrawToolBase.prototype.lineUpHandler = function(oe) {
 
         oe._pushUndo();
         oe.prepareDrawing();
+        var x0 = Math.floor(oe.mouseX);
+        var y0 = Math.floor(oe.mouseY);
+        oe._actionMgr.line(x0, y0, this.startX, this.startY, this.lineType)
+        
+        /*
         var ctx = oe.canvasCtx[oe.current];
         var x0 = Math.floor(oe.mouseX);
         var y0 = Math.floor(oe.mouseY);
         oe.drawLine(ctx, x0, y0, this.startX, this.startY, this.lineType);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        */
     }
 };
 
@@ -3825,12 +4286,15 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
         this.y2 = Math.floor(oe.mouseY);
 
         oe._pushUndo();
-        oe.drawBezier(oe.canvasCtx[oe.current],
+        oe._actionMgr.bezier(this.x0, this.y0,this.x1, this.y1,
+                               this.x2, this.y2, this.x3, this.y3, this.lineType);
+        oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+        
+        /*oe.drawBezier(oe.canvasCtx[oe.current],
                       this.x0, this.y0, this.x1, this.y1,
                       this.x2, this.y2, this.x3, this.y3, this.lineType);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 
-        oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
         this.step = 0;
         break;
 
@@ -4200,8 +4664,12 @@ Neo.FillTool.prototype.isUpMove = false;
 Neo.FillTool.prototype.downHandler = function(oe) {
     var x = Math.floor(oe.mouseX);
     var y = Math.floor(oe.mouseY);
+    var layer = oe.current;
+    var color = oe.getColor();
+    
     oe._pushUndo();
-    oe.fill(x, y, oe.canvasCtx[oe.current]);
+    oe._actionMgr.floodFill(layer, x, y, color);
+    //oe.doFloodFill(layer, x, y, color);
 };
 
 Neo.FillTool.prototype.upHandler = function(oe) {
@@ -4228,10 +4696,11 @@ Neo.EraseAllTool.prototype.isUpMove = false;
 
 Neo.EraseAllTool.prototype.downHandler = function(oe) {
     oe._pushUndo();
-
-    oe.prepareDrawing();
+    oe._actionMgr.eraseAll();
+    
+    /*oe.prepareDrawing();
     oe.canvasCtx[oe.current].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 };
 
 Neo.EraseAllTool.prototype.upHandler = function(oe) {
@@ -4348,9 +4817,10 @@ Neo.EraseRectTool.prototype = new Neo.EffectToolBase();
 Neo.EraseRectTool.prototype.type = Neo.Painter.TOOLTYPE_ERASERECT;
 
 Neo.EraseRectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.eraseRect(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.eraseRect(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.eraseRect2(x, y, width, height);
 };
 
 /*
@@ -4364,9 +4834,10 @@ Neo.FlipHTool.prototype = new Neo.EffectToolBase();
 Neo.FlipHTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_H;
 
 Neo.FlipHTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.flipH(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.flipH(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.flipH(x, y, width, height);
 };
 
 /*
@@ -4380,9 +4851,10 @@ Neo.FlipVTool.prototype = new Neo.EffectToolBase();
 Neo.FlipVTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_V;
 
 Neo.FlipVTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.flipV(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.flipV(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.flipV(x, y, width, height);
 };
 
 /*
@@ -4396,9 +4868,10 @@ Neo.BlurRectTool.prototype = new Neo.EffectToolBase();
 Neo.BlurRectTool.prototype.type = Neo.Painter.TOOLTYPE_BLURRECT;
 
 Neo.BlurRectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.blurRect(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.blurRect(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.blurRect(x, y, width, height);
 };
 
 Neo.BlurRectTool.prototype.loadStates = function() {
@@ -4435,8 +4908,9 @@ Neo.TurnTool.prototype.upHandler = function(oe) {
 
     if (width > 0 && height > 0) {
         oe._pushUndo();
-        oe.turn(x, y, width, height);
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//      oe.turn(x, y, width, height);
+//      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe._actionMgr.turn(x, y, width, height);
     }
 };
 
@@ -4451,9 +4925,10 @@ Neo.MergeTool.prototype = new Neo.EffectToolBase();
 Neo.MergeTool.prototype.type = Neo.Painter.TOOLTYPE_MERGE;
 
 Neo.MergeTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.merge(ctx, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.merge(ctx, x, y, width, height);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.merge(x, y, width, height);
 };
 
 /*
@@ -4467,7 +4942,8 @@ Neo.CopyTool.prototype = new Neo.EffectToolBase();
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function(oe, x, y, width, height) {
-    oe.copy(x, y, width, height);
+//  oe.copy(oe.current, x, y, width, height);
+    oe._actionMgr.copy(x, y, width, height);
     oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
     oe.tool.x = x;
     oe.tool.y = y;
@@ -4494,8 +4970,11 @@ Neo.PasteTool.prototype.downHandler = function(oe) {
 Neo.PasteTool.prototype.upHandler = function(oe) {
     oe._pushUndo();
 
-    oe.paste(this.x, this.y, this.width, this.height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    var dx = oe.tempX;
+    var dy = oe.tempY;
+//  oe.paste(oe.current, this.x, this.y, this.width, this.height, dx, dy);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.paste(this.x, this.y, this.width, this.height, dx, dy);
 
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
 };
@@ -4546,9 +5025,10 @@ Neo.RectTool.prototype = new Neo.EffectToolBase();
 Neo.RectTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
 
 Neo.RectTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.rectMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4563,9 +5043,10 @@ Neo.RectFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECTFILL;
 
 Neo.RectFillTool.prototype.isFill = true;
 Neo.RectFillTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.rectFillMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectFillMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4579,9 +5060,10 @@ Neo.EllipseTool.prototype = new Neo.EffectToolBase();
 Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSE;
 Neo.EllipseTool.prototype.isEllipse = true;
 Neo.EllipseTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.ellipseMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4596,9 +5078,10 @@ Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
 Neo.EllipseFillTool.prototype.isEllipse = true;
 Neo.EllipseFillTool.prototype.isFill = true;
 Neo.EllipseFillTool.prototype.doEffect = function(oe, x, y, width, height) {
-    var ctx = oe.canvasCtx[oe.current];
-    oe.doFill(ctx, x, y, width, height, oe.ellipseFillMask);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+//  var ctx = oe.canvasCtx[oe.current];
+//  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseFillMask);
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe._actionMgr.fill(x, y, width, height, this.type);
 };
 
 /*
@@ -4645,10 +5128,23 @@ Neo.TextTool.prototype.keyDownHandler = function(e) {
 
         var oe = Neo.painter;
         var text = oe.inputText;
+
         if (text) {
             oe._pushUndo();
-            this.drawText(oe);
-            oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+            //this.drawText(oe);
+            //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+
+            var string = text.textContent || text.innerText;
+            var size = text.style.fontSize;
+            var family = text.style.fontFamily || "Arial";
+            var layer = oe.current;
+            var color = oe.getColor();
+            var alpha = oe.alpha;
+            var x = this.startX;
+            var y = this.startY;
+            //oe.doText(layer, this.startX, this.startY, color, string, size, family);
+            oe._actionMgr.text(this.startX, this.startY,
+                               color, alpha, string, size, family);
 
             text.style.display = "none";
             text.blur();
@@ -4660,19 +5156,23 @@ Neo.TextTool.prototype.kill = function(oe) {
     Neo.painter.hideInputText();
 };
 
+/*
 Neo.TextTool.prototype.drawText = function(oe) {
     var text = oe.inputText;
 
-    // unescape entities
-    //var tmp = document.createElement("textarea");
-    //tmp.innerHTML = text.innerHTML;
-    //var string = tmp.value;
-
     var string = text.textContent || text.innerText;
-    
-    if (string.length <= 0) return;
-    oe.doText(this.startX, this.startY, string, text.style.fontSize);
+    var size = text.style.fontSize;
+    var family = text.style.fontFamily || "Arial";
+    var layer = oe.current;
+    var color = oe.getColor();
+    var alpha = oe.alpha;
+    var x = this.startX;
+    var y = this.startY;
+    //oe.doText(layer, this.startX, this.startY, color, string, size, family);
+    oe._actionMgr.doText(layer, this.startX, this.startY,
+                         color, alpha, string, size, family);
 };
+*/
 
 Neo.TextTool.prototype.loadStates = function() {
     var reserve = this.getReserve();
@@ -4682,6 +5182,7 @@ Neo.TextTool.prototype.loadStates = function() {
         Neo.updateUI();
     };
 };
+
 
 /*
   -------------------------------------------------------------------------
@@ -4789,6 +5290,570 @@ Neo.CopyrightCommand.prototype.execute = function() {
         Neo.openURL(url);
     }
 };
+
+'use strict';
+
+
+Neo.ActionManager = function() {
+    this._items = [];
+    this._head = 0;
+}
+
+Neo.ActionManager.prototype.step = function() {
+    if (!Neo.animation) return;
+    
+    if (this._items.length > this._head) {
+        this._items.length = this._head;
+    }
+    this._items.push([]);
+    this._head++;
+}
+
+Neo.ActionManager.prototype.back = function() {
+    if (!Neo.animation) return;
+
+    if (this._head > 0) {
+        this._head--;
+    }
+}
+
+Neo.ActionManager.prototype.forward = function() {
+    if (!Neo.animation) return;
+
+    if (this._head < this._items.length) {
+        this._head++;
+    }
+}
+
+Neo.ActionManager.prototype.push = function() {
+    if (!Neo.animation) return;
+
+    var head = this._items[this._head - 1];
+    for (var i = 0; i < arguments.length; i++) {
+        head.push(arguments[i]);
+    }
+};
+
+Neo.ActionManager.prototype.pushCurrent = function() {
+    if (!Neo.animation) return;
+
+    var oe = Neo.painter;
+    var head = this._items[this._head - 1];
+
+    var color = oe._currentColor;
+    var mask = oe._currentMask;
+    var width = oe._currentWidth;
+    var type = oe._currentMaskType;
+
+    head.push(color[0], color[1], color[2], color[3]);
+    head.push(mask[0], mask[1], mask[2]);
+    head.push(width);
+    head.push(type);
+};
+
+Neo.ActionManager.prototype.getCurrent = function(item) {
+    var oe = Neo.painter;
+
+    oe._currentColor = [item[2], item[3], item[4], item[5]];
+    oe._currentMask = [item[6], item[7], item[8]];
+    oe._currentWidth = item[9];
+    oe._currentMaskType = item[10];
+};
+
+Neo.ActionManager.prototype.play = function(wait) {
+    if (!wait) wait = 0;
+    
+    if (this._head < this._items.length) {
+        var item = this._items[this._head];
+
+        if (!Neo.viewer) {
+            Neo.painter._pushUndo(0, 0,
+                                  Neo.painter.canvasWidth,
+                                  Neo.painter.canvasHeight,
+                                  true);
+        }
+
+        if (Neo.viewer) {
+            console.log("play", item[0], this._head, this._items.length);
+        }
+
+        if (item[0] != "restore") {
+            // sync
+            if (item[0] && this[item[0]]) {
+                (this[item[0]])(item);
+            }
+            this._head++;
+
+            setTimeout(function() {
+                Neo.painter._actionMgr.play(wait);
+            }, wait);
+
+        } else {
+            // async
+            if (item[0] && this[item[0]]) {
+                (this[item[0]])(item, function() {
+                    Neo.painter._actionMgr.play(wait);
+                });
+            }
+            this._head++;
+        }
+
+    } else {
+        Neo.painter.dirty = false;
+    }
+}
+
+
+/*
+-------------------------------------------------------------------------
+    Action
+-------------------------------------------------------------------------
+*/
+
+Neo.ActionManager.prototype.clearCanvas = function() {
+    if (typeof arguments[0] != "object") {
+        this.push('clearCanvas');
+    }
+    
+    var oe = Neo.painter;
+    oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.canvasCtx[1].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+}
+
+Neo.ActionManager.prototype.floodFill = function(layer, x, y, color) {
+    if (typeof layer != "object") {
+        this.push('floodFill', layer, x, y, color);
+
+    } else {
+        var item = layer;
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        color = item[4];
+    }
+
+    var oe = Neo.painter;
+    oe.doFloodFill(layer, x, y, color);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+}
+
+Neo.ActionManager.prototype.eraseAll = function() {
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
+    if (typeof arguments[0] != "object") {
+        this.push('eraseAll', layer);
+
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+    }
+
+    var oe = Neo.painter;
+    oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
+    if (arguments.length > 1) {
+        this.push('freeHand', layer);
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x0, y0);
+        
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
+
+    } else {
+        var item = arguments[0];
+        var length = item.length;
+        
+        layer = item[1];
+        this.getCurrent(item);
+
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        var x1, y1;
+
+        for (var i = 14; i + 1 < length; i += 2) {
+            x1 = x0;
+            y1 = y0;
+            x0 = item[i + 0]
+            y0 = item[i + 1]
+            oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        }
+        oe.prevLine = null;
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }
+}
+
+Neo.ActionManager.prototype.freeHandMove = function(x0, y0, x1, y1, lineType) {
+    if (arguments.length > 1) {
+        var oe = Neo.painter;
+        var layer = oe.current;
+        var head = this._items[this._head - 1];
+        if (head && head.length == 0) {
+            this.push('freeHand', layer);
+            this.pushCurrent();
+            this.push(lineType, x1, y1, x0, y0);
+
+        } else if (Neo.animation) {
+            head.push(x0, y0);
+
+            // 記録漏れがないか確認
+            var x = head[head.length - 4]
+            var y = head[head.length - 3]
+            if (x1 != head[head.length - 4] ||
+                y1 != head[head.length - 3] ||
+                lineType != head[11]) {
+                console.log('eror in freeHandMove?', x, y, lineType, head)
+            }
+        }
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        
+    } else {
+        console.log('error in freeHandMove: called from recorder', head);
+    }
+}
+
+Neo.ActionManager.prototype.line = function(
+    x0, y0,
+    x1, y1,
+    lineType)
+{
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('line', layer);
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x1, y1);
+
+    } else {
+        var item = arguments[0];
+
+        layer = item[1];
+        this.getCurrent(item);
+
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        x1 = item[14];
+        y1 = item[15];
+    }
+    oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.bezier = function(
+    x0, y0,
+    x1, y1,
+    x2, y2,
+    x3, y3,
+    lineType)
+{
+    var oe = Neo.painter;
+    var layer = oe.current;
+    var isReplay = true;
+    
+    if (arguments.length > 1) {
+        this.push('bezier', layer)
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x1, y1, x2, y2, x3, y3);
+        isReplay = false;
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        this.getCurrent(item);
+        
+        lineType = item[11];
+        x0 = item[12];
+        y0 = item[13];
+        x1 = item[14];
+        y1 = item[15];
+        x2 = item[16];
+        y2 = item[17];
+        x3 = item[18];
+        y3 = item[19];
+    }
+    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType, isReplay);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('fill', layer);
+        this.pushCurrent();
+        this.push(x, y, width, height, type);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        this.getCurrent(item);
+        
+        x = item[11];
+        y = item[12];
+        width = item[13];
+        height = item[14];
+        type = item[15];
+    }
+    oe.doFill(layer, x, y, width, height, type);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.flipH = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('flipH', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.flipH(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.flipV = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
+    if (arguments.length > 1) {
+        this.push('flipV', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.flipV(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.merge = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('merge', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.merge(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('blurRect', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.blurRect(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.eraseRect2 = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('eraseRect2', layer);
+        this.pushCurrent();
+        this.push(x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        this.getCurrent(item);
+        
+        x = item[11];
+        y = item[12];
+        width = item[13];
+        height = item[14];
+    }
+    oe.eraseRect(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.eraseRect = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('eraseRect', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.eraseRect(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.copy = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('copy', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+
+    oe.copy(layer, x, y, width, height);
+    oe.tool.x = x;
+    oe.tool.y = y;
+    oe.tool.width = width;
+    oe.tool.height = height;
+//  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.paste = function(x, y, width, height, dx, dy) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('paste', layer, x, y, width, height, dx, dy);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+        dx = item[6];
+        dy = item[7];
+    }
+
+    oe.paste(layer, x, y, width, height, dx, dy);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.turn = function(x, y, width, height) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (arguments.length > 1) {
+        this.push('turn', layer, x, y, width, height);
+        
+    } else {
+        var item = arguments[0];
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        width = item[4];
+        height = item[5];
+    }
+    oe.turn(layer, x, y, width, height);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.text = function(
+    x, y,
+    color,
+    alpha,
+    string,
+    size,
+    family)
+{
+    var oe = Neo.painter;
+    var layer = oe.current;
+    
+    if (arguments.length > 1) {
+        this.push('text', layer, x, y, color, alpha, string, size, family);
+
+    } else {
+        var item = arguments[0];
+        
+        layer = item[1];
+        x = item[2];
+        y = item[3];
+        color = item[4];
+        alpha = item[5];
+        string = item[6];
+        size = item[7];
+        family = item[8];
+    }
+    oe.doText(layer, x, y, color, alpha, string, size, family);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+}
+
+Neo.ActionManager.prototype.restore = function() {
+    var oe = Neo.painter;
+    var width = oe.canvasWidth;
+    var height = oe.canvasHeight;
+    
+    if (arguments.length == 0) {
+        this.push('restore');
+
+        var img0 = oe.canvas[0].toDataURL('image/png');
+        var img1 = oe.canvas[1].toDataURL('image/png');
+        this.push(img0, img1);
+        
+    } else {
+        var item = arguments[0];
+        var callback = arguments[1];
+
+        var img0 = new Image();
+        img0.src = item[1];
+        img0.onload = function() {
+            var img1 = new Image();
+            img1.src = item[2];
+            img1.onload = function() {
+                oe.canvasCtx[0].clearRect(0, 0, width, height);
+                oe.canvasCtx[1].clearRect(0, 0, width, height);
+                oe.canvasCtx[0].drawImage(img0, 0, 0);
+                oe.canvasCtx[1].drawImage(img1, 0, 0);
+                oe.updateDestCanvas(0, 0, width, height);
+
+                if (callback) callback();
+            }
+        }
+    }
+}
 
 'use strict';
 
@@ -6055,3 +7120,510 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
     }
 };
 
+
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function() {
+
+// private property
+var f = String.fromCharCode;
+var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+var baseReverseDic = {};
+
+function getBaseValue(alphabet, character) {
+  if (!baseReverseDic[alphabet]) {
+    baseReverseDic[alphabet] = {};
+    for (var i=0 ; i<alphabet.length ; i++) {
+      baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+    }
+  }
+  return baseReverseDic[alphabet][character];
+}
+
+var LZString = {
+  compressToBase64 : function (input) {
+    if (input == null) return "";
+    var res = LZString._compress(input, 6, function(a){return keyStrBase64.charAt(a);});
+    switch (res.length % 4) { // To produce valid Base64
+    default: // When could this happen ?
+    case 0 : return res;
+    case 1 : return res+"===";
+    case 2 : return res+"==";
+    case 3 : return res+"=";
+    }
+  },
+
+  decompressFromBase64 : function (input) {
+    if (input == null) return "";
+    if (input == "") return null;
+    return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+  },
+
+  compressToUTF16 : function (input) {
+    if (input == null) return "";
+    return LZString._compress(input, 15, function(a){return f(a+32);}) + " ";
+  },
+
+  decompressFromUTF16: function (compressed) {
+    if (compressed == null) return "";
+    if (compressed == "") return null;
+    return LZString._decompress(compressed.length, 16384, function(index) { return compressed.charCodeAt(index) - 32; });
+  },
+
+  //compress into uint8array (UCS-2 big endian format)
+  compressToUint8Array: function (uncompressed) {
+    var compressed = LZString.compress(uncompressed);
+    var buf=new Uint8Array(compressed.length*2); // 2 bytes per character
+
+    for (var i=0, TotalLen=compressed.length; i<TotalLen; i++) {
+      var current_value = compressed.charCodeAt(i);
+      buf[i*2] = current_value >>> 8;
+      buf[i*2+1] = current_value % 256;
+    }
+    return buf;
+  },
+
+  //decompress from uint8array (UCS-2 big endian format)
+  decompressFromUint8Array:function (compressed) {
+    if (compressed===null || compressed===undefined){
+        return LZString.decompress(compressed);
+    } else {
+        var buf=new Array(compressed.length/2); // 2 bytes per character
+        for (var i=0, TotalLen=buf.length; i<TotalLen; i++) {
+          buf[i]=compressed[i*2]*256+compressed[i*2+1];
+        }
+
+        var result = [];
+        buf.forEach(function (c) {
+          result.push(f(c));
+        });
+        return LZString.decompress(result.join(''));
+
+    }
+
+  },
+
+
+  //compress into a string that is already URI encoded
+  compressToEncodedURIComponent: function (input) {
+    if (input == null) return "";
+    return LZString._compress(input, 6, function(a){return keyStrUriSafe.charAt(a);});
+  },
+
+  //decompress from an output of compressToEncodedURIComponent
+  decompressFromEncodedURIComponent:function (input) {
+    if (input == null) return "";
+    if (input == "") return null;
+    input = input.replace(/ /g, "+");
+    return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+  },
+
+  compress: function (uncompressed) {
+    return LZString._compress(uncompressed, 16, function(a){return f(a);});
+  },
+  _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+    if (uncompressed == null) return "";
+    var i, value,
+        context_dictionary= {},
+        context_dictionaryToCreate= {},
+        context_c="",
+        context_wc="",
+        context_w="",
+        context_enlargeIn= 2, // Compensate for the first entry which should not count
+        context_dictSize= 3,
+        context_numBits= 2,
+        context_data=[],
+        context_data_val=0,
+        context_data_position=0,
+        ii;
+
+    for (ii = 0; ii < uncompressed.length; ii += 1) {
+      context_c = uncompressed.charAt(ii);
+      if (!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)) {
+        context_dictionary[context_c] = context_dictSize++;
+        context_dictionaryToCreate[context_c] = true;
+      }
+
+      context_wc = context_w + context_c;
+      if (Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)) {
+        context_w = context_wc;
+      } else {
+        if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+          if (context_w.charCodeAt(0)<256) {
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<8 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          } else {
+            value = 1;
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1) | value;
+              if (context_data_position ==bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = 0;
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<16 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn == 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          delete context_dictionaryToCreate[context_w];
+        } else {
+          value = context_dictionary[context_w];
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+
+
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        // Add wc to the dictionary.
+        context_dictionary[context_wc] = context_dictSize++;
+        context_w = String(context_c);
+      }
+    }
+
+    // Output the code for w.
+    if (context_w !== "") {
+      if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+        if (context_w.charCodeAt(0)<256) {
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<8 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        } else {
+          value = 1;
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | value;
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = 0;
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<16 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        delete context_dictionaryToCreate[context_w];
+      } else {
+        value = context_dictionary[context_w];
+        for (i=0 ; i<context_numBits ; i++) {
+          context_data_val = (context_data_val << 1) | (value&1);
+          if (context_data_position == bitsPerChar-1) {
+            context_data_position = 0;
+            context_data.push(getCharFromInt(context_data_val));
+            context_data_val = 0;
+          } else {
+            context_data_position++;
+          }
+          value = value >> 1;
+        }
+
+
+      }
+      context_enlargeIn--;
+      if (context_enlargeIn == 0) {
+        context_enlargeIn = Math.pow(2, context_numBits);
+        context_numBits++;
+      }
+    }
+
+    // Mark the end of the stream
+    value = 2;
+    for (i=0 ; i<context_numBits ; i++) {
+      context_data_val = (context_data_val << 1) | (value&1);
+      if (context_data_position == bitsPerChar-1) {
+        context_data_position = 0;
+        context_data.push(getCharFromInt(context_data_val));
+        context_data_val = 0;
+      } else {
+        context_data_position++;
+      }
+      value = value >> 1;
+    }
+
+    // Flush the last char
+    while (true) {
+      context_data_val = (context_data_val << 1);
+      if (context_data_position == bitsPerChar-1) {
+        context_data.push(getCharFromInt(context_data_val));
+        break;
+      }
+      else context_data_position++;
+    }
+    return context_data.join('');
+  },
+
+  decompress: function (compressed) {
+    if (compressed == null) return "";
+    if (compressed == "") return null;
+    return LZString._decompress(compressed.length, 32768, function(index) { return compressed.charCodeAt(index); });
+  },
+
+  _decompress: function (length, resetValue, getNextValue) {
+    var dictionary = [],
+        next,
+        enlargeIn = 4,
+        dictSize = 4,
+        numBits = 3,
+        entry = "",
+        result = [],
+        i,
+        w,
+        bits, resb, maxpower, power,
+        c,
+        data = {val:getNextValue(0), position:resetValue, index:1};
+
+    for (i = 0; i < 3; i += 1) {
+      dictionary[i] = i;
+    }
+
+    bits = 0;
+    maxpower = Math.pow(2,2);
+    power=1;
+    while (power!=maxpower) {
+      resb = data.val & data.position;
+      data.position >>= 1;
+      if (data.position == 0) {
+        data.position = resetValue;
+        data.val = getNextValue(data.index++);
+      }
+      bits |= (resb>0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+
+    switch (next = bits) {
+      case 0:
+          bits = 0;
+          maxpower = Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 1:
+          bits = 0;
+          maxpower = Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 2:
+        return "";
+    }
+    dictionary[3] = c;
+    w = c;
+    result.push(c);
+    while (true) {
+      if (data.index > length) {
+        return "";
+      }
+
+      bits = 0;
+      maxpower = Math.pow(2,numBits);
+      power=1;
+      while (power!=maxpower) {
+        resb = data.val & data.position;
+        data.position >>= 1;
+        if (data.position == 0) {
+          data.position = resetValue;
+          data.val = getNextValue(data.index++);
+        }
+        bits |= (resb>0 ? 1 : 0) * power;
+        power <<= 1;
+      }
+
+      switch (c = bits) {
+        case 0:
+          bits = 0;
+          maxpower = Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 1:
+          bits = 0;
+          maxpower = Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 2:
+          return result.join('');
+      }
+
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+
+      if (dictionary[c]) {
+        entry = dictionary[c];
+      } else {
+        if (c === dictSize) {
+          entry = w + w.charAt(0);
+        } else {
+          return null;
+        }
+      }
+      result.push(entry);
+
+      // Add w+entry[0] to the dictionary.
+      dictionary[dictSize++] = w + entry.charAt(0);
+      enlargeIn--;
+
+      w = entry;
+
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+
+    }
+  }
+};
+  return LZString;
+})();
+
+if (typeof define === 'function' && define.amd) {
+  define(function () { return LZString; });
+} else if( typeof module !== 'undefined' && module != null ) {
+  module.exports = LZString
+} else if( typeof angular !== 'undefined' && angular != null ) {
+  angular.module('LZString', [])
+  .factory('LZString', function () {
+    return LZString;
+  });
+}

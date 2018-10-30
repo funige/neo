@@ -264,11 +264,13 @@ Neo.ActionManager.prototype.bezier = function(
 {
     var oe = Neo.painter;
     var layer = oe.current;
-
+    var isReplay = true;
+    
     if (arguments.length > 1) {
         this.push('bezier', layer)
         this.pushCurrent();
         this.push(lineType, x0, y0, x1, y1, x2, y2, x3, y3);
+        isReplay = false;
         
     } else {
         var item = arguments[0];
@@ -285,7 +287,7 @@ Neo.ActionManager.prototype.bezier = function(
         x3 = item[18];
         y3 = item[19];
     }
-    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType);
+    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType, isReplay);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 

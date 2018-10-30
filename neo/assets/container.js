@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.8";
+Neo.version = "1.4.9";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -511,10 +511,7 @@ Neo.initButtons = function() {
 };
 
 Neo.start = function(isApp) {
-    if (!Neo.painter) {
-//      Neo.startViewer(isApp);
-        return;
-    }
+    if (!Neo.painter) return;
 
     Neo.initSkin();
     Neo.initComponents();
@@ -998,18 +995,18 @@ Neo.createViewer = function(applet) {
 </div>
 </div>
 
-<div style="backgrond-color: red; padding:5px;">
+
 <div id="viewerButtons">
-<div id="viewerPlay" class="buttonOff">...</div>
-<div id="viewerStop" class="buttonOff">...</div>
+<div id="viewerPlay" class="buttonOff"></div>
+<div id="viewerStop" class="buttonOff"></div>
 
-<div id="viewerRewind" class="buttonOff">...</div>
-<div id="viewerSpeed" class="buttonOff">...</div>
-<div id="viewerZoomPlus" class="buttonOff">+</div>
-<div id="viewerZoomMinus" class="buttonOff">-</div>
-<div id="viewerBar" class="buttonOff" style="display:inline-block; width: 30%;">...</div>
+<div id="viewerRewind" class="buttonOff"></div>
+<div id="viewerSpeed" class="buttonOff" style="padding-left:2px;">既</div>
+<div id="viewerZoomPlus" class="buttonOff"></div>
+<div id="viewerZoomMinus" class="buttonOff"></div>
+<div id="viewerBar" class="buttonOff" style="display:inline-block;"></div>
 
-</div></div>
+</div>
 
 </div>
 </div>
@@ -1059,7 +1056,12 @@ Neo.initViewer = function(pch) {
     painter.style.bottom = (dy + 26) + "px";
     painter.style.left = (dx) + "px";
 
-
+    var viewerButtons = document.getElementById("viewerButtons");
+    viewerButtons.style.width = (pageWidth - 2) + "px";
+    
+    var viewerBar = document.getElementById("viewerBar");
+    viewerBar.style.width = (pageWidth - (24 * 6) - 6) + "px"; 
+    
     Neo.canvas.style.width = Neo.config.width + "px";
     Neo.canvas.style.height = Neo.config.height + "px";
     
@@ -1071,12 +1073,12 @@ Neo.initViewer = function(pch) {
     if (pch) {//Neo.config.pch_file) {
         Neo.painter._actionMgr._items = pch.data;
         Neo.painter._actionMgr.play(10);
-//      Neo.painter.loadAnimation(Neo.config.pch_file, 10)
-    }        
+    }
 };
 
 Neo.startViewer = function() {
     console.log("start viewer...");
+
     new Neo.Button().init("viewerPlay").onmouseup = function() {
         console.log("init viewerPlay");
     };

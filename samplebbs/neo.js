@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.8";
+Neo.version = "1.4.9";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -511,10 +511,7 @@ Neo.initButtons = function() {
 };
 
 Neo.start = function(isApp) {
-    if (!Neo.painter) {
-//      Neo.startViewer(isApp);
-        return;
-    }
+    if (!Neo.painter) return;
 
     Neo.initSkin();
     Neo.initComponents();
@@ -998,18 +995,18 @@ Neo.createViewer = function(applet) {
 </div>
 </div>
 
-<div style="backgrond-color: red; padding:5px;">
+
 <div id="viewerButtons">
-<div id="viewerPlay" class="buttonOff">...</div>
-<div id="viewerStop" class="buttonOff">...</div>
+<div id="viewerPlay" class="buttonOff"></div>
+<div id="viewerStop" class="buttonOff"></div>
 
-<div id="viewerRewind" class="buttonOff">...</div>
-<div id="viewerSpeed" class="buttonOff">...</div>
-<div id="viewerZoomPlus" class="buttonOff">+</div>
-<div id="viewerZoomMinus" class="buttonOff">-</div>
-<div id="viewerBar" class="buttonOff" style="display:inline-block; width: 30%;">...</div>
+<div id="viewerRewind" class="buttonOff"></div>
+<div id="viewerSpeed" class="buttonOff" style="padding-left:2px;">既</div>
+<div id="viewerZoomPlus" class="buttonOff"></div>
+<div id="viewerZoomMinus" class="buttonOff"></div>
+<div id="viewerBar" class="buttonOff" style="display:inline-block;"></div>
 
-</div></div>
+</div>
 
 </div>
 </div>
@@ -1059,7 +1056,12 @@ Neo.initViewer = function(pch) {
     painter.style.bottom = (dy + 26) + "px";
     painter.style.left = (dx) + "px";
 
-
+    var viewerButtons = document.getElementById("viewerButtons");
+    viewerButtons.style.width = (pageWidth - 2) + "px";
+    
+    var viewerBar = document.getElementById("viewerBar");
+    viewerBar.style.width = (pageWidth - (24 * 6) - 6) + "px"; 
+    
     Neo.canvas.style.width = Neo.config.width + "px";
     Neo.canvas.style.height = Neo.config.height + "px";
     
@@ -1071,12 +1073,12 @@ Neo.initViewer = function(pch) {
     if (pch) {//Neo.config.pch_file) {
         Neo.painter._actionMgr._items = pch.data;
         Neo.painter._actionMgr.play(10);
-//      Neo.painter.loadAnimation(Neo.config.pch_file, 10)
-    }        
+    }
 };
 
 Neo.startViewer = function() {
     console.log("start viewer...");
+
     new Neo.Button().init("viewerPlay").onmouseup = function() {
         console.log("init viewerPlay");
     };
@@ -1584,26 +1586,28 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     var ref = this;
 
-    var container = document.getElementById("container");
+    if (!Neo.viewer) {
+        var container = document.getElementById("container");
 
-    container.onmousedown = function(e) {ref._mouseDownHandler(e)};
-    container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
-    container.onmouseup = function(e) {ref._mouseUpHandler(e)};
-    container.onmouseover = function(e) {ref._rollOverHandler(e)};
-    container.onmouseout = function(e) {ref._rollOutHandler(e)};
-    container.addEventListener("touchstart", function(e) {
-        ref._mouseDownHandler(e);
-    }, false);
-    container.addEventListener("touchmove", function(e) {
-        ref._mouseMoveHandler(e);
-    }, false);
-    container.addEventListener("touchend", function(e) {
-        ref._mouseUpHandler(e);
-    }, false);
+        container.onmousedown = function(e) {ref._mouseDownHandler(e)};
+        container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
+        container.onmouseup = function(e) {ref._mouseUpHandler(e)};
+        container.onmouseover = function(e) {ref._rollOverHandler(e)};
+        container.onmouseout = function(e) {ref._rollOutHandler(e)};
+        container.addEventListener("touchstart", function(e) {
+            ref._mouseDownHandler(e);
+        }, false);
+        container.addEventListener("touchmove", function(e) {
+            ref._mouseMoveHandler(e);
+        }, false);
+        container.addEventListener("touchend", function(e) {
+            ref._mouseUpHandler(e);
+        }, false);
 
-    document.onkeydown = function(e) {ref._keyDownHandler(e)};
-    document.onkeyup = function(e) {ref._keyUpHandler(e)};
-
+        document.onkeydown = function(e) {ref._keyDownHandler(e)};
+        document.onkeyup = function(e) {ref._keyUpHandler(e)};
+    }
+    
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
@@ -2909,16 +2913,19 @@ Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y
 
 var nmax = 1;
 
-Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
+Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type, isReplay) {
     var xmax = Math.max(x0, x1, x2, x3);
     var xmin = Math.min(x0, x1, x2, x3);
     var ymax = Math.max(y0, y1, y2, y3);
     var ymin = Math.min(y0, y1, y2, y3);
     var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 2.5);
 
-    if (n > nmax) {
-        n = (n < nmax * 2) ? n : nmax * 2;
-        nmax = n;
+    // 最初にベジェを使う時ここで処理落ちするため
+    if (!isReplay) {
+        if (n > nmax) {
+            n = (n < nmax * 2) ? n : nmax * 2;
+            nmax = n;
+        }
     }
 
     for (var i = 0; i < n; i++) {
@@ -5550,11 +5557,13 @@ Neo.ActionManager.prototype.bezier = function(
 {
     var oe = Neo.painter;
     var layer = oe.current;
-
+    var isReplay = true;
+    
     if (arguments.length > 1) {
         this.push('bezier', layer)
         this.pushCurrent();
         this.push(lineType, x0, y0, x1, y1, x2, y2, x3, y3);
+        isReplay = false;
         
     } else {
         var item = arguments[0];
@@ -5571,7 +5580,7 @@ Neo.ActionManager.prototype.bezier = function(
         x3 = item[18];
         y3 = item[19];
     }
-    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType);
+    oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType, isReplay);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 }
 

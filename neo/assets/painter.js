@@ -259,26 +259,28 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
 
     var ref = this;
 
-    var container = document.getElementById("container");
+    if (!Neo.viewer) {
+        var container = document.getElementById("container");
 
-    container.onmousedown = function(e) {ref._mouseDownHandler(e)};
-    container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
-    container.onmouseup = function(e) {ref._mouseUpHandler(e)};
-    container.onmouseover = function(e) {ref._rollOverHandler(e)};
-    container.onmouseout = function(e) {ref._rollOutHandler(e)};
-    container.addEventListener("touchstart", function(e) {
-        ref._mouseDownHandler(e);
-    }, false);
-    container.addEventListener("touchmove", function(e) {
-        ref._mouseMoveHandler(e);
-    }, false);
-    container.addEventListener("touchend", function(e) {
-        ref._mouseUpHandler(e);
-    }, false);
+        container.onmousedown = function(e) {ref._mouseDownHandler(e)};
+        container.onmousemove = function(e) {ref._mouseMoveHandler(e)};
+        container.onmouseup = function(e) {ref._mouseUpHandler(e)};
+        container.onmouseover = function(e) {ref._rollOverHandler(e)};
+        container.onmouseout = function(e) {ref._rollOutHandler(e)};
+        container.addEventListener("touchstart", function(e) {
+            ref._mouseDownHandler(e);
+        }, false);
+        container.addEventListener("touchmove", function(e) {
+            ref._mouseMoveHandler(e);
+        }, false);
+        container.addEventListener("touchend", function(e) {
+            ref._mouseUpHandler(e);
+        }, false);
 
-    document.onkeydown = function(e) {ref._keyDownHandler(e)};
-    document.onkeyup = function(e) {ref._keyUpHandler(e)};
-
+        document.onkeydown = function(e) {ref._keyDownHandler(e)};
+        document.onkeyup = function(e) {ref._keyUpHandler(e)};
+    }
+    
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
@@ -1584,16 +1586,19 @@ Neo.Painter.prototype.getBezierPoint = function(t, x0, y0, x1, y1, x2, y2, x3, y
 
 var nmax = 1;
 
-Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type) {
+Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type, isReplay) {
     var xmax = Math.max(x0, x1, x2, x3);
     var xmin = Math.min(x0, x1, x2, x3);
     var ymax = Math.max(y0, y1, y2, y3);
     var ymin = Math.min(y0, y1, y2, y3);
     var n = Math.ceil(((xmax - xmin) + (ymax - ymin)) * 2.5);
 
-    if (n > nmax) {
-        n = (n < nmax * 2) ? n : nmax * 2;
-        nmax = n;
+    // 最初にベジェを使う時ここで処理落ちするため
+    if (!isReplay) {
+        if (n > nmax) {
+            n = (n < nmax * 2) ? n : nmax * 2;
+            nmax = n;
+        }
     }
 
     for (var i = 0; i < n; i++) {
