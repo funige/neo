@@ -372,7 +372,8 @@ Neo.DrawToolBase.prototype.bezierDownHandler = function(oe) {
 Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
     if (this.isUpMove == false) {
         this.isUpMove = true;
-    }
+
+    } else return; // 枠外からベジェを開始したときdownを通らずにupが呼ばれてエラーになる
 
     this.step++;
     switch (this.step) {

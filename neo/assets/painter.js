@@ -79,6 +79,7 @@ Neo.Painter.LINETYPE_BRUSH = 3;
 Neo.Painter.LINETYPE_TONE = 4;
 Neo.Painter.LINETYPE_DODGE = 5;
 Neo.Painter.LINETYPE_BURN = 6;
+Neo.Painter.LINETYPE_BLUR = 7;
 
 Neo.Painter.MASKTYPE_NONE = 0;
 Neo.Painter.MASKTYPE_NORMAL = 1;

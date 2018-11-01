@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.9";
+Neo.version = "1.4.10";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1406,6 +1406,7 @@ Neo.Painter.LINETYPE_BRUSH = 3;
 Neo.Painter.LINETYPE_TONE = 4;
 Neo.Painter.LINETYPE_DODGE = 5;
 Neo.Painter.LINETYPE_BURN = 6;
+Neo.Painter.LINETYPE_BLUR = 7;
 
 Neo.Painter.MASKTYPE_NONE = 0;
 Neo.Painter.MASKTYPE_NORMAL = 1;
@@ -4266,7 +4267,8 @@ Neo.DrawToolBase.prototype.bezierDownHandler = function(oe) {
 Neo.DrawToolBase.prototype.bezierUpHandler = function(oe) {
     if (this.isUpMove == false) {
         this.isUpMove = true;
-    }
+
+    } else return; // 枠外からベジェを開始したときdownを通らずにupが呼ばれてエラーになる
 
     this.step++;
     switch (this.step) {
