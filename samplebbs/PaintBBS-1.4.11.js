@@ -3,14 +3,14 @@
 document.addEventListener("DOMContentLoaded", function() {
     Neo.init();
 
-    if (!navigator.userAgent.match("Electron") && !Neo.viewer) {
+    if (!navigator.userAgent.match("Electron")) {
         Neo.start();
     }
 });
 
 var Neo = function() {};
 
-Neo.version = "1.4.10";
+Neo.version = "1.4.11";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -54,16 +54,18 @@ Neo.init = function() {
 
         if (name == "paintbbs" || name == "pch") {
             Neo.applet = applet;
-            Neo.initConfig(applet);
 
             if (name == "paintbbs") {
+                Neo.initConfig(applet);
                 Neo.createContainer(applet);
                 Neo.init2();
 
             } else {
+                Neo.viewer = true;
+                Neo.initConfig(applet);
+                
                 var pch = Neo.getPCH(function(pch) {
                     if (pch) {
-                        Neo.viewer = true;
                         Neo.createViewer(applet);
                         Neo.config.width = pch.width;
                         Neo.config.height = pch.height;
@@ -150,6 +152,10 @@ Neo.initConfig = function(applet) {
         var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
         Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
 
+        if (Neo.viewer && !Neo.config.color_bar) {
+            Neo.config.color_bar = "#ddddff";
+        }
+
         Neo.readStyles();
         Neo.applyStyle("color_bk", "#ccccff");
         Neo.applyStyle("color_bk2", "#bbbbff");
@@ -164,6 +170,12 @@ Neo.initConfig = function(applet) {
         Neo.applyStyle("tool_color_bar", "#ddddff");
         Neo.applyStyle("tool_color_frame", "#000000");
 
+        // viewer用
+        if (Neo.viewer) {
+            Neo.applyStyle("color_back", "#ccccff");
+            Neo.applyStyle("color_bar_select", "#407675");
+        }
+        
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
         if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
@@ -199,16 +211,18 @@ Neo.fixConfig = function(value) {
     return value;
 };
 
-Neo.initSkin = function() {
+Neo.getStyleSheet = function() {
     var sheet = document.styleSheets[0];
     if (!sheet) {
         var style = document.createElement("style");
         document.head.appendChild(style); // must append before you can access sheet property
         sheet = style.sheet;
     }
+    return sheet;
+};
 
-    Neo.styleSheet = sheet;
-
+Neo.initSkin = function() {
+    Neo.styleSheet = Neo.getStyleSheet();
     var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
     var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
     var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
@@ -511,7 +525,10 @@ Neo.initButtons = function() {
 };
 
 Neo.start = function(isApp) {
-    if (!Neo.painter) return;
+    if (Neo.viewer) {
+        Neo.startViewer();
+        return;
+    }
 
     Neo.initSkin();
     Neo.initComponents();
@@ -779,8 +796,10 @@ Neo.submit = function(board, blob, thumbnail, thumbnail2) {
     request.open("POST", url, true);
     
     request.onload = function(e) {
-        console.log(request.response);
-        Neo.uploaded = true;
+        console.log(request.response, 'status=', request.status);
+        if (request.status / 100 == 2) {
+            Neo.uploaded = true;
+        }
 
         var url = Neo.config.url_exit;
         if (url[0] == '/') {
@@ -996,16 +1015,19 @@ Neo.createViewer = function(applet) {
 </div>
 
 
-<div id="viewerButtons" style="display:none;">
-<div id="viewerPlay" class="buttonOff"></div>
-<div id="viewerStop" class="buttonOff"></div>
+<div id="viewerButtonsWrapper" style="display:block;">
+<div id="viewerButtons" style="display:block;">
 
-<div id="viewerRewind" class="buttonOff"></div>
-<div id="viewerSpeed" class="buttonOff" style="padding-left:2px;">既</div>
-<div id="viewerZoomPlus" class="buttonOff"></div>
-<div id="viewerZoomMinus" class="buttonOff"></div>
-<div id="viewerBar" class="buttonOff" style="display:inline-block;"></div>
+<div id="viewerPlay"></div>
+<div id="viewerStop"></div>
+<div id="viewerRewind"></div>
+<div id="viewerSpeed" style="padding-left:2px;"></div>
+<div id="viewerPlus"></div>
+<div id="viewerMinus"></div>
 
+<div id="viewerBar" style="display:inline-block;">
+  <div style="width:calc(30% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
+</div>
 </div>
 
 </div>
@@ -1056,11 +1078,14 @@ Neo.initViewer = function(pch) {
     painter.style.bottom = (dy + 26) + "px";
     painter.style.left = (dx) + "px";
 
-    var viewerButtons = document.getElementById("viewerButtons");
-    viewerButtons.style.width = (pageWidth - 2) + "px";
+    var viewerButtonsWrapper = document.getElementById("viewerButtonsWrapper");
+    viewerButtonsWrapper.style.width = (pageWidth - 2) + "px";
     
     var viewerBar = document.getElementById("viewerBar");
-    viewerBar.style.width = (pageWidth - (24 * 6) - 6) + "px"; 
+    viewerBar.style.position = "absolute";
+    viewerBar.style.right = "2px";
+    viewerBar.style.top = "1px";
+    viewerBar.style.width = (pageWidth - (24 * 6) - 2) + "px"; 
     
     Neo.canvas.style.width = Neo.config.width + "px";
     Neo.canvas.style.height = Neo.config.height + "px";
@@ -1077,20 +1102,39 @@ Neo.initViewer = function(pch) {
 };
 
 Neo.startViewer = function() {
-    console.log("start viewer...");
+    Neo.styleSheet = Neo.getStyleSheet();
+    var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
+    var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
+    
+    Neo.addRule(".NEO #viewerButtons", "color", Neo.config.color_text);
+    Neo.addRule(".NEO #viewerButtons", "background-color", Neo.config.color_back);
 
-    new Neo.Button().init("viewerPlay").onmouseup = function() {
-        console.log("init viewerPlay");
-    };
-    new Neo.Button().init("viewerStop").onmouseup = function() {
-        console.log("init viewerStop");
-    };
-    new Neo.Button().init("viewerRewind").onmouseup = function() {
-        console.log("init viewerRewind");
-    };
-    new Neo.Button().init("viewerSpeed").onmouseup = function() {
-        console.log("init viewerSpeed");
-    };
+    Neo.addRule(".NEO #viewerButtonsWrapper", "border", "1px solid " + Neo.config.color_frame + " !important");
+
+    Neo.addRule(".NEO #viewerButtons", "border", "1px solid " + Neo.config.color_back + " !important");
+    Neo.addRule(".NEO #viewerButtons", "border-left", "1px solid " + lightBack + " !important");
+    Neo.addRule(".NEO #viewerButtons", "border-top", "1px solid " + lightBack + " !important");
+
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff", "background-color", Neo.config.color_icon + " !important");
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "background-color", darkBack + " !important");
+
+    Neo.addRule(".NEO #viewerButtons >div", "border", "1px solid " + Neo.config.color_frame + " !important");
+    
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff:hover", "border", "1px solid" + Neo.config.color_bar_select + " !important");
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "border", "1px solid" + Neo.config.color_bar_select + " !important");
+
+    Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar + " !important");
+
+    setTimeout(function () {
+        new Neo.ViewerButton().init("viewerPlay");
+        new Neo.ViewerButton().init("viewerStop");
+        new Neo.ViewerButton().init("viewerRewind").onmouseup = function() {
+            console.log("whehehe;");
+        };
+        new Neo.ViewerButton().init("viewerSpeed");
+        new Neo.ViewerButton().init("viewerPlus");
+        new Neo.ViewerButton().init("viewerMinus");
+    }, 100);
 };
 
 Neo.getFilename = function() {
@@ -1147,6 +1191,25 @@ Neo.fixPCH = function(items) {
     }
     return items;
 };
+
+Neo.tintImage = function(ctx, c) {
+    c = (Neo.painter.getColor(c) & 0xffffff);
+    
+    var imageData = ctx.getImageData(0, 0, 46, 18);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+
+    for (var i = 0; i < buf32.length; i++) {
+        var a = buf32[i] & 0xff000000;
+        if (a) {
+            buf32[i] = buf32[i] & a | c;
+        }
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+};
+
+
 
 'use strict';
 
@@ -6249,24 +6312,7 @@ Neo.ToolTip.prototype.draw = function(c) {
 
 Neo.ToolTip.prototype.drawTintImage = function(ctx, img, c, x, y) {
     ctx.drawImage(img, x, y);
-    this.tintImage(ctx, c);
-};
-
-Neo.ToolTip.prototype.tintImage = function(ctx, c) {
-    c = (Neo.painter.getColor(c) & 0xffffff);
-    
-    var imageData = ctx.getImageData(0, 0, 46, 18);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-
-    for (var i = 0; i < buf32.length; i++) {
-        var a = buf32[i] & 0xff000000;
-        if (a) {
-            buf32[i] = buf32[i] & a | c;
-        }
-    }
-    imageData.data.set(buf8);
-    ctx.putImageData(imageData, 0, 0);
+    Neo.tintImage(ctx, c);
 };
 
 Neo.ToolTip.bezier = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
@@ -7122,6 +7168,59 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
     }
 };
 
+/*
+  -------------------------------------------------------------------------
+    ViewerButton
+  -------------------------------------------------------------------------
+*/
+
+Neo.ViewerButton;
+
+Neo.ViewerButton = function() {};
+Neo.ViewerButton.prototype = new Neo.Button();
+
+Neo.ViewerButton.prototype.init = function(name, params) {
+    Neo.Button.prototype.init.call(this, name, params);
+
+    if (name != "viewerSpeed") {
+        this.element.innerHTML = "<canvas width=24 height=24></canvas>"
+        this.canvas = this.element.getElementsByTagName('canvas')[0];
+        var ctx = this.canvas.getContext("2d");
+        
+        var img = new Image();
+        img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, '')];
+        img.onload = function() {
+            var ref = this;
+            ctx.clearRect(0, 0, 24, 24);
+            ctx.drawImage(img, 0, 0);
+            Neo.tintImage(ctx, Neo.config.color_text)
+        }.bind(this);
+
+    } else {
+        this.element.innerHTML = "<div>既</div>";
+    }
+    return this;
+};
+
+Neo.ViewerButton.minus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.plus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAfSURBVAjXY2BAA0wTMAimVasaIARj2FQHCIGkBAUAAGm3CXHeKF1tAAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.play = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAuSURBVAjXY2BAABUQoQkitBxAxAQQsQRErAQRq+CspSBiKogIAekIABKqDhAzAAuwB6SsnxQ6AAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.stop = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYIAB+x8EEBgAACjyDV75Mi9xAAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.rewind = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAACxJREFUCNdjYAADJiYGNjYGPj4GOTkGOzuGujqGf/9AJJANFAGKA2WBahgYAIE2Bb0RIYJRAAAAAElFTkSuQmCC";
+
+/*
+  -------------------------------------------------------------------------
+    ViewerBar
+  -------------------------------------------------------------------------
+*/
+
+Neo.ViewerBar = function() {};
+Neo.ViewerBar.prototype.init = function(name, params) {
+}
 
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
 // This work is free. You can redistribute it and/or modify it

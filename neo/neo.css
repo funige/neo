@@ -551,22 +551,30 @@
 -----------------------
 */
 
-.NEO #viewerButtons {
+.NEO #viewerButtonsWrapper {
     position: absolute;
-
     bottom: 0px;
     left: 0px;
     width: 100%;
     height: 24px;
-    border: 1px solid black;
-    font-size: 0;
+    border: 1px solid red;
+    margin:0;
+    padding:0;
+}
 
+.NEO #viewerButtons {
+    width: calc(100% - 2px);
+    height: 22px;
+    border: 1px solid white;
+    font-size: 0;
     text-align: left;
 
     margin: 0;
     padding: 0;
     //padding-top: 2px;
     //padding-left: 2px;
+
+    overflow: hidden;
 }
 
 .NEO #viewerButtons > div {
@@ -575,8 +583,8 @@
     width: 18px;
     height: 18px;
     overflow: hidden;
-    margin-top: 2px;
-    margin-left: 3px;
+    margin-top: 1px;
+    margin-left: 2px;
 
     font-size: 14px;
     font-weight: 100;
@@ -586,12 +594,12 @@
     font-smoothing: antialiased;
 }
 
-.NEO #viewerButtons > div.buttonOff {
+.NEO #viewerButtons >div.buttonOff {
     display: inline-block;
     border: 1px solid black;
     width: 18px;
     height: 18px;
-    background-color: white;
+    background-color: red;
     
     border-left: 1px solid rgba(0, 0, 0, 1);
     border-top: 1px solid rgba(0, 0, 0, 1);
@@ -611,4 +619,13 @@
 
     border-right: 1px solid rgba(0, 0, 0, 1);
     border-bottom: 1px solid rgba(0, 0, 0, 1);
+}
+
+.NEO #viewerButtons canvas {
+    max-width: 24px;
+    margin-left: 1px;
+    margin-top: 1px;
+}
+
+.NEO #viewerBar div {
 }

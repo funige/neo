@@ -390,24 +390,7 @@ Neo.ToolTip.prototype.draw = function(c) {
 
 Neo.ToolTip.prototype.drawTintImage = function(ctx, img, c, x, y) {
     ctx.drawImage(img, x, y);
-    this.tintImage(ctx, c);
-};
-
-Neo.ToolTip.prototype.tintImage = function(ctx, c) {
-    c = (Neo.painter.getColor(c) & 0xffffff);
-    
-    var imageData = ctx.getImageData(0, 0, 46, 18);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-
-    for (var i = 0; i < buf32.length; i++) {
-        var a = buf32[i] & 0xff000000;
-        if (a) {
-            buf32[i] = buf32[i] & a | c;
-        }
-    }
-    imageData.data.set(buf8);
-    ctx.putImageData(imageData, 0, 0);
+    Neo.tintImage(ctx, c);
 };
 
 Neo.ToolTip.bezier = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
@@ -1263,3 +1246,56 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
     }
 };
 
+/*
+  -------------------------------------------------------------------------
+    ViewerButton
+  -------------------------------------------------------------------------
+*/
+
+Neo.ViewerButton;
+
+Neo.ViewerButton = function() {};
+Neo.ViewerButton.prototype = new Neo.Button();
+
+Neo.ViewerButton.prototype.init = function(name, params) {
+    Neo.Button.prototype.init.call(this, name, params);
+
+    if (name != "viewerSpeed") {
+        this.element.innerHTML = "<canvas width=24 height=24></canvas>"
+        this.canvas = this.element.getElementsByTagName('canvas')[0];
+        var ctx = this.canvas.getContext("2d");
+        
+        var img = new Image();
+        img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, '')];
+        img.onload = function() {
+            var ref = this;
+            ctx.clearRect(0, 0, 24, 24);
+            ctx.drawImage(img, 0, 0);
+            Neo.tintImage(ctx, Neo.config.color_text)
+        }.bind(this);
+
+    } else {
+        this.element.innerHTML = "<div>既</div>";
+    }
+    return this;
+};
+
+Neo.ViewerButton.minus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.plus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAfSURBVAjXY2BAA0wTMAimVasaIARj2FQHCIGkBAUAAGm3CXHeKF1tAAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.play = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAuSURBVAjXY2BAABUQoQkitBxAxAQQsQRErAQRq+CspSBiKogIAekIABKqDhAzAAuwB6SsnxQ6AAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.stop = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYIAB+x8EEBgAACjyDV75Mi9xAAAAAElFTkSuQmCC";
+
+Neo.ViewerButton.rewind = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAACxJREFUCNdjYAADJiYGNjYGPj4GOTkGOzuGujqGf/9AJJANFAGKA2WBahgYAIE2Bb0RIYJRAAAAAElFTkSuQmCC";
+
+/*
+  -------------------------------------------------------------------------
+    ViewerBar
+  -------------------------------------------------------------------------
+*/
+
+Neo.ViewerBar = function() {};
+Neo.ViewerBar.prototype.init = function(name, params) {
+}
