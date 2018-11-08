@@ -153,7 +153,7 @@ Neo.initConfig = function(applet) {
         Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
 
         if (Neo.viewer && !Neo.config.color_bar) {
-            Neo.config.color_bar = "#ddddff";
+            Neo.config.color_bar = "#eeeeff";
         }
 
         Neo.readStyles();
@@ -1026,7 +1026,8 @@ Neo.createViewer = function(applet) {
 <div id="viewerMinus"></div>
 
 <div id="viewerBar" style="display:inline-block;">
-  <div style="width:calc(30% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
+  <div id="viewerBarLeft" style="width:calc(50% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
+  <div id="viewerBarMark" style="background-color:red; width:1px; height:16px; position:absolute; top:1px; left:1px;"></div>
 </div>
 </div>
 
@@ -1123,7 +1124,9 @@ Neo.startViewer = function() {
     Neo.addRule(".NEO #viewerButtons >div.buttonOff:hover", "border", "1px solid" + Neo.config.color_bar_select + " !important");
     Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "border", "1px solid" + Neo.config.color_bar_select + " !important");
 
-    Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar + " !important");
+    Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
+    Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
+    Neo.addRule(".NEO #viewerBarMark", "background-color", "red");
 
     setTimeout(function () {
         new Neo.ViewerButton().init("viewerPlay");
