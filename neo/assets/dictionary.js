@@ -46,8 +46,11 @@ Neo.dictionary = {
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
 
         "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
-//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
         "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "Discard animation data and restore session?",
+        "最": "Mx", 
+        "早": "H", 
+        "既": "M", 
+        "鈍": "L", 
     },
     "enx": {
 	"やり直し": "Redo",
@@ -95,8 +98,11 @@ Neo.dictionary = {
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
 
         "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "Send this picture and end session?",
-//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
         "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "Discard animation data and restore session?",
+        "最": "Mx", 
+        "早": "H", 
+        "既": "M", 
+        "鈍": "L", 
     },
     "es": {
 	"やり直し": "Rehacer",
@@ -145,8 +151,11 @@ Neo.dictionary = {
         "このブラウザでは<br>投稿に失敗することがあります<br>": "Este navegador podría no enviar su imagen.<br>",
 
         "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "¿Enviar esta imagen y finalizar sesión?",
-//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO no puede analizar estos datos de animación.",
         "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "¿Desechar datos de animación y restaurar sesión?",
+        "最": "Mx", 
+        "早": "H", 
+        "既": "M", 
+        "鈍": "L", 
     },
 };
 

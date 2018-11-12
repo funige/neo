@@ -735,7 +735,7 @@ function regist($name,$email,$sub,$com,$url,$pwd,$upfile,$upfile_name,$resto,$pi
 		$H = $size[1];
 
 		switch ($size[2]) {
-			case 1 : $ext=".gif";break;
+//gif画像を拒否		case 1 : $ext=".gif";break;
 			case 2 : $ext=".jpg";break;
 			case 3 : $ext=".png";break;
 			default : error(MSG004,$dest);

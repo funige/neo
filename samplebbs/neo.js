@@ -70,8 +70,7 @@ Neo.init = function() {
                         Neo.config.width = pch.width;
                         Neo.config.height = pch.height;
                         Neo.initViewer(pch);
-                        
-                        applet.parentNode.removeChild(applet)
+                        Neo.startViewer();
                     }
                 });
             }
@@ -525,10 +524,7 @@ Neo.initButtons = function() {
 };
 
 Neo.start = function(isApp) {
-    if (Neo.viewer) {
-        Neo.startViewer();
-        return;
-    }
+    if (Neo.viewer) return;
 
     Neo.initSkin();
     Neo.initComponents();
@@ -686,6 +682,12 @@ Neo.resizeCanvas = function() {
     width = Math.floor(width / 2) * 2;
     height = Math.floor(height / 2) * 2;
 
+    if (Neo.viewer) {
+        console.log(canvasWidth, canvasHeight, width, height);
+        width = canvasWidth;
+        height = canvasHeight;
+    }
+    
     Neo.painter.destWidth = width;
     Neo.painter.destHeight = height;
 
@@ -993,208 +995,6 @@ Neo.createContainer = function(applet) {
     }, 0);
 };
 
-/*
-  -----------------------------------------------------------------------
-    動画表示モード
-  -----------------------------------------------------------------------
-*/
-
-Neo.createViewer = function(applet) {
-    var neo = document.createElement("div");
-    neo.className = "NEO";
-    neo.id = "NEO";
-    var html = (function() {/*
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-
-<div id="pageView" style="margin:auto;">
-<div id="container" style="visibility:visible;" class="o">
-
-<div id="painter" style="background-color:white;">
-<div id="canvas" style="background-color:white;">
-</div>
-</div>
-
-
-<div id="viewerButtonsWrapper" style="display:block;">
-<div id="viewerButtons" style="display:block;">
-
-<div id="viewerPlay"></div>
-<div id="viewerStop"></div>
-<div id="viewerRewind"></div>
-<div id="viewerSpeed" style="padding-left:2px;"></div>
-<div id="viewerPlus"></div>
-<div id="viewerMinus"></div>
-
-<div id="viewerBar" style="display:inline-block;">
-  <div id="viewerBarLeft" style="width:calc(50% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
-  <div id="viewerBarMark" style="background-color:red; width:1px; height:16px; position:absolute; top:1px; left:1px;"></div>
-</div>
-</div>
-
-</div>
-</div>
-                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
-
-    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
-	return Neo.translate(str)
-    })
-    
-    var parent = applet.parentNode;
-    parent.appendChild(neo);
-    parent.insertBefore(neo, applet);
-
-    // applet.style.display = "none";
-
-    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
-    setTimeout(function() {
-        var tmp = document.getElementsByClassName("NEO");
-        if (tmp.length > 1) {
-            for (var i = 1; i < tmp.length; i++) {
-                tmp[i].style.display = "none";
-            }
-        }
-    }, 0);
-};
-
-Neo.initViewer = function(pch) {
-    var pageview = document.getElementById("pageView");
-    var pageWidth = Neo.config.applet_width;
-    var pageHeight = Neo.config.applet_height;
-    pageview.style.width = pageWidth + "px";
-    pageview.style.height = pageHeight + "px";
-    
-    Neo.canvas = document.getElementById("canvas");
-    Neo.container = document.getElementById("container");
-    Neo.container.style.backgroundColor = Neo.config.color_back;
-    Neo.container.style.border = "0";
-
-    var dx = (pageWidth - Neo.config.width) / 2;
-    var dy = (pageHeight - Neo.config.height - 26) / 2;
-    
-    var painter = document.getElementById("painter");
-
-    painter.style.marginTop = "0";
-    painter.style.position = "absolute";
-    painter.style.padding = "0";
-    painter.style.bottom = (dy + 26) + "px";
-    painter.style.left = (dx) + "px";
-
-    var viewerButtonsWrapper = document.getElementById("viewerButtonsWrapper");
-    viewerButtonsWrapper.style.width = (pageWidth - 2) + "px";
-    
-    var viewerBar = document.getElementById("viewerBar");
-    viewerBar.style.position = "absolute";
-    viewerBar.style.right = "2px";
-    viewerBar.style.top = "1px";
-    viewerBar.style.width = (pageWidth - (24 * 6) - 2) + "px"; 
-    
-    Neo.canvas.style.width = Neo.config.width + "px";
-    Neo.canvas.style.height = Neo.config.height + "px";
-    
-    Neo.painter = new Neo.Painter();
-    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-    
-    Neo.container.oncontextmenu = function() {return false;};
-
-    if (pch) {//Neo.config.pch_file) {
-        Neo.painter._actionMgr._items = pch.data;
-        Neo.painter._actionMgr.play(10);
-    }
-};
-
-Neo.startViewer = function() {
-    Neo.styleSheet = Neo.getStyleSheet();
-    var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
-    var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
-    
-    Neo.addRule(".NEO #viewerButtons", "color", Neo.config.color_text);
-    Neo.addRule(".NEO #viewerButtons", "background-color", Neo.config.color_back);
-
-    Neo.addRule(".NEO #viewerButtonsWrapper", "border", "1px solid " + Neo.config.color_frame + " !important");
-
-    Neo.addRule(".NEO #viewerButtons", "border", "1px solid " + Neo.config.color_back + " !important");
-    Neo.addRule(".NEO #viewerButtons", "border-left", "1px solid " + lightBack + " !important");
-    Neo.addRule(".NEO #viewerButtons", "border-top", "1px solid " + lightBack + " !important");
-
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff", "background-color", Neo.config.color_icon + " !important");
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "background-color", darkBack + " !important");
-
-    Neo.addRule(".NEO #viewerButtons >div", "border", "1px solid " + Neo.config.color_frame + " !important");
-    
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff:hover", "border", "1px solid" + Neo.config.color_bar_select + " !important");
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "border", "1px solid" + Neo.config.color_bar_select + " !important");
-
-    Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
-    Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
-    Neo.addRule(".NEO #viewerBarMark", "background-color", "red");
-
-    setTimeout(function () {
-        new Neo.ViewerButton().init("viewerPlay");
-        new Neo.ViewerButton().init("viewerStop");
-        new Neo.ViewerButton().init("viewerRewind").onmouseup = function() {
-            console.log("whehehe;");
-        };
-        new Neo.ViewerButton().init("viewerSpeed");
-        new Neo.ViewerButton().init("viewerPlus");
-        new Neo.ViewerButton().init("viewerMinus");
-    }, 100);
-};
-
-Neo.getFilename = function() {
-    return Neo.config.pch_file || Neo.config.image_canvas;
-};
-
-Neo.getPCH = function(callback) {
-    var filename = Neo.getFilename();
-    if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
-    
-    var request = new XMLHttpRequest();
-    request.open("GET", filename, true);
-    request.responseType = "arraybuffer";
-    request.onload = function() {
-        var byteArray = new Uint8Array(request.response);
-        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
-        var header = byteArray.slice(0, 12);
-
-        if ((header[0] == "N".charCodeAt(0)) &&
-            (header[1] == "E".charCodeAt(0)) &&
-            (header[2] == "O".charCodeAt(0))) {
-            var width = header[4] + header[5] * 0x100
-            var height = header[6] + header[7] * 0x100
-            console.log('NEO animation:', width, 'x', height);
-            if (callback) {
-                var items = Neo.fixPCH(JSON.parse(data))
-                callback({
-                    width:width,
-                    height:height,
-                    data:items
-                });
-            }
-            
-        } else {
-            console.log('not a NEO animation:');
-        }
-    }
-    request.send();
-};
-
-Neo.fixPCH = function(items) {
-    for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-
-        var index = item.indexOf('eraseAll');
-        if (index > 0) {
-            var tmp = item.slice(index);
-            var tmp2 = item.slice(0, index);
-            console.log("fix eraseAll", tmp2, tmp);
-
-            items[i] = tmp2;
-            items.splice(i, 0, tmp)
-        }
-    }
-    return items;
-};
-
 Neo.tintImage = function(ctx, c) {
     c = (Neo.painter.getColor(c) & 0xffffff);
     
@@ -1262,8 +1062,11 @@ Neo.dictionary = {
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
 
         "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
-//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
         "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "Discard animation data and restore session?",
+        "最": "Mx", 
+        "早": "H", 
+        "既": "M", 
+        "鈍": "L", 
     },
     "enx": {
 	"やり直し": "Redo",
@@ -1311,8 +1114,11 @@ Neo.dictionary = {
         "このブラウザでは<br>投稿に失敗することがあります<br>": "This browser may fail to send your picture.<br>",
 
         "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "Send this picture and end session?",
-//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO can't handle this animation data.",
         "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "Discard animation data and restore session?",
+        "最": "Mx", 
+        "早": "H", 
+        "既": "M", 
+        "鈍": "L", 
     },
     "es": {
 	"やり直し": "Rehacer",
@@ -1361,8 +1167,11 @@ Neo.dictionary = {
         "このブラウザでは<br>投稿に失敗することがあります<br>": "Este navegador podría no enviar su imagen.<br>",
 
         "画像を投稿しますか？<br>投稿に成功後、編集を終了します。": "¿Enviar esta imagen y finalizar sesión?",
-//      "PaintBBS NEOではこの動画の続きを描くことはできません": "PaintBBS NEO no puede analizar estos datos de animación.",
         "描きかけの画像があります。動画の読み込みを中止して復元しますか？": "¿Desechar datos de animación y restaurar sesión?",
+        "最": "Mx", 
+        "早": "H", 
+        "既": "M", 
+        "鈍": "L", 
     },
 };
 
@@ -3912,28 +3721,53 @@ Neo.Painter.prototype.getEmulationMode = function() {
 */
 
 Neo.Painter.prototype.play = function(wait) {
-    this.saveSnapshot();
+//    this.saveSnapshot();
 
     if (this._actionMgr) {
-        this._actionMgr.clearCanvas();
-        this._actionMgr._head = 0;
-        this.prevLine = null;
+        this.onrewind();
 
+        this._actionMgr._mark = this._actionMgr._items.length;
+        this._actionMgr._play = true;
         this._actionMgr.play(wait);
     }
 };
 
-Neo.Painter.prototype.snapshot = [];
-Neo.Painter.prototype.saveSnapshot = function() {
-    var width = this.canvasWidth;
-    var height = this.canvasHeight;
-    this.snapshot = [this.canvasCtx[0].getImageData(0, 0, width, height),
-                     this.canvasCtx[1].getImageData(0, 0, width, height)];
+Neo.Painter.prototype.onrewind = function() {
+    if (this._actionMgr) {
+        this._actionMgr.clearCanvas();
+        this._actionMgr._head = 0;
+        this.prevLine = null;
+     }
+    if (Neo.viewerBar) Neo.viewerBar.update();
+    if (!this._actionMgr._pause) {
+        this._actionMgr.play();
+    }
 };
 
-Neo.Painter.prototype.loadSnapshot = function() {
-    this.canvasCtx[0].putImageData(this.snapshot[0], 0, 0);
-    this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
+Neo.Painter.prototype.onsetmark = function() {
+    if (Neo.viewerBar) Neo.viewerBar.update();
+    if (!this._actionMgr._pause) {
+        if (this._actionMgr._head < this._actionMgr._mark) {
+            this.play();
+        } else {
+            this.rewind();
+        }
+    }
+};
+
+Neo.Painter.prototype.onplay = function() {
+    Neo.viewerPlay.setSelected(true);
+    Neo.viewerStop.setSelected(false);
+    if (this._actionMgr._pause) {
+        this._actionMgr._pause = false;
+        this._actionMgr.play();
+    }
+};
+
+Neo.Painter.prototype.onstop = function() {
+    Neo.viewerPlay.setSelected(false);
+    Neo.viewerStop.setSelected(true);
+    this._actionMgr._pause = true;
 };
 
 Neo.Painter.prototype.setCurrent = function(item) {
@@ -5362,9 +5196,20 @@ Neo.CopyrightCommand.prototype.execute = function() {
 'use strict';
 
 
+/*
+  -----------------------------------------------------------------------
+    Action Manager
+  -----------------------------------------------------------------------
+*/
+
 Neo.ActionManager = function() {
     this._items = [];
     this._head = 0;
+
+    this._pause = false;
+    this._seek = 0;
+    this._mark = 0;
+    this._speed = 3;
 }
 
 Neo.ActionManager.prototype.step = function() {
@@ -5430,8 +5275,14 @@ Neo.ActionManager.prototype.getCurrent = function(item) {
 
 Neo.ActionManager.prototype.play = function(wait) {
     if (!wait) wait = 0;
-    
-    if (this._head < this._items.length) {
+    if (Neo.viewerBar) Neo.viewerBar.update();
+
+    if (this._pause) {
+        console.log('suspend viewer');
+        return;
+    }
+
+    if ((this._head < this._items.length) && (this._head < this._mark)) {
         var item = this._items[this._head];
 
         if (!Neo.viewer) {
@@ -5441,7 +5292,7 @@ Neo.ActionManager.prototype.play = function(wait) {
                                   true);
         }
 
-        if (Neo.viewer) {
+        if (Neo.viewer && Neo.viewerBar) {
             console.log("play", item[0], this._head, this._items.length);
         }
 
@@ -5470,7 +5321,6 @@ Neo.ActionManager.prototype.play = function(wait) {
         Neo.painter.dirty = false;
     }
 }
-
 
 /*
 -------------------------------------------------------------------------
@@ -5922,6 +5772,290 @@ Neo.ActionManager.prototype.restore = function() {
         }
     }
 }
+
+/*
+  -----------------------------------------------------------------------
+    動画表示モード
+  -----------------------------------------------------------------------
+*/
+
+Neo.createViewer = function(applet) {
+    var neo = document.createElement("div");
+    neo.className = "NEO";
+    neo.id = "NEO";
+    var html = (function() {/*
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<div id="pageView" style="margin:auto;">
+<div id="container" style="visibility:visible;" class="o">
+
+<div id="painter" style="background-color:white;">
+<div id="canvas" style="background-color:white;">
+</div>
+</div>
+
+
+<div id="viewerButtonsWrapper" style="display:block;">
+<div id="viewerButtons" style="display:block;">
+
+<div id="viewerPlay"></div>
+<div id="viewerStop"></div>
+<div id="viewerRewind"></div>
+<div id="viewerSpeed" style="padding-left:2px; margin-top: 1px;">ほ</div>
+<div id="viewerPlus"></div>
+<div id="viewerMinus"></div>
+
+<div id="viewerBar" style="display:inline-block;">
+<!--
+  <div id="viewerBarLeft" style="width:calc(50% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
+  <div id="viewerBarMark" style="background-color:red; width:1px; height:16px; position:absolute; top:1px; left:1px;"></div>
+-->
+</div>
+</div>
+
+</div>
+</div>
+                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
+
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+	return Neo.translate(str)
+    })
+    
+    var parent = applet.parentNode;
+    parent.appendChild(neo);
+    parent.insertBefore(neo, applet);
+
+    // applet.style.display = "none";
+
+    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
+    setTimeout(function() {
+        var tmp = document.getElementsByClassName("NEO");
+        if (tmp.length > 1) {
+            for (var i = 1; i < tmp.length; i++) {
+                tmp[i].style.display = "none";
+            }
+        }
+    }, 0);
+};
+
+Neo.initViewer = function(pch) {
+    console.log("initViewer");
+    var pageview = document.getElementById("pageView");
+    var pageWidth = Neo.config.applet_width;
+    var pageHeight = Neo.config.applet_height;
+    pageview.style.width = pageWidth + "px";
+    pageview.style.height = pageHeight + "px";
+    
+    Neo.canvas = document.getElementById("canvas");
+    Neo.container = document.getElementById("container");
+    Neo.container.style.backgroundColor = Neo.config.color_back;
+    Neo.container.style.border = "0";
+
+    var dx = (pageWidth - Neo.config.width) / 2;
+    var dy = (pageHeight - Neo.config.height - 26) / 2;
+    
+    var painter = document.getElementById("painter");
+
+    painter.style.marginTop = "0";
+    painter.style.position = "absolute";
+    painter.style.padding = "0";
+    painter.style.bottom = (dy + 26) + "px";
+    painter.style.left = (dx) + "px";
+
+    var viewerButtonsWrapper = document.getElementById("viewerButtonsWrapper");
+    viewerButtonsWrapper.style.width = (pageWidth - 2) + "px";
+    
+    var viewerBar = document.getElementById("viewerBar");
+    viewerBar.style.position = "absolute";
+    viewerBar.style.right = "2px";
+    viewerBar.style.top = "1px";
+    viewerBar.style.width = (pageWidth - (24 * 6) - 2) + "px"; 
+    
+    Neo.canvas.style.width = Neo.config.width + "px";
+    Neo.canvas.style.height = Neo.config.height + "px";
+    
+    Neo.painter = new Neo.Painter();
+    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
+    
+    Neo.container.oncontextmenu = function() {return false;};
+
+    painter.addEventListener('mousedown', function() {
+        Neo.painter._actionMgr.isMouseDown = true;
+    }, false);
+    
+    document.addEventListener('mousemove', function(e) {
+        if (Neo.painter._actionMgr.isMouseDown) {
+            var zoom = Neo.painter.zoom;
+            var x = Neo.painter.zoomX - e.movementX / zoom;
+            var y = Neo.painter.zoomY - e.movementY / zoom;
+            Neo.painter.setZoomPosition(x, y);
+        }
+    }, false);
+    document.addEventListener('mouseup', function() {
+        Neo.painter._actionMgr.isMouseDown = false;
+        Neo.viewerBar.isMouseDown = false;
+    }, false);
+    
+    if (pch) {//Neo.config.pch_file) {
+        Neo.painter._actionMgr._items = pch.data;
+        //Neo.painter._actionMgr.play(10);
+        Neo.painter.play(10);
+    }
+};
+
+Neo.startViewer = function() {
+    console.log("startViewer");
+    
+    var name = Neo.applet.attributes.name.value || "pch";
+    if (!document[name]) document[name] = Neo;
+    Neo.applet.parentNode.removeChild(Neo.applet);
+
+    Neo.styleSheet = Neo.getStyleSheet();
+    var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
+    var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
+    
+    Neo.addRule(".NEO #viewerButtons", "color", Neo.config.color_text);
+    Neo.addRule(".NEO #viewerButtons", "background-color", Neo.config.color_back);
+
+    Neo.addRule(".NEO #viewerButtonsWrapper", "border", "1px solid " + Neo.config.color_frame + " !important");
+
+    Neo.addRule(".NEO #viewerButtons", "border", "1px solid " + Neo.config.color_back + " !important");
+    Neo.addRule(".NEO #viewerButtons", "border-left", "1px solid " + lightBack + " !important");
+    Neo.addRule(".NEO #viewerButtons", "border-top", "1px solid " + lightBack + " !important");
+
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff", "background-color", Neo.config.color_icon + " !important");
+
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "background-color", darkBack + " !important");
+    Neo.addRule(".NEO #viewerButtons >div.buttonOn", "background-color", darkBack + " !important");
+
+    Neo.addRule(".NEO #viewerButtons >div", "border", "1px solid " + Neo.config.color_frame + " !important");
+    
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff:hover", "border", "1px solid" + Neo.config.color_bar_select + " !important");
+
+    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "border", "1px solid" + Neo.config.color_bar_select + " !important");
+    Neo.addRule(".NEO #viewerButtons >div.buttonOn", "border", "1px solid" + Neo.config.color_bar_select + " !important");
+
+    Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
+    Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
+    Neo.addRule(".NEO #viewerBarMark", "background-color", Neo.config.color_text + " !important");
+
+    setTimeout(function () {
+        Neo.viewerPlay = new Neo.ViewerButton().init("viewerPlay");
+        Neo.viewerPlay.setSelected(true);
+        Neo.viewerPlay.onmouseup = function() {
+            Neo.painter.onplay();
+        }
+        Neo.viewerStop = new Neo.ViewerButton().init("viewerStop");
+        Neo.viewerStop.onmouseup = function() {
+            Neo.painter.onstop();
+        }
+        
+        new Neo.ViewerButton().init("viewerRewind").onmouseup = function() {
+            Neo.painter.onrewind();
+        }
+        new Neo.ViewerButton().init("viewerSpeed").onmouseup = function() {
+            console.log('speed');
+        };
+        new Neo.ViewerButton().init("viewerPlus").onmouseup = function() {
+            new Neo.ZoomPlusCommand(Neo.painter).execute();
+        };
+        new Neo.ViewerButton().init("viewerMinus").onmouseup = function() {
+            new Neo.ZoomMinusCommand(Neo.painter).execute();
+        };
+
+        var length = Neo.painter._actionMgr._items.length;
+        Neo.viewerBar = new Neo.ViewerBar().init("viewerBar", { length:length });
+
+    }, 0);
+};
+
+Neo.getFilename = function() {
+    return Neo.config.pch_file || Neo.config.image_canvas;
+};
+
+Neo.getPCH = function(callback) {
+    var filename = Neo.getFilename();
+    if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
+    
+    var request = new XMLHttpRequest();
+    request.open("GET", filename, true);
+    request.responseType = "arraybuffer";
+    request.onload = function() {
+        var byteArray = new Uint8Array(request.response);
+        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+        var header = byteArray.slice(0, 12);
+
+        if ((header[0] == "N".charCodeAt(0)) &&
+            (header[1] == "E".charCodeAt(0)) &&
+            (header[2] == "O".charCodeAt(0))) {
+            var width = header[4] + header[5] * 0x100
+            var height = header[6] + header[7] * 0x100
+            console.log('NEO animation:', width, 'x', height);
+            if (callback) {
+                var items = Neo.fixPCH(JSON.parse(data))
+                callback({
+                    width:width,
+                    height:height,
+                    data:items
+                });
+            }
+            
+        } else {
+            console.log('not a NEO animation:');
+        }
+    }
+    request.send();
+};
+
+Neo.fixPCH = function(items) {
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+
+        var index = item.indexOf('eraseAll');
+        if (index > 0) {
+            var tmp = item.slice(index);
+            var tmp2 = item.slice(0, index);
+            console.log("fix eraseAll", tmp2, tmp);
+
+            items[i] = tmp2;
+            items.splice(i, 0, tmp)
+        }
+    }
+    return items;
+};
+
+/*
+  -----------------------------------------------------------------------
+    LiveConnect
+  -----------------------------------------------------------------------
+*/
+
+Neo.playPCH = function() {
+    Neo.painter.onplay();
+};
+
+Neo.suspendDraw = function() {
+    Neo.painter.onstop();
+};
+
+Neo.setSpeed = function(value) {
+    Neo.painter._actionMgr._speed = value;
+};
+
+Neo.setMark = function(value) {
+    Neo.painter._actionMgr._mark = value;
+    Neo.viewerBar.update();
+
+    Neo.painter.onsetmark();
+};
+
+Neo.getSeek = function() {
+    return Neo.painter._actionMgr._head;
+};
+
+Neo.getLineCount = function() {
+    return Neo.painter._actionMgr._items.length;
+};
 
 'use strict';
 
@@ -7177,10 +7311,10 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton;
-
 Neo.ViewerButton = function() {};
 Neo.ViewerButton.prototype = new Neo.Button();
+
+Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 
 Neo.ViewerButton.prototype.init = function(name, params) {
     Neo.Button.prototype.init.call(this, name, params);
@@ -7200,7 +7334,9 @@ Neo.ViewerButton.prototype.init = function(name, params) {
         }.bind(this);
 
     } else {
-        this.element.innerHTML = "<div>既</div>";
+        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[1]);
+        this.element.innerHTML = "<div>" + speedString + "</div>";
+        this.element.innerHTML += "<canvas width=24 height=24></canvas>"
     }
     return this;
 };
@@ -7221,9 +7357,73 @@ Neo.ViewerButton.rewind = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAA
   -------------------------------------------------------------------------
 */
 
+// length/mark/count
+// update
+
 Neo.ViewerBar = function() {};
 Neo.ViewerBar.prototype.init = function(name, params) {
-}
+    this.element = document.getElementById(name);
+    this.params = params || {};
+    this.name = name;
+    this.isMouseDown = false;
+
+    this.element.style.display = "inline-block";
+    this.element.innerHTML =
+        "<div id='viewerBarLeft'></div>" +
+        "<div id='viewerBarMark'></div>" +
+        "<div id='viewerBarText'>hoge</div>";
+    this.seekElement = this.element.children[0];
+    this.markElement = this.element.children[1];
+    this.textElement = this.element.children[2];
+
+    this.width = this.seekElement.offsetWidth;
+
+    this.length = this.params.length || 100;
+    this.mark = this.length;
+    this.seek = 0;
+
+    var ref = this;
+    this.element.onmousedown = function(e) {
+        ref.isMouseDown = true;
+        ref._touchHandler(e);
+    }
+    this.element.onmousemove = function(e) {
+        if (ref.isMouseDown) {
+            ref._touchHandler(e);
+        }
+    }
+//  this.element.onmouseup = function(e) { this.isMouseDown = false; }
+//  this.element.onmouseout = function(e) { this.isMouseDown = false; }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._touchHandler(e);
+        e.preventDefault();
+    }, true);
+
+    this.update();
+    return this;
+};
+
+Neo.ViewerBar.prototype.update = function() {
+    this.mark = Neo.painter._actionMgr._mark;
+    this.seek = Neo.painter._actionMgr._head;
+    
+    var markX = (this.mark / this.length) * this.width;
+    this.markElement.style.left = markX + "px";
+
+    var seekX = (this.seek / this.length) * this.width;
+    this.seekElement.style.width = seekX + "px";
+    this.textElement.innerHTML = this.seek + '/' + this.length;
+};
+
+Neo.ViewerBar.prototype._touchHandler = function(e) {
+    var x = e.offsetX / this.width;
+    x = Math.max(Math.min(x, 1), 0);
+
+    Neo.painter._actionMgr._mark = Math.round(x * this.length);
+    this.update();
+
+    console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
+};
 
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
 // This work is free. You can redistribute it and/or modify it

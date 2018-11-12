@@ -70,8 +70,7 @@ Neo.init = function() {
                         Neo.config.width = pch.width;
                         Neo.config.height = pch.height;
                         Neo.initViewer(pch);
-                        
-                        applet.parentNode.removeChild(applet)
+                        Neo.startViewer();
                     }
                 });
             }
@@ -525,10 +524,7 @@ Neo.initButtons = function() {
 };
 
 Neo.start = function(isApp) {
-    if (Neo.viewer) {
-        Neo.startViewer();
-        return;
-    }
+    if (Neo.viewer) return;
 
     Neo.initSkin();
     Neo.initComponents();
@@ -686,6 +682,12 @@ Neo.resizeCanvas = function() {
     width = Math.floor(width / 2) * 2;
     height = Math.floor(height / 2) * 2;
 
+    if (Neo.viewer) {
+        console.log(canvasWidth, canvasHeight, width, height);
+        width = canvasWidth;
+        height = canvasHeight;
+    }
+    
     Neo.painter.destWidth = width;
     Neo.painter.destHeight = height;
 
@@ -991,208 +993,6 @@ Neo.createContainer = function(applet) {
             }
         }
     }, 0);
-};
-
-/*
-  -----------------------------------------------------------------------
-    動画表示モード
-  -----------------------------------------------------------------------
-*/
-
-Neo.createViewer = function(applet) {
-    var neo = document.createElement("div");
-    neo.className = "NEO";
-    neo.id = "NEO";
-    var html = (function() {/*
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-
-<div id="pageView" style="margin:auto;">
-<div id="container" style="visibility:visible;" class="o">
-
-<div id="painter" style="background-color:white;">
-<div id="canvas" style="background-color:white;">
-</div>
-</div>
-
-
-<div id="viewerButtonsWrapper" style="display:block;">
-<div id="viewerButtons" style="display:block;">
-
-<div id="viewerPlay"></div>
-<div id="viewerStop"></div>
-<div id="viewerRewind"></div>
-<div id="viewerSpeed" style="padding-left:2px;"></div>
-<div id="viewerPlus"></div>
-<div id="viewerMinus"></div>
-
-<div id="viewerBar" style="display:inline-block;">
-  <div id="viewerBarLeft" style="width:calc(50% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
-  <div id="viewerBarMark" style="background-color:red; width:1px; height:16px; position:absolute; top:1px; left:1px;"></div>
-</div>
-</div>
-
-</div>
-</div>
-                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
-
-    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
-	return Neo.translate(str)
-    })
-    
-    var parent = applet.parentNode;
-    parent.appendChild(neo);
-    parent.insertBefore(neo, applet);
-
-    // applet.style.display = "none";
-
-    // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
-    setTimeout(function() {
-        var tmp = document.getElementsByClassName("NEO");
-        if (tmp.length > 1) {
-            for (var i = 1; i < tmp.length; i++) {
-                tmp[i].style.display = "none";
-            }
-        }
-    }, 0);
-};
-
-Neo.initViewer = function(pch) {
-    var pageview = document.getElementById("pageView");
-    var pageWidth = Neo.config.applet_width;
-    var pageHeight = Neo.config.applet_height;
-    pageview.style.width = pageWidth + "px";
-    pageview.style.height = pageHeight + "px";
-    
-    Neo.canvas = document.getElementById("canvas");
-    Neo.container = document.getElementById("container");
-    Neo.container.style.backgroundColor = Neo.config.color_back;
-    Neo.container.style.border = "0";
-
-    var dx = (pageWidth - Neo.config.width) / 2;
-    var dy = (pageHeight - Neo.config.height - 26) / 2;
-    
-    var painter = document.getElementById("painter");
-
-    painter.style.marginTop = "0";
-    painter.style.position = "absolute";
-    painter.style.padding = "0";
-    painter.style.bottom = (dy + 26) + "px";
-    painter.style.left = (dx) + "px";
-
-    var viewerButtonsWrapper = document.getElementById("viewerButtonsWrapper");
-    viewerButtonsWrapper.style.width = (pageWidth - 2) + "px";
-    
-    var viewerBar = document.getElementById("viewerBar");
-    viewerBar.style.position = "absolute";
-    viewerBar.style.right = "2px";
-    viewerBar.style.top = "1px";
-    viewerBar.style.width = (pageWidth - (24 * 6) - 2) + "px"; 
-    
-    Neo.canvas.style.width = Neo.config.width + "px";
-    Neo.canvas.style.height = Neo.config.height + "px";
-    
-    Neo.painter = new Neo.Painter();
-    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-    
-    Neo.container.oncontextmenu = function() {return false;};
-
-    if (pch) {//Neo.config.pch_file) {
-        Neo.painter._actionMgr._items = pch.data;
-        Neo.painter._actionMgr.play(10);
-    }
-};
-
-Neo.startViewer = function() {
-    Neo.styleSheet = Neo.getStyleSheet();
-    var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
-    var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
-    
-    Neo.addRule(".NEO #viewerButtons", "color", Neo.config.color_text);
-    Neo.addRule(".NEO #viewerButtons", "background-color", Neo.config.color_back);
-
-    Neo.addRule(".NEO #viewerButtonsWrapper", "border", "1px solid " + Neo.config.color_frame + " !important");
-
-    Neo.addRule(".NEO #viewerButtons", "border", "1px solid " + Neo.config.color_back + " !important");
-    Neo.addRule(".NEO #viewerButtons", "border-left", "1px solid " + lightBack + " !important");
-    Neo.addRule(".NEO #viewerButtons", "border-top", "1px solid " + lightBack + " !important");
-
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff", "background-color", Neo.config.color_icon + " !important");
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "background-color", darkBack + " !important");
-
-    Neo.addRule(".NEO #viewerButtons >div", "border", "1px solid " + Neo.config.color_frame + " !important");
-    
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff:hover", "border", "1px solid" + Neo.config.color_bar_select + " !important");
-    Neo.addRule(".NEO #viewerButtons >div.buttonOff:active", "border", "1px solid" + Neo.config.color_bar_select + " !important");
-
-    Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
-    Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
-    Neo.addRule(".NEO #viewerBarMark", "background-color", "red");
-
-    setTimeout(function () {
-        new Neo.ViewerButton().init("viewerPlay");
-        new Neo.ViewerButton().init("viewerStop");
-        new Neo.ViewerButton().init("viewerRewind").onmouseup = function() {
-            console.log("whehehe;");
-        };
-        new Neo.ViewerButton().init("viewerSpeed");
-        new Neo.ViewerButton().init("viewerPlus");
-        new Neo.ViewerButton().init("viewerMinus");
-    }, 100);
-};
-
-Neo.getFilename = function() {
-    return Neo.config.pch_file || Neo.config.image_canvas;
-};
-
-Neo.getPCH = function(callback) {
-    var filename = Neo.getFilename();
-    if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
-    
-    var request = new XMLHttpRequest();
-    request.open("GET", filename, true);
-    request.responseType = "arraybuffer";
-    request.onload = function() {
-        var byteArray = new Uint8Array(request.response);
-        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
-        var header = byteArray.slice(0, 12);
-
-        if ((header[0] == "N".charCodeAt(0)) &&
-            (header[1] == "E".charCodeAt(0)) &&
-            (header[2] == "O".charCodeAt(0))) {
-            var width = header[4] + header[5] * 0x100
-            var height = header[6] + header[7] * 0x100
-            console.log('NEO animation:', width, 'x', height);
-            if (callback) {
-                var items = Neo.fixPCH(JSON.parse(data))
-                callback({
-                    width:width,
-                    height:height,
-                    data:items
-                });
-            }
-            
-        } else {
-            console.log('not a NEO animation:');
-        }
-    }
-    request.send();
-};
-
-Neo.fixPCH = function(items) {
-    for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-
-        var index = item.indexOf('eraseAll');
-        if (index > 0) {
-            var tmp = item.slice(index);
-            var tmp2 = item.slice(0, index);
-            console.log("fix eraseAll", tmp2, tmp);
-
-            items[i] = tmp2;
-            items.splice(i, 0, tmp)
-        }
-    }
-    return items;
 };
 
 Neo.tintImage = function(ctx, c) {

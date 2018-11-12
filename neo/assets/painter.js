@@ -2519,28 +2519,53 @@ Neo.Painter.prototype.getEmulationMode = function() {
 */
 
 Neo.Painter.prototype.play = function(wait) {
-    this.saveSnapshot();
+//    this.saveSnapshot();
 
     if (this._actionMgr) {
-        this._actionMgr.clearCanvas();
-        this._actionMgr._head = 0;
-        this.prevLine = null;
+        this.onrewind();
 
+        this._actionMgr._mark = this._actionMgr._items.length;
+        this._actionMgr._play = true;
         this._actionMgr.play(wait);
     }
 };
 
-Neo.Painter.prototype.snapshot = [];
-Neo.Painter.prototype.saveSnapshot = function() {
-    var width = this.canvasWidth;
-    var height = this.canvasHeight;
-    this.snapshot = [this.canvasCtx[0].getImageData(0, 0, width, height),
-                     this.canvasCtx[1].getImageData(0, 0, width, height)];
+Neo.Painter.prototype.onrewind = function() {
+    if (this._actionMgr) {
+        this._actionMgr.clearCanvas();
+        this._actionMgr._head = 0;
+        this.prevLine = null;
+     }
+    if (Neo.viewerBar) Neo.viewerBar.update();
+    if (!this._actionMgr._pause) {
+        this._actionMgr.play();
+    }
 };
 
-Neo.Painter.prototype.loadSnapshot = function() {
-    this.canvasCtx[0].putImageData(this.snapshot[0], 0, 0);
-    this.canvasCtx[1].putImageData(this.snapshot[1], 0, 0);
+Neo.Painter.prototype.onsetmark = function() {
+    if (Neo.viewerBar) Neo.viewerBar.update();
+    if (!this._actionMgr._pause) {
+        if (this._actionMgr._head < this._actionMgr._mark) {
+            this.play();
+        } else {
+            this.rewind();
+        }
+    }
+};
+
+Neo.Painter.prototype.onplay = function() {
+    Neo.viewerPlay.setSelected(true);
+    Neo.viewerStop.setSelected(false);
+    if (this._actionMgr._pause) {
+        this._actionMgr._pause = false;
+        this._actionMgr.play();
+    }
+};
+
+Neo.Painter.prototype.onstop = function() {
+    Neo.viewerPlay.setSelected(false);
+    Neo.viewerStop.setSelected(true);
+    this._actionMgr._pause = true;
 };
 
 Neo.Painter.prototype.setCurrent = function(item) {

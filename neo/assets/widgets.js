@@ -1252,10 +1252,10 @@ Neo.ScrollBarButton.prototype.update = function(oe) {
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton;
-
 Neo.ViewerButton = function() {};
 Neo.ViewerButton.prototype = new Neo.Button();
+
+Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 
 Neo.ViewerButton.prototype.init = function(name, params) {
     Neo.Button.prototype.init.call(this, name, params);
@@ -1275,7 +1275,9 @@ Neo.ViewerButton.prototype.init = function(name, params) {
         }.bind(this);
 
     } else {
-        this.element.innerHTML = "<div>既</div>";
+        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[1]);
+        this.element.innerHTML = "<div>" + speedString + "</div>";
+        this.element.innerHTML += "<canvas width=24 height=24></canvas>"
     }
     return this;
 };
@@ -1296,6 +1298,70 @@ Neo.ViewerButton.rewind = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAA
   -------------------------------------------------------------------------
 */
 
+// length/mark/count
+// update
+
 Neo.ViewerBar = function() {};
 Neo.ViewerBar.prototype.init = function(name, params) {
-}
+    this.element = document.getElementById(name);
+    this.params = params || {};
+    this.name = name;
+    this.isMouseDown = false;
+
+    this.element.style.display = "inline-block";
+    this.element.innerHTML =
+        "<div id='viewerBarLeft'></div>" +
+        "<div id='viewerBarMark'></div>" +
+        "<div id='viewerBarText'>hoge</div>";
+    this.seekElement = this.element.children[0];
+    this.markElement = this.element.children[1];
+    this.textElement = this.element.children[2];
+
+    this.width = this.seekElement.offsetWidth;
+
+    this.length = this.params.length || 100;
+    this.mark = this.length;
+    this.seek = 0;
+
+    var ref = this;
+    this.element.onmousedown = function(e) {
+        ref.isMouseDown = true;
+        ref._touchHandler(e);
+    }
+    this.element.onmousemove = function(e) {
+        if (ref.isMouseDown) {
+            ref._touchHandler(e);
+        }
+    }
+//  this.element.onmouseup = function(e) { this.isMouseDown = false; }
+//  this.element.onmouseout = function(e) { this.isMouseDown = false; }
+    this.element.addEventListener("touchstart", function(e) {
+        ref._touchHandler(e);
+        e.preventDefault();
+    }, true);
+
+    this.update();
+    return this;
+};
+
+Neo.ViewerBar.prototype.update = function() {
+    this.mark = Neo.painter._actionMgr._mark;
+    this.seek = Neo.painter._actionMgr._head;
+    
+    var markX = (this.mark / this.length) * this.width;
+    this.markElement.style.left = markX + "px";
+
+    var seekX = (this.seek / this.length) * this.width;
+    this.seekElement.style.width = seekX + "px";
+    this.textElement.innerHTML = this.seek + '/' + this.length;
+};
+
+Neo.ViewerBar.prototype._touchHandler = function(e) {
+    var x = e.offsetX / this.width;
+    x = Math.max(Math.min(x, 1), 0);
+
+    Neo.painter._actionMgr._mark = Math.round(x * this.length);
+    this.update();
+
+    console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
+};
