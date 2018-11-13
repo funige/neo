@@ -820,7 +820,7 @@ Neo.Painter.prototype.setZoomPosition = function(x, y) {
 */
 
 Neo.Painter.prototype.submit = function(board) {
-    if (1) { // neo_save_layers
+    if (Neo.animation) { // neo_save_layers
         var items = this._actionMgr._items;
         if (items[items.length - 1][0] != 'restore') {
             this._pushUndo();
