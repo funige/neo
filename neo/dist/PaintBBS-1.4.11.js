@@ -3758,10 +3758,10 @@ Neo.Painter.prototype.onrewind = function() {
 Neo.Painter.prototype.onmark = function() {
     if (Neo.viewerBar) Neo.viewerBar.update();
     if (!this._actionMgr._pause) {
-        if (this._actionMgr._head < this._actionMgr._mark) {
-            this.onplay();
-        } else {
+        if (this._actionMgr._head > this._actionMgr._mark) {
             this.onrewind();
+        } else {
+            this.onplay();
         }
     }
 };
@@ -6448,7 +6448,7 @@ Neo.ToolTip.prototype.draw = function(c) {
             }.bind(this);
 
         } else {
-            this.tintImage(ctx, c);
+            Neo.tintImage(ctx, c);
         }
     }
 };

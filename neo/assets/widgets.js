@@ -383,7 +383,7 @@ Neo.ToolTip.prototype.draw = function(c) {
             }.bind(this);
 
         } else {
-            this.tintImage(ctx, c);
+            Neo.tintImage(ctx, c);
         }
     }
 };
