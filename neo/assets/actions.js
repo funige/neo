@@ -81,7 +81,7 @@ Neo.ActionManager.prototype.getCurrent = function(item) {
 Neo.ActionManager.prototype.play = function(wait) {
     if (!wait) wait = 0;
     if (Neo.viewerBar) Neo.viewerBar.update();
-
+    
     if (this._pause) {
         console.log('suspend viewer');
         return;
@@ -644,7 +644,6 @@ Neo.createViewer = function(applet) {
 };
 
 Neo.initViewer = function(pch) {
-    console.log("initViewer");
     var pageview = document.getElementById("pageView");
     var pageWidth = Neo.config.applet_width;
     var pageHeight = Neo.config.applet_height;
@@ -709,8 +708,6 @@ Neo.initViewer = function(pch) {
 };
 
 Neo.startViewer = function() {
-    console.log("startViewer");
-    
     var name = Neo.applet.attributes.name.value || "pch";
     if (!document[name]) document[name] = Neo;
     Neo.applet.parentNode.removeChild(Neo.applet);
@@ -741,7 +738,7 @@ Neo.startViewer = function() {
     Neo.addRule(".NEO #viewerButtons >div.buttonOn", "border", "1px solid" + Neo.config.color_bar_select + " !important");
 
     Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
-    Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
+//  Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
     Neo.addRule(".NEO #viewerBarMark", "background-color", Neo.config.color_text + " !important");
 
     setTimeout(function () {
@@ -795,7 +792,8 @@ Neo.getPCH = function(callback) {
             (header[2] == "O".charCodeAt(0))) {
             var width = header[4] + header[5] * 0x100
             var height = header[6] + header[7] * 0x100
-            console.log('NEO animation:', width, 'x', height);
+
+            //console.log('NEO animation:', width, 'x', height);
             if (callback) {
                 var items = Neo.fixPCH(JSON.parse(data))
                 callback({
@@ -849,9 +847,7 @@ Neo.setSpeed = function(value) {
 
 Neo.setMark = function(value) {
     Neo.painter._actionMgr._mark = value;
-    Neo.viewerBar.update();
-
-    Neo.painter.onsetmark();
+    Neo.painter.onmark();
 };
 
 Neo.getSeek = function() {

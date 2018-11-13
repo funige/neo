@@ -820,6 +820,14 @@ Neo.Painter.prototype.setZoomPosition = function(x, y) {
 */
 
 Neo.Painter.prototype.submit = function(board) {
+    if (1) { // neo_save_layers
+        var items = this._actionMgr._items;
+        if (items[items.length - 1][0] != 'restore') {
+            this._pushUndo();
+            this._actionMgr.restore();
+        }
+    }
+
     var thumbnail = null;
     var thumbnail2 = null;
 
@@ -2393,6 +2401,7 @@ Neo.Painter.prototype.loadAnimation = function (filename, wait) {
 
         var items = JSON.parse(data);
         Neo.painter._actionMgr._items = Neo.fixPCH(JSON.parse(data));
+        Neo.painter._actionMgr._mark = Neo.painter._actionMgr._items.length;
         Neo.painter._actionMgr.play(wait);
     };
     request.send();
@@ -2519,14 +2528,16 @@ Neo.Painter.prototype.getEmulationMode = function() {
 */
 
 Neo.Painter.prototype.play = function(wait) {
-//    this.saveSnapshot();
-
     if (this._actionMgr) {
-        this.onrewind();
+        this._actionMgr.clearCanvas();
+        this.prevLine = null;
 
+        //console.log('[play]');
+        
+        this._actionMgr._head = 0;
         this._actionMgr._mark = this._actionMgr._items.length;
-        this._actionMgr._play = true;
-        this._actionMgr.play(wait);
+        this._actionMgr._pause = false;
+        this._actionMgr.play();
     }
 };
 
@@ -2542,13 +2553,13 @@ Neo.Painter.prototype.onrewind = function() {
     }
 };
 
-Neo.Painter.prototype.onsetmark = function() {
+Neo.Painter.prototype.onmark = function() {
     if (Neo.viewerBar) Neo.viewerBar.update();
     if (!this._actionMgr._pause) {
         if (this._actionMgr._head < this._actionMgr._mark) {
-            this.play();
+            this.onplay();
         } else {
-            this.rewind();
+            this.onrewind();
         }
     }
 };
@@ -2556,10 +2567,9 @@ Neo.Painter.prototype.onsetmark = function() {
 Neo.Painter.prototype.onplay = function() {
     Neo.viewerPlay.setSelected(true);
     Neo.viewerStop.setSelected(false);
-    if (this._actionMgr._pause) {
-        this._actionMgr._pause = false;
-        this._actionMgr.play();
-    }
+
+    this._actionMgr._pause = false;
+    this._actionMgr.play();
 };
 
 Neo.Painter.prototype.onstop = function() {

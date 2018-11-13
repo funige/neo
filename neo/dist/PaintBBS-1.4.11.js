@@ -2022,6 +2022,14 @@ Neo.Painter.prototype.setZoomPosition = function(x, y) {
 */
 
 Neo.Painter.prototype.submit = function(board) {
+    if (1) { // neo_save_layers
+        var items = this._actionMgr._items;
+        if (items[items.length - 1][0] != 'restore') {
+            this._pushUndo();
+            this._actionMgr.restore();
+        }
+    }
+
     var thumbnail = null;
     var thumbnail2 = null;
 
@@ -3595,6 +3603,7 @@ Neo.Painter.prototype.loadAnimation = function (filename, wait) {
 
         var items = JSON.parse(data);
         Neo.painter._actionMgr._items = Neo.fixPCH(JSON.parse(data));
+        Neo.painter._actionMgr._mark = Neo.painter._actionMgr._items.length;
         Neo.painter._actionMgr.play(wait);
     };
     request.send();
@@ -3721,14 +3730,16 @@ Neo.Painter.prototype.getEmulationMode = function() {
 */
 
 Neo.Painter.prototype.play = function(wait) {
-//    this.saveSnapshot();
-
     if (this._actionMgr) {
-        this.onrewind();
+        this._actionMgr.clearCanvas();
+        this.prevLine = null;
 
+        //console.log('[play]');
+        
+        this._actionMgr._head = 0;
         this._actionMgr._mark = this._actionMgr._items.length;
-        this._actionMgr._play = true;
-        this._actionMgr.play(wait);
+        this._actionMgr._pause = false;
+        this._actionMgr.play();
     }
 };
 
@@ -3744,13 +3755,13 @@ Neo.Painter.prototype.onrewind = function() {
     }
 };
 
-Neo.Painter.prototype.onsetmark = function() {
+Neo.Painter.prototype.onmark = function() {
     if (Neo.viewerBar) Neo.viewerBar.update();
     if (!this._actionMgr._pause) {
         if (this._actionMgr._head < this._actionMgr._mark) {
-            this.play();
+            this.onplay();
         } else {
-            this.rewind();
+            this.onrewind();
         }
     }
 };
@@ -3758,10 +3769,9 @@ Neo.Painter.prototype.onsetmark = function() {
 Neo.Painter.prototype.onplay = function() {
     Neo.viewerPlay.setSelected(true);
     Neo.viewerStop.setSelected(false);
-    if (this._actionMgr._pause) {
-        this._actionMgr._pause = false;
-        this._actionMgr.play();
-    }
+
+    this._actionMgr._pause = false;
+    this._actionMgr.play();
 };
 
 Neo.Painter.prototype.onstop = function() {
@@ -5276,7 +5286,7 @@ Neo.ActionManager.prototype.getCurrent = function(item) {
 Neo.ActionManager.prototype.play = function(wait) {
     if (!wait) wait = 0;
     if (Neo.viewerBar) Neo.viewerBar.update();
-
+    
     if (this._pause) {
         console.log('suspend viewer');
         return;
@@ -5839,7 +5849,6 @@ Neo.createViewer = function(applet) {
 };
 
 Neo.initViewer = function(pch) {
-    console.log("initViewer");
     var pageview = document.getElementById("pageView");
     var pageWidth = Neo.config.applet_width;
     var pageHeight = Neo.config.applet_height;
@@ -5904,8 +5913,6 @@ Neo.initViewer = function(pch) {
 };
 
 Neo.startViewer = function() {
-    console.log("startViewer");
-    
     var name = Neo.applet.attributes.name.value || "pch";
     if (!document[name]) document[name] = Neo;
     Neo.applet.parentNode.removeChild(Neo.applet);
@@ -5936,7 +5943,7 @@ Neo.startViewer = function() {
     Neo.addRule(".NEO #viewerButtons >div.buttonOn", "border", "1px solid" + Neo.config.color_bar_select + " !important");
 
     Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
-    Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
+//  Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
     Neo.addRule(".NEO #viewerBarMark", "background-color", Neo.config.color_text + " !important");
 
     setTimeout(function () {
@@ -5990,7 +5997,8 @@ Neo.getPCH = function(callback) {
             (header[2] == "O".charCodeAt(0))) {
             var width = header[4] + header[5] * 0x100
             var height = header[6] + header[7] * 0x100
-            console.log('NEO animation:', width, 'x', height);
+
+            //console.log('NEO animation:', width, 'x', height);
             if (callback) {
                 var items = Neo.fixPCH(JSON.parse(data))
                 callback({
@@ -6044,9 +6052,7 @@ Neo.setSpeed = function(value) {
 
 Neo.setMark = function(value) {
     Neo.painter._actionMgr._mark = value;
-    Neo.viewerBar.update();
-
-    Neo.painter.onsetmark();
+    Neo.painter.onmark();
 };
 
 Neo.getSeek = function() {
@@ -7420,9 +7426,10 @@ Neo.ViewerBar.prototype._touchHandler = function(e) {
     x = Math.max(Math.min(x, 1), 0);
 
     Neo.painter._actionMgr._mark = Math.round(x * this.length);
-    this.update();
+    //this.update();
+    //  console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
 
-    console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
+    Neo.painter.onmark();
 };
 
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>

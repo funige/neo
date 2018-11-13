@@ -1361,7 +1361,8 @@ Neo.ViewerBar.prototype._touchHandler = function(e) {
     x = Math.max(Math.min(x, 1), 0);
 
     Neo.painter._actionMgr._mark = Math.round(x * this.length);
-    this.update();
+    //this.update();
+    //  console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
 
-    console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
+    Neo.painter.onmark();
 };
