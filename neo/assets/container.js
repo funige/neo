@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.11";
+Neo.version = "1.4.12";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -683,7 +683,6 @@ Neo.resizeCanvas = function() {
     height = Math.floor(height / 2) * 2;
 
     if (Neo.viewer) {
-        console.log(canvasWidth, canvasHeight, width, height);
         width = canvasWidth;
         height = canvasHeight;
     }

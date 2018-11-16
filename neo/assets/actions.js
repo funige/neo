@@ -14,8 +14,31 @@ Neo.ActionManager = function() {
     this._pause = false;
     this._seek = 0;
     this._mark = 0;
-    this._speed = 3;
-}
+
+    this._speedTable = [-1, 0, 1, 11];
+    this._speed = parseInt(Neo.config.speed || 0);
+    this._speedMode = this.generateSpeedTable();
+};
+
+Neo.ActionManager.prototype.generateSpeedTable = function() {
+    var speed = this._speed;
+    var mode = 0;
+
+    if (speed < 0) {
+        mode = 0;
+
+    } else if (speed == 0) {
+        mode = 1;
+        
+    } else if (speed <= 10) {
+        mode = 2;
+
+    } else {
+        mode = 3;
+    }
+    this._speedTable[mode] = speed;
+    return mode;
+};
 
 Neo.ActionManager.prototype.step = function() {
     if (!Neo.animation) return;
@@ -25,7 +48,7 @@ Neo.ActionManager.prototype.step = function() {
     }
     this._items.push([]);
     this._head++;
-}
+};
 
 Neo.ActionManager.prototype.back = function() {
     if (!Neo.animation) return;
@@ -33,7 +56,7 @@ Neo.ActionManager.prototype.back = function() {
     if (this._head > 0) {
         this._head--;
     }
-}
+};
 
 Neo.ActionManager.prototype.forward = function() {
     if (!Neo.animation) return;
@@ -41,7 +64,7 @@ Neo.ActionManager.prototype.forward = function() {
     if (this._head < this._items.length) {
         this._head++;
     }
-}
+};
 
 Neo.ActionManager.prototype.push = function() {
     if (!Neo.animation) return;
@@ -756,7 +779,8 @@ Neo.startViewer = function() {
             Neo.painter.onrewind();
         }
         new Neo.ViewerButton().init("viewerSpeed").onmouseup = function() {
-            console.log('speed');
+            Neo.painter.onspeed();
+            this.update();
         };
         new Neo.ViewerButton().init("viewerPlus").onmouseup = function() {
             new Neo.ZoomPlusCommand(Neo.painter).execute();

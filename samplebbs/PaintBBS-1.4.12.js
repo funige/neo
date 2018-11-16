@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.11";
+Neo.version = "1.4.12";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -683,7 +683,6 @@ Neo.resizeCanvas = function() {
     height = Math.floor(height / 2) * 2;
 
     if (Neo.viewer) {
-        console.log(canvasWidth, canvasHeight, width, height);
         width = canvasWidth;
         height = canvasHeight;
     }
@@ -3780,6 +3779,14 @@ Neo.Painter.prototype.onstop = function() {
     this._actionMgr._pause = true;
 };
 
+Neo.Painter.prototype.onspeed = function() {
+    var mgr = Neo.painter._actionMgr;
+    var mode = (mgr._speedMode + 1) % 4;
+    mgr._speedMode = mode;
+    mgr._speed = mgr._speedTable[mode];
+    console.log('speed=', mgr._speed);
+};
+
 Neo.Painter.prototype.setCurrent = function(item) {
     var color = this._currentColor;
     var mask = this._currentMask;
@@ -5219,8 +5226,31 @@ Neo.ActionManager = function() {
     this._pause = false;
     this._seek = 0;
     this._mark = 0;
-    this._speed = 3;
-}
+
+    this._speedTable = [-1, 0, 1, 11];
+    this._speed = parseInt(Neo.config.speed || 0);
+    this._speedMode = this.generateSpeedTable();
+};
+
+Neo.ActionManager.prototype.generateSpeedTable = function() {
+    var speed = this._speed;
+    var mode = 0;
+
+    if (speed < 0) {
+        mode = 0;
+
+    } else if (speed == 0) {
+        mode = 1;
+        
+    } else if (speed <= 10) {
+        mode = 2;
+
+    } else {
+        mode = 3;
+    }
+    this._speedTable[mode] = speed;
+    return mode;
+};
 
 Neo.ActionManager.prototype.step = function() {
     if (!Neo.animation) return;
@@ -5230,7 +5260,7 @@ Neo.ActionManager.prototype.step = function() {
     }
     this._items.push([]);
     this._head++;
-}
+};
 
 Neo.ActionManager.prototype.back = function() {
     if (!Neo.animation) return;
@@ -5238,7 +5268,7 @@ Neo.ActionManager.prototype.back = function() {
     if (this._head > 0) {
         this._head--;
     }
-}
+};
 
 Neo.ActionManager.prototype.forward = function() {
     if (!Neo.animation) return;
@@ -5246,7 +5276,7 @@ Neo.ActionManager.prototype.forward = function() {
     if (this._head < this._items.length) {
         this._head++;
     }
-}
+};
 
 Neo.ActionManager.prototype.push = function() {
     if (!Neo.animation) return;
@@ -5961,7 +5991,8 @@ Neo.startViewer = function() {
             Neo.painter.onrewind();
         }
         new Neo.ViewerButton().init("viewerSpeed").onmouseup = function() {
-            console.log('speed');
+            Neo.painter.onspeed();
+            this.update();
         };
         new Neo.ViewerButton().init("viewerPlus").onmouseup = function() {
             new Neo.ZoomPlusCommand(Neo.painter).execute();
@@ -7340,11 +7371,18 @@ Neo.ViewerButton.prototype.init = function(name, params) {
         }.bind(this);
 
     } else {
-        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[1]);
-        this.element.innerHTML = "<div>" + speedString + "</div>";
-        this.element.innerHTML += "<canvas width=24 height=24></canvas>"
+        this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>"
+        this.update();
     }
     return this;
+};
+
+Neo.ViewerButton.prototype.update = function() {
+    if (this.name == "viewerSpeed") {
+        var mode = Neo.painter._actionMgr._speedMode;
+        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+        this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
+    }
 };
 
 Neo.ViewerButton.minus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";

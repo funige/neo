@@ -1275,11 +1275,18 @@ Neo.ViewerButton.prototype.init = function(name, params) {
         }.bind(this);
 
     } else {
-        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[1]);
-        this.element.innerHTML = "<div>" + speedString + "</div>";
-        this.element.innerHTML += "<canvas width=24 height=24></canvas>"
+        this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>"
+        this.update();
     }
     return this;
+};
+
+Neo.ViewerButton.prototype.update = function() {
+    if (this.name == "viewerSpeed") {
+        var mode = Neo.painter._actionMgr._speedMode;
+        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+        this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
+    }
 };
 
 Neo.ViewerButton.minus = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";

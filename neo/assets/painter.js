@@ -2578,6 +2578,14 @@ Neo.Painter.prototype.onstop = function() {
     this._actionMgr._pause = true;
 };
 
+Neo.Painter.prototype.onspeed = function() {
+    var mgr = Neo.painter._actionMgr;
+    var mode = (mgr._speedMode + 1) % 4;
+    mgr._speedMode = mode;
+    mgr._speed = mgr._speedTable[mode];
+    console.log('speed=', mgr._speed);
+};
+
 Neo.Painter.prototype.setCurrent = function(item) {
     var color = this._currentColor;
     var mask = this._currentMask;
