@@ -2535,6 +2535,7 @@ Neo.Painter.prototype.play = function(wait) {
         //console.log('[play]');
         
         this._actionMgr._head = 0;
+        this._actionMgr._index = 0;
         this._actionMgr._mark = this._actionMgr._items.length;
         this._actionMgr._pause = false;
         this._actionMgr.play();
@@ -2545,6 +2546,7 @@ Neo.Painter.prototype.onrewind = function() {
     if (this._actionMgr) {
         this._actionMgr.clearCanvas();
         this._actionMgr._head = 0;
+        this._actionMgr._index = 0;
         this.prevLine = null;
      }
     if (Neo.viewerBar) Neo.viewerBar.update();
