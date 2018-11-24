@@ -3602,7 +3602,6 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
         //console.log(pch);
         Neo.painter._actionMgr._items = pch.data;
         Neo.painter._actionMgr._mark = pch.data.length;
-        Neo.painter._actionMgr.skip();
         Neo.painter._actionMgr.play();
     });
 };
