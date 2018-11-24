@@ -63,8 +63,9 @@ Neo.init = function() {
             } else {
                 Neo.viewer = true;
                 Neo.initConfig(applet);
-                
-                var pch = Neo.getPCH(function(pch) {
+
+                var filename = Neo.getFilename();
+                var pch = Neo.getPCH(filename, function(pch) {
                     if (pch) {
                         Neo.createViewer(applet);
                         Neo.config.width = pch.width;

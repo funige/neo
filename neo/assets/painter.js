@@ -447,6 +447,8 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
+    if (this.busy) return; // loadAnimation実行中は何もしない
+
     if (e.target == Neo.painter.destCanvas) {
         //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
         //http://stackoverflow.com/questions/2745028/chrome-sets-cursor-to-text-while-dragging-why    
@@ -2389,22 +2391,35 @@ Neo.Painter.prototype.loadImage = function (filename) {
     };
 };
 
-Neo.Painter.prototype.loadAnimation = function (filename, wait) {
+Neo.Painter.prototype.loadAnimation = function (filename) {
     console.log("loadAnimation " + filename);
+
+    Neo.painter.busy = true;
+    Neo.getPCH(filename, function(pch) {
+        //console.log(pch);
+        
+        Neo.painter._actionMgr._items = pch.data;
+        Neo.painter._actionMgr._mark = pch.data.length;
+        Neo.painter._actionMgr.play();
+    });
+/*
     var request = new XMLHttpRequest();
     request.open("GET", filename, true);
     request.responseType = "arraybuffer";
     request.onload = function() {
         var byteArray = new Uint8Array(request.response);
-        var header = byteArray.slice(0, 12);
-        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+//      var header = byteArray.slice(0, 12);
+//      var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+        var header = byteArray.subarray(0, 12);
+        var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
 
         var items = JSON.parse(data);
         Neo.painter._actionMgr._items = Neo.fixPCH(JSON.parse(data));
         Neo.painter._actionMgr._mark = Neo.painter._actionMgr._items.length;
-        Neo.painter._actionMgr.play(wait);
+        Neo.painter._actionMgr.play();
     };
     request.send();
+*/
 };
 
 Neo.Painter.prototype.loadSession = function (callback) {
@@ -2538,7 +2553,7 @@ Neo.Painter.prototype.play = function(wait) {
         this._actionMgr._index = 0;
         this._actionMgr._mark = this._actionMgr._items.length;
         this._actionMgr._pause = false;
-        this._actionMgr.play();
+        this._actionMgr.play(wait);
     }
 };
 
@@ -2585,7 +2600,7 @@ Neo.Painter.prototype.onspeed = function() {
     var mode = (mgr._speedMode + 1) % 4;
     mgr._speedMode = mode;
     mgr._speed = mgr._speedTable[mode];
-    console.log('speed=', mgr._speed);
+//  console.log('speed=', mgr._speed);
 };
 
 Neo.Painter.prototype.setCurrent = function(item) {

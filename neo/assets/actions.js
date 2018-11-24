@@ -18,6 +18,8 @@ Neo.ActionManager = function() {
     this._speedTable = [-1, 0, 1, 11];
     this._speed = parseInt(Neo.config.speed || 0);
     this._speedMode = this.generateSpeedTable();
+
+    this._prevSpeed = this._speed; // freeHandの途中で速度が変わると困るので
 };
 
 Neo.ActionManager.prototype.generateSpeedTable = function() {
@@ -103,7 +105,10 @@ Neo.ActionManager.prototype.getCurrent = function(item) {
 };
 
 Neo.ActionManager.prototype.play = function(wait) {
-    if (!wait) wait = 0;
+    if (!wait) {
+        wait = (this._prevSpeed < 0) ? 0 : this._prevSpeed;
+        wait *= 1; //2
+    }
     if (Neo.viewerBar) Neo.viewerBar.update();
     
     if (this._pause) {
@@ -121,42 +126,34 @@ Neo.ActionManager.prototype.play = function(wait) {
                                   true);
         }
 
-        if (Neo.viewer && Neo.viewerBar) {
+        if (0) { //Neo.viewer && Neo.viewerBar) {
             console.log("play", item[0], this._head, this._items.length);
         }
-/*
-        if (item[0] != "restore" &&
-            item[0] != "freeHand") {
-            // sync
-            if (item[0] && this[item[0]]) {
-                (this[item[0]])(item);
-            }
-            this._head++;
-            this._index = 0;
-            
-            setTimeout(function() {
-                Neo.painter._actionMgr.play(wait);
-            }, wait);
 
-        } else {*/
-
-            // async
         var that = this;
-        
         if (item[0] && this[item[0]]) {
             (this[item[0]])(item, function(result) {
                 if (result) {
                     that._head++;
                     that._index = 0;
+                    that._prevSpeed = that._speed;
                 }
-                Neo.painter._actionMgr.play(wait);
+
+                if (!Neo.viewer ||
+                    ((that._prevSpeed < 0) && (that._head % 10 != 0))) {
+                    Neo.painter._actionMgr.play();
+
+                } else {
+                    setTimeout(function () {
+                        Neo.painter._actionMgr.play();
+                    }, wait);
+                }
             });
         }
-//          this._head++;
-//      }
 
     } else {
         Neo.painter.dirty = false;
+        Neo.painter.busy = false;
     }
 }
 
@@ -221,6 +218,56 @@ Neo.ActionManager.prototype.eraseAll = function() {
 }
 
 Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
+    var oe = Neo.painter;
+    var layer = oe.current;
+
+    if (typeof arguments[0] != "object") {
+        this.push('freeHand', layer);
+        this.pushCurrent();
+        this.push(lineType, x0, y0, x0, y0);
+        
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
+
+    } else if (!Neo.viewer || this._prevSpeed <= 0) {
+        this.freeHandFast(arguments[0], arguments[1]);
+        
+    } else {
+        var item = arguments[0];
+
+        layer = item[1];
+        lineType = item[11];
+        this.getCurrent(item);
+
+        var i = this._index;
+        if (i == 0) {
+            i = 12;
+        } else {
+            i += 2;
+        }
+
+        var x1 = item[i + 0];
+        var y1 = item[i + 1];
+        x0 = item[i + 2];
+        y0 = item[i + 3];
+
+        oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+
+        this._index = i;
+        var result = (i + 2 + 3) >= item.length;
+ 
+        if (!result) {
+            oe.prevLine = null;
+        }
+        
+        var callback = arguments[1];
+        if (callback && typeof callback == "function") {
+            callback(result);
+        }
+    }
+}
+
+Neo.ActionManager.prototype.freeHandFast = function(x0, y0, lineType) {
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -787,8 +834,7 @@ Neo.initViewer = function(pch) {
     
     if (pch) {//Neo.config.pch_file) {
         Neo.painter._actionMgr._items = pch.data;
-        //Neo.painter._actionMgr.play(10);
-        Neo.painter.play(10);
+        Neo.painter.play();
     }
 };
 
@@ -861,8 +907,7 @@ Neo.getFilename = function() {
     return Neo.config.pch_file || Neo.config.image_canvas;
 };
 
-Neo.getPCH = function(callback) {
-    var filename = Neo.getFilename();
+Neo.getPCH = function(filename, callback) {
     if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
     
     var request = new XMLHttpRequest();
@@ -870,8 +915,10 @@ Neo.getPCH = function(callback) {
     request.responseType = "arraybuffer";
     request.onload = function() {
         var byteArray = new Uint8Array(request.response);
-        var data = LZString.decompressFromUint8Array(byteArray.slice(12));
-        var header = byteArray.slice(0, 12);
+//      var data = LZString.decompressFromUint8Array(byteArray.slice(12));
+//      var header = byteArray.slice(0, 12);
+        var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
+        var header = byteArray.subarray(0, 12);
 
         if ((header[0] == "N".charCodeAt(0)) &&
             (header[1] == "E".charCodeAt(0)) &&
