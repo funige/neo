@@ -104,6 +104,14 @@ Neo.ActionManager.prototype.getCurrent = function(item) {
     oe._currentMaskType = item[10];
 };
 
+Neo.ActionManager.prototype.skip = function(wait) {
+    for (var i = 0; i < this._items.length; i++) {
+        if (this._items[i][0] == 'restore') {
+            this._head = i;
+        }
+    }
+};
+
 Neo.ActionManager.prototype.play = function(wait) {
     if (!wait) {
         wait = (this._prevSpeed < 0) ? 0 : this._prevSpeed;
@@ -126,7 +134,7 @@ Neo.ActionManager.prototype.play = function(wait) {
                                   true);
         }
 
-        if (0) { //Neo.viewer && Neo.viewerBar) {
+        if (Neo.viewer && Neo.viewerBar) {
             console.log("play", item[0], this._head, this._items.length);
         }
 

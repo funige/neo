@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.4.12";
+Neo.version = "1.5.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1273,6 +1273,7 @@ Neo.Painter.prototype._currentMask = [];
 
 Neo.Painter.prototype.aerr;
 Neo.Painter.prototype.dirty = false;
+Neo.Painter.prototype.busy = false;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -3599,29 +3600,11 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
     Neo.painter.busy = true;
     Neo.getPCH(filename, function(pch) {
         //console.log(pch);
-        
         Neo.painter._actionMgr._items = pch.data;
         Neo.painter._actionMgr._mark = pch.data.length;
+        Neo.painter._actionMgr.skip();
         Neo.painter._actionMgr.play();
     });
-/*
-    var request = new XMLHttpRequest();
-    request.open("GET", filename, true);
-    request.responseType = "arraybuffer";
-    request.onload = function() {
-        var byteArray = new Uint8Array(request.response);
-//      var header = byteArray.slice(0, 12);
-//      var data = LZString.decompressFromUint8Array(byteArray.slice(12));
-        var header = byteArray.subarray(0, 12);
-        var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
-
-        var items = JSON.parse(data);
-        Neo.painter._actionMgr._items = Neo.fixPCH(JSON.parse(data));
-        Neo.painter._actionMgr._mark = Neo.painter._actionMgr._items.length;
-        Neo.painter._actionMgr.play();
-    };
-    request.send();
-*/
 };
 
 Neo.Painter.prototype.loadSession = function (callback) {
@@ -5334,6 +5317,14 @@ Neo.ActionManager.prototype.getCurrent = function(item) {
     oe._currentMaskType = item[10];
 };
 
+Neo.ActionManager.prototype.skip = function(wait) {
+    for (var i = 0; i < this._items.length; i++) {
+        if (this._items[i][0] == 'restore') {
+            this._head = i;
+        }
+    }
+};
+
 Neo.ActionManager.prototype.play = function(wait) {
     if (!wait) {
         wait = (this._prevSpeed < 0) ? 0 : this._prevSpeed;
@@ -5356,7 +5347,7 @@ Neo.ActionManager.prototype.play = function(wait) {
                                   true);
         }
 
-        if (0) { //Neo.viewer && Neo.viewerBar) {
+        if (Neo.viewer && Neo.viewerBar) {
             console.log("play", item[0], this._head, this._items.length);
         }
 
