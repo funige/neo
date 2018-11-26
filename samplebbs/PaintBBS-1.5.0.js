@@ -5347,7 +5347,7 @@ Neo.ActionManager.prototype.play = function(wait) {
         }
 
         if (Neo.viewer && Neo.viewerBar) {
-            console.log("play", item[0], this._head, this._items.length);
+            console.log("play", item[0], this._head + 1, this._items.length);
         }
 
         var that = this;
@@ -5629,7 +5629,7 @@ Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
     var oe = Neo.painter;
     var layer = oe.current;
 
-    if (arguments.length > 1) {
+    if (typeof arguments[0] != "object") {
         this.push('fill', layer);
         this.pushCurrent();
         this.push(x, y, width, height, type);
@@ -5645,6 +5645,7 @@ Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
         height = item[14];
         type = item[15];
     }
+
     oe.doFill(layer, x, y, width, height, type);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
