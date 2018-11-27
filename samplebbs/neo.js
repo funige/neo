@@ -5351,25 +5351,25 @@ Neo.ActionManager.prototype.play = function(wait) {
         }
 
         var that = this;
-        if (item[0] && this[item[0]]) {
-            (this[item[0]])(item, function(result) {
-                if (result) {
-                    that._head++;
-                    that._index = 0;
-                    that._prevSpeed = that._speed;
-                }
+        var func = (item[0] && this[item[0]]) ? item[0] : 'dummy';
 
-                if (!Neo.viewer ||
-                    ((that._prevSpeed < 0) && (that._head % 10 != 0))) {
+        (this[func])(item, function(result) {
+            if (result) {
+                that._head++;
+                that._index = 0;
+                that._prevSpeed = that._speed;
+            }
+
+            if (!Neo.viewer ||
+                ((that._prevSpeed < 0) && (that._head % 10 != 0))) {
+                Neo.painter._actionMgr.play();
+
+            } else {
+                setTimeout(function () {
                     Neo.painter._actionMgr.play();
-
-                } else {
-                    setTimeout(function () {
-                        Neo.painter._actionMgr.play();
-                    }, wait);
-                }
-            });
-        }
+                }, wait);
+            }
+        });
 
     } else {
         Neo.painter.dirty = false;
@@ -5929,6 +5929,11 @@ Neo.ActionManager.prototype.restore = function() {
             }
         }
     }
+}
+
+Neo.ActionManager.prototype.dummy = function() {
+    var callback = arguments[1];
+    if (callback && typeof callback == "function") callback(true);
 }
 
 /*
