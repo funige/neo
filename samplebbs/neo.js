@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.5.0";
+Neo.version = "1.5.1";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1274,6 +1274,7 @@ Neo.Painter.prototype._currentMask = [];
 Neo.Painter.prototype.aerr;
 Neo.Painter.prototype.dirty = false;
 Neo.Painter.prototype.busy = false;
+Neo.Painter.prototype.busySkipped = false;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -1650,7 +1651,13 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
-    if (this.busy) return; // loadAnimation実行中は何もしない
+    if (this.busy) {
+        // loadAnimation実行中は何もしない
+        if (e.target == Neo.painter.destCanvas) {
+            this.busySkipped = true;
+        }
+        return;
+    }
 
     if (e.target == Neo.painter.destCanvas) {
         //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
@@ -3598,6 +3605,8 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
     console.log("loadAnimation " + filename);
 
     Neo.painter.busy = true;
+    Neo.painter.busySkipped = false;
+    
     Neo.getPCH(filename, function(pch) {
         //console.log(pch);
         Neo.painter._actionMgr._items = pch.data;
@@ -4916,6 +4925,12 @@ Neo.PasteTool.prototype.keyDownHandler = function(e) {
     }
 };
 
+Neo.PasteTool.prototype.kill = function() {
+    var oe = Neo.painter;
+    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+};
+    
+
 Neo.PasteTool.prototype.drawCursor = function(oe) {
     var ctx = oe.destCanvasCtx;
 
@@ -5355,13 +5370,19 @@ Neo.ActionManager.prototype.play = function(wait) {
 
         (this[func])(item, function(result) {
             if (result) {
-                that._head++;
+                if (Neo.painter.busySkipped &&
+                    that._head < that._mark - 2 && that._mark - 2 >= 0 &&
+                    that._items[that._mark - 1][0] == 'restore') {
+                    that._head = that._mark - 2;
+
+                } else {
+                    that._head++;
+                }
                 that._index = 0;
                 that._prevSpeed = that._speed;
             }
 
-            if (!Neo.viewer ||
-                ((that._prevSpeed < 0) && (that._head % 10 != 0))) {
+            if ((that._prevSpeed < 0) && (that._head % 10 != 0)) {
                 Neo.painter._actionMgr.play();
 
             } else {
@@ -5374,6 +5395,13 @@ Neo.ActionManager.prototype.play = function(wait) {
     } else {
         Neo.painter.dirty = false;
         Neo.painter.busy = false;
+
+        if (Neo.painter.bushSkipped) {
+            Neo.painter.busySkipped = false;
+            console.log('animation skipped');
+        } else {
+            console.log('animation finished');
+        }
     }
 }
 
@@ -5431,7 +5459,7 @@ Neo.ActionManager.prototype.eraseAll = function() {
 
     var oe = Neo.painter;
     oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5471,7 +5499,7 @@ Neo.ActionManager.prototype.freeHand = function(x0, y0, lineType) {
         y0 = item[i + 3];
 
         oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
         this._index = i;
         var result = (i + 2 + 3) >= item.length;
@@ -5518,7 +5546,7 @@ Neo.ActionManager.prototype.freeHandFast = function(x0, y0, lineType) {
             oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
         }
         oe.prevLine = null;
-        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     }
 
     var callback = arguments[1];
@@ -5580,7 +5608,7 @@ Neo.ActionManager.prototype.line = function(
         y1 = item[15];
     }
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5619,7 +5647,7 @@ Neo.ActionManager.prototype.bezier = function(
         y3 = item[19];
     }
     oe.drawBezier(oe.canvasCtx[layer], x0, y0, x1, y1, x2, y2, x3, y3, lineType, isReplay);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5647,7 +5675,7 @@ Neo.ActionManager.prototype.fill = function(x, y, width, height, type) {
     }
 
     oe.doFill(layer, x, y, width, height, type);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5669,7 +5697,7 @@ Neo.ActionManager.prototype.flipH = function(x, y, width, height) {
         height = item[5];
     }
     oe.flipH(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5691,7 +5719,7 @@ Neo.ActionManager.prototype.flipV = function(x, y, width, height) {
         height = item[5];
     }
     oe.flipV(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5713,7 +5741,7 @@ Neo.ActionManager.prototype.merge = function(x, y, width, height) {
         height = item[5];
     }
     oe.merge(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5736,7 +5764,7 @@ Neo.ActionManager.prototype.blurRect = function(x, y, width, height) {
         height = item[5];
     }
     oe.blurRect(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5762,7 +5790,7 @@ Neo.ActionManager.prototype.eraseRect2 = function(x, y, width, height) {
         height = item[14];
     }
     oe.eraseRect(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5784,7 +5812,7 @@ Neo.ActionManager.prototype.eraseRect = function(x, y, width, height) {
         height = item[5];
     }
     oe.eraseRect(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5836,7 +5864,7 @@ Neo.ActionManager.prototype.paste = function(x, y, width, height, dx, dy) {
     }
 
     oe.paste(layer, x, y, width, height, dx, dy);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5858,7 +5886,7 @@ Neo.ActionManager.prototype.turn = function(x, y, width, height) {
         height = item[5];
     }
     oe.turn(layer, x, y, width, height);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -5891,7 +5919,7 @@ Neo.ActionManager.prototype.text = function(
         family = item[8];
     }
     oe.doText(layer, x, y, color, alpha, string, size, family);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);

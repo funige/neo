@@ -259,7 +259,7 @@ define('DISP_ID', '0');
 define('ID_SEED', 'IDの種');
 
 //改行を抑制する行数 しない:0
-define('BR_CHECK', '15');
+define('BR_CHECK', '0');
 
 //URLを自動リンクする する:1 しない:0
 define('AUTOLINK', '1');
@@ -343,8 +343,8 @@ define('TEMP_LIMIT', '14');
 
 //お絵描き最大サイズ（これ以上は強制でこの値
 //最小値は幅、高さともに 100 固定です
-define('PMAX_W', '500');	//幅
-define('PMAX_H', '500');	//高さ
+define('PMAX_W', '2000');	//幅
+define('PMAX_H', '2000');	//高さ
 
 //お絵描きデフォルトサイズ
 define('PDEF_W', '400');	//幅

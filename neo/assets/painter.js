@@ -72,6 +72,7 @@ Neo.Painter.prototype._currentMask = [];
 Neo.Painter.prototype.aerr;
 Neo.Painter.prototype.dirty = false;
 Neo.Painter.prototype.busy = false;
+Neo.Painter.prototype.busySkipped = false;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -448,7 +449,13 @@ Neo.Painter.prototype._rollOutHandler = function(e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function(e) {
-    if (this.busy) return; // loadAnimation実行中は何もしない
+    if (this.busy) {
+        // loadAnimation実行中は何もしない
+        if (e.target == Neo.painter.destCanvas) {
+            this.busySkipped = true;
+        }
+        return;
+    }
 
     if (e.target == Neo.painter.destCanvas) {
         //よくわからないがChromeでドラッグの時カレットが出るのを防ぐ
@@ -2396,6 +2403,8 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
     console.log("loadAnimation " + filename);
 
     Neo.painter.busy = true;
+    Neo.painter.busySkipped = false;
+    
     Neo.getPCH(filename, function(pch) {
         //console.log(pch);
         Neo.painter._actionMgr._items = pch.data;
