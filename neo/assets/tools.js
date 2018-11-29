@@ -1104,6 +1104,12 @@ Neo.PasteTool.prototype.keyDownHandler = function(e) {
     }
 };
 
+Neo.PasteTool.prototype.kill = function() {
+    var oe = Neo.painter;
+    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+};
+    
+
 Neo.PasteTool.prototype.drawCursor = function(oe) {
     var ctx = oe.destCanvasCtx;
 
