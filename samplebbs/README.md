@@ -50,9 +50,6 @@ neo.jsとneo.cssの2つのファイルを[/dist](https://github.com/funige/neo/t
 
 POTI-board以外にも幾つか掲示板スクリプトがありますが、詳細は調べてみないと何とも言えません……。
 
-- さとぴあさんのBBSNote8.0での設置例  
-  http://stp.sblo.jp/article/182045577.html  
-
 # NEO独自のパラメータについて
 
   &lt;applet>の下に、他のパラメータと同じように指定してください。
