@@ -26,32 +26,54 @@ neo.jsとneo.cssの2つのファイルを[/dist](https://github.com/funige/neo/t
 #### 2. セキュリティチェックのコードを修正（ふたばでは不要です）
 ふたば以外の多くの掲示板では、送信された画像のUser-Agentを見て不正な投稿かどうかチェックしているようです。アプリではUser-Agentを簡単に偽装できるのですが、埋め込みのNEOでは偽装は難しいので、このチェックを外す必要があります。
 
-このサンプルでは、picpost.phpの
+このサンプルでは、picpost.phpの以下の部分をコメントアウトしています。
 
-    /＊
     if($h=='S'){
-        if(!strstr($u_agent,'Shi-Painter/')){
-            unlink($full_imgfile);
-            error("UA error。画像は保存されません。");
-            exit;
-        }
+    //  if(!strstr($u_agent,'Shi-Painter/')){
+    //      unlink($full_imgfile);
+    //      error("UA error。画像は保存されません。");
+    //      exit;
+    //  }
         $ext = '.spch';
     }else{
-        if(!strstr($u_agent,'PaintBBS/')){
-            unlink($full_imgfile);
-            error("UA error。画像は保存されません。");
-            exit;
-        }
+    //  if(!strstr($u_agent,'PaintBBS/')){
+    //      unlink($full_imgfile);
+    //      error("UA error。画像は保存されません。");
+    //      exit;
+    //  }
         $ext = '.pch';
     }
-    ＊/
 
-の部分をコメントアウトしています。
+# 動画記録について
 
-POTI-board以外にも幾つか掲示板スクリプトがありますが、詳細は調べてみないと何とも言えません……。
+v1.5で動画記録をサポートしました。
 
-- さとぴあさんのBBSNote8.0での設置例  
-  http://stp.sblo.jp/article/182045577.html  
+お絵描きするページでは描画用のJavaアプレット（PaintBBS.jar）が読み込まれ、動画を表示するページでは動画ビューアのアプレット（PCHViewer.jar）が読み込まていると思います。
+
+動画記録に対応するには、どちらのページでもNEOが起動するように、neo.jsとneo.cssを適切に挿入する必要があります。
+
+残念ながら動画データ（.pch）は解析できなかったので、NEOは互換性のない記録方法を採用しています。
+
+* **PaintBBSのpch**  
+magic (4byte: 1f 8b 08 00)  
+speed (2byte)  
+width (2byte)  
+height (2byte)  
+:  
+
+* **NEOのpch**  
+magic (3byte: 4c 45 4f) + version (1byte: 20)  
+width (2byte)  
+height (2byte)  
+拡張用 (4byte: 00 00 00 00)  
+:  
+
+POTI-boardやRelmではこれが問題になることはないのですが、BBSNoteはヘッダをチェックするので、NEOの動画データを受け付けてくれません。
+
+詳細はミミニャーさんの記事を参照してください。  
+お絵かき掲示板NEOの設置方法(BBSnote編)
+https://oekakiart.net/blog/bbsnoteneo/
+
 
 # NEO独自のパラメータについて
 
@@ -102,4 +124,4 @@ POTI-board以外にも幾つか掲示板スクリプトがありますが、詳�
     .NEO .tool_color_bar     { color: #ddddff; }
     .NEO .tool_color_frame   { color: #000000; }
 
-* スタイルシート対応は隠し機能的な扱いです。スタイルシートの文法はとても柔軟ですが、NEOではほとんど対応できていません。
+

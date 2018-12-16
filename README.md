@@ -1,5 +1,7 @@
 
 # PaintBBS NEO
+![ver1.0](https://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20181205/20181205141944.png)  
+
 お絵描きしぃ掲示板 PaintBBS (&copy;2000-2004しぃちゃん) をhtml5化するプロジェクトです。  
 
 作者行方不明のため、許諾は取れていません。
@@ -14,7 +16,9 @@ http://hp.vector.co.jp/authors/VA016309/
 1. 掲示板に投稿できるMac/Win用のアプリを開発します(中身はjavascript)
 
 2. PaintBBSと見た目や操作性がだいたい同じになってきたら、  
-管理人さんに連絡取って直接組み込んでもらうことを目指します
+管理人さんに連絡取って直接組み込んでもらうことを目指します  
+
+  :
 
 **……というわけで、ふたばでNEOが使えるようになりました！**
 
@@ -23,12 +27,13 @@ http://hp.vector.co.jp/authors/VA016309/
     http://nov.2chan.net/q/futaba.htm
     調子が良ければ他のお絵かき板にも導入します
 
-----
+
 
 ## <a name="browser">対応環境</a>
 
-  Chrome/FireFox/Safari/<s>Edge</s>（最近のバージョンのみ）  
+  Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
   iOS(Mobile Safari)  
+
   IEはサポート対象外です  
   Androidでもだいたい動くのですが、サポート対象外とします
 
@@ -36,38 +41,53 @@ http://hp.vector.co.jp/authors/VA016309/
   - Chromeを使う
   - Wacomのタブレットを使用している場合は「デジタルインクを使用する」をオフにする
 
-  Firefoxはタブレットドライバにバグがあるようで「デジタルインクを使用する」をオフにすると  
-  線が乱れます。そのうち直ると思いますが……。
+  Firefoxはタブレットドライバにバグがあるようで「デジタルインクを使用する」をオフにすると線が乱れます。そのうち直ると思いますが……。
 
 ### [**サンプル掲示板**](http://neo.websozai.jp)  
 動作確認にご利用ください。
 
-## <a name="append">既存の掲示板にNEOを組み込むには</a><small>（管理者向け）</small>
-/samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に書きました。  
+
+## <a name="animation">動画記録について</a>
+v1.5で動画記録をサポートしましたが、動画データ（.pch）のフォーマットが解析できなかったため、Java版のPaintBBSで作った動画データと互換性がありません。
+
+掲示板によっては、動画を記録しようとすると不具合が発生することがあります。
+
+
+## 掲示板の管理者、新しく軽視板を設置したい方へ
+
+### <a name="append">既存のお絵かき掲示板にNEOを組み込むには</a>
+現在稼働中のお絵かき掲示板なら、とりあえず2行追加するだけでNEOを組み込むことができます。
+
+/samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に詳細を書きました。  
 不明な点があれば[サンプル掲示板](http://neo.websozai.jp)で聞いてください
 
-## <a name="new">掲示板を新規作成するには</a><small>（管理者向け）</small>
-基本的には/samplebbsの中身をそのままレンタルサーバーにコピーすればいいのですが、古いPHP5.6用なのでうまく動かないことがあるようです  
-[http://neo.websozai.jp/potiboard.php?res=356](http://htmlpreview.github.io/?https://github.com/funige/neo/blob/master/samplebbs/log/356.html)
+### <a name="new">掲示板を新規作成するには</a>
+[サンプル掲示板 (/samplebbs)](https://github.com/funige/neo/tree/master/samplebbs.zip) をそのままPHPが動くレンタルサーバーにコピーするのが簡単です。
 
-PHP7に対応したPOTI-boardはサ骨さんのところで公開されています  
-[POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)
+サンプル掲示板はサ骨さんが開発したPOTI-board改をカスタマイズしたものです。   
+
+サ骨さんのページでは他にも数種類のテンプレートが公開されています。  
+[POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)  
+
 
 さとぴあさんの記事も参考になるかと思います  
 [POTI-board用テンプレート PINK を配布します。 http://stp.sblo.jp/article/182310034.html](http://stp.sblo.jp/article/182310034.html)
 
+
 ## <a name="app">Mac/Win用アプリについて</a>
 Mac/Win用アプリはNEO開発のために作られたものです  
-もうあまり使うことはないと思いますが、今でもNEO非対応の掲示板に投稿するのに使えます
+もうほとんど使うことはないと思います
 
 **インストール方法**
 
-1. neo-darwin-x64.zip(Mac)または  
-neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する  
+1. app/neo-darwin-x64.zip(Mac)または  
+app/neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する  
 
 2. 実行ファイル (neo.app または neo.exe) をダブルクリック
 
-Chrome等のブラウザで描きたい掲示板を開いてから、アドレスバーのURLをこのアプリにドラッグドロップしてください
+**NEO非対応の掲示板にこのアプリを使って投稿する方法**  
+1. Chrome等のブラウザで描きたい掲示板を開く
+2. アドレスバーのURLをこのアプリにドラッグドロップしてください
 
 ## <a name="history">履歴</a>
 
@@ -286,4 +306,3 @@ Chrome等のブラウザで描きたい掲示板を開いてから、アドレ�
 https://github.com/funige/neo/issues  
 
 - しぃペインターとかPooとかは作りません  
-- アニメーションの記録・再生には対応しません  
