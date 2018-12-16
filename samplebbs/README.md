@@ -74,7 +74,10 @@ POTI-boardやRelmではこれが問題になることはないのですが、BBS
 お絵かき掲示板NEOの設置方法(BBSnote編)
 https://oekakiart.net/blog/bbsnoteneo/
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 373ff12198944051b783becbd1cc1c51db96cada
 # NEO独自のパラメータについて
 
   &lt;applet>の下に、他のパラメータと同じように指定してください。
