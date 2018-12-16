@@ -74,10 +74,6 @@ POTI-boardやRelmではこれが問題になることはないのですが、BBS
 お絵かき掲示板NEOの設置方法(BBSnote編)
 https://oekakiart.net/blog/bbsnoteneo/
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 373ff12198944051b783becbd1cc1c51db96cada
 # NEO独自のパラメータについて
 
   &lt;applet>の下に、他のパラメータと同じように指定してください。
@@ -112,7 +108,7 @@ https://oekakiart.net/blog/bbsnoteneo/
 
 
   優先順位は、（１）paramで指定した色（２）スタイルシートで指定した色（３）デフォルトの色です。
-  
+
     .NEO .color_bk           { color: #ccccff; }
     .NEO .color_bk2          { color: #bbbbff; }
     .NEO .color_tool_icon    { color: #e8dfae; }
@@ -126,5 +122,3 @@ https://oekakiart.net/blog/bbsnoteneo/
     .NEO .tool_color_text    { color: #773333; }
     .NEO .tool_color_bar     { color: #ddddff; }
     .NEO .tool_color_frame   { color: #000000; }
-
-
