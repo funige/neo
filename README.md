@@ -66,9 +66,8 @@ v1.5で動画記録をサポートしましたが、動画データ（.pch）の
 1. [サンプル掲示板 (/samplebbs)](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
 2. その中にあるpotiboard.phpをブラウザで開く
 
-サンプル掲示板はサ骨さんが開発したPOTI-board改をカスタマイズしたものです。
-実際に運用する場合は、サ骨さんのページから最新版を入手してください。
-
+サンプル掲示板はサ骨さんが開発したPOTI-board改をカスタマイズしたものです。  
+実際に運用する場合は、サ骨さんのページから最新版を入手してください。  
 サ骨さんのページでは他にも数種類のテンプレートが公開されています。  
 [POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)  
 
