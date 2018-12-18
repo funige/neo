@@ -62,11 +62,12 @@ v1.5で動画記録をサポートしましたが、動画データ（.pch）の
 不明な点があれば[サンプル掲示板](http://neo.websozai.jp)で聞いてください
 
 ### <a name="new">掲示板を新規作成するには</a>
-とりあえず動作確認をするには、サンプル掲示板をコピーするのが簡単です。
-1. [サンプル掲示板の内容 (/samplebbs)](https://github.com/funige/neo/blob/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
+動作確認は、サンプル掲示板をそのままPHPが動くレンタルサーバーにコピーするのが簡単です。
+1. [サンプル掲示板 (/samplebbs)](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
 2. その中にあるpotiboard.phpをブラウザで開く
 
-サンプル掲示板はサ骨さんが開発したPOTI-board改をカスタマイズしたものです。   
+サンプル掲示板はサ骨さんが開発したPOTI-board改をカスタマイズしたものです。
+実際に運用する場合は、サ骨さんのページから最新版を入手してください。
 
 サ骨さんのページでは他にも数種類のテンプレートが公開されています。  
 [POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)  
