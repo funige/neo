@@ -66,6 +66,7 @@ v1.5で動画記録をサポートしましたが、動画データ（.pch）の
 1. [サンプル掲示板](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
 
   ターミナルでコピーする例：
+
     > cd www  
     > curl -LO https://github.com/funige/neo/raw/master/samplebbs.zip  
     > unzip samplebbs.zip  
