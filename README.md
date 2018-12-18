@@ -65,10 +65,10 @@ v1.5で動画記録をサポートしましたが、動画データ（.pch）の
 動作確認は、サンプル掲示板 (/samplebbs) をそのままPHPが動くレンタルサーバーにコピーするのが簡単です。
 1. [サンプル掲示板](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
 
-    ターミナルでコピーする例
-        > cd www  
-        > curl -LO https://github.com/funige/neo/raw/master/samplebbs.zip  
-        > unzip samplebbs.zip  
+  ターミナルでコピーする例：
+    > cd www  
+    > curl -LO https://github.com/funige/neo/raw/master/samplebbs.zip  
+    > unzip samplebbs.zip  
     
 2. その中にあるpotiboard.phpをブラウザで開くと、掲示板が初期化されます。
 
