@@ -1,10 +1,10 @@
 
 # PaintBBS NEO
-![ver1.0](https://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20181205/20181205141944.png)  
+![ver1.5.1](https://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20181205/20181205141944.png)  
 
 お絵描きしぃ掲示板 PaintBBS (&copy;2000-2004しぃちゃん) をhtml5化するプロジェクトです。  
 
-作者行方不明のため、許諾は取れていません。
+作者行方不明のため、許諾は取れていません。連絡お待ちしています。
 
 しぃちゃんのホームページ（Vector）  
 http://hp.vector.co.jp/authors/VA016309/
@@ -40,20 +40,21 @@ http://hp.vector.co.jp/authors/VA016309/
   Windowsで線がうまく引けない場合は、以下をお試しください
   - Chromeを使う
   - Wacomのタブレットを使用している場合は「デジタルインクを使用する」をオフにする
-
-  Firefoxはタブレットドライバにバグがあるようで「デジタルインクを使用する」をオフにすると線が乱れます。そのうち直ると思いますが……。
+  
+[Firefox(59以降)はバグがあるようで、](http://neo.websozai.jp/potiboard.php?res=553)タブレットの設定にかかわらず線が乱れることがあります。  
+「マルチプロセスを切ると症状が解消されました」という報告がありますが、未確認です……  
+（about:configでbrowser.tabs.remote.autostartをFalse）
 
 ### [**サンプル掲示板**](http://neo.websozai.jp)  
 動作確認にご利用ください。
 
 
 ## <a name="animation">動画記録について</a>
-v1.5で動画記録をサポートしましたが、動画データ（.pch）のフォーマットが解析できなかったため、Java版のPaintBBSで作った動画データと互換性がありません。
+v1.5で動画記録をサポートしました。
+Java版の動画データ（.pch）が解析不能なため、NEOの動画データと互換性はありません。
 
-掲示板によっては、動画を記録しようとすると不具合が発生することがあります。
 
-
-## 掲示板の管理者、新しく軽視板を設置したい方へ
+## 掲示板の管理者、新しく掲示板を設置したい方へ
 
 ### <a name="append">既存のお絵かき掲示板にNEOを組み込むには</a>
 現在稼働中のお絵かき掲示板なら、とりあえず2行追加するだけでNEOを組み込むことができます。
@@ -65,7 +66,7 @@ v1.5で動画記録をサポートしましたが、動画データ（.pch）の
 動作確認は、サンプル掲示板 (/samplebbs) をそのままPHPが動くレンタルサーバーにコピーするのが簡単です。
 1. [サンプル掲示板](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
 
-  ターミナルでコピーする例：
+  レンタルサーバーのターミナルでコピーする例：
 
     > cd www  
     > curl -LO https://github.com/funige/neo/raw/master/samplebbs.zip  
