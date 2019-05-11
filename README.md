@@ -4,7 +4,7 @@
 
 お絵描きしぃ掲示板 PaintBBS (&copy;2000-2004しぃちゃん) をhtml5化するプロジェクトです。  
 
-作者行方不明のため、許諾は取れていません。連絡お待ちしています。
+作者行方不明のため、許諾は取れていません。
 
 しぃちゃんのホームページ（Vector）  
 http://hp.vector.co.jp/authors/VA016309/
@@ -41,9 +41,8 @@ http://hp.vector.co.jp/authors/VA016309/
   - Chromeを使う
   - Wacomのタブレットを使用している場合は「デジタルインクを使用する」をオフにする
   
-[Firefox(59以降)はバグがあるようで、](http://neo.websozai.jp/potiboard.php?res=553)タブレットの設定にかかわらず線が乱れることがあります。  
-「マルチプロセスを切ると症状が解消されました」という報告がありますが、未確認です……  
-（about:configでbrowser.tabs.remote.autostartをFalse）
+[Firefox(59以降？)はタブレット関係のバグがあるらしく、](http://neo.websozai.jp/potiboard.php?res=553)線が乱れることがあるようです。  
+マルチプロセスを切ると症状が解消されるかもしれません。（about:configでbrowser.tabs.remote.autostartをFalse）
 
 ### [**サンプル掲示板**](http://neo.websozai.jp)  
 動作確認にご利用ください。
