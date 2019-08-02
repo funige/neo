@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.5.1";
+Neo.version = "1.5.2";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -3371,11 +3371,14 @@ Neo.Painter.prototype.paste = function(layer, x, y, width, height, dx, dy) {
     var imageData = ctx.getImageData(x + dx, y + dy, width, height);
     var buf32 = new Uint32Array(imageData.data.buffer);
     var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    for (var i = 0; i < buf32.length; i++) {
-        buf32[i] = this.temp[i];
+
+    if (this.temp) {
+        for (var i = 0; i < buf32.length; i++) {
+            buf32[i] = this.temp[i];
+        }
+        imageData.data.set(buf8);
+        ctx.putImageData(imageData, x + dx, y + dy);
     }
-    imageData.data.set(buf8);
-    ctx.putImageData(imageData, x + dx, y + dy);
 
     this.temp = null;
     this.tempX = 0;
