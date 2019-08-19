@@ -1612,7 +1612,7 @@ Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3,
     var that = this;
     
     this.draw(ctx, points, function(left, top, width, height, buf8, imageData) {
-        var n = Math.ceil(Math.max(width, height) * 2.5);
+        var n = Math.ceil((width + height) * 2.5);
         var oType = that._currentMaskType;
         var oAlpha = that._currentColor[3];
 
