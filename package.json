@@ -1,9 +1,9 @@
 {
   "name": "PaintBBS",
   "version": "1.5.3",
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
-    "hello": "echo 'hello'"
+    "app": "node_modules/.bin/electron ."
   },
   "dependencies": {
     "node-static": "^0.7.11",

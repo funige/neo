@@ -24,7 +24,9 @@
             <option value="zip.2chan.net/p">ふたば☆ちゃんねる - お絵かき</option>
             <option value="nov.2chan.net/q">ふたば☆ちゃんねる - 落書き</option>
             <option value="cgi.2chan.net/u">ふたば☆ちゃんねる - 落書き裏</option>
+            <!-- 
             <option value="p.noob.jp/bbsnote">お絵かき掲示板「仮」</option>
+            -->
             <option value="kazumi386.org:8801/b/jisatsue">虹裏自殺絵　お絵描き掲示板</option>
             <option value="kazumi386.org:8801/b/houti-e">虹裏放置絵　お絵描き掲示板</option>
             <option value="kazumi386.org:8801/b/mugon">虹裏無言絵　お絵描き掲示板</option>
@@ -38,10 +40,10 @@
 </div>
 
 <!--
-<webview id="webview" src="http://localhost/samplebbs" preload="./dist/neo.js" autosize=on></webview>
+<webview id="webview" src="http://localhost/samplebbs" preload="../dist/neo.js" autosize=on></webview>
 -->
 
-<webview id="webview" src="http://jun.2chan.net/oe" preload="./dist/neo.js" autosize=on></webview>
+<webview id="webview" src="http://jun.2chan.net/oe" preload="../dist/neo.js" autosize=on></webview>
 
 
 <script>
@@ -72,7 +74,7 @@
 
     var insertCSS = function() {
         var fs = require('fs');
-        fs.readFile(__dirname + '/neo.css', 'utf-8', function(error, data) {
+        fs.readFile('./dist/neo.css', 'utf-8', function(error, data) {
             if (!error) {
                 webview.insertCSS(data);
             };

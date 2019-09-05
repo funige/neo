@@ -50,7 +50,7 @@ http://hp.vector.co.jp/authors/VA016309/
 
 ## <a name="animation">動画記録について</a>
 v1.5で動画記録をサポートしました。
-Java版の動画データ（.pch）が解析不能なため、NEOの動画データと互換性はありません。
+Java版の動画データ（.pch）が解析不能なため、動画データの互換性はありません。
 
 
 ## 掲示板の管理者、新しく掲示板を設置したい方へ
@@ -65,7 +65,7 @@ Java版の動画データ（.pch）が解析不能なため、NEOの動画デー
 動作確認は、サンプル掲示板 (/samplebbs) をそのままPHPが動くレンタルサーバーにコピーするのが簡単です。
 1. [サンプル掲示板](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
 
-  レンタルサーバーのターミナルでコピーする例：
+  レンタルサーバーのターミナルが使える人はこんな感じで……
 
     > cd www  
     > curl -LO https://github.com/funige/neo/raw/master/samplebbs.zip  
@@ -86,19 +86,12 @@ Java版の動画データ（.pch）が解析不能なため、NEOの動画デー
 
 
 ## <a name="app">Mac/Win用アプリについて</a>
-Mac/Win用アプリはNEO開発のために作られたものです  
-もうほとんど使うことはないと思います
+Mac/Win用アプリはNEO開発の過程で使われたものです。  
+バイナリは重いので削除しました。  
+必要な方はソースコードからビルドしてください。  
 
-**インストール方法**
-
-1. app/neo-darwin-x64.zip(Mac)または  
-app/neo-win32-ia32.zip(Win)をダウンロードして、どこかに展開する  
-
-2. 実行ファイル (neo.app または neo.exe) をダブルクリック
-
-**NEO非対応の掲示板にこのアプリを使って投稿する方法**  
-1. Chrome等のブラウザで描きたい掲示板を開く
-2. アドレスバーのURLをこのアプリにドラッグドロップしてください
+    > npm install  
+    > npm run app
 
 ## <a name="history">履歴</a>
 
