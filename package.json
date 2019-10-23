@@ -1,7 +1,11 @@
 {
   "name": "PaintBBS",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "main": "app/main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/funige/neo.git"
+  },
   "scripts": {
     "app": "node_modules/.bin/electron ."
   },

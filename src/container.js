@@ -1,5 +1,6 @@
 'use strict';
 
+
 document.addEventListener("DOMContentLoaded", function() {
     Neo.init();
 
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.5.3";
+Neo.version = "1.5.4";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -566,7 +567,9 @@ Neo.isIE = function() {
 };
 
 Neo.isMobile = function() {
-    return navigator.userAgent.match(/Android|iPhone|iPad|iPod/i);
+    if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
+    if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
+    return false;
 };
 
 Neo.showWarning = function() {

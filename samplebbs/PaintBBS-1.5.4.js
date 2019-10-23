@@ -1,5 +1,6 @@
 'use strict';
 
+
 document.addEventListener("DOMContentLoaded", function() {
     Neo.init();
 
@@ -10,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.5.3";
+Neo.version = "1.5.4";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -566,7 +567,9 @@ Neo.isIE = function() {
 };
 
 Neo.isMobile = function() {
-    return navigator.userAgent.match(/Android|iPhone|iPad|iPod/i);
+    if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
+    if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
+    return false;
 };
 
 Neo.showWarning = function() {
@@ -2814,7 +2817,7 @@ Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3,
     var that = this;
     
     this.draw(ctx, points, function(left, top, width, height, buf8, imageData) {
-        var n = Math.ceil(Math.max(width, height) * 2.5);
+        var n = Math.ceil((width + height) * 2.5);
         var oType = that._currentMaskType;
         var oAlpha = that._currentColor[3];
 
@@ -2839,6 +2842,7 @@ Neo.Painter.prototype.drawBezier = function(ctx, x0, y0, x1, y1, x2, y2, x3, y3,
         that.prevLine = null;
     });
 }
+
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
 Neo.Painter.prototype.drawLine = function(ctx, x0, y0, x1, y1, type) {
