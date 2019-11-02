@@ -20,18 +20,19 @@
 
     <div style="text-align:center; margin-top: 2px;">
         <select id="target" name="target">
+            <option value="neotest.websozai.jp">http://neotest.websozai.jp</option>
+            <!-- 
             <option value="jun.2chan.net/oe">ふたば☆ちゃんねる - お絵sql</option>
             <option value="zip.2chan.net/p">ふたば☆ちゃんねる - お絵かき</option>
             <option value="nov.2chan.net/q">ふたば☆ちゃんねる - 落書き</option>
             <option value="cgi.2chan.net/u">ふたば☆ちゃんねる - 落書き裏</option>
-            <!-- 
             <option value="p.noob.jp/bbsnote">お絵かき掲示板「仮」</option>
-            -->
             <option value="kazumi386.org:8801/b/jisatsue">虹裏自殺絵　お絵描き掲示板</option>
             <option value="kazumi386.org:8801/b/houti-e">虹裏放置絵　お絵描き掲示板</option>
             <option value="kazumi386.org:8801/b/mugon">虹裏無言絵　お絵描き掲示板</option>
             <option value="kazumi386.org:8801/b/shit-e">虹裏嫉妬絵　お絵描き掲示板</option>
             <option value="kazumi386.org:8801/b/heta-e">虹裏下手絵　お絵描き掲示板</option>
+            -->
         </select>
         <input id="post" type="button" value="開く" 
                onclick="load(document.getElementById('target').value);">
@@ -43,7 +44,7 @@
 <webview id="webview" src="http://localhost/samplebbs" preload="../dist/neo.js" autosize=on></webview>
 -->
 
-<webview id="webview" src="http://jun.2chan.net/oe" preload="../dist/neo.js" autosize=on></webview>
+<webview id="webview" src="http://neotest.websozai.jp" Preload="../dist/neo.js" autosize=on></webview>
 
 
 <script>
