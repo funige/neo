@@ -11,11 +11,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.5.4";
+Neo.version = "1.5.5";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
+Neo.toolSide = "right";
 
 Neo.config = {
     width: 300,
@@ -1016,3 +1017,16 @@ Neo.tintImage = function(ctx, c) {
 };
 
 
+Neo.toggleToolSide = function() {
+    Neo.toolSide = (Neo.toolSide === "right") ? "left" : "right";
+
+    if (Neo.toolSide === "right") {
+      Neo.addRule(".NEO #toolsWrapper", "right", "0");
+      Neo.addRule(".NEO #toolsWrapper", "left", "auto");
+      Neo.addRule(".NEO #painterWrapper", "padding", "0 55px 0 0 !important");
+    } else {
+      Neo.addRule(".NEO #toolsWrapper", "right", "auto");
+      Neo.addRule(".NEO #toolsWrapper", "left", "0");
+      Neo.addRule(".NEO #painterWrapper", "padding", "0 0 0 55px !important");
+    }
+};

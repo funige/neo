@@ -380,6 +380,9 @@ Neo.ActionManager.prototype.line = function(
         x1 = item[14];
         y1 = item[15];
     }
+    if (x1 === null) x1 = x0
+    if (y1 === null) y1 = y0
+  
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
