@@ -16,7 +16,7 @@ Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
-Neo.toolSide = "right";
+Neo.toolSide = false;
 
 Neo.config = {
     width: 300,
@@ -1017,10 +1017,12 @@ Neo.tintImage = function(ctx, c) {
 };
 
 
-Neo.toggleToolSide = function() {
-    Neo.toolSide = (Neo.toolSide === "right") ? "left" : "right";
+Neo.setToolSide = function(side) {
+    if (side === 'left') side = true;
+    if (side === 'right') side = false;
+    Neo.toolSide = !!side;
 
-    if (Neo.toolSide === "right") {
+    if (!Neo.toolSide) {
       Neo.addRule(".NEO #toolsWrapper", "right", "0");
       Neo.addRule(".NEO #toolsWrapper", "left", "auto");
       Neo.addRule(".NEO #painterWrapper", "padding", "0 55px 0 0 !important");
