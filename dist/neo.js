@@ -1025,11 +1025,14 @@ Neo.setToolSide = function(side) {
     if (!Neo.toolSide) {
       Neo.addRule(".NEO #toolsWrapper", "right", "0");
       Neo.addRule(".NEO #toolsWrapper", "left", "auto");
-      Neo.addRule(".NEO #painterWrapper", "padding", "0 55px 0 0 !important");
+	  Neo.addRule(".NEO #painterWrapper", "padding", "0 55px 0 0 !important");
+	  Neo.addRule(".NEO #upper", "padding-right", "75px !important");
+	  
     } else {
-      Neo.addRule(".NEO #toolsWrapper", "right", "auto");
-      Neo.addRule(".NEO #toolsWrapper", "left", "0");
-      Neo.addRule(".NEO #painterWrapper", "padding", "0 0 0 55px !important");
+	  Neo.addRule(".NEO #toolsWrapper", "right", "auto");
+	  Neo.addRule(".NEO #toolsWrapper", "left", "0");
+	  Neo.addRule(".NEO #painterWrapper", "padding", "0 0 0 55px !important");
+	  Neo.addRule(".NEO #upper", "padding-right", "20px !important");
     }
 };
 
