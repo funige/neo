@@ -44,56 +44,57 @@ http://hp.vector.co.jp/authors/VA016309/
 [Firefox(59以降？)はタブレット関係のバグがあるらしく、](http://neo.websozai.jp/potiboard.php?res=553)線が乱れることがあるようです。  
 マルチプロセスを切ると症状が解消されるかもしれません。（about:configでbrowser.tabs.remote.autostartをFalse）
 
-### [**サンプル掲示板**](http://neo.websozai.jp)  
-動作確認にご利用ください。
-
-
 ## <a name="animation">動画記録について</a>
 v1.5で動画記録をサポートしました。
 Java版の動画データ（.pch）が解析不能なため、動画データの互換性はありません。
 
-
 ## 掲示板の管理者、新しく掲示板を設置したい方へ
 
 ### <a name="append">既存のお絵かき掲示板にNEOを組み込むには</a>
-現在稼働中のお絵かき掲示板なら、とりあえず2行追加するだけでNEOを組み込むことができます。
-
-/samplebbsの下の[README.md](https://github.com/funige/neo/tree/master/samplebbs/README.md) に詳細を書きました。  
-不明な点があれば[サンプル掲示板](http://neo.websozai.jp)で聞いてください
+まだ古いPOTI-baordを稼働中の方は、（最短で）2行追加するだけでNEOを組み込めるかもしれません。  
+[README-potiboard.md](README-potiboard.md)を御一読ください。
 
 ### <a name="new">掲示板を新規作成するには</a>
-動作確認は、サンプル掲示板 (/samplebbs) をそのままPHPが動くレンタルサーバーにコピーするのが簡単です。
-1. [サンプル掲示板](https://github.com/funige/neo/raw/master/samplebbs.zip) をPHPが動くレンタルサーバーにコピーする  
-
-  レンタルサーバーのターミナルが使える人はこんな感じで……
-
-    > cd www  
-    > curl -LO https://github.com/funige/neo/raw/master/samplebbs.zip  
-    > unzip samplebbs.zip  
-    
-2. その中にあるpotiboard.phpをブラウザで開くと、掲示板が初期化されます。
-
-サンプル掲示板はサ骨さんが開発したPOTI-board改をカスタマイズしたものです。  
-**ちょっと古くなってることもありますので、実際に運用する場合は、サ骨さんのページから  
-最新版のPOTI改を入手してください。**  
-
-サ骨さんのページでは他にも数種類のテンプレートが公開されています。  
+古いPHPには（セキュリティなど）様々な問題があります。  
+新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
 [POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)  
 
 
-さとぴあさんの記事も参考になるかと思います  
-[POTI-board用テンプレート PINK を配布します。 http://stp.sblo.jp/article/182310034.html](http://stp.sblo.jp/article/182310034.html)
+以前公開していた、sample掲示板は保守が困難になったので削除しました。  
+今後は申し訳ないのですが（というか前からほぼ任せきりなのですが）掲示板の設置方法に関する質問は  
+- さとぴあさん(https://twitter.com/satopian/)か  
+- さこつさん(https://sakots.red/poti/)の方へお願いします。  
+
+本当にお世話になっています。
 
 
-## <a name="app">Mac/Win用アプリについて</a>
+## 開発者の方へ
+
+NEOの本体は、[dist/](https://github.com/funige/neo/tree/master/dist/)の下のneo.jsとneo.cssです。  
+
+昔はPaintBBS-xxx.(js|css)という名前でバージョンごとに分けていましたが、アップデートが面倒なので現在はneo.(js|css)を上書きするだけで更新できるようになっています。
+
+ただ、ブラウザのキャッシュがあるので、更新した時はユーザー側で強制リロードしないと古いのがそのまま表示されたりします。ご注意ください。
+
+[dist/](https://github.com/funige/neo/tree/master/dist/)のファイルは、[src/](https://github.com/funige/neo/tree/master/src/)のソースコードからgulpで自動ビルドしています（配布専用です）ので、プルリクエストする時は、srcの方を編集してもらうといい感じになると思います。
+
+    > npm install
+    > gulp
+    > (gulpを動かしたままsrcの方で編集してください)
+
+
+### <a name="app">Mac/Win用アプリについて</a>
 Mac/Win用アプリはNEO開発の過程で使われたものです。  
 バイナリは重いので削除しました。  
-必要な方はソースコードからビルドしてください。  
+興味のある方はソースコードからビルドしてください。  
 
     > npm install  
     > npm run app
 
 ## <a name="history">履歴</a>
+
+#### ver1.5.6 (2020/05/9)
+- samplebbsの保守が困難になっていたので、リポジトリから削除しました
 
 #### ver1.5.5 (2020/04/11)
 - lineを使った動画の再生でなぜか無限ループに入ることがあったので対処

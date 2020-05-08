@@ -6,7 +6,7 @@ var fs = require('fs');
 var json = JSON.parse(fs.readFileSync('./package.json'));
 
 var jsFiles = ["src/container.js",
-	       "src/dictionary.js",
+               "src/dictionary.js",
                "src/painter.js",
                "src/tools.js",
                "src/commands.js",
@@ -17,27 +17,28 @@ var jsDest = "dist";
 var cssFiles = ["src/neo.css"]
 var name = json.name + "-" + json.version;
 
-gulp.task('scripts', function() {
-    return gulp.src(jsFiles)
-        .pipe(concat('neo.js'))
-        .pipe(gulp.dest(jsDest))
-        .pipe(gulp.dest('samplebbs'))
-        .pipe(rename(name + '.js'))
-        .pipe(gulp.dest(jsDest))
-        .pipe(gulp.dest('samplebbs'));
-});
+var jsBuild = function() {
+  return gulp.src(jsFiles)
+             .pipe(concat('neo.js'))
+             .pipe(gulp.dest(jsDest))
+             .pipe(rename(name + '.js'))
+             .pipe(gulp.dest(jsDest));
+};
 
-gulp.task('scripts2', function() {
-    return gulp.src(cssFiles)
-        .pipe(concat('neo.css'))
-        .pipe(gulp.dest(jsDest))
-        .pipe(gulp.dest('samplebbs'))
-        .pipe(rename(name + '.css'))
-        .pipe(gulp.dest(jsDest))
-        .pipe(gulp.dest('samplebbs'));
-});
+var cssBuild = function() {
+  return gulp.src(cssFiles)
+             .pipe(concat('neo.css'))
+             .pipe(gulp.dest(jsDest))
+             .pipe(rename(name + '.css'))
+             .pipe(gulp.dest(jsDest));
+};
+
+gulp.task('scripts', jsBuild);
+gulp.task('scripts2', cssBuild);
 
 gulp.task('default', function() {
-    gulp.watch(jsFiles, ['scripts']);
-    gulp.watch(cssFiles, ['scripts2']);
+  jsBuild();
+  cssBuild();
+  gulp.watch(jsFiles, ['scripts']);
+  gulp.watch(cssFiles, ['scripts2']);
 });

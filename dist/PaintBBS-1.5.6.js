@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 var Neo = function() {};
 
-Neo.version = "1.5.5";
+Neo.version = "1.5.6";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -699,7 +699,7 @@ Neo.resizeCanvas = function() {
     Neo.painter.destCanvas.height = height;
     Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d");
     Neo.painter.destCanvasCtx.imageSmoothingEnabled = false;
-    Neo.painter.destCanvasCtx.mozImageSmoothingEnabled = false;
+    //Neo.painter.destCanvasCtx.mozImageSmoothingEnabled = false;
 
     Neo.canvas.style.width = width + "px";
     Neo.canvas.style.height = height + "px";
@@ -890,7 +890,7 @@ Neo.createContainer = function(applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    var html = (function() {/*
+    var html = `
 
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
@@ -976,7 +976,7 @@ Neo.createContainer = function(applet) {
 </div>
 
 
-                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
+    `;
 
     neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
 	return Neo.translate(str)
