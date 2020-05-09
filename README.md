@@ -62,8 +62,8 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
 
 以前公開していた、sample掲示板は保守が困難になったので削除しました。  
 今後は申し訳ないのですが（というか前からほぼ任せきりなのですが）掲示板の設置方法に関する質問は  
-- さとぴあさん(https://twitter.com/satopian/)か  
-- さこつさん(https://sakots.red/poti/)の方へお願いします。  
+- さとぴあさん https://twitter.com/satopian/ か  
+- さこつさん https://sakots.red/poti/ の方へお願いします。  
 
 本当にお世話になっています。
 
