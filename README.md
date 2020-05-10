@@ -62,10 +62,10 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
 
 以前公開していた、sample掲示板は保守が困難になったので削除しました。  
 今後は申し訳ないのですが（というか前からほぼ任せきりなのですが）掲示板の設置方法に関する質問は  
-- さとぴあさん https://twitter.com/satopian/ か  
-- さこつさん https://sakots.red/poti/ の方へお願いします。  
+- さとぴあさん [@satopian](https://twitter.com/satopian) か  
+- さこつさん [@sakots80001](https://twitter.com/sakots80001) の方へお願いします。  
 
-本当にお世話になっています。
+いや本当にお世話になっています。
 
 
 ## 開発者の方へ
@@ -76,32 +76,36 @@ NEOの本体は、[dist/](https://github.com/funige/neo/tree/master/dist/)の下
 
 ただ、ブラウザのキャッシュがあるので、更新した時はユーザー側で強制リロードしないと古いのがそのまま表示されたりします。ご注意ください。
 
-[dist/](https://github.com/funige/neo/tree/master/dist/)のファイルは、[src/](https://github.com/funige/neo/tree/master/src/)のソースコードからgulpで自動ビルドしています（配布専用です）ので、プルリクエストする時は、srcの方を編集してもらうといい感じになると思います。
+[dist/](https://github.com/funige/neo/tree/master/dist/)のファイルは、[src/](https://github.com/funige/neo/tree/master/src/)のソースコードからgulpで毎回自動生成しています（配布専用です）ので、プルリクエストする時は、srcの方を編集してもらうといい感じになると思います。
 
+    > git clone https://github.com/funige/neo.git
+    > cd neo 
     > npm install
     > gulp
-    > (gulpを動かしたままsrcの方で編集してください)
+    (gulpを動かしたまま別のターミナルでsrcを編集してください)
+    
 
 
 ### <a name="app">Mac/Win用アプリについて</a>
 Mac/Win用アプリはNEO開発の過程で使われたものです。  
+NEOの入っていない掲示板に投稿して、動作を確認することができます。  
 バイナリは重いので削除しました。  
 興味のある方はソースコードからビルドしてください。  
 
-    > npm install  
-    > npm run app
+      > npm run app
 
 ## <a name="history">履歴</a>
 
-#### ver1.5.6 (2020/05/9)
+#### ver1.5.6 (2020/05/10)
 - samplebbsの保守が困難になっていたので、リポジトリから削除しました
+- Apacheでmod_pagespeedを使った時、正しく表示されない問題に対処しました
 
 #### ver1.5.5 (2020/04/11)
 - lineを使った動画の再生でなぜか無限ループに入ることがあったので対処
-- ツールの位置の左右入れ替えができるようになりました。JavaScriptコンソールで  
+- ツールの位置の左右入れ替えができるようになりました。
 
     Neo.setToolSide(true) // true|false  
-    
+  
   trueのときツールはキャンバスの左側になります
 
 #### ver1.5.4 (2019/10/23)

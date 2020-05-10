@@ -890,96 +890,85 @@ Neo.createContainer = function(applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    var html = `
 
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-
-<div id="pageView" style="width:450px; height:470px; margin:auto;">
-<div id="container" style="visibility:hidden;" class="o">
-<div id="center" class="o">
-<div id="painterContainer" class="o">
-<div id="painterWrapper" class="o">
-<div id="upper" class="o">
-<div id="redo">[やり直し]</div>
-<div id="undo">[元に戻す]</div>
-<div id="fill">[塗り潰し]</div>
-<div id="right" style="display:none;">[右]</div>
-</div>
-<div id="painter">
-<div id="canvas"> <!-- class="o">-->
-<div id="scrollH"></div>
-<div id="scrollV"></div>
-<div id="zoomPlusWrapper">
-<div id="zoomPlus">+</div>
-</div>
-<div id="zoomMinusWrapper">
-<div id="zoomMinus">-</div>
-</div>
-<div id="neoWarning"></div>
-</div>
-</div>
-<div id="lower" class="o">
-</div>
-</div>
-<div id="toolsWrapper">
-<div id="tools">
-<div id="toolSet">
-<div id="pen"></div>
-<div id="pen2"></div>
-<div id="effect"></div>
-<div id="effect2"></div>
-<div id="eraser"></div>
-<div id="draw"></div>
-<div id="mask"></div>
-
-<div class="colorTips">
-<div id="color2"></div><div id="color1"></div><br>
-<div id="color4"></div><div id="color3"></div><br>
-<div id="color6"></div><div id="color5"></div><br>
-<div id="color8"></div><div id="color7"></div><br>
-<div id="color10"></div><div id="color9"></div><br>
-<div id="color12"></div><div id="color11"></div><br>
-<div id="color14"></div><div id="color13"></div>
-</div>
-
-<div id="sliderRed"></div>
-<div id="sliderGreen"></div>
-<div id="sliderBlue"></div>
-<div id="sliderAlpha"></div>
-<div id="sliderSize"></div>
-
-<div class="reserveControl" style="margin-top:4px;">
-<div id="reserve1"></div>
-<div id="reserve2"></div>
-<div id="reserve3"></div>
-</div>
-<div id="layerControl" style="margin-top:6px;"></div>
-
-<!--<div id="toolPad" style="height:20px;"></div>-->
-</div>
-</div>
-</div>
-</div>
-</div>
-<div id="headerButtons">
-<div id="window">[窓]</div>
-</div>
-<div id="footerButtons">
-<div id="submit">[投稿]</div>
-<div id="copyright">[(C)しぃちゃん PaintBBS NEO]</div>
-</div>
-</div>
-</div>
-
-<div id="windowView" style="display: none;">
-
-</div>
-
-
-    `;
+    var html =
+        '<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>' +
+        '<div id="pageView" style="width:450px; height:470px; margin:auto;">' +
+        '<div id="container" style="visibility:hidden;" class="o">' +
+        '<div id="center" class="o">' +
+        '<div id="painterContainer" class="o">' +
+        '<div id="painterWrapper" class="o">' +
+        '<div id="upper" class="o">' +
+        '<div id="redo">[やり直し]</div> ' +
+        '<div id="undo">[元に戻す]</div> ' +
+        '<div id="fill">[塗り潰し]</div> ' +
+        '<div id="right" style="display:none;">[右]</div> ' +
+        '</div>' +
+        '<div id="painter">' +
+        '<div id="canvas">' +
+        '<div id="scrollH"></div>' +
+        '<div id="scrollV"></div>' +
+        '<div id="zoomPlusWrapper">' +
+        '<div id="zoomPlus">+</div>' +
+        '</div>' +
+        '<div id="zoomMinusWrapper">' +
+        '<div id="zoomMinus">-</div>' +
+        '</div>' +
+        '<div id="neoWarning"></div>' +
+        '</div>' +
+        '</div>' +
+        '<div id="lower" class="o">' +
+        '</div>' +
+        '</div>' +
+        '<div id="toolsWrapper">' +
+        '<div id="tools">' +
+        '<div id="toolSet">' +
+        '<div id="pen"></div>' +
+        '<div id="pen2"></div>' +
+        '<div id="effect"></div>' +
+        '<div id="effect2"></div>' +
+        '<div id="eraser"></div>' +
+        '<div id="draw"></div>' +
+        '<div id="mask"></div>' +
+        '<div class="colorTips">' +
+        '<div id="color2"></div><div id="color1"></div><br>' +
+        '<div id="color4"></div><div id="color3"></div><br>' +
+        '<div id="color6"></div><div id="color5"></div><br>' +
+        '<div id="color8"></div><div id="color7"></div><br>' +
+        '<div id="color10"></div><div id="color9"></div><br>' +
+        '<div id="color12"></div><div id="color11"></div><br>' +
+        '<div id="color14"></div><div id="color13"></div>' +
+        '</div>' +
+        '<div id="sliderRed"></div>' +
+        '<div id="sliderGreen"></div>' +
+        '<div id="sliderBlue"></div>' +
+        '<div id="sliderAlpha"></div>' +
+        '<div id="sliderSize"></div>' +
+        '<div class="reserveControl" style="margin-top:4px;">' +
+        '<div id="reserve1"></div>' +
+        '<div id="reserve2"></div>' +
+        '<div id="reserve3"></div>' +
+        '</div>' +
+        '<div id="layerControl" style="margin-top:6px;"></div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div id="headerButtons">' +
+        '<div id="window">[窓]</div>' +
+        '</div>' +
+        '<div id="footerButtons">' +
+        '<div id="submit">[投稿]</div> ' +
+        '<div id="copyright">[(C)しぃちゃん PaintBBS NEO]</div> ' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '<div id="windowView" style="display: none;">' +
+        '</div>'
 
     neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
-	return Neo.translate(str)
+        return Neo.translate(str)
     })
     
     var parent = applet.parentNode;
