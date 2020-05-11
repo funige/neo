@@ -44,6 +44,11 @@ http://hp.vector.co.jp/authors/VA016309/
 [Firefox(59以降？)はタブレット関係のバグがあるらしく、](http://neo.websozai.jp/potiboard.php?res=553)線が乱れることがあるようです。  
 マルチプロセスを切ると症状が解消されるかもしれません。（about:configでbrowser.tabs.remote.autostartをFalse）
 
+## サポート掲示板を準備中です
+少々お待ちください。
+
+以前公開していた動作確認用の掲示板は[こちら](http://neo.websozai.jp)
+
 ## <a name="animation">動画記録について</a>
 v1.5で動画記録をサポートしました。
 Java版の動画データ（.pch）が解析不能なため、動画データの互換性はありません。
@@ -58,14 +63,6 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
 古いPHPには（セキュリティなど）様々な問題があります。  
 新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
 [POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)  
-
-
-以前公開していた、sample掲示板は保守が困難になったので削除しました。  
-今後は申し訳ないのですが（というか前からほぼ任せきりなのですが）掲示板の設置方法に関する質問は  
-- さとぴあさん [@satopian](https://twitter.com/satopian) か  
-- さこつさん [@sakots80001](https://twitter.com/sakots80001) の方へお願いします。  
-
-いや本当にお世話になっています。
 
 
 ## 開発者の方へ
