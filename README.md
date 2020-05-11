@@ -40,29 +40,27 @@ http://hp.vector.co.jp/authors/VA016309/
   Windowsで線がうまく引けない場合は、以下をお試しください
   - Chromeを使う
   - Wacomのタブレットを使用している場合は「デジタルインクを使用する」をオフにする
-  
+
+<small>
 [Firefox(59以降？)はタブレット関係のバグがあるらしく、](http://neo.websozai.jp/potiboard.php?res=553)線が乱れることがあるようです。  
 マルチプロセスを切ると症状が解消されるかもしれません。（about:configでbrowser.tabs.remote.autostartをFalse）
+</small>
 
-## サポート掲示板を準備中です
-少々お待ちください。
+## <a name="deploy">掲示板の設置方法について</a>
+新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
 
-以前公開していた動作確認用の掲示板は[こちら](http://neo.websozai.jp)
+- [POTI改公式サイト](https://poti-k.info/)
+
+- [POTI改設置質問板](https://pbbs.sakura.ne.jp/cgi/neosample/support/)
+サポートはこちらです。
+
+[既存のお絵描き掲示板にNEOを組み込む方法](README-potiboard.md)もありますが、古いPHPには（セキュリティなど）様々な問題があります。  
+
+以前公開していた動作確認用の掲示板は[こちら](http://neo.websozai.jp)です
 
 ## <a name="animation">動画記録について</a>
 v1.5で動画記録をサポートしました。
 Java版の動画データ（.pch）が解析不能なため、動画データの互換性はありません。
-
-## 掲示板の管理者、新しく掲示板を設置したい方へ
-
-### <a name="append">既存のお絵かき掲示板にNEOを組み込むには</a>
-まだ古いPOTI-baordを稼働中の方は、（最短で）2行追加するだけでNEOを組み込めるかもしれません。  
-[README-potiboard.md](README-potiboard.md)を御一読ください。
-
-### <a name="new">掲示板を新規作成するには</a>
-古いPHPには（セキュリティなど）様々な問題があります。  
-新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
-[POTI-board改 https://sakots.red/poti/](https://sakots.red/poti/)  
 
 
 ## 開発者の方へ
