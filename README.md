@@ -61,7 +61,7 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
 
 以前ここで公開していた動作確認用掲示板は[こちら](http://neo.websozai.jp)
 
-**掲示板以外についての質問・ご要望は直接[こちら](https://github.com/funige/neo/issues)へ**
+**掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
 
 ### <a name="app">Mac/Win用アプリについて</a>
 Mac/Win用アプリは、NEO開発の過程で使われたものです。  
