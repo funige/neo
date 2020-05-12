@@ -28,66 +28,49 @@ http://hp.vector.co.jp/authors/VA016309/
     調子が良ければ他のお絵かき板にも導入します
 
 
+### <a name="animation">動画記録について</a>
+v1.5で動画記録をサポートしました。
+Java版の動画データ（.pch）が解析不能なため、動画データの互換性はありません。
+
 
 ## <a name="browser">対応環境</a>
 
   Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
   iOS(Mobile Safari)  
 
-  IEはサポート対象外です  
+  IEではサポート対象外です  
   Androidでもだいたい動くのですが、サポート対象外とします
 
   Windowsで線がうまく引けない場合は、以下をお試しください
   - Chromeを使う
   - Wacomのタブレットを使用している場合は「デジタルインクを使用する」をオフにする
 
-<small>
 [Firefox(59以降？)はタブレット関係のバグがあるらしく、](http://neo.websozai.jp/potiboard.php?res=553)線が乱れることがあるようです。  
 マルチプロセスを切ると症状が解消されるかもしれません。（about:configでbrowser.tabs.remote.autostartをFalse）
-</small>
 
-## <a name="deploy">掲示板の設置方法について</a>
+## <a name="deploy">お絵かき掲示板の設置方法について</a>
 新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
 
 - [POTI改公式サイト](https://poti-k.info/)
 
-- [POTI改設置質問板](https://pbbs.sakura.ne.jp/cgi/neosample/support/)
-サポートはこちらです。
+公式サイトには[設置サポート掲示板](https://pbbs.sakura.ne.jp/cgi/neosample/support/)があります。  
+掲示板の設置に関するご質問・不具合の報告等ありましたら、遠慮なくこちらへどうぞ。
 
-[既存のお絵描き掲示板にNEOを組み込む方法](README-potiboard.md)もありますが、古いPHPには（セキュリティなど）様々な問題があります。  
+まだ古いPOTI-baordを稼働中の方のための[移行ガイド](README_potiboard.md)  
+(古いPHPのコードには色々問題がありますので、あまりお勧めできません)
 
-以前公開していた動作確認用の掲示板は[こちら](http://neo.websozai.jp)です
-
-## <a name="animation">動画記録について</a>
-v1.5で動画記録をサポートしました。
-Java版の動画データ（.pch）が解析不能なため、動画データの互換性はありません。
-
-
-## 開発者の方へ
-
-NEOの本体は、[dist/](https://github.com/funige/neo/tree/master/dist/)の下のneo.jsとneo.cssです。  
-
-昔はPaintBBS-xxx.(js|css)という名前でバージョンごとに分けていましたが、アップデートが面倒なので現在はneo.(js|css)を上書きするだけで更新できるようになっています。
-
-ただ、ブラウザのキャッシュがあるので、更新した時はユーザー側で強制リロードしないと古いのがそのまま表示されたりします。ご注意ください。
-
-[dist/](https://github.com/funige/neo/tree/master/dist/)のファイルは、[src/](https://github.com/funige/neo/tree/master/src/)のソースコードからgulpで毎回自動生成しています（配布専用です）ので、プルリクエストする時は、srcの方を編集してもらうといい感じになると思います。
-
-    > git clone https://github.com/funige/neo.git
-    > cd neo 
-    > npm install
-    > gulp
-    (gulpを動かしたまま別のターミナルでsrcを編集してください)
-    
-
+旧動作確認用掲示板は[こちら](http://neo.websozai.jp)
 
 ### <a name="app">Mac/Win用アプリについて</a>
-Mac/Win用アプリはNEO開発の過程で使われたものです。  
+Mac/Win用アプリは、NEO開発の過程で使われたものです。  
 NEOの入っていない掲示板に投稿して、動作を確認することができます。  
 バイナリは重いので削除しました。  
 興味のある方はソースコードからビルドしてください。  
 
-      > npm run app
+    > git clone https://github.com/funige/neo.git
+    > cd neo 
+    > npm install
+    > npm run app
 
 ## <a name="history">履歴</a>
 
