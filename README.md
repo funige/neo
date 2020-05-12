@@ -59,7 +59,9 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
 まだ古いPOTI-baordを稼働中の方のための[移行ガイド](README_potiboard.md)  
 (古いPHPのコードには色々問題がありますので、あまりお勧めできません)
 
-旧動作確認用掲示板は[こちら](http://neo.websozai.jp)
+以前ここで公開していた動作確認用掲示板は[こちら](http://neo.websozai.jp)
+
+**掲示板以外についての質問・ご要望は直接[こちら](https://github.com/funige/neo/issues)へ**
 
 ### <a name="app">Mac/Win用アプリについて</a>
 Mac/Win用アプリは、NEO開発の過程で使われたものです。  
@@ -307,7 +309,4 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
  ![ver0.1](https://cdn-ak.f.st-hatena.com/images/fotolife/f/funige/20160922/20160922095441.png?1474505726)
 
 ----
-**質問・要望等は直接こちらへ**  
-https://github.com/funige/neo/issues  
-
 - しぃペインターとかPooとかは作りません  
