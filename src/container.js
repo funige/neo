@@ -2,16 +2,16 @@
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    Neo.init();
-
-    if (!navigator.userAgent.match("Electron")) {
-        Neo.start();
+    if (Neo.init()) {
+        if (!navigator.userAgent.match("Electron")) {
+            Neo.start();
+        }
     }
 });
 
 var Neo = function() {};
 
-Neo.version = "1.5.6";
+Neo.version = "1.5.7";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -77,9 +77,10 @@ Neo.init = function() {
                     }
                 });
             }
-            break;
+            return true;
         }
     }
+    return false;
 };
 
 Neo.init2 = function() {
@@ -214,13 +215,9 @@ Neo.fixConfig = function(value) {
 };
 
 Neo.getStyleSheet = function() {
-    var sheet = document.styleSheets[0];
-    if (!sheet) {
-        var style = document.createElement("style");
-        document.head.appendChild(style); // must append before you can access sheet property
-        sheet = style.sheet;
-    }
-    return sheet;
+    var style = document.createElement("style");
+    document.head.appendChild(style);
+    return  style.sheet;
 };
 
 Neo.initSkin = function() {
@@ -755,7 +752,7 @@ Neo.openURL = function(url) {
 Neo.submit = function(board, blob, thumbnail, thumbnail2) {
     var url = board + Neo.config.url_save;
     var headerString = Neo.str_header || "";
-    console.log("submit url=" + url + " header=" + headerString);
+    // console.log("submit url=" + url + " header=" + headerString);
 
     if (document.paintBBSCallback) {
         var result = document.paintBBSCallback('check')
@@ -893,7 +890,7 @@ Neo.createContainer = function(applet) {
 
     var html =
         '<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>' +
-        '<div id="pageView" style="width:450px; height:470px; margin:auto;">' +
+        '<div id="pageView" style="width:450px; height:470px;">' +
         '<div id="container" style="visibility:hidden;" class="o">' +
         '<div id="center" class="o">' +
         '<div id="painterContainer" class="o">' +
@@ -1012,13 +1009,13 @@ Neo.setToolSide = function(side) {
     Neo.toolSide = !!side;
 
     if (!Neo.toolSide) {
-        Neo.addRule(".NEO #toolsWrapper", "right", "0");
+        Neo.addRule(".NEO #toolsWrapper", "right", "-3px");
         Neo.addRule(".NEO #toolsWrapper", "left", "auto");
         Neo.addRule(".NEO #painterWrapper", "padding", "0 55px 0 0 !important");
         Neo.addRule(".NEO #upper", "padding-right", "75px !important");
     } else {
         Neo.addRule(".NEO #toolsWrapper", "right", "auto");
-        Neo.addRule(".NEO #toolsWrapper", "left", "0");
+        Neo.addRule(".NEO #toolsWrapper", "left", "-3px");
         Neo.addRule(".NEO #painterWrapper", "padding", "0 0 0 55px !important");
         Neo.addRule(".NEO #upper", "padding-right", "20px !important");
     }

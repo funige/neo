@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <link rel="stylesheet" href="../dist/neo.css" type="text/css">
+    <script src="../dist/neo.js" charset="UTF-8"></script>
+    <script>
+     const params = location.search.substring(1).split('&').reduce((result, query) => {
+       const [k, v] = query.split('=');
+       result[k] = decodeURI(v);
+       return result;
+     }, {});
+     const w = params.w || 400;
+     const h = params.h || 450;
+     const iw = params.iw || 300;
+     const ih = params.ih || 300;
+    </script>
+  </head>
+  <body>
+    <h1>PaintBBS Test</h1>
+
+    <script>
+     document.write(`
+       <applet-dummy name="paintbbs" width="${w}" height="${h}" >
+         <param name="image_width" value="${iw}">
+         <param name="image_height" value="${ih}">
+         <param name="thumbnail_type" value="animation">
+       </applet-dummy>
+
+       <br>
+       <form>
+       <input type="text" name="w" value="${w}"> x
+       <input type="text" name="h" value="${h}"> Applet<br>
+       <input type="text" name="iw" value="${iw}"> x
+       <input type="text" name="ih" value="${ih}"> Canvas<br>
+       <input type="reset" value="RESET"><br>
+       <input type="submit" value="RELOAD">
+       </form>
+     `)
+
+     document.paintBBSCallback = function (str) {
+       if (str === 'check') {
+         const image = Neo.painter.getImage();
+         const animation = Neo.painter.getThumbnail('animation');
+         
+         const img = document.createElement('img');
+         img.src = image.toDataURL('image/png');
+         img.className = "sample";
+
+         const a = document.createElement('a');
+         a.href= URL.createObjectURL(animation);
+         a.innerHTML = a.download = (new Date() - 0) + ".pch";
+
+         const top = document.querySelector('img.sample')
+         document.body.insertBefore(img, top);
+         document.body.insertBefore(a, top);
+         return false;
+       }
+     }
+    </script>
+    <br>
+    
+    <style>
+      img.sample {
+        border: 1px solid black;
+        margin-bottom: 5px;
+        display: block;
+      }
+      input {
+        width: 100px;
+      }
+    </style>
+  </body>
+</html>

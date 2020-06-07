@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <link rel="stylesheet" href="../dist/neo.css" type="text/css">
+    <script src="../dist/neo.js" charset="UTF-8"></script>
+    <script>
+     const params = location.search.substring(1).split('&').reduce((result, query) => {
+       const [k, v] = query.split('=');
+       result[k] = decodeURI(v);
+       return result;
+     }, {});
+     const w = params.w || 400;
+     const h = params.h || 450;
+    </script>
+  </head>
+  <body>
+    <h1>PCH Test</h1>
+
+    <script>
+     document.write(`
+       <applet-dummy name="pch" width="${w}" height="${h}" >
+       </applet-dummy>
+
+       <br>
+       <input type="file" name="file" onchange="loadFile(this)"><br>
+     `)
+
+     const loadFile = function (e) {
+       const data = e.files[0]
+       const reader = new FileReader();
+       reader.onload = function () {
+         const pch = Neo.decodePCH(reader.result);
+         console.log(pch)
+
+         Neo.createViewer(document.querySelector('input'));
+         Neo.config.width = pch.width;
+         Neo.config.height = pch.height;
+         Neo.initViewer(pch);
+         Neo.startViewer();
+       }
+       reader.readAsArrayBuffer(data);
+     }
+    </script>
+    
+    <style>
+      input {
+        margin-top: 1em;
+      }
+    </style>
+  </body>
+</html>

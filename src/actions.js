@@ -750,42 +750,31 @@ Neo.createViewer = function(applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    var html = (function() {/*
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
-<div id="pageView" style="margin:auto;">
-<div id="container" style="visibility:visible;" class="o">
-
-<div id="painter" style="background-color:white;">
-<div id="canvas" style="background-color:white;">
-</div>
-</div>
-
-
-<div id="viewerButtonsWrapper" style="display:block;">
-<div id="viewerButtons" style="display:block;">
-
-<div id="viewerPlay"></div>
-<div id="viewerStop"></div>
-<div id="viewerRewind"></div>
-<div id="viewerSpeed" style="padding-left:2px; margin-top: 1px;">ほ</div>
-<div id="viewerPlus"></div>
-<div id="viewerMinus"></div>
-
-<div id="viewerBar" style="display:inline-block;">
-<!--
-  <div id="viewerBarLeft" style="width:calc(50% - 2px); height:16px; position: absolute; top: 1px; left: 1px;"></div>
-  <div id="viewerBarMark" style="background-color:red; width:1px; height:16px; position:absolute; top:1px; left:1px;"></div>
--->
-</div>
-</div>
-
-</div>
-</div>
-                                 */}).toString().match(/\/\*([^]*)\*\//)[1];
-
+    var html =
+        '<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>' +
+        '<div id="pageView">' +
+        '<div id="container" style="visibility:visible;" class="o">' +
+        '<div id="painter" style="background-color:white;">' +
+        '<div id="canvas" style="background-color:white;">' +
+        '</div>' +
+        '</div>' +
+        '<div id="viewerButtonsWrapper" style="display:block;">' +
+        '<div id="viewerButtons" style="display:block;">' +
+        '<div id="viewerPlay"></div>' +
+        '<div id="viewerStop"></div>' +
+        '<div id="viewerRewind"></div>' +
+        '<div id="viewerSpeed" style="padding-left:2px; margin-top: 1px;"></div>' +
+        '<div id="viewerPlus"></div>' +
+        '<div id="viewerMinus"></div>' +
+        '<div id="viewerBar" style="display:inline-block;">' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>';
+  
     neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
-	return Neo.translate(str)
+	      return Neo.translate(str)
     })
     
     var parent = applet.parentNode;
@@ -869,9 +858,13 @@ Neo.initViewer = function(pch) {
 };
 
 Neo.startViewer = function() {
-    var name = Neo.applet.attributes.name.value || "pch";
-    if (!document[name]) document[name] = Neo;
-    Neo.applet.parentNode.removeChild(Neo.applet);
+    if (Neo.applet) {
+      var name = Neo.applet.attributes.name.value || "pch";
+      if (!document[name]) document[name] = Neo;
+      if (Neo.applet.parentNode) {
+          Neo.applet.parentNode.removeChild(Neo.applet);
+      }
+    }
 
     Neo.styleSheet = Neo.getStyleSheet();
     var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
@@ -944,33 +937,36 @@ Neo.getPCH = function(filename, callback) {
     request.open("GET", filename, true);
     request.responseType = "arraybuffer";
     request.onload = function() {
-        var byteArray = new Uint8Array(request.response);
-//      var data = LZString.decompressFromUint8Array(byteArray.slice(12));
-//      var header = byteArray.slice(0, 12);
-        var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
-        var header = byteArray.subarray(0, 12);
-
-        if ((header[0] == "N".charCodeAt(0)) &&
-            (header[1] == "E".charCodeAt(0)) &&
-            (header[2] == "O".charCodeAt(0))) {
-            var width = header[4] + header[5] * 0x100
-            var height = header[6] + header[7] * 0x100
-
-            //console.log('NEO animation:', width, 'x', height);
-            if (callback) {
-                var items = Neo.fixPCH(JSON.parse(data))
-                callback({
-                    width:width,
-                    height:height,
-                    data:items
-                });
-            }
-            
+        var pch = Neo.decodePCH(request.response);
+        if (pch) {
+            if (callback) callback(pch);
         } else {
-            console.log('not a NEO animation:');
+            console.log('not a NEO animation');
         }
     }
-    request.send();
+  request.send();
+};
+
+Neo.decodePCH = function(rawdata) {
+    var byteArray = new Uint8Array(rawdata);
+    var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
+    var header = byteArray.subarray(0, 12);
+
+    if ((header[0] == "N".charCodeAt(0)) &&
+        (header[1] == "E".charCodeAt(0)) &&
+        (header[2] == "O".charCodeAt(0))) {
+        var width = header[4] + header[5] * 0x100
+        var height = header[6] + header[7] * 0x100
+        var items = Neo.fixPCH(JSON.parse(data))
+        return {
+            width:width,
+            height:height,
+            data:items
+        };
+
+    } else {
+        return null;
+    }
 };
 
 Neo.fixPCH = function(items) {

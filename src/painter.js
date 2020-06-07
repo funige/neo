@@ -283,7 +283,14 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
         document.onkeydown = function(e) {ref._keyDownHandler(e)};
         document.onkeyup = function(e) {ref._keyUpHandler(e)};
     }
-    
+
+    if (!(Neo.config.neo_enable_history_back == "true")) {
+        history.pushState(null, document.title, location.href);
+        window.addEventListener("popstate", function (e) {
+          history.pushState(null, document.title, location.href);
+        });
+    }
+  
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
@@ -422,7 +429,12 @@ Neo.Painter.prototype._keyDownHandler = function(e) {
     }
 
     //スペース・Shift+スペースででスクロールしないように
-    if (document.activeElement != this.inputText) e.preventDefault();
+    // if (document.activeElement != this.inputText) e.preventDefault();
+    // console.log(document.activeElement.tagName)
+    if ((document.activeElement != this.inputText) &&
+        !(document.activeElement.tagName == "INPUT")) {
+        e.preventDefault();
+    }
 };
 
 Neo.Painter.prototype._keyUpHandler = function(e) {

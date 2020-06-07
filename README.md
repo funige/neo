@@ -35,10 +35,11 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
 
 ## <a name="browser">対応環境</a>
 
-  Chrome/FireFox/Safari/Edge（最近のバージョンのみ）  
+  Chrome/FireFox/Safari/Edge
   iOS(Mobile Safari)  
+  ※ 最新のバージョンのみ
 
-  IEではサポート対象外です  
+  IEはサポート対象外です  
   Androidでもだいたい動くのですが、サポート対象外とします
 
   Windowsで線がうまく引けない場合は、以下をお試しください
@@ -75,6 +76,9 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
     > npm run app
 
 ## <a name="history">履歴</a>
+
+#### ver1.5.7 (2020/06/07)
+- Chromeで左から右にスワイプした時に前の画面に戻ってしまう問題に対処
 
 #### ver1.5.6 (2020/05/10)
 - samplebbsの保守が困難になっていたので、リポジトリから削除しました
