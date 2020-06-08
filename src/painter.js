@@ -284,7 +284,7 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
         document.onkeyup = function(e) {ref._keyUpHandler(e)};
     }
 
-    if (Neo.config.neo_confirm_history_back == "true") {
+    if (Neo.config.neo_confirm_unload == "true") {
         window.onbeforeunload = function () {
             if (!Neo.uploaded && Neo.painter.isDirty()) {
                 return false;

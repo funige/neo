@@ -80,7 +80,7 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 #### ver1.5.7 (2020/06/08)
 - Chromeで左から右にスワイプした時に前の画面に戻ってしまう問題の対処ですが……
 
-  &lt;param name="neo_confirm_history_back" value="true">
+  &lt;param name="neo_confirm_unload" value="true">
   
   にすると、戻るボタンを押した時に「このサイトを離れますか？」という警告が出るようになります。  
   **デフォルトはfalseです**
