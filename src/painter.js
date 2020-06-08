@@ -284,13 +284,13 @@ Neo.Painter.prototype._initCanvas = function(div, width, height) {
         document.onkeyup = function(e) {ref._keyUpHandler(e)};
     }
 
-    if (!(Neo.config.neo_enable_history_back == "true")) {
-        history.pushState(null, document.title, location.href);
-        window.addEventListener("popstate", function (e) {
-          history.pushState(null, document.title, location.href);
-        });
+    if (Neo.config.neo_confirm_history_back == "true") {
+        window.onbeforeunload = function () {
+            if (!Neo.uploaded && Neo.painter.isDirty()) {
+                return false;
+            }
+        }
     }
-  
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
