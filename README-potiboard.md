@@ -71,6 +71,10 @@ https://oekakiart.net/blog/bbsnoteneo/
 
   &lt;applet>の下に、他のパラメータと同じように指定してください。
 
+- __&lt;PARAM NAME="neo_confirm_unload" VALUE="true">__  
+  このフラグをtrueにすると、「戻る」ボタンを押した時などに「このサイトを離れますか？」という警告を出して、うっかり描画履歴が失われるのを防ぐことができます。  
+  **デフォルトはfalseです**
+
 - __&lt;PARAM NAME="neo_warning" VALUE="...">__  
   キャンバスを開いた時に、VALUEに書かれた警告文を表示します。  
   ブラウザのバージョンアップで不具合が出た時など、ユーザーに  

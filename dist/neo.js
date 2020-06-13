@@ -182,6 +182,11 @@ Neo.initConfig = function(applet) {
         var e = document.getElementById("container");
         Neo.config.inherit_color = Neo.getInheritColor(e);
         if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
+
+        if (Neo.config.neo_tool_side == "left" ||
+            Neo.config.neo_tool_side == "true") {
+            Neo.toolSide = true;
+        }
     }
 
     Neo.config.reserves = [
@@ -296,6 +301,7 @@ Neo.initSkin = function() {
             Neo.addRule(selector, "letter-spacing", "0px !important");
         }
     }
+    Neo.setToolSide(Neo.toolSide);
 };
 
 Neo.addRule = function(selector, styleName, value, sheet) {
