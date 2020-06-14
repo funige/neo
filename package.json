@@ -1,13 +1,14 @@
 {
   "name": "PaintBBS",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "main": "app/main.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/funige/neo.git"
   },
   "scripts": {
-    "app": "node_modules/.bin/electron ."
+    "app": "electron .",
+    "format": "prettier --write src/[^l]*.js"
   },
   "dependencies": {
     "node-static": "^0.7.11",
@@ -15,9 +16,10 @@
   },
   "devDependencies": {
     "electron": "^1.8.2-beta.4",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.0.0"
+    "gulp-uglify": "^2.0.0",
+    "prettier": "^2.0.5"
   }
 }

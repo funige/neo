@@ -39,6 +39,6 @@ gulp.task('scripts2', cssBuild);
 gulp.task('default', function() {
   jsBuild();
   cssBuild();
-  gulp.watch(jsFiles, ['scripts']);
-  gulp.watch(cssFiles, ['scripts2']);
+  gulp.watch(jsFiles, gulp.series('scripts'));
+  gulp.watch(cssFiles, gulp.series('scripts2'));
 });
