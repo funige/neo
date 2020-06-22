@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.8";
+Neo.version = "1.5.9";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -951,10 +951,10 @@ Neo.showWarning = function () {
 };
 
 /*
-  -----------------------------------------------------------------------
-    UIの更新
-  -----------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   UIの更新
+   -----------------------------------------------------------------------
+ */
 
 Neo.updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
@@ -999,10 +999,10 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 };
 
 /*
-  -----------------------------------------------------------------------
-    リサイズ対応
-  -----------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   リサイズ対応
+   -----------------------------------------------------------------------
+ */
 
 Neo.updateWindow = function () {
   if (Neo.fullScreen) {
@@ -1067,10 +1067,10 @@ Neo.resizeCanvas = function () {
 };
 
 /*
-  -----------------------------------------------------------------------
-    投稿
-  -----------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   投稿
+   -----------------------------------------------------------------------
+ */
 
 Neo.clone = function (src) {
   var dst = {};
@@ -1099,6 +1099,7 @@ Neo.openURL = function (url) {
 Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var url = board + Neo.config.url_save;
   var headerString = Neo.str_header || "";
+
   // console.log("submit url=" + url + " header=" + headerString);
 
   if (document.paintBBSCallback) {
@@ -1117,7 +1118,38 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var imageType = Neo.config.send_header_image_type;
   if (imageType && imageType == "true") {
     headerString = "image_type=png&" + headerString;
-    console.log("header=" + headerString);
+  }
+
+  var count = Neo.painter.securityCount;
+  var timer = new Date() - Neo.painter.securityTimer;
+  if (Neo.config.send_header_count == "true") {
+    headerString = "count=" + count + "&" + headerString;
+  }
+  if (Neo.config.send_header_timer == "true") {
+    headerString = "timer=" + timer + "&" + headerString;
+  }
+  console.log("header: " + headerString);
+
+  if (Neo.config.neo_emulate_security_error == "true") {
+    var securityError = false;
+    if (Neo.config.security_click) {
+      if (count - parseInt(Neo.config.security_click || 0) < 0) {
+        securityError = true;
+      }
+    }
+    if (Neo.config.security_timer) {
+      if (timer - parseInt(Neo.config.security_timer || 0) * 1000 < 0) {
+        securityError = true;
+      }
+    }
+    if (securityError && Neo.config.security_url) {
+      if (Neo.config.security_post == "true") {
+        url = Neo.config.security_url;
+      } else {
+        location.href = Neo.config.security_url;
+        return;
+      }
+    }
   }
 
   var header = new Blob([headerString]);
@@ -1834,6 +1866,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   this.zoomX = width * 0.5;
   this.zoomY = height * 0.5;
 
+  this.securityTimer = new Date() - 0;
+  this.securityCount = 0;
+
   for (var i = 0; i < 2; i++) {
     this.canvas[i] = document.createElement("canvas");
     this.canvas[i].width = width;
@@ -2035,10 +2070,10 @@ Neo.Painter.prototype.updateInputText = function () {
 };
 
 /*
------------------------------------------------------------------------
-    Mouse Event Handling
------------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   Mouse Event Handling
+   -----------------------------------------------------------------------
+ */
 
 Neo.Painter.prototype._keyDownHandler = function (e) {
   this.isShiftDown = e.shiftKey;
@@ -2132,6 +2167,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   this._updateMousePosition(e);
   this.prevMouseX = this.mouseX;
   this.prevMouseY = this.mouseY;
+  this.securityCount++;
 
   if (this.isMouseDownRight) {
     this.isMouseDownRight = false;
@@ -2260,31 +2296,31 @@ Neo.Painter.prototype._updateMousePosition = function (e) {
   }
 
   /*
-    this.slowX = this.slowX * 0.8 + this.mouseX * 0.2;
-    this.slowY = this.slowY * 0.8 + this.mouseY * 0.2;
-    var now = new Date().getTime();
-    if (this.stab) {
-        var pause = this.stab[3];
-        if (pause) {
-            // ポーズ中
-            if (now > pause) {
-                this.stab = [this.slowX, this.slowY, now];
-            }
-    
-        } else {
-            // ポーズされていないとき
-            var prev = this.stab[2];
-            if (now - prev > 150) { // 150ms以上止まっていたらポーズをオンにする
-                this.stab[3] = now + 200 // 200msペンの位置を固定
+     this.slowX = this.slowX * 0.8 + this.mouseX * 0.2;
+     this.slowY = this.slowY * 0.8 + this.mouseY * 0.2;
+     var now = new Date().getTime();
+     if (this.stab) {
+     var pause = this.stab[3];
+     if (pause) {
+     // ポーズ中
+     if (now > pause) {
+     this.stab = [this.slowX, this.slowY, now];
+     }
+     
+     } else {
+     // ポーズされていないとき
+     var prev = this.stab[2];
+     if (now - prev > 150) { // 150ms以上止まっていたらポーズをオンにする
+     this.stab[3] = now + 200 // 200msペンの位置を固定
 
-            } else {
-                this.stab = [this.slowX, this.slowY, now];
-            }
-        }
-    } else {
-        this.stab = [this.slowX, this.slowY, now];
-    }
-    */
+     } else {
+     this.stab = [this.slowX, this.slowY, now];
+     }
+     }
+     } else {
+     this.stab = [this.slowX, this.slowY, now];
+     }
+   */
 
   this.rawMouseX = x;
   this.rawMouseY = y;
@@ -2297,16 +2333,16 @@ Neo.Painter.prototype._beforeUnloadHandler = function (e) {
 };
 
 /*
-Neo.Painter.prototype.getStabilized = function() {
-    return this.stab;
-};
-*/
+   Neo.Painter.prototype.getStabilized = function() {
+   return this.stab;
+   };
+ */
 
 /*
--------------------------------------------------------------------------
-    Undo
--------------------------------------------------------------------------
-*/
+   -------------------------------------------------------------------------
+   Undo
+   -------------------------------------------------------------------------
+ */
 
 Neo.Painter.prototype.undo = function () {
   var undoItem = this._undoMgr.popUndo();
@@ -2388,10 +2424,10 @@ Neo.Painter.prototype._pushRedo = function (x, y, w, h) {
 };
 
 /*
--------------------------------------------------------------------------
-    Data Cache for Undo / Redo
--------------------------------------------------------------------------
-*/
+   -------------------------------------------------------------------------
+   Data Cache for Undo / Redo
+   -------------------------------------------------------------------------
+ */
 
 Neo.UndoManager = function (_maxStep) {
   this._maxStep = _maxStep;
@@ -2435,10 +2471,10 @@ Neo.UndoItem.prototype.width;
 Neo.UndoItem.prototype.height;
 
 /*
--------------------------------------------------------------------------
-    Zoom Controller
--------------------------------------------------------------------------
-*/
+   -------------------------------------------------------------------------
+   Zoom Controller
+   -------------------------------------------------------------------------
+ */
 
 Neo.Painter.prototype.setZoom = function (value) {
   this.zoom = value;
@@ -2481,10 +2517,10 @@ Neo.Painter.prototype.setZoomPosition = function (x, y) {
 };
 
 /*
--------------------------------------------------------------------------
-    Drawing Helper
--------------------------------------------------------------------------
-*/
+   -------------------------------------------------------------------------
+   Drawing Helper
+   -------------------------------------------------------------------------
+ */
 
 Neo.Painter.prototype.submit = function (board) {
   if (Neo.animation) {
@@ -2508,12 +2544,12 @@ Neo.Painter.prototype.submit = function (board) {
   }
 
   /*
-    if (this.useThumbnail()) {
-        thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
-        if (Neo.config.thumbnail_type2) {
-            thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
-        }
-    }*/
+     if (this.useThumbnail()) {
+     thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
+     if (Neo.config.thumbnail_type2) {
+     thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
+     }
+     }*/
 
   Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
 };
@@ -2667,10 +2703,10 @@ Neo.Painter.prototype.clearCanvas = function (doConfirm) {
     this._pushUndo();
     this._actionMgr.clearCanvas();
     /*        
-        this.canvasCtx[0].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-        this.canvasCtx[1].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-        this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
-*/
+       this.canvasCtx[0].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+       this.canvasCtx[1].clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+       this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
+     */
   }
 };
 
@@ -4160,8 +4196,8 @@ Neo.Painter.prototype.ellipseMask = function (x, y, width, height) {
 };
 
 /*
------------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+ */
 
 Neo.Painter.prototype.getDestCanvasPosition = function (
   mx,
@@ -4382,10 +4418,10 @@ Neo.Painter.prototype.getEmulationMode = function () {
 };
 
 /*
--------------------------------------------------------------------------
-    Recorder Test
--------------------------------------------------------------------------
-*/
+   -------------------------------------------------------------------------
+   Recorder Test
+   -------------------------------------------------------------------------
+ */
 
 Neo.Painter.prototype.play = function (wait) {
   if (this._actionMgr) {

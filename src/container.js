@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.8";
+Neo.version = "1.5.9";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -951,10 +951,10 @@ Neo.showWarning = function () {
 };
 
 /*
-  -----------------------------------------------------------------------
-    UIの更新
-  -----------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   UIの更新
+   -----------------------------------------------------------------------
+ */
 
 Neo.updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
@@ -999,10 +999,10 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 };
 
 /*
-  -----------------------------------------------------------------------
-    リサイズ対応
-  -----------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   リサイズ対応
+   -----------------------------------------------------------------------
+ */
 
 Neo.updateWindow = function () {
   if (Neo.fullScreen) {
@@ -1067,10 +1067,10 @@ Neo.resizeCanvas = function () {
 };
 
 /*
-  -----------------------------------------------------------------------
-    投稿
-  -----------------------------------------------------------------------
-*/
+   -----------------------------------------------------------------------
+   投稿
+   -----------------------------------------------------------------------
+ */
 
 Neo.clone = function (src) {
   var dst = {};
@@ -1099,6 +1099,7 @@ Neo.openURL = function (url) {
 Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var url = board + Neo.config.url_save;
   var headerString = Neo.str_header || "";
+
   // console.log("submit url=" + url + " header=" + headerString);
 
   if (document.paintBBSCallback) {
@@ -1117,7 +1118,38 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var imageType = Neo.config.send_header_image_type;
   if (imageType && imageType == "true") {
     headerString = "image_type=png&" + headerString;
-    console.log("header=" + headerString);
+  }
+
+  var count = Neo.painter.securityCount;
+  var timer = new Date() - Neo.painter.securityTimer;
+  if (Neo.config.send_header_count == "true") {
+    headerString = "count=" + count + "&" + headerString;
+  }
+  if (Neo.config.send_header_timer == "true") {
+    headerString = "timer=" + timer + "&" + headerString;
+  }
+  console.log("header: " + headerString);
+
+  if (Neo.config.neo_emulate_security_error == "true") {
+    var securityError = false;
+    if (Neo.config.security_click) {
+      if (count - parseInt(Neo.config.security_click || 0) < 0) {
+        securityError = true;
+      }
+    }
+    if (Neo.config.security_timer) {
+      if (timer - parseInt(Neo.config.security_timer || 0) * 1000 < 0) {
+        securityError = true;
+      }
+    }
+    if (securityError && Neo.config.security_url) {
+      if (Neo.config.security_post == "true") {
+        url = Neo.config.security_url;
+      } else {
+        location.href = Neo.config.security_url;
+        return;
+      }
+    }
   }
 
   var header = new Blob([headerString]);
