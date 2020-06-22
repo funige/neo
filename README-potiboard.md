@@ -127,3 +127,38 @@ https://oekakiart.net/blog/bbsnoteneo/
     Neo.setToolSide(true) // true|false  
     
   trueのときツールはキャンバスの左側になります。
+  
+- __&lt;PARAM NAME="neo_tool_side" VALUE="left">__ 
+  &lt;applet>の&lt;param>で指定することもできます。
+
+# セキュリティ関連のオプション
+
+  オリジナルのPaintBBSには、描画時間やキャンバスをクリックした回数が閾値より少なかった時に、投稿を受け付けずに他のURL（警視庁のURLとか）に飛ばす機能がありました。
+
+  この機能を再現するには（再現しないほうがいいと思うのですが）
+
+- __&lt;PARAM NAME="neo_emulate_security_error" VALUE="true">__  
+  と一緒に
+
+  __&lt;PARAM NAME="security_click" VALUE="クリック回数">__  
+  __&lt;PARAM NAME="security_timer" VALUE="秒数">__  
+  __&lt;PARAM NAME="security_url" VALUE="ジャンプ先のURL">__  
+
+  などのパラメータを設定して下さい。  
+  詳しくは[原作者によるドキュメント](Readme_Shichan.html)を参照。
+
+これとは別に、クリック回数や秒数「だけ」取得したい開発者のためのオプションもオリジナルのPaintBBSにはあります。
+
+- __&lt;PARAM NAME="send_header_count" VALUE="true">__  
+  __&lt;PARAM NAME="send_header_timer" VALUE="true">__  
+
+を指定すると、送信されるデータの拡張ヘッダに
+
+    timer=3391&count=1&...
+
+などの文字列が追加されます（timerの単位はmsです）。  
+一応実装してみました。
+
+
+
+

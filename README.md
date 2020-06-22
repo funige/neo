@@ -77,6 +77,16 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 
+#### ver1.5.9 (2020/06/22)
+- オリジナルのPaintBBSにあったセキュリティ関連のオプションを実装しました。
+
+  &lt;param name="neo_emulate_security_error" value="true">
+
+  にすると、描画時間やクリック回数が少ない時に投稿を拒否して、警視庁のURLとかに飛ばすことができます。  
+  [README-potiboard.mdにも追記しました](README-potiboard.md)  
+  **デフォルトはfalseです**
+
+
 #### ver1.5.8 (2020/06/14)
 - （v1.5.7のソースコードをprettierで整形しただけです）
 
