@@ -82,7 +82,7 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 
   &lt;param name="neo_emulate_security_error" value="true">
 
-  にすると、描画時間やクリック回数が少ない時に投稿を拒否して、警視庁のURLとかに飛ばすことができます。  
+  にすると、描画時間やクリック回数が少ない時に投稿を拒否して、任意のURLに飛ばすことができます。  
   [README-potiboard.mdにも追記しました](README-potiboard.md)  
   **デフォルトはfalseです**
 
