@@ -133,7 +133,7 @@ https://oekakiart.net/blog/bbsnoteneo/
 
 # セキュリティ関連のオプション
 
-  オリジナルのPaintBBSには、描画時間やキャンバスをクリックした回数が閾値より少なかった時に、投稿を受け付けずに他のURL（警視庁のURLとか）に飛ばす機能がありました。
+  オリジナルのPaintBBSには、描画時間やキャンバスをクリックした回数が閾値より少なかった時に、投稿を受け付けずに他のURL（警察庁のURLとか）に飛ばす機能がありました。
 
   この機能を再現するには（再現しないほうがいいと思うのですが）
 
@@ -145,7 +145,7 @@ https://oekakiart.net/blog/bbsnoteneo/
   __&lt;PARAM NAME="security_url" VALUE="ジャンプ先のURL">__  
 
   などのパラメータを設定して下さい。  
-  詳しくは[原作者によるドキュメント](Readme_Shichan.html)を参照。
+  詳しくは[原作者によるドキュメント](https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)を参照。
 
 これとは別に、クリック回数や秒数「だけ」取得したい開発者のためのオプションもオリジナルのPaintBBSにはあります。
 
