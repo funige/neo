@@ -1269,7 +1269,7 @@ Neo.createContainer = function (applet) {
   neo.id = "NEO";
 
   var html =
-    '<div id="pageView" style="width:450px; height:470px;">' +
+    '<div id="pageView" style="margin:auto; width:450px; height:470px;">' +
     '<div id="container" style="visibility:hidden;" class="o">' +
     '<div id="center" class="o">' +
     '<div id="painterContainer" class="o">' +
