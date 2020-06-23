@@ -744,7 +744,7 @@ Neo.createViewer = function (applet) {
   neo.id = "NEO";
 
   var html =
-    '<div id="pageView">' +
+    '<div id="pageView" style="margin:auto;">' +
     '<div id="container" style="visibility:visible;" class="o">' +
     '<div id="painter" style="background-color:white;">' +
     '<div id="canvas" style="background-color:white;">' +

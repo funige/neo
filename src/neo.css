@@ -63,7 +63,7 @@
     right: 0;
 
     height:30px;
-    padding-right: 75px; //20px;
+	padding-right: 75px; /* 20px; */
     text-align:right;
 }
 
@@ -571,8 +571,8 @@
 
     margin: 0;
     padding: 0;
-    //padding-top: 2px;
-    //padding-left: 2px;
+    /* padding-top: 2px; */
+    /* padding-left: 2px; */
 
     overflow: hidden;
 }
