@@ -1393,7 +1393,7 @@ Neo.setToolSide = function (side) {
     Neo.addRule(".NEO #upper", "padding-right", "75px !important");
   } else {
     Neo.addRule(".NEO #toolsWrapper", "right", "auto");
-    Neo.addRule(".NEO #toolsWrapper", "left", "-3px");
+    Neo.addRule(".NEO #toolsWrapper", "left", "-1px");
     Neo.addRule(".NEO #painterWrapper", "padding", "0 0 0 55px !important");
     Neo.addRule(".NEO #upper", "padding-right", "20px !important");
   }
