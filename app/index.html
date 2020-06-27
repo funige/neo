@@ -23,18 +23,6 @@
             <option value="www.punyu.net/php/poti_monow">MONO WHITE</option>
             <option value="www.punyu.net/php/poti_cool">COOL TYPE</option>
             <option value="www.punyu.net/php/poti_diary">日記モドキ</option>
-            <!-- 
-            <option value="jun.2chan.net/oe">ふたば☆ちゃんねる - お絵sql</option>
-            <option value="zip.2chan.net/p">ふたば☆ちゃんねる - お絵かき</option>
-            <option value="nov.2chan.net/q">ふたば☆ちゃんねる - 落書き</option>
-            <option value="cgi.2chan.net/u">ふたば☆ちゃんねる - 落書き裏</option>
-            <option value="p.noob.jp/bbsnote">お絵かき掲示板「仮」</option>
-            <option value="kazumi386.org:8801/b/jisatsue">虹裏自殺絵　お絵描き掲示板</option>
-            <option value="kazumi386.org:8801/b/houti-e">虹裏放置絵　お絵描き掲示板</option>
-            <option value="kazumi386.org:8801/b/mugon">虹裏無言絵　お絵描き掲示板</option>
-            <option value="kazumi386.org:8801/b/shit-e">虹裏嫉妬絵　お絵描き掲示板</option>
-            <option value="kazumi386.org:8801/b/heta-e">虹裏下手絵　お絵描き掲示板</option>
-            -->
         </select>
         <input id="post" type="button" value="開く" 
                onclick="load(document.getElementById('target').value);">
@@ -46,10 +34,16 @@
 <webview id="webview" src="http://localhost/samplebbs" preload="../dist/neo.js" autosize=on></webview>
 -->
 
-<webview id="webview" src="http://www.punyu.net/php/poti_monow" Preload="../dist/neo.js" autosize=on></webview>
+<webview id="webview" src="../sample/index.html" preload="../dist/neo.js" autosize=on></webview>
 
 
 <script>
+    console.log('[App Sample]')
+    console.log('To access inside:')
+    console.log('webview.openDevTools()')
+    console.log('Neo.version')
+    console.log('...')
+
     var {shell} = require('electron');
     var webview = document.getElementById("webview");
     var ipc = require('electron').ipcMain;
@@ -103,7 +97,7 @@
 
         setTimeout(function() {
     var duplicateInstanceWarning = (navigator.language.indexOf("ja") == 0) ? "アプリと掲示板のNEOが同時に起動しています。アプリ側のNEOを使いたい時は、掲示板の「NEOを使う」設定をオフにしてください。" : "Embeded NEO script is running. If you want to use app&#39;s, disable embeded one before.";
-    webview.executeJavaScript("try {document.neo.start(true);} catch (e) {document.getElementById('neoWarning').innerHTML = '" + duplicateInstanceWarning + "';}");
+    webview.executeJavaScript("try {document.neo.start(true);} catch (e) {if((location.href).indexOf('file')!=0){document.getElementById('neoWarning').innerHTML = '" + duplicateInstanceWarning + "';}}");
         }, 500);
    });
 

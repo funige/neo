@@ -2633,7 +2633,6 @@ Neo.Painter.prototype.getPNG = function () {
 };
 
 Neo.Painter.prototype.getThumbnail = function (type) {
-  console.log("getThumnail", type);
   if (type != "animation") {
     var thumbnailWidth = this.getThumbnailWidth();
     var thumbnailHeight = this.getThumbnailHeight();
