@@ -59,6 +59,21 @@ Neo.Button.prototype.init = function (name, params) {
 
   this.element.className = !this.params.type == "fill" ? "button" : "buttonOff";
 
+  this.disable = function(wait) {
+    this.element.style.pointerEvents = "none";
+    this.element.style.opacity = "0.5";
+    if (wait) {
+      setTimeout(function () {
+        ref.enable();
+      }, wait);
+    }
+  }
+
+  this.enable = function() {
+    this.element.style.pointerEvents = "inherit";
+    this.element.style.opacity = "1.0";
+  }
+  
   return this;
 };
 

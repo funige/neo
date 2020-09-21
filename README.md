@@ -46,8 +46,11 @@ Java版の動画データ（.pch）が解析不能なため、動画データの
   - Chromeを使う
   - Wacomのタブレットを使用している場合は「デジタルインクを使用する」をオフにする
 
+  
 [Firefox(59以降？)はタブレット関係のバグがあるらしく、](http://neo.websozai.jp/potiboard.php?res=553)線が乱れることがあるようです。  
 マルチプロセスを切ると症状が解消されるかもしれません。（about:configでbrowser.tabs.remote.autostartをFalse）
+
+Chrome(80以降？)で横に長い線を引くとジェスチャーと誤認識される場合は、chrome://flags/#overscroll-history-navigation でジェスチャーを無効にするといいかもしれません。
 
 ## <a name="deploy">お絵かき掲示板の設置方法について</a>
 新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
@@ -76,6 +79,9 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
     > npm run app
 
 ## <a name="history">履歴</a>
+
+#### ver1.5.10 (2020/09/21)
+- 投稿ボタン連打対策を入れました
 
 #### ver1.5.9 (2020/06/22)
 - オリジナルのPaintBBSにあったセキュリティ関連のオプションを実装しました。

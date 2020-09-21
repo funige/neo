@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.9";
+Neo.version = "1.5.10";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -792,9 +792,6 @@ Neo.initButtons = function () {
   new Neo.Button().init("window").onmouseup = function () {
     new Neo.WindowCommand(Neo.painter).execute();
   };
-  new Neo.Button().init("submit").onmouseup = function () {
-    new Neo.SubmitCommand(Neo.painter).execute();
-  };
   new Neo.Button().init("copyright").onmouseup = function () {
     new Neo.CopyrightCommand(Neo.painter).execute();
   };
@@ -803,6 +800,11 @@ Neo.initButtons = function () {
   };
   new Neo.Button().init("zoomMinus").onmouseup = function () {
     new Neo.ZoomMinusCommand(Neo.painter).execute();
+  };
+  Neo.submitButton = new Neo.Button().init("submit");
+  Neo.submitButton.onmouseup = function () {
+    Neo.submitButton.disable(5000);
+    new Neo.SubmitCommand(Neo.painter).execute();
   };
 
   Neo.fillButton = new Neo.FillButton().init("fill");
@@ -1181,6 +1183,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 
   request.onload = function (e) {
     console.log(request.response, "status=", request.status);
+    //Neo.submitButton.enable();
     if (request.status / 100 == 2) {
       Neo.uploaded = true;
     }
@@ -1213,12 +1216,15 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   };
   request.onerror = function (e) {
     console.log("error");
+    Neo.submitButton.enable();
   };
   request.onabort = function (e) {
     console.log("abort");
+    Neo.submitButton.enable();
   };
   request.ontimeout = function (e) {
     console.log("timeout");
+    Neo.submitButton.enable();
   };
 
   request.send(body);
