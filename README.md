@@ -55,7 +55,7 @@ Chrome(80以降？)で横に長い線を引くとジェスチャーと誤認識�
 ## <a name="deploy">お絵かき掲示板の設置方法について</a>
 新しくお絵かき掲示板を設置したい方には、POTI-board改の利用をお勧めします。  
 
-- [POTI改公式サイト](https://poti-k.info/)
+- [POTI改公式サイト](https://pbbs.sakura.ne.jp/poti/)
 
 公式サイトには[設置サポート掲示板](https://pbbs.sakura.ne.jp/cgi/neosample/support/)があります。  
 掲示板の設置に関するご質問・不具合の報告等ありましたら、遠慮なくこちらへどうぞ。
@@ -63,6 +63,7 @@ Chrome(80以降？)で横に長い線を引くとジェスチャーと誤認識�
 まだ古いPOTI-baordを稼働中の方のための[移行ガイド](README-potiboard.md)  
 (古いPHPのコードには色々問題がありますので、お勧めできません)
 
+[動作確認用掲示板](http://futabize.websozai.jp)
 以前ここで公開していた動作確認用掲示板は[こちら](http://neo.websozai.jp)
 
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
