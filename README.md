@@ -63,12 +63,12 @@ Chrome(80以降？)で横に長い線を引くとジェスチャーと誤認識�
 まだ古いPOTI-baordを稼働中の方のための[移行ガイド](README-potiboard.md)  
 (古いPHPのコードには色々問題がありますので、お勧めできません)
 
-[動作確認用掲示板](http://futabize.websozai.jp)
-以前ここで公開していた動作確認用掲示板は[こちら](http://neo.websozai.jp)
-
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
 
-### <a name="app">Mac/Win用アプリについて</a>
+## [動作確認用掲示板](http://futabize.websozai.jp)
+以前ここで公開していた旧掲示板は[こちら](http://neo.websozai.jp)。
+
+## <a name="app">Mac/Win用アプリについて</a>
 Mac/Win用アプリは、NEO開発の過程で使われたものです。  
 NEOの入っていない掲示板に投稿して、動作を確認することができます。  
 バイナリは重いので削除しました。  
