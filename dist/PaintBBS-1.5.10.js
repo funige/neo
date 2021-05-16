@@ -1107,7 +1107,7 @@ Neo.getAbsoluteURL = function (board, url) {
 }
 
 Neo.submit = function (board, blob, thumbnail, thumbnail2) {
-  var url = board + Neo.config.url_save;
+  var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
   var headerString = Neo.str_header || "";
 
   if (document.paintBBSCallback) {
@@ -1118,7 +1118,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 
     result = document.paintBBSCallback("header");
     if (result && typeof result == "string") {
-      headerString == result;
+      headerString = result;
     }
   }
   if (!headerString) headerString = Neo.config.send_header || "";
@@ -1183,7 +1183,9 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     array.push(thumbnail2Length, thumbnail2);
   }
 
-  var body = new Blob(array, { type: "application/octet-binary" }); //これが必要！！
+  var futaba = location.hostname.match(/2chan.net/i);
+  var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
+  var body = new Blob(array, { type: "application/" + subtype });
 
   var request = new XMLHttpRequest();
   request.open("POST", url, true);
