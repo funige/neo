@@ -81,6 +81,16 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 
+#### ver1.5.11 (2021/05/16)
+- 送信エラーが発生した時の動作を改善しました。  
+  失敗した時はURL遷移しません。  
+  成功しても応答が「error\n」ではじまる文字列だった場合は
+  [仕様通り](http://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html#error_message)エラーになります。  
+- url_save, url_exitでオリジナルと同じように絶対バスが指定できるようになりました。
+- POSTのMIMEをapplication/octet-streamに変更しました。  
+  (ふたばでは互換性を重視して従来通りapplicatio/octet-binaryです)  
+  もし問題が発生する環境があれば個別に対応しますので、連絡ください。
+
 #### ver1.5.10 (2020/09/21)
 - 投稿ボタン連打対策を入れました
 
