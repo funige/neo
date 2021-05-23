@@ -55,6 +55,8 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "Please push send button again.",
   },
   enx: {
     やり直し: "Redo",
@@ -62,7 +64,7 @@ Neo.dictionary = {
     塗り潰し: "Fill",
     窓: "Float",
     投稿: "Send",
-    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
+    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
     鉛筆: "Solid",
     水彩: "WaterCo",
     ﾃｷｽﾄ: "Text",
@@ -111,6 +113,8 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "Failed to upload image. please try again.",
   },
   es: {
     やり直し: "Rehacer",
@@ -118,7 +122,7 @@ Neo.dictionary = {
     塗り潰し: "Llenar",
     窓: "Ventana",
     投稿: "Enviar",
-    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-cyan PaintBBS NEO",
+    "(C)しぃちゃん PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
     鉛筆: "Lápiz",
     水彩: "Acuarela",
     ﾃｷｽﾄ: "Texto",
@@ -167,6 +171,8 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
   },
 };
 

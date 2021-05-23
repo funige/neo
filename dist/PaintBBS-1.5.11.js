@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.11";
+Neo.version = "1.5.12";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1469,6 +1469,8 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "Please push send button again.",
   },
   enx: {
     やり直し: "Redo",
@@ -1525,6 +1527,8 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "Failed to upload image. please try again.",
   },
   es: {
     やり直し: "Rehacer",
@@ -1581,6 +1585,8 @@ Neo.dictionary = {
     早: "H",
     既: "M",
     鈍: "L",
+    "投稿に失敗。時間を置いて再度投稿してみてください。":
+      "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
   },
 };
 

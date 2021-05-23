@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.11";
+Neo.version = "1.5.12";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1195,7 +1195,8 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 
     var errorMessage = null;
     if (request.status / 100 != 2) {
-      errorMessage = request.response.replace(/<[^>]*>?/gm, '');
+      errorMessage = request.responseURL + "\n"
+                   + Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
     } else if (request.response.match(/^error\n/m)) {
       errorMessage = request.response.replace(/^error\n/m, '');
     } else {

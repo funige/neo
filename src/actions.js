@@ -111,7 +111,6 @@ Neo.ActionManager.prototype.skip = function (wait) {
 Neo.ActionManager.prototype.play = function (wait) {
   if (!wait) {
     wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-    wait *= 1; //2
   }
   if (Neo.viewerBar) Neo.viewerBar.update();
 
@@ -168,7 +167,7 @@ Neo.ActionManager.prototype.play = function (wait) {
     Neo.painter.dirty = false;
     Neo.painter.busy = false;
 
-    if (Neo.painter.bushSkipped) {
+    if (Neo.painter.busySkipped) {
       Neo.painter.busySkipped = false;
       console.log("animation skipped");
     } else {
