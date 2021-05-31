@@ -4442,7 +4442,7 @@ Neo.Painter.prototype.getEmulationMode = function () {
    -------------------------------------------------------------------------
  */
 
-Neo.Painter.prototype.play = function (wait) {
+Neo.Painter.prototype.play = function () {
   if (this._actionMgr) {
     this._actionMgr.clearCanvas();
     this.prevLine = null;
@@ -4453,7 +4453,7 @@ Neo.Painter.prototype.play = function (wait) {
     this._actionMgr._index = 0;
     this._actionMgr._mark = this._actionMgr._items.length;
     this._actionMgr._pause = false;
-    this._actionMgr.play(wait);
+    this._actionMgr.play();
   }
 };
 
@@ -4497,9 +4497,8 @@ Neo.Painter.prototype.onstop = function () {
 
 Neo.Painter.prototype.onspeed = function () {
   var mgr = Neo.painter._actionMgr;
-  var mode = (mgr._speedMode + 1) % 4;
-  mgr._speedMode = mode;
-  Neo.speed = mgr._speedTable[mode];
+  var mode = mgr.speedMode();
+  Neo.speed = mgr._speedTable[(mode + 1) % 4];
 };
 
 Neo.Painter.prototype.setCurrent = function (item) {
@@ -6034,27 +6033,21 @@ Neo.ActionManager = function () {
   this._mark = 0;
 
   this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
-  Neo.speed = parseInt(Neo.config.speed || 0);
-  this._speedMode = this.generateSpeedTable();
 
+  Neo.speed = parseInt(Neo.config.speed || 0);
   this._prevSpeed = Neo.speed;
 };
 
-Neo.ActionManager.prototype.generateSpeedTable = function () {
-  var speed = Neo.speed;
-  var mode = 0;
-
-  if (speed < 0) {
-    mode = 0;
-  } else if (speed == 0) {
-    mode = 1;
-  } else if (speed <= 10) {
-    mode = 2;
+Neo.ActionManager.prototype.speedMode = function () {
+  if (Neo.speed < 0) {
+    return 0;
+  } else if (Neo.speed == 0) {
+    return 1;
+  } else if (Neo.speed <= 10) {
+    return 2;
   } else {
-    mode = 3;
+    return 3;
   }
-  this._speedTable[mode] = speed;
-  return mode;
 };
 
 Neo.ActionManager.prototype.step = function () {
@@ -6119,7 +6112,7 @@ Neo.ActionManager.prototype.getCurrent = function (item) {
   oe._currentMaskType = item[10];
 };
 
-Neo.ActionManager.prototype.skip = function (wait) {
+Neo.ActionManager.prototype.skip = function () {
   for (var i = 0; i < this._items.length; i++) {
     if (this._items[i][0] == "restore") {
       this._head = i;
@@ -6127,10 +6120,7 @@ Neo.ActionManager.prototype.skip = function (wait) {
   }
 };
 
-Neo.ActionManager.prototype.play = function (wait) {
-  if (!wait) {
-    wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-  }
+Neo.ActionManager.prototype.play = function () {
   if (Neo.viewerBar) Neo.viewerBar.update();
 
   if (this._pause) {
@@ -6151,12 +6141,14 @@ Neo.ActionManager.prototype.play = function (wait) {
       );
     }
 
-    if (Neo.viewer && Neo.viewerBar && this._index == 0) {
-      console.log("play", item[0], this._head + 1, this._items.length);
+    if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
+      Neo.viewerSpeed.update();
+      //console.log("play", item[0], this._head + 1, this._items.length);
     }
 
-    var that = this;
     var func = item[0] && this[item[0]] ? item[0] : "dummy";
+    var that = this;
+    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
     this[func](item, function (result) {
       if (result) {
@@ -6974,13 +6966,14 @@ Neo.startViewer = function () {
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
+    Neo.viewerSpeed = new Neo.ViewerButton().init("viewerSpeed");
+    Neo.viewerSpeed.onmouseup = function () {
+      Neo.painter.onspeed();
+      this.update();
+    };
 
     new Neo.ViewerButton().init("viewerRewind").onmouseup = function () {
       Neo.painter.onrewind();
-    };
-    new Neo.ViewerButton().init("viewerSpeed").onmouseup = function () {
-      Neo.painter.onspeed();
-      this.update();
     };
     new Neo.ViewerButton().init("viewerPlus").onmouseup = function () {
       new Neo.ZoomPlusCommand(Neo.painter).execute();
@@ -8501,7 +8494,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 
 Neo.ViewerButton.prototype.update = function () {
   if (this.name == "viewerSpeed") {
-    var mode = Neo.painter._actionMgr._speedMode;
+    var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
   }

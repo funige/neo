@@ -15,27 +15,21 @@ Neo.ActionManager = function () {
   this._mark = 0;
 
   this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
-  Neo.speed = parseInt(Neo.config.speed || 0);
-  this._speedMode = this.generateSpeedTable();
 
+  Neo.speed = parseInt(Neo.config.speed || 0);
   this._prevSpeed = Neo.speed;
 };
 
-Neo.ActionManager.prototype.generateSpeedTable = function () {
-  var speed = Neo.speed;
-  var mode = 0;
-
-  if (speed < 0) {
-    mode = 0;
-  } else if (speed == 0) {
-    mode = 1;
-  } else if (speed <= 10) {
-    mode = 2;
+Neo.ActionManager.prototype.speedMode = function () {
+  if (Neo.speed < 0) {
+    return 0;
+  } else if (Neo.speed == 0) {
+    return 1;
+  } else if (Neo.speed <= 10) {
+    return 2;
   } else {
-    mode = 3;
+    return 3;
   }
-  this._speedTable[mode] = speed;
-  return mode;
 };
 
 Neo.ActionManager.prototype.step = function () {
@@ -100,7 +94,7 @@ Neo.ActionManager.prototype.getCurrent = function (item) {
   oe._currentMaskType = item[10];
 };
 
-Neo.ActionManager.prototype.skip = function (wait) {
+Neo.ActionManager.prototype.skip = function () {
   for (var i = 0; i < this._items.length; i++) {
     if (this._items[i][0] == "restore") {
       this._head = i;
@@ -108,10 +102,7 @@ Neo.ActionManager.prototype.skip = function (wait) {
   }
 };
 
-Neo.ActionManager.prototype.play = function (wait) {
-  if (!wait) {
-    wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-  }
+Neo.ActionManager.prototype.play = function () {
   if (Neo.viewerBar) Neo.viewerBar.update();
 
   if (this._pause) {
@@ -132,12 +123,14 @@ Neo.ActionManager.prototype.play = function (wait) {
       );
     }
 
-    if (Neo.viewer && Neo.viewerBar && this._index == 0) {
-      console.log("play", item[0], this._head + 1, this._items.length);
+    if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
+      Neo.viewerSpeed.update();
+      //console.log("play", item[0], this._head + 1, this._items.length);
     }
 
-    var that = this;
     var func = item[0] && this[item[0]] ? item[0] : "dummy";
+    var that = this;
+    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
     this[func](item, function (result) {
       if (result) {
@@ -955,13 +948,14 @@ Neo.startViewer = function () {
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
+    Neo.viewerSpeed = new Neo.ViewerButton().init("viewerSpeed");
+    Neo.viewerSpeed.onmouseup = function () {
+      Neo.painter.onspeed();
+      this.update();
+    };
 
     new Neo.ViewerButton().init("viewerRewind").onmouseup = function () {
       Neo.painter.onrewind();
-    };
-    new Neo.ViewerButton().init("viewerSpeed").onmouseup = function () {
-      Neo.painter.onspeed();
-      this.update();
     };
     new Neo.ViewerButton().init("viewerPlus").onmouseup = function () {
       new Neo.ZoomPlusCommand(Neo.painter).execute();

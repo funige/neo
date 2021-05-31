@@ -2824,7 +2824,7 @@ Neo.Painter.prototype.getEmulationMode = function () {
    -------------------------------------------------------------------------
  */
 
-Neo.Painter.prototype.play = function (wait) {
+Neo.Painter.prototype.play = function () {
   if (this._actionMgr) {
     this._actionMgr.clearCanvas();
     this.prevLine = null;
@@ -2835,7 +2835,7 @@ Neo.Painter.prototype.play = function (wait) {
     this._actionMgr._index = 0;
     this._actionMgr._mark = this._actionMgr._items.length;
     this._actionMgr._pause = false;
-    this._actionMgr.play(wait);
+    this._actionMgr.play();
   }
 };
 
@@ -2879,9 +2879,8 @@ Neo.Painter.prototype.onstop = function () {
 
 Neo.Painter.prototype.onspeed = function () {
   var mgr = Neo.painter._actionMgr;
-  var mode = (mgr._speedMode + 1) % 4;
-  mgr._speedMode = mode;
-  Neo.speed = mgr._speedTable[mode];
+  var mode = mgr.speedMode();
+  Neo.speed = mgr._speedTable[(mode + 1) % 4];
 };
 
 Neo.Painter.prototype.setCurrent = function (item) {

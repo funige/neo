@@ -1413,7 +1413,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 
 Neo.ViewerButton.prototype.update = function () {
   if (this.name == "viewerSpeed") {
-    var mode = Neo.painter._actionMgr._speedMode;
+    var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
   }
