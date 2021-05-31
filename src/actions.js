@@ -14,15 +14,15 @@ Neo.ActionManager = function () {
   this._pause = false;
   this._mark = 0;
 
-  this._speedTable = [-1, 0, 1, 11];
-  this._speed = parseInt(Neo.config.speed || 0);
+  this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
+  Neo.speed = parseInt(Neo.config.speed || 0);
   this._speedMode = this.generateSpeedTable();
 
-  this._prevSpeed = this._speed; // freeHandの途中で速度が変わると困るので
+  this._prevSpeed = Neo.speed;
 };
 
 Neo.ActionManager.prototype.generateSpeedTable = function () {
-  var speed = this._speed;
+  var speed = Neo.speed;
   var mode = 0;
 
   if (speed < 0) {
@@ -132,7 +132,7 @@ Neo.ActionManager.prototype.play = function (wait) {
       );
     }
 
-    if (Neo.viewer && Neo.viewerBar) {
+    if (Neo.viewer && Neo.viewerBar && this._index == 0) {
       console.log("play", item[0], this._head + 1, this._items.length);
     }
 
@@ -152,17 +152,14 @@ Neo.ActionManager.prototype.play = function (wait) {
           that._head++;
         }
         that._index = 0;
-        that._prevSpeed = that._speed;
+        that._prevSpeed = Neo.speed;
       }
 
-      if (that._prevSpeed < 0 && that._head % 10 != 0) {
+      setTimeout(function () {
         Neo.painter._actionMgr.play();
-      } else {
-        setTimeout(function () {
-          Neo.painter._actionMgr.play();
-        }, wait);
-      }
+      }, wait);
     });
+
   } else {
     Neo.painter.dirty = false;
     Neo.painter.busy = false;
@@ -1054,7 +1051,7 @@ Neo.suspendDraw = function () {
 };
 
 Neo.setSpeed = function (value) {
-  Neo.painter._actionMgr._speed = value;
+  Neo.speed = value;
 };
 
 Neo.setMark = function (value) {

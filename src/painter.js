@@ -2881,8 +2881,7 @@ Neo.Painter.prototype.onspeed = function () {
   var mgr = Neo.painter._actionMgr;
   var mode = (mgr._speedMode + 1) % 4;
   mgr._speedMode = mode;
-  mgr._speed = mgr._speedTable[mode];
-  //  console.log('speed=', mgr._speed);
+  Neo.speed = mgr._speedTable[mode];
 };
 
 Neo.Painter.prototype.setCurrent = function (item) {
