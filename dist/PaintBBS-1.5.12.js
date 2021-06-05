@@ -7066,6 +7066,15 @@ Neo.setSpeed = function (value) {
   Neo.speed = value;
 };
 
+Neo.setVisit = function (layer, value) {
+  Neo.painter.visible[layer] = (value == 0) ? false : true;
+  Neo.painter.updateDestCanvas(
+    0,
+    0,
+    Neo.painter.canvasWidth,
+    Neo.painter.canvasHeight);
+};
+
 Neo.setMark = function (value) {
   Neo.painter._actionMgr._mark = value;
   Neo.painter.onmark();

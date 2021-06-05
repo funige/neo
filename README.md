@@ -81,6 +81,9 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 
+#### ver1.5.12 (2021/06/05)
+- [LiveConnectの仕様](https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html#js)にあったdocument.paintbbs.speedを実装しました。
+
 #### ver1.5.11 (2021/05/16)
 - 送信エラーが発生した時の動作を改善しました。  
   失敗した時はURL遷移しません。  
