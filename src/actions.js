@@ -846,7 +846,9 @@ Neo.initViewer = function (pch) {
   );
 
   if (pch) {
-    //Neo.config.pch_file) {
+    console.log(pch);
+    Neo.painter.ignoreLSB = pch.ignoreLSB | Neo.isBrave();
+    
     Neo.painter._actionMgr._items = pch.data;
     Neo.painter.play();
   }
@@ -1003,10 +1005,13 @@ Neo.decodePCH = function (rawdata) {
     var width = header[4] + header[5] * 0x100;
     var height = header[6] + header[7] * 0x100;
     var items = Neo.fixPCH(JSON.parse(data));
+    var ignoreLSB = (header[3] == "!".charCodeAt(0)) ? true : false;
+
     return {
       width: width,
       height: height,
       data: items,
+      ignoreLSB: ignoreLSB,
     };
   } else {
     return null;

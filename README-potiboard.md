@@ -55,7 +55,7 @@ height (2byte)
 :  
 
 * **NEOのpch**  
-magic (3byte: 4c 45 4f) + version (1byte: 20)  
+magic (3byte: 4c 45 4f) + version (1byte: 20または21)  
 width (2byte)  
 height (2byte)  
 拡張用 (4byte: 00 00 00 00)  
@@ -66,6 +66,13 @@ POTI-boardやRelmではこれが問題になることはないのですが、BBS
 詳細はミミニャーさんの記事を参照してください。  
 お絵かき掲示板NEOの設置方法(BBSnote編)
 https://oekakiart.net/blog/bbsnoteneo/
+
+**<a name="brave">braveブラウザ対応</a>**
+
+v1.5.13からは、brave用の新しいヘッダを導入しています。
+
+* brave (ignoreLSB がオン)の時、version=0x21 (magicは"NEO!")  
+* それ以外の時は従来通り、version=0x20 (magicは"NEO ") です。
 
 # NEO独自のパラメータについて
 

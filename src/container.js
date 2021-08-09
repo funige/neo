@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.12";
+Neo.version = "1.5.13";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -915,6 +915,10 @@ Neo.isMobile = function () {
   if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
   if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
   return false;
+};
+
+Neo.isBrave = function () {
+  return navigator.brave;
 };
 
 Neo.showWarning = function () {
