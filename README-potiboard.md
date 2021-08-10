@@ -71,8 +71,11 @@ https://oekakiart.net/blog/bbsnoteneo/
 
 v1.5.13からは、brave用の新しいヘッダを導入しています。
 
-* brave (ignoreLSB がオン)の時、version=0x21 (magicは"NEO!")  
-* それ以外の時は従来通り、version=0x20 (magicは"NEO ") です。
+* brave (ignoreLSB がオン)の時、version=0x21 (先頭4バイトは"NEO!")  
+* それ以外の時は従来通り、version=0x20 (先頭4バイトは"NEO ") です。
+
+先頭3バイトでNEOの動画データかどうか判別していれば、これまで通り動くと思います。
+
 
 # NEO独自のパラメータについて
 
