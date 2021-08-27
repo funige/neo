@@ -363,10 +363,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       }
     };
   }
-  if (Neo.config.neo_ignore_lsb == "true" || Neo.isBrave()) {
-    this.ignoreLSB = true;
-  }
-  
   this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
@@ -1064,7 +1060,7 @@ Neo.Painter.prototype.getThumbnail = function (type) {
     var data = JSON.stringify(this._actionMgr._items);
     data = LZString.compressToUint8Array(data);
 
-    var magic = (this.ignoreLSB) ? "NEO!" : "NEO ";
+    var magic = "NEO ";
     var w = this.canvasWidth;
     var h = this.canvasHeight;
 
@@ -1293,18 +1289,6 @@ Neo.Painter.prototype.isMasked = function (buf8, index) {
     r0 = 0xff;
     g0 = 0xff;
     b0 = 0xff;
-  }
-
-  if (this.ignoreLSB) {
-    r = r & 0xfe;
-    g = g & 0xfe;
-    b = b & 0xfe;
-    r0 = r0 & 0xfe;
-    g0 = g0 & 0xfe;
-    b0 = b0 & 0xfe;
-    r1 = r1 & 0xfe;
-    g1 = g1 & 0xfe;
-    b1 = b1 & 0xfe;
   }
 
   var type = this._currentMaskType; //this.maskType;
@@ -2699,9 +2683,7 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
   Neo.painter.busySkipped = false;
 
   Neo.getPCH(filename, function (pch) {
-    console.log(pch);
-    Neo.painter.ignoreLSB = pch.ignoreLSB | Neo.isBrave();
-
+    //console.log(pch);
     Neo.painter._actionMgr._items = pch.data;
     Neo.painter._actionMgr._mark = pch.data.length;
     Neo.painter._actionMgr.play();

@@ -81,21 +81,6 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 
-#### ver1.5.13 (2021/08/09)
-- Braveブラウザ対応  
-  [Brave](https://brave.com)は[web fingerprinting](https://nakedsecurity.sophos.com/2020/03/11/brave-browser-to-block-web-fingerprinting-with-randomisation/web)を防ぐため、canvasに描画するとき最下位ビットにランダムなノイズを追加します。 
-
-  人間の目には見えないのですが、マスクや逆マスクを使う時このノイズが「違う色」と認識されてしまいます。  
-  これではマスクが使えないので、(braveの時だけ) 色を比較するときは最下位ビットを無視して、「同じ色」として扱うようにしました。
-
-    brave以外のブラウザでこの設定をオンにしたい場合は、
-  
-  &lt;param name="neo_ignore_lsb" value="true">  
-  としてください。
-
-  動画データ(.pch)の仕様にも一部変更があります。開発者の方は[こちらも参考に。](README-potiboard.md#brave) 
-  
-
 #### ver1.5.12 (2021/06/05)
 - [LiveConnectの仕様](https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html#js)にあったdocument.paintbbs.speedを実装しました。
 
