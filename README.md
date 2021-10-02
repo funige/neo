@@ -81,6 +81,9 @@ NEOの入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 
+#### ver1.5.14 (2021/10/03)
+- url_saveを指定しないと投稿できなくなっていた問題を修正
+
 #### ver1.5.12 (2021/06/05)
 - [LiveConnectの仕様](https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html#js)にあったdocument.paintbbs.speedを実装しました。
 
