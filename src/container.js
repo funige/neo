@@ -1228,6 +1228,8 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     }
   };
   request.onerror = function (e) {
+    var errorMessage = null;
+    errorMessage = Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
     console.log("error");
     Neo.submitButton.enable();
   };
@@ -1236,8 +1238,6 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     Neo.submitButton.enable();
   };
   request.ontimeout = function (e) {
-    var errorMessage = null;
-    errorMessage = Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
     alert(errorMessage);
     console.log("timeout");
     Neo.submitButton.enable();
