@@ -1195,9 +1195,15 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 
     var errorMessage = null;
     if (request.status / 100 != 2) {
-	errorMessage = "Error " + request.status + "\n" 
-	+ request.responseURL + "\n"
-                   + Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
+    errorMessage = request.responseURL + "\n";
+    if (request.status == 403) {
+        errorMessage = errorMessage + Neo.translate("投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。");
+        } else if (request.status == 404) {
+        errorMessage = errorMessage + Neo.translate("ファイルが見当たりません。");
+        } else {
+        errorMessage = errorMessage + 
+        + Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
+        }
     } else if (request.response.match(/^error\n/m)) {
       errorMessage = request.response.replace(/^error\n/m, '');
     } else {
@@ -1224,6 +1230,8 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     }
   };
   request.onerror = function (e) {
+    var errorMessage = null;
+    errorMessage = Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
     console.log("error");
     Neo.submitButton.enable();
   };
@@ -1232,10 +1240,11 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     Neo.submitButton.enable();
   };
   request.ontimeout = function (e) {
+    alert(errorMessage);
     console.log("timeout");
     Neo.submitButton.enable();
   };
-
+  request.setRequestHeader("X-Requested-With", "PaintBBS");
   request.send(body);
 };
 
