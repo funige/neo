@@ -1,6 +1,6 @@
 {
   "name": "PaintBBS",
-  "version": "1.5.15",
+  "version": "1.5.16",
   "main": "app/main.js",
   "repository": {
     "type": "git",
@@ -15,7 +15,6 @@
     "request": "^2.86.0"
   },
   "devDependencies": {
-    "electron": "^1.8.2-beta.4",
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-rename": "^1.2.2",
