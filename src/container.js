@@ -1195,13 +1195,15 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 
     var errorMessage = null;
     if (request.status / 100 != 2) {
+    errorMessage = request.responseURL + "\n";
     if (request.status == 403) {
-        errorMessage = "403 forbidden\n";
+        errorMessage = errorMessage + Neo.translate("投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。");
         } else if (request.status == 404) {
-            errorMessage = "404 not found\n";
+        errorMessage = errorMessage + Neo.translate("ファイルが見当たりません。");
+        } else {
+        errorMessage = errorMessage + 
+        + Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
         }
-        errorMessage = errorMessage + request.responseURL + "\n" +
-        Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
     } else if (request.response.match(/^error\n/m)) {
       errorMessage = request.response.replace(/^error\n/m, '');
     } else {
