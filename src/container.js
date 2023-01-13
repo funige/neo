@@ -1159,6 +1159,19 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
       }
     }
   }
+  if (Neo.config.neo_send_with_formdata == "true") {
+
+	var formData = new FormData();
+	formData.append('header', headerString);
+	formData.append('picture',blob,blob);
+
+	if (thumbnail) {
+		formData.append('thumbnail',thumbnail,blob);
+	  }
+	  if (thumbnail2) {
+		formData.append('pch',thumbnail2,blob);
+	}
+  }
   // console.log("submit url=" + url + " header=" + headerString);
 
   var header = new Blob([headerString]);
@@ -1245,7 +1258,11 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     Neo.submitButton.enable();
   };
   request.setRequestHeader("X-Requested-With", "PaintBBS");
+  if (Neo.config.neo_send_with_formdata == "true") {
+	request.send(formData);
+  }else{
   request.send(body);
+  }
 };
 
 /*
