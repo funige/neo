@@ -569,12 +569,12 @@ Neo.backgroundImage = function () {
 };
 
 Neo.multColor = function (c, scale) {
-  var r = Math.round(parseInt(c.substr(1, 2), 16) * scale);
-  var g = Math.round(parseInt(c.substr(3, 2), 16) * scale);
-  var b = Math.round(parseInt(c.substr(5, 2), 16) * scale);
-  r = ("0" + Math.min(Math.max(r, 0), 255).toString(16)).substr(-2);
-  g = ("0" + Math.min(Math.max(g, 0), 255).toString(16)).substr(-2);
-  b = ("0" + Math.min(Math.max(b, 0), 255).toString(16)).substr(-2);
+  var r = Math.round(parseInt(c.substring(1, 3), 16) * scale);
+  var g = Math.round(parseInt(c.substring(3, 5), 16) * scale);
+  var b = Math.round(parseInt(c.substring(5, 7), 16) * scale);
+  r = ("0" + Math.min(Math.max(r, 0), 255).toString(16)).slice(-2);
+  g = ("0" + Math.min(Math.max(g, 0), 255).toString(16)).slice(-2);
+  b = ("0" + Math.min(Math.max(b, 0), 255).toString(16)).slice(-2);
   return "#" + r + g + b;
 };
 
