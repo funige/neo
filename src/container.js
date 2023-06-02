@@ -553,7 +553,9 @@ Neo.backgroundImage = function () {
   var bgCanvas = document.createElement("canvas");
   bgCanvas.width = 16;
   bgCanvas.height = 16;
-  var ctx = bgCanvas.getContext("2d");
+  var ctx = bgCanvas.getContext("2d",{
+		willReadFrequently: true,
+	});
   var imageData = ctx.getImageData(0, 0, 16, 16);
   var buf32 = new Uint32Array(imageData.data.buffer);
   var buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -1044,7 +1046,9 @@ Neo.resizeCanvas = function () {
 
   Neo.painter.destCanvas.width = width;
   Neo.painter.destCanvas.height = height;
-  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d");
+  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d",{
+		willReadFrequently: true,
+	});
   Neo.painter.destCanvasCtx.imageSmoothingEnabled = false;
   //Neo.painter.destCanvasCtx.mozImageSmoothingEnabled = false;
 
@@ -1196,73 +1200,74 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     array.push(thumbnail2Length, thumbnail2);
   }
 
-  var futaba = location.hostname.match(/2chan.net/i);
-  var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
-  var body = new Blob(array, { type: "application/" + subtype });
+	var futaba = location.hostname.match(/2chan.net/i);
+	var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
+	var body = new Blob(array, { type: "application/" + subtype });
 
-  var request = new XMLHttpRequest();
-  request.open("POST", url, true);
+	const postData = (path, data) => {
+		var errorMessage=path+"\n";
 
-  request.onload = function (e) {
-    console.log(request.response, "status=", request.status);
+		const requestOptions = {
+			method: 'post',
+			body: data,
+		};
+		
+		if (!futaba) {//ふたばの時は、'X-Requested-With'を追加しない
+			requestOptions.mode = 'same-origin';
+			requestOptions.headers = {
+			'X-Requested-With': 'PaintBBS'
+			};
+		}
 
-    var errorMessage = null;
-    if (request.status / 100 != 2) {
-    errorMessage = request.responseURL + "\n";
-    if (request.status == 403) {
-        errorMessage = errorMessage + Neo.translate("投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。");
-        } else if (request.status == 404) {
-        errorMessage = errorMessage + Neo.translate("ファイルが見当たりません。");
-        } else {
-        errorMessage = errorMessage + 
-        + Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
-        }
-    } else if (request.response.match(/^error\n/m)) {
-      errorMessage = request.response.replace(/^error\n/m, '');
-    } else {
-      Neo.uploaded = true;
-    }
+		fetch(path, requestOptions)
+		.then((response) => {
+			if (response.ok) {
+				response.text().then((text) => {
+				console.log(text)
+				if (text.match(/^error\n/m)) {
+					Neo.submitButton.enable();
+					return alert(text.replace(/^error\n/m, ''));
+				}
+				var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
+				var responseURL = text.replace(/&amp;/g, "&");
+			
+				// ふたばではresponseの文字列をそのままURLとして解釈する
+				if (responseURL.match(/painttmp=/)) {
+				exitURL = responseURL;
+				}
+				// responseが "URL:〜" の形だった場合はそのURLへ
+				if (responseURL.match(/^URL:/)) {
+				exitURL = responseURL.replace(/^URL:/, "");
+				}
+				Neo.uploaded = true;
+				return location.href = exitURL;
+				})
+			}else{
+				let response_status = response.status; 
+				if (response_status == 403) {
 
-    var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
-    var responseURL = request.response.replace(/&amp;/g, "&");
+					return alert(errorMessage + Neo.translate("投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。"));
+				}
+				if(response_status===404) {
+				return alert(errorMessage + Neo.translate("ファイルが見当たりません。"));
+				}
+				return alert(errorMessage + 
+				+ Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
 
-    // ふたばではresponseの文字列をそのままURLとして解釈する
-    if (responseURL.match(/painttmp=/)) {
-      exitURL = responseURL;
-    }
-    // responseが "URL:〜" の形だった場合はそのURLへ
-    if (responseURL.match(/^URL:/)) {
-      exitURL = responseURL.replace(/^URL:/, "");
-    }
+			}
+		})
+		.catch((error) => {
+			alert(errorMessage + 
+			+ Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
+		Neo.submitButton.enable();
+		})
+	}
 
-    if (Neo.uploaded) {
-      location.href = exitURL;
-    } else {
-      alert(errorMessage);
-      Neo.submitButton.enable();
-    }
-  };
-  request.onerror = function (e) {
-    var errorMessage = null;
-    errorMessage = Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。");
-    alert(errorMessage);
-    console.log("error");
-    Neo.submitButton.enable();
-  };
-  request.onabort = function (e) {
-    console.log("abort");
-    Neo.submitButton.enable();
-  };
-  request.ontimeout = function (e) {
-    console.log("timeout");
-    Neo.submitButton.enable();
-  };
-  request.setRequestHeader("X-Requested-With", "PaintBBS");
-  if (Neo.config.neo_send_with_formdata == "true") {
-	request.send(formData);
-  }else{
-  request.send(body);
-  }
+	if (Neo.config.neo_send_with_formdata == "true") {
+		postData(url, formData);
+	}else{
+		postData(url, body);
+	}
 };
 
 /*

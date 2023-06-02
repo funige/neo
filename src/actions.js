@@ -976,19 +976,20 @@ Neo.getFilename = function () {
 Neo.getPCH = function (filename, callback) {
   if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
 
-  var request = new XMLHttpRequest();
-  request.open("GET", filename, true);
-  request.responseType = "arraybuffer";
-  request.onload = function () {
-    var pch = Neo.decodePCH(request.response);
+  fetch(filename)
+  .then(response => response.arrayBuffer())
+  .then(buffer => {
+    var pch = Neo.decodePCH(buffer);
     if (pch) {
       if (callback) callback(pch);
     } else {
       console.log("not a NEO animation");
     }
-  };
-  request.send();
-};
+  })
+  .catch(error => {
+    console.log(error);
+  });
+}
 
 Neo.decodePCH = function (rawdata) {
   var byteArray = new Uint8Array(rawdata);

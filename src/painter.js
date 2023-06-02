@@ -275,7 +275,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     this.canvas[i] = document.createElement("canvas");
     this.canvas[i].width = width;
     this.canvas[i].height = height;
-    this.canvasCtx[i] = this.canvas[i].getContext("2d");
+    this.canvasCtx[i] = this.canvas[i].getContext("2d",{
+		willReadFrequently: true,
+	});
 
     this.canvas[i].style.imageRendering = "pixelated";
     this.canvasCtx[i].imageSmoothingEnabled = false;
@@ -286,7 +288,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   this.tempCanvas = document.createElement("canvas");
   this.tempCanvas.width = width;
   this.tempCanvas.height = height;
-  this.tempCanvasCtx = this.tempCanvas.getContext("2d");
+  this.tempCanvasCtx = this.tempCanvas.getContext("2d",{
+		willReadFrequently: true,
+	});
   this.tempCanvas.style.position = "absolute";
   this.tempCanvas.enabled = false;
 
@@ -298,7 +302,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     this.container.appendChild(this.destCanvas);
   }
 
-  this.destCanvasCtx = this.destCanvas.getContext("2d");
+  this.destCanvasCtx = this.destCanvas.getContext("2d",{
+		willReadFrequently: true,
+	});
   this.destCanvas.width = destWidth;
   this.destCanvas.height = destHeight;
 
@@ -1023,7 +1029,9 @@ Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
   var pngCanvas = document.createElement("canvas");
   pngCanvas.width = imageWidth;
   pngCanvas.height = imageHeight;
-  var pngCanvasCtx = pngCanvas.getContext("2d");
+  var pngCanvasCtx = pngCanvas.getContext("2d",{
+		willReadFrequently: true,
+	});
   pngCanvasCtx.fillStyle = "#ffffff";
   pngCanvasCtx.fillRect(0, 0, imageWidth, imageHeight);
 
