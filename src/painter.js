@@ -745,34 +745,6 @@ Neo.Painter.prototype._beforeUnloadHandler = function (e) {
    return this.stab;
    };
  */
-function isPinchZooming () {//ピンチズームを検知
-	if ('visualViewport' in window) {
-		return window.visualViewport.scale > 1
-	} else {
-		return document.documentElement.clientWidth > window.innerWidth
-	}
-}
-
-function neo_disable_touch_move (e) {//NEOの網目でスワイプしない
-	if (typeof e.cancelable !== 'boolean' || e.cancelable) {
-	e.preventDefault();
-	e.stopPropagation();
-	}
-}
-
-function neo_add_disable_touch_move() {
-	document.getElementById('NEO').addEventListener('touchmove', neo_disable_touch_move ,{ passive: false });
-}
-function neo_remove_disable_touch_move() {
-	document.getElementById('NEO').removeEventListener('touchmove', neo_disable_touch_move ,{ passive: false });
-}
-document.addEventListener('touchmove', function(e) {
-	neo_add_disable_touch_move();
-	if(isPinchZooming ()){//ピンチズーム使用時はNEOの網目でスワイプする
-		neo_remove_disable_touch_move();
-	}
-});
-window.addEventListener('DOMContentLoaded',neo_add_disable_touch_move,false);
 
 /*
    -------------------------------------------------------------------------
