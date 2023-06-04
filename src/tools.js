@@ -459,7 +459,7 @@ Neo.DrawToolBase.prototype.bezierUpMoveHandler = function (oe) {
 };
 
 Neo.DrawToolBase.prototype.bezierKeyDownHandler = function (e) {
-  if (e.keyCode == 27) {
+  if (e.key == 'Escape') {
     //Escでキャンセル
     this.step = 0;
 
@@ -1158,7 +1158,7 @@ Neo.PasteTool.prototype.moveHandler = function (oe) {
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
-  if (e.keyCode == 27) {
+  if (e.key == 'Escape') {
     //Escでキャンセル
     var oe = Neo.painter;
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
@@ -1300,7 +1300,7 @@ Neo.TextTool.prototype.rollOverHandler = function (oe) {};
 Neo.TextTool.prototype.rollOutHandler = function (oe) {};
 
 Neo.TextTool.prototype.keyDownHandler = function (e) {
-  if (e.keyCode == 13) {
+  if (e.key == 'Enter') {
     // Returnで確定
     e.preventDefault();
 
