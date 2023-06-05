@@ -55,7 +55,7 @@ if(isset($_FILES['pch']) && ($_FILES['pch']['error'] == UPLOAD_ERR_OK)){
 // 情報データをファイルに書き込む
 file_put_contents(SAVE_DIR.$imgfile.".dat",$userdata,LOCK_EX);
 if(!is_file(SAVE_DIR.$imgfile.'.dat')){
-	die("error\n{$errormsg_1}");
+	die("error\nYour picture upload failed! Please try again!");
 }
 chmod(SAVE_DIR.$imgfile.'.dat',PERMISSION_FOR_LOG);
 
