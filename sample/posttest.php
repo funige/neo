@@ -9,12 +9,12 @@ if(($_SERVER["REQUEST_METHOD"]) == "POST"){
   if(isset($_FILES['picture'])) {
     $png = "temp/".$timestamp.".png";
     move_uploaded_file($_FILES['picture']['tmp_name'], $png);
-    chmod($out, 0606);
+    chmod($png, 0606);
   }
   if(isset($_FILES['pch'])) {
     $pch = "temp/".$timestamp.".pch";
     move_uploaded_file($_FILES['pch']['tmp_name'], $pch);
-    chmod($out, 0606);
+    chmod($pch, 0606);
   }
   die("ok");
 }
