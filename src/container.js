@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.5.16";
+Neo.version = "1.6.0";
 Neo.painter;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1163,20 +1163,20 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
       }
     }
   }
+
   if (Neo.config.neo_send_with_formdata == "true") {
+    var formData = new FormData();
+    formData.append('header', headerString);
+	  formData.append('picture',blob,blob);
 
-	var formData = new FormData();
-	formData.append('header', headerString);
-	formData.append('picture',blob,blob);
-
-	if (thumbnail) {
-		formData.append('thumbnail',thumbnail,blob);
+	  if (thumbnail) {
+		  formData.append('thumbnail',thumbnail,blob);
 	  }
 	  if (thumbnail2) {
-		formData.append('pch',thumbnail2,blob);
-	}
+		  formData.append('pch',thumbnail2,blob);
+    }
   }
-  // console.log("submit url=" + url + " header=" + headerString);
+  //console.log("submit url=" + url + " header=" + headerString);
 
   var header = new Blob([headerString]);
   var headerLength = this.getSizeString(header.size);

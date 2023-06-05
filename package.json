@@ -1,6 +1,6 @@
 {
   "name": "PaintBBS",
-  "version": "1.5.16",
+  "version": "1.6.0",
   "main": "app/main.js",
   "repository": {
     "type": "git",
@@ -11,8 +11,6 @@
     "format": "prettier --write src/[^l]*.js"
   },
   "dependencies": {
-    "node-static": "^0.7.11",
-    "request": "^2.86.0"
   },
   "devDependencies": {
     "gulp": "^4.0.2",

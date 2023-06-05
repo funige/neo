@@ -62,6 +62,9 @@ Chrome(80 以降？)で横に長い線を引くとジェスチャーと誤認識
 まだ古い POTI-baord を稼働中の方のための[移行ガイド](README-potiboard.md)  
 (古い PHP のコードには色々問題がありますので、お勧めできません)
 
+- PaintBBS オリジナルの起動オプションについては[オリジナルの README](https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)
+- NEO 独自のオプションについては、[NEO の独自拡張について](README-params.md)を参照してください。
+
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
 
 ## [動作確認用掲示板](http://futabize.websozai.jp)
@@ -71,15 +74,15 @@ Chrome(80 以降？)で横に長い線を引くとジェスチャーと誤認識
 ## <a name="app">Mac/Win 用アプリについて</a>
 
 Mac/Win 用アプリは、NEO 開発の過程で使われたものです。  
-NEO の入っていない掲示板に投稿して、動作を確認することができます
+NEO の入っていない掲示板に投稿して、動作を確認することができたのですが……
 
-残念ながらelectronのバージョンアップで動かなくなってしまいました。
+残念ながら、electron のバージョンアップで動かなくなってしまいました。
 そのうち直して再アップロードしたいと思います。
 
 <!--
-Mac/Win 用アプリは、NEO 開発の過程で使われたものです。  
-NEO の入っていない掲示板に投稿して、動作を確認することができます。  
-バイナリは重いので削除しました。  
+Mac/Win 用アプリは、NEO 開発の過程で使われたものです。
+NEO の入っていない掲示板に投稿して、動作を確認することができます。
+バイナリは重いので削除しました。
 興味のある方はソースコードからビルドしてください。
 
     > git clone https://github.com/funige/neo.git
@@ -90,9 +93,15 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 
-#### ver1.6.0 (2023/6/04)
+#### ver1.6.0 (2023/6/05)
 
+- WAF 誤検知等の問題に対処するため、画像やアニメーションデータを formData で送信する機能がつきました。作っていただいた @satopian さんに感謝。
 
+  &lt;param name="neo_send_with_formdata" value="true">
+
+  で有効になります。詳細は[サンプル](sample/README.md)参照。
+
+- 時代遅れになった javascipt を使っている部分を修正。これも@satopian さん提供です。
 
 #### ver1.5.16 (2022/12/22)
 
