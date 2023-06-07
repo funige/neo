@@ -1259,7 +1259,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 		})
 		.catch((error) => {
 			Neo.submitButton.enable();
-			alert(errorMessage + 
+			return alert(errorMessage + 
 				Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
 		})
 	}
