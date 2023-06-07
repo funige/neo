@@ -1243,6 +1243,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 				return location.href = exitURL;
 				})
 			}else{
+				Neo.submitButton.enable();
 				let response_status = response.status; 
 				if (response_status == 403) {
 
@@ -1252,14 +1253,14 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 				return alert(errorMessage + Neo.translate("ファイルが見当たりません。"));
 				}
 				return alert(errorMessage + 
-				+ Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
+				Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
 
 			}
 		})
 		.catch((error) => {
-			alert(errorMessage + 
-			+ Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
-		Neo.submitButton.enable();
+			Neo.submitButton.enable();
+			return alert(errorMessage + 
+				Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
 		})
 	}
 
