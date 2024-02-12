@@ -1140,7 +1140,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   if (Neo.config.send_header_timer == "true") {
     headerString = "timer=" + timer + "&" + headerString;
   }
-//console.log("header: " + headerString);
+//   console.log("header: " + headerString);
 
   if (Neo.config.neo_emulate_security_error == "true") {
     var securityError = false;
@@ -1177,10 +1177,10 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 		}
 	  if (thumbnail2) {
 		if (!Neo.config.neo_max_pch || isNaN(parseInt(Neo.config.neo_max_pch)) || ((parseInt(Neo.config.neo_max_pch)*1024*1024) > (headerString.length+blob.size+thumbnail_size+thumbnail2.size))) {
-		  formData.append('pch',thumbnail2,blob);
-		  }else{
-			  pchFileNotAppended = true;
-		  }
+			formData.append('pch',thumbnail2,blob);
+			}else{
+				pchFileNotAppended = true;
+			}
 		}
 	}
 
