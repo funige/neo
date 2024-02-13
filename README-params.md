@@ -35,7 +35,7 @@ v1.5 で動画記録をサポートしました。
   :
 
 - **NEO の pch**  
-  magic (3byte: 4c 45 4f) + version (1byte: 20)  
+  magic (3byte: 4e 45 4f) + version (1byte: 20)  
   width (2byte)  
   height (2byte)  
   拡張用 (4byte: 00 00 00 00)  
@@ -133,6 +133,9 @@ v1.6 からはより安全で扱いやすい formData を使ったデータ送�
 - **&lt;PARAM NAME="neo_send_with_formdata" VALUE="true">**
 
   で、formData を使った送信が行われるようになります。
+- **&lt;PARAM NAME=name="neo_max_pch" VALUE="(post_max_size 単位MB)">**  
+で、サーバの`post_max_size`を渡し超過する時はアニメーションデータを切り捨てて画像の投稿を成功させます。
+
 
 [エラーチェックとか省略した短いサンプル](sample/posttest.php)を作りましたので、参考にどうぞ。
 
