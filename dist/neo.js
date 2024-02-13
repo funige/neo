@@ -1140,7 +1140,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   if (Neo.config.send_header_timer == "true") {
     headerString = "timer=" + timer + "&" + headerString;
   }
-//console.log("header: " + headerString);
+//   console.log("header: " + headerString);
 
   if (Neo.config.neo_emulate_security_error == "true") {
     var securityError = false;
@@ -1177,10 +1177,10 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 		}
 	  if (thumbnail2) {
 		if (!Neo.config.neo_max_pch || isNaN(parseInt(Neo.config.neo_max_pch)) || ((parseInt(Neo.config.neo_max_pch)*1024*1024) > (headerString.length+blob.size+thumbnail_size+thumbnail2.size))) {
-		  formData.append('pch',thumbnail2,blob);
-		  }else{
-			  pchFileNotAppended = true;
-		  }
+			formData.append('pch',thumbnail2,blob);
+			}else{
+				pchFileNotAppended = true;
+			}
 		}
 	}
 
@@ -2190,14 +2190,19 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   //スペース・Shift+スペースででスクロールしないように
   // if (document.activeElement != this.inputText) e.preventDefault();
   // console.log(document.activeElement.tagName)
-  if (
-    document.activeElement != this.inputText &&
-    !(document.activeElement.tagName == "INPUT")
-  ) {
-    e.preventDefault();
-  }
-};
-
+	//ctrlキーとの組み合わせのブラウザデフォルトのショートカットキーを無効化
+	//但しctrl+v,ctrl+x,ctrl+aは使用可能
+	const keys = ["+",";","=","-","s","h","r","y","z","u"];
+	if ((e.ctrlKey||e.metaKey) && keys.includes(e.key.toLowerCase())){
+		e.preventDefault();
+	}
+	//text入力と、入力フォーム以外はすべてのキーボードイベントを無効化
+	if(document.activeElement != this.inputText){
+		if (!(document.activeElement.tagName.toLocaleUpperCase() === "INPUT" || document.activeElement.tagName.toLocaleUpperCase() === "TEXTAREA")) {
+		e.preventDefault();
+		}
+	}
+}
 Neo.Painter.prototype._keyUpHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
