@@ -1,9 +1,9 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 
 var fs = require('fs');
-var json = JSON.parse(fs.readFileSync('./package.json'));
 
 var jsFiles = ["src/container.js",
                "src/dictionary.js",
@@ -15,17 +15,21 @@ var jsFiles = ["src/container.js",
                "src/lz-string.js"];
 var jsDest = "dist";
 var cssFiles = ["src/neo.css"]
-var name = json.name + "-" + json.version;
 
 var jsBuild = function() {
+  var json = JSON.parse(fs.readFileSync('./package.json'));
+  var name = json.name + "-" + json.version;
   return gulp.src(jsFiles)
              .pipe(concat('neo.js'))
+             .pipe(replace(/PACKAGE_JSON_VERSION/g, json.version))
              .pipe(gulp.dest(jsDest))
              .pipe(rename(name + '.js'))
              .pipe(gulp.dest(jsDest));
 };
 
 var cssBuild = function() {
+  var json = JSON.parse(fs.readFileSync('./package.json'));
+  var name = json.name + "-" + json.version;
   return gulp.src(cssFiles)
              .pipe(concat('neo.css'))
              .pipe(gulp.dest(jsDest))
@@ -39,6 +43,6 @@ gulp.task('scripts2', cssBuild);
 gulp.task('default', function() {
   jsBuild();
   cssBuild();
-  gulp.watch(jsFiles, gulp.series('scripts'));
-  gulp.watch(cssFiles, gulp.series('scripts2'));
+  gulp.watch([...jsFiles, "package.json"], gulp.series('scripts'));
+  gulp.watch([...cssFiles, "package.json"], gulp.series('scripts2'));
 });
