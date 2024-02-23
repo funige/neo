@@ -337,21 +337,24 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       function (e) {
         ref._mouseDownHandler(e);
       },
-      false
+	  { passive: false,
+		capture: false }
     );
     container.addEventListener(
       "touchmove",
       function (e) {
         ref._mouseMoveHandler(e);
       },
-      false
+	  { passive: false,
+		capture: false }
     );
     container.addEventListener(
       "touchend",
       function (e) {
         ref._mouseUpHandler(e);
       },
-      false
+	  { passive: false,
+		capture: false }
     );
 
     document.onkeydown = function (e) {
