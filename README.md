@@ -95,25 +95,27 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 
 #### ver1.6.3 (2024/03/14)
 
-- [#106 PARAM NAME=name="neo_max_pch"の説明追加とmagic (3byte: 4e 45 4f)](https://funige.github.io/neo2/pulls/106.html)
-- [#107 画面移動の関数が定義されている時はユーザーが定義した関数で画面移動](https://funige.github.io/neo2/pulls/107.html)
-- [#108 {passive\_ false}を明示的に指定。](https://funige.github.io/neo2/pulls/108.html)
-- [#109 ブラウザデフォルトのショートカットキー｢ctrl+o｣を無効化。](https://funige.github.io/neo2/pulls/109.html)
+- [#106 PARAM NAME=name="neo_max_pch"の説明追加とmagic (3byte: 4e 45 4f)](https://funige.github.io/neo/pulls/106.html)
+- [#107 画面移動の関数が定義されている時はユーザーが定義した関数で画面移動](https://funige.github.io/neo/pulls/107.html)
+- [#108 {passive\_ false}を明示的に指定。](https://funige.github.io/neo/pulls/108.html)
+- [#109 ブラウザデフォルトのショートカットキー｢ctrl+o｣を無効化。](https://funige.github.io/neo/pulls/109.html)
 
-- リポジトリをneo2に引越ししました。  
+- Git LFSへの依存解消のためリポジトリを再作成しました。  
   詳細は[README-neo2.md](README-neo2.md)を参照。
+
+  フォークは自動的に更新されないため、新リポジトリから再度フォークする必要があります。
 
 #### ver1.6.2 (2024/02/15)
 
-- [#100 サーバのPOSTの上限を超えるPOST時に動画、画像ともに投稿に失敗する問題](https://funige.github.io/neo2/pulls/100.html)
-- [#102 パレットマトリクスのtextareaでキー入力ができない問題を修正](https://funige.github.io/neo2/pulls/102.html)
+- [#100 サーバのPOSTの上限を超えるPOST時に動画、画像ともに投稿に失敗する問題](https://funige.github.io/neo/pulls/100.html)
+- [#102 パレットマトリクスのtextareaでキー入力ができない問題を修正](https://funige.github.io/neo/pulls/102.html)
 
 - README-development.md を追加しました。
 - package.jsonのバージョン番号を変更するとソースコード内のバージョン番号も同期して更新されるようになりました。
 
 #### ver1.6.1 (2023/12/25)
 
-- [#99 オリジナルのPaintBBSと同じように、描画中に円カーソルを表示したままにする](https://funige.github.io/neo2/pulls/99.html)
+- [#99 オリジナルのPaintBBSと同じように、描画中に円カーソルを表示したままにする](https://funige.github.io/neo/pulls/99.html)
 
 #### ver1.6.0 (2023/6/05)
 

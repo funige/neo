@@ -553,9 +553,9 @@ Neo.backgroundImage = function () {
   var bgCanvas = document.createElement("canvas");
   bgCanvas.width = 16;
   bgCanvas.height = 16;
-  var ctx = bgCanvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  var ctx = bgCanvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   var imageData = ctx.getImageData(0, 0, 16, 16);
   var buf32 = new Uint32Array(imageData.data.buffer);
   var buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -1046,9 +1046,9 @@ Neo.resizeCanvas = function () {
 
   Neo.painter.destCanvas.width = width;
   Neo.painter.destCanvas.height = height;
-  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   Neo.painter.destCanvasCtx.imageSmoothingEnabled = false;
   //Neo.painter.destCanvasCtx.mozImageSmoothingEnabled = false;
 
@@ -1103,12 +1103,12 @@ Neo.openURL = function (url) {
 };
 
 Neo.getAbsoluteURL = function (board, url) {
-  if (url && (url.indexOf('://') > 0 || url.indexOf('//') === 0)) {
+  if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
     return url;
   } else {
     return board + url;
   }
-}
+};
 
 Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
@@ -1140,7 +1140,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   if (Neo.config.send_header_timer == "true") {
     headerString = "timer=" + timer + "&" + headerString;
   }
-//   console.log("header: " + headerString);
+  //   console.log("header: " + headerString);
 
   if (Neo.config.neo_emulate_security_error == "true") {
     var securityError = false;
@@ -1164,27 +1164,32 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     }
   }
 
-  let pchFileNotAppended=false;
+  let pchFileNotAppended = false;
 
   if (Neo.config.neo_send_with_formdata == "true") {
     var formData = new FormData();
-    formData.append('header', headerString);
-	  formData.append('picture',blob,blob);
-	  let thumbnail_size = 0;
-	  if (thumbnail) {
-		  formData.append('thumbnail',thumbnail,blob);
-		  thumbnail_size=thumbnail.size;
-		}
-	  if (thumbnail2) {
-		if (!Neo.config.neo_max_pch || isNaN(parseInt(Neo.config.neo_max_pch)) || ((parseInt(Neo.config.neo_max_pch)*1024*1024) > (headerString.length+blob.size+thumbnail_size+thumbnail2.size))) {
-			formData.append('pch',thumbnail2,blob);
-			}else{
-				pchFileNotAppended = true;
-			}
-		}
-	}
+    formData.append("header", headerString);
+    formData.append("picture", blob, blob);
+    let thumbnail_size = 0;
+    if (thumbnail) {
+      formData.append("thumbnail", thumbnail, blob);
+      thumbnail_size = thumbnail.size;
+    }
+    if (thumbnail2) {
+      if (
+        !Neo.config.neo_max_pch ||
+        isNaN(parseInt(Neo.config.neo_max_pch)) ||
+        parseInt(Neo.config.neo_max_pch) * 1024 * 1024 >
+          headerString.length + blob.size + thumbnail_size + thumbnail2.size
+      ) {
+        formData.append("pch", thumbnail2, blob);
+      } else {
+        pchFileNotAppended = true;
+      }
+    }
+  }
 
-	//console.log("submit url=" + url + " header=" + headerString);
+  //console.log("submit url=" + url + " header=" + headerString);
 
   var header = new Blob([headerString]);
   var headerLength = this.getSizeString(header.size);
@@ -1208,88 +1213,104 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     array.push(thumbnail2Length, thumbnail2);
   }
 
-	var futaba = location.hostname.match(/2chan.net/i);
-	var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
-	var body = new Blob(array, { type: "application/" + subtype });
+  var futaba = location.hostname.match(/2chan.net/i);
+  var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
+  var body = new Blob(array, { type: "application/" + subtype });
 
-	const postData = (path, data) => {
-		var errorMessage=path+"\n";
+  const postData = (path, data) => {
+    var errorMessage = path + "\n";
 
-		const requestOptions = {
-			method: 'post',
-			body: data,
-		};
-		
-		if (!futaba) {//ふたばの時は、'X-Requested-With'を追加しない
-			requestOptions.mode = 'same-origin';
-			requestOptions.headers = {
-			'X-Requested-With': 'PaintBBS'
-			};
-		}
+    const requestOptions = {
+      method: "post",
+      body: data,
+    };
 
-		fetch(path, requestOptions)
-		.then((response) => {
-			if (response.ok) {
-				response.text().then((text) => {
-				console.log(text)
-				if (text.match(/^error\n/m)) {
-					Neo.submitButton.enable();
-					return alert(text.replace(/^error\n/m, ''));
-				}
-				var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
-				var responseURL = text.replace(/&amp;/g, "&");
-			
-				// ふたばではresponseの文字列をそのままURLとして解釈する
-				if (responseURL.match(/painttmp=/)) {
-				exitURL = responseURL;
-				}
-				// responseが "URL:〜" の形だった場合はそのURLへ
-				if (responseURL.match(/^URL:/)) {
-				exitURL = responseURL.replace(/^URL:/, "");
-				}
-				Neo.uploaded = true;
-				//画面移動の関数が定義されている時はユーザーが定義した関数で画面移動
-				if (typeof Neo.handleExit === 'function') {
-					return Neo.handleExit();
-				}
-				return location.href = exitURL;
-				})
-			}else{
-				Neo.submitButton.enable();
-				let response_status = response.status; 
-				if (response_status == 403) {
+    if (!futaba) {
+      //ふたばの時は、'X-Requested-With'を追加しない
+      requestOptions.mode = "same-origin";
+      requestOptions.headers = {
+        "X-Requested-With": "PaintBBS",
+      };
+    }
 
-					return alert(errorMessage + Neo.translate("投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。"));
-				}
-				if(response_status===404) {
-				return alert(errorMessage + Neo.translate("ファイルが見当たりません。"));
-				}
-				return alert(errorMessage + 
-				Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
+    fetch(path, requestOptions)
+      .then((response) => {
+        if (response.ok) {
+          response.text().then((text) => {
+            console.log(text);
+            if (text.match(/^error\n/m)) {
+              Neo.submitButton.enable();
+              return alert(text.replace(/^error\n/m, ""));
+            }
+            var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
+            var responseURL = text.replace(/&amp;/g, "&");
 
-			}
-		})
-		.catch((error) => {
-			Neo.submitButton.enable();
-			return alert(errorMessage + 
-				Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"));
-		})
-	}
-	if (Neo.config.neo_send_with_formdata == "true") {
-
-		if(pchFileNotAppended){
-			if (window.confirm(Neo.translate("画像のみが送信されます。\nレイヤー情報は保持されません。"))) {
-				postData(url, formData);
-			} else {
-				console.log("中止しました。");
-			}
-		}else{
-			postData(url, formData);
-		}
-
-	}else{
-		postData(url, body);
-	}
+            // ふたばではresponseの文字列をそのままURLとして解釈する
+            if (responseURL.match(/painttmp=/)) {
+              exitURL = responseURL;
+            }
+            // responseが "URL:〜" の形だった場合はそのURLへ
+            if (responseURL.match(/^URL:/)) {
+              exitURL = responseURL.replace(/^URL:/, "");
+            }
+            Neo.uploaded = true;
+            //画面移動の関数が定義されている時はユーザーが定義した関数で画面移動
+            if (typeof Neo.handleExit === "function") {
+              return Neo.handleExit();
+            }
+            return (location.href = exitURL);
+          });
+        } else {
+          Neo.submitButton.enable();
+          let response_status = response.status;
+          if (response_status == 403) {
+            return alert(
+              errorMessage +
+                Neo.translate(
+                  "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。"
+                )
+            );
+          }
+          if (response_status === 404) {
+            return alert(
+              errorMessage + Neo.translate("ファイルが見当たりません。")
+            );
+          }
+          return alert(
+            errorMessage +
+              Neo.translate(
+                "投稿に失敗。時間を置いて再度投稿してみてください。"
+              )
+          );
+        }
+      })
+      .catch((error) => {
+        Neo.submitButton.enable();
+        return alert(
+          errorMessage +
+            Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")
+        );
+      });
+  };
+  if (Neo.config.neo_send_with_formdata == "true") {
+    if (pchFileNotAppended) {
+      if (
+        window.confirm(
+          Neo.translate(
+            "画像のみが送信されます。\nレイヤー情報は保持されません。"
+          )
+        )
+      ) {
+        postData(url, formData);
+      } else {
+        console.log("中止しました。");
+      }
+    } else {
+      postData(url, formData);
+    }
+  } else {
+    postData(url, body);
+  }
 };
 
 /*
