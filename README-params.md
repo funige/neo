@@ -133,7 +133,7 @@ v1.6 からはより安全で扱いやすい formData を使ったデータ送�
 - **&lt;PARAM NAME="neo_send_with_formdata" VALUE="true">**
 
   で、formData を使った送信が行われるようになります。
-- **&lt;PARAM NAME=name="neo_max_pch" VALUE="(post_max_size 単位MB)">**  
+- **&lt;PARAM NAME="neo_max_pch" VALUE="(post_max_size 単位MB)">**  
 で、サーバの`post_max_size`を渡し超過する時はアニメーションデータを切り捨てて画像の投稿を成功させます。
 
 
