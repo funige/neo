@@ -571,9 +571,9 @@ Neo.backgroundImage = function () {
 };
 
 Neo.multColor = function (c, scale) {
-  var r = Math.round(parseInt(c.substring(1, 3), 16) * scale);
-  var g = Math.round(parseInt(c.substring(3, 5), 16) * scale);
-  var b = Math.round(parseInt(c.substring(5, 7), 16) * scale);
+  var r = Math.round(parseInt(c.slice(1, 3), 16) * scale);
+  var g = Math.round(parseInt(c.slice(3, 5), 16) * scale);
+  var b = Math.round(parseInt(c.slice(5, 7), 16) * scale);
   r = ("0" + Math.min(Math.max(r, 0), 255).toString(16)).slice(-2);
   g = ("0" + Math.min(Math.max(g, 0), 255).toString(16)).slice(-2);
   b = ("0" + Math.min(Math.max(b, 0), 255).toString(16)).slice(-2);
@@ -2900,9 +2900,9 @@ Neo.Painter.prototype.getBound = function (x0, y0, x1, y1, r) {
 
 Neo.Painter.prototype.getColor = function (c) {
   if (!c) c = this.foregroundColor;
-  var r = parseInt(c.substring(1, 3), 16);
-  var g = parseInt(c.substring(3, 5), 16);
-  var b = parseInt(c.substring(5, 7), 16);
+  var r = parseInt(c.slice(1, 3), 16);
+  var g = parseInt(c.slice(3, 5), 16);
+  var b = parseInt(c.slice(5, 7), 16);
   var a = Math.floor(this.alpha * 255);
   return (a << 24) | (b << 16) | (g << 8) | r;
 };
@@ -2956,14 +2956,14 @@ Neo.Painter.prototype.getAlpha = function (type) {
 };
 
 Neo.Painter.prototype.prepareDrawing = function () {
-  var r = parseInt(this.foregroundColor.substring(1, 3), 16);
-  var g = parseInt(this.foregroundColor.substring(3, 5), 16);
-  var b = parseInt(this.foregroundColor.substring(5, 7), 16);
+  var r = parseInt(this.foregroundColor.slice(1, 3), 16);
+  var g = parseInt(this.foregroundColor.slice(3, 5), 16);
+  var b = parseInt(this.foregroundColor.slice(5, 7), 16);
   var a = Math.floor(this.alpha * 255);
 
-  var maskR = parseInt(this.maskColor.substring(1, 3), 16);
-  var maskG = parseInt(this.maskColor.substring(3, 5), 16);
-  var maskB = parseInt(this.maskColor.substring(5, 7), 16);
+  var maskR = parseInt(this.maskColor.slice(1, 3), 16);
+  var maskG = parseInt(this.maskColor.slice(3, 5), 16);
+  var maskB = parseInt(this.maskColor.slice(5, 7), 16);
 
   this._currentColor = [r, g, b, a];
   this._currentMask = [maskR, maskG, maskB];
