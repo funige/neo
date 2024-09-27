@@ -47,21 +47,19 @@ Neo.Button.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-	{ passive: false,
-		capture: true }
-	  );
+    { passive: false, capture: true }
+  );
   this.element.addEventListener(
     "touchend",
     function (e) {
       ref._mouseUpHandler(e);
     },
-	{ passive: false,
-		capture: true }
-	  );
+    { passive: false, capture: true }
+  );
 
   this.element.className = !this.params.type == "fill" ? "button" : "buttonOff";
 
-  this.disable = function(wait) {
+  this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
     this.element.style.opacity = "0.5";
     if (wait) {
@@ -69,13 +67,13 @@ Neo.Button.prototype.init = function (name, params) {
         ref.enable();
       }, wait);
     }
-  }
+  };
 
-  this.enable = function() {
+  this.enable = function () {
     this.element.style.pointerEvents = "inherit";
     this.element.style.opacity = "1.0";
-  }
-  
+  };
+
   return this;
 };
 
@@ -215,9 +213,8 @@ Neo.ColorTip.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-	{ passive: false,
-		capture: true }
-	  );
+    { passive: false, capture: true }
+  );
   this.element.addEventListener(
     "touchend",
     function (e) {
@@ -351,9 +348,8 @@ Neo.ToolTip.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-	{ passive: false,
-		capture: true }
-	  );
+    { passive: false, capture: true }
+  );
   this.element.addEventListener(
     "touchend",
     function (e) {
@@ -435,9 +431,9 @@ Neo.ToolTip.prototype.update = function () {};
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+    var ctx = this.canvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
     if (this.prevMode != this.mode) {
       this.prevMode = this.mode;
@@ -610,9 +606,9 @@ Neo.Pen2Tip.prototype.update = function () {
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
-  var ctx = this.canvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  var ctx = this.canvas.getContext("2d", {
+    willReadFrequently: true,
+  });
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
   var buf32 = new Uint32Array(imageData.data.buffer);
@@ -685,9 +681,9 @@ Neo.EraserTip.prototype.update = function () {
 };
 
 Neo.EraserTip.prototype.draw = function () {
-  var ctx = this.canvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  var ctx = this.canvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   var img = new Image();
 
@@ -852,9 +848,9 @@ Neo.MaskTip.prototype.update = function () {
 Neo.MaskTip.prototype.draw = function (c) {
   if (typeof c != "string") c = Neo.painter.getColorString(c);
 
-  var ctx = this.canvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  var ctx = this.canvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   ctx.fillStyle = c;
   ctx.fillRect(1, 1, 43, 9);
@@ -1212,8 +1208,7 @@ Neo.LayerControl.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-	{ passive: false,
-		capture: true }
+    { passive: false, capture: true }
   );
 
   this.element.className = "layerControl";
@@ -1294,8 +1289,7 @@ Neo.ReserveControl.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-	{ passive: false,
-		capture: true }
+    { passive: false, capture: true }
   );
 
   this.element.className = "reserve";
@@ -1408,9 +1402,9 @@ Neo.ViewerButton.prototype.init = function (name, params) {
   if (name != "viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
-    var ctx = this.canvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+    var ctx = this.canvas.getContext("2d", {
+      willReadFrequently: true,
+    });
 
     var img = new Image();
     img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, "")];
@@ -1499,8 +1493,7 @@ Neo.ViewerBar.prototype.init = function (name, params) {
       ref._touchHandler(e);
       e.preventDefault();
     },
-	{ passive: false,
-		capture: true }
+    { passive: false, capture: true }
   );
 
   this.update();

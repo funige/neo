@@ -152,7 +152,6 @@ Neo.ActionManager.prototype.play = function () {
         Neo.painter._actionMgr.play();
       }, wait);
     });
-
   } else {
     Neo.painter.dirty = false;
     Neo.painter.busy = false;
@@ -977,19 +976,19 @@ Neo.getPCH = function (filename, callback) {
   if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
 
   fetch(filename)
-  .then(response => response.arrayBuffer())
-  .then(buffer => {
-    var pch = Neo.decodePCH(buffer);
-    if (pch) {
-      if (callback) callback(pch);
-    } else {
-      console.log("not a NEO animation");
-    }
-  })
-  .catch(error => {
-    console.log(error);
-  });
-}
+    .then((response) => response.arrayBuffer())
+    .then((buffer) => {
+      var pch = Neo.decodePCH(buffer);
+      if (pch) {
+        if (callback) callback(pch);
+      } else {
+        console.log("not a NEO animation");
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
 Neo.decodePCH = function (rawdata) {
   var byteArray = new Uint8Array(rawdata);
@@ -1050,12 +1049,13 @@ Neo.setSpeed = function (value) {
 };
 
 Neo.setVisit = function (layer, value) {
-  Neo.painter.visible[layer] = (value == 0) ? false : true;
+  Neo.painter.visible[layer] = value == 0 ? false : true;
   Neo.painter.updateDestCanvas(
     0,
     0,
     Neo.painter.canvasWidth,
-    Neo.painter.canvasHeight);
+    Neo.painter.canvasHeight
+  );
 };
 
 Neo.setMark = function (value) {

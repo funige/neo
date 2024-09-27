@@ -59,9 +59,10 @@ Neo.dictionary = {
       "Please push send button again.",
     "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
       "It may be a WAF false positive.\nTry to draw a little more.",
-    "ファイルが見当たりません。":"File not found",
-	"画像のみが送信されます。\nレイヤー情報は保持されません。":"Only image will be sent.\nLayer information will not be retained.",
-},
+    "ファイルが見当たりません。": "File not found",
+    "画像のみが送信されます。\nレイヤー情報は保持されません。":
+      "Only image will be sent.\nLayer information will not be retained.",
+  },
   enx: {
     やり直し: "Redo",
     元に戻す: "Undo",
@@ -121,9 +122,10 @@ Neo.dictionary = {
       "Failed to upload image. please try again.",
     "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
       "It may be a WAF false positive.\nTry to draw a little more.",
-    "ファイルが見当たりません。":"File not found.",
-	"画像のみが送信されます。\nレイヤー情報は保持されません。":"Only image will be sent.\nLayer information will not be retained.",
-},
+    "ファイルが見当たりません。": "File not found.",
+    "画像のみが送信されます。\nレイヤー情報は保持されません。":
+      "Only image will be sent.\nLayer information will not be retained.",
+  },
   es: {
     やり直し: "Rehacer",
     元に戻す: "Deshacer",
@@ -182,9 +184,10 @@ Neo.dictionary = {
     "投稿に失敗。時間を置いて再度投稿してみてください。":
       "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
     "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
-	  "Puede ser un falso positivo de WAF.\nIntenta dibujar un poco más.",
-    "ファイルが見当たりません。":"Archivo no encontrado.",
-	"画像のみが送信されます。\nレイヤー情報は保持されません。":"Sólo se enviará la imagen.\nNo se conservará la información de la capa.",
+      "Puede ser un falso positivo de WAF.\nIntenta dibujar un poco más.",
+    "ファイルが見当たりません。": "Archivo no encontrado.",
+    "画像のみが送信されます。\nレイヤー情報は保持されません。":
+      "Sólo se enviará la imagen.\nNo se conservará la información de la capa.",
   },
 };
 

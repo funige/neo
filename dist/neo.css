@@ -187,8 +187,8 @@
      height: 50px;
 }
 
-.NEO #scrollH div:hover {}
-.NEO #scrollV div:hover {}
+/* .NEO #scrollH div:hover {}
+.NEO #scrollV div:hover {} */
 
 .NEO #neoWarning {
     position: absolute;
@@ -229,7 +229,7 @@
 
 }
 
-.NEO .buttonOff:hover {}
+/* .NEO .buttonOff:hover {} */
 
 .NEO .buttonOff:active,
 .NEO .buttonOn {
@@ -607,7 +607,7 @@
     border-bottom: 1px solid rgba(0, 0, 0, 1);
 }
 
-.NEO #viewerButtons >div.buttonOff:hover {}
+/* .NEO #viewerButtons >div.buttonOff:hover {} */
 
 .NEO #viewerButtons >div.buttonOff:active,
 .NEO #viewerButtons >div.buttonOn {

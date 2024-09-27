@@ -275,9 +275,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     this.canvas[i] = document.createElement("canvas");
     this.canvas[i].width = width;
     this.canvas[i].height = height;
-    this.canvasCtx[i] = this.canvas[i].getContext("2d",{
-		willReadFrequently: true,
-	});
+    this.canvasCtx[i] = this.canvas[i].getContext("2d", {
+      willReadFrequently: true,
+    });
 
     this.canvas[i].style.imageRendering = "pixelated";
     this.canvasCtx[i].imageSmoothingEnabled = false;
@@ -288,9 +288,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   this.tempCanvas = document.createElement("canvas");
   this.tempCanvas.width = width;
   this.tempCanvas.height = height;
-  this.tempCanvasCtx = this.tempCanvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  this.tempCanvasCtx = this.tempCanvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   this.tempCanvas.style.position = "absolute";
   this.tempCanvas.enabled = false;
 
@@ -302,9 +302,9 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     this.container.appendChild(this.destCanvas);
   }
 
-  this.destCanvasCtx = this.destCanvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  this.destCanvasCtx = this.destCanvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   this.destCanvas.width = destWidth;
   this.destCanvas.height = destHeight;
 
@@ -337,24 +337,21 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       function (e) {
         ref._mouseDownHandler(e);
       },
-	  { passive: false,
-		capture: false }
+      { passive: false, capture: false }
     );
     container.addEventListener(
       "touchmove",
       function (e) {
         ref._mouseMoveHandler(e);
       },
-	  { passive: false,
-		capture: false }
+      { passive: false, capture: false }
     );
     container.addEventListener(
       "touchend",
       function (e) {
         ref._mouseUpHandler(e);
       },
-	  { passive: false,
-		capture: false }
+      { passive: false, capture: false }
     );
 
     document.onkeydown = function (e) {
@@ -417,21 +414,7 @@ Neo.Painter.prototype._initToneData = function () {
 
 Neo.Painter.prototype.getToneData = function (alpha) {
   var alphaTable = [
-    23,
-    47,
-    69,
-    92,
-    114,
-    114,
-    114,
-    138,
-    161,
-    184,
-    184,
-    207,
-    230,
-    230,
-    253,
+    23, 47, 69, 92, 114, 114, 114, 138, 161, 184, 184, 207, 230, 230, 253,
   ];
 
   for (var i = 0; i < alphaTable.length; i++) {
@@ -490,20 +473,20 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
   this.isAltDown = e.altKey;
-  var key=e.key.toLowerCase();
-  if (key === ' ') this.isSpaceDown = true;
-  
+  var key = e.key.toLowerCase();
+  if (key === " ") this.isSpaceDown = true;
+
   if (!this.isShiftDown && this.isCtrlDown) {
-	if (!this.isAltDown) {
-	  if (key === 'z' || key === 'u') this.undo(); // Ctrl+Z, Ctrl+U
-	  if (key === 'y') this.redo(); // Ctrl+Y
-	} else {
-	  if (key === 'z') this.redo(); // Ctrl+Alt+Z
-	}
+    if (!this.isAltDown) {
+      if (key === "z" || key === "u") this.undo(); // Ctrl+Z, Ctrl+U
+      if (key === "y") this.redo(); // Ctrl+Y
+    } else {
+      if (key === "z") this.redo(); // Ctrl+Alt+Z
+    }
   }
   if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-    if (key == '+') new Neo.ZoomPlusCommand(this).execute(); // +
-    if (key == '-') new Neo.ZoomMinusCommand(this).execute(); // -
+    if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
+    if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
   }
 
   if (this.tool.keyDownHandler) {
@@ -513,24 +496,29 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   //スペース・Shift+スペースででスクロールしないように
   // if (document.activeElement != this.inputText) e.preventDefault();
   // console.log(document.activeElement.tagName)
-	//ctrlキーとの組み合わせのブラウザデフォルトのショートカットキーを無効化
-	//但しctrl+v,ctrl+x,ctrl+aは使用可能
-	const keys = ["+",";","=","-","s","h","r","y","z","u","o"];
-	if ((e.ctrlKey||e.metaKey) && keys.includes(e.key.toLowerCase())){
-		e.preventDefault();
-	}
-	//text入力と、入力フォーム以外はすべてのキーボードイベントを無効化
-	if(document.activeElement != this.inputText){
-		if (!(document.activeElement.tagName.toLocaleUpperCase() === "INPUT" || document.activeElement.tagName.toLocaleUpperCase() === "TEXTAREA")) {
-		e.preventDefault();
-		}
-	}
-}
+  //ctrlキーとの組み合わせのブラウザデフォルトのショートカットキーを無効化
+  //但しctrl+v,ctrl+x,ctrl+aは使用可能
+  const keys = ["+", ";", "=", "-", "s", "h", "r", "y", "z", "u", "o"];
+  if ((e.ctrlKey || e.metaKey) && keys.includes(e.key.toLowerCase())) {
+    e.preventDefault();
+  }
+  //text入力と、入力フォーム以外はすべてのキーボードイベントを無効化
+  if (document.activeElement != this.inputText) {
+    if (
+      !(
+        document.activeElement.tagName.toLocaleUpperCase() === "INPUT" ||
+        document.activeElement.tagName.toLocaleUpperCase() === "TEXTAREA"
+      )
+    ) {
+      e.preventDefault();
+    }
+  }
+};
 Neo.Painter.prototype._keyUpHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
   this.isAltDown = e.altKey;
-  if (e.key == ' ') this.isSpaceDown = false;
+  if (e.key == " ") this.isSpaceDown = false;
 
   if (this.tool.keyUpHandler) {
     this.tool.keyUpHandler(oe);
@@ -1009,9 +997,9 @@ Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
   var pngCanvas = document.createElement("canvas");
   pngCanvas.width = imageWidth;
   pngCanvas.height = imageHeight;
-  var pngCanvasCtx = pngCanvas.getContext("2d",{
-		willReadFrequently: true,
-	});
+  var pngCanvasCtx = pngCanvas.getContext("2d", {
+    willReadFrequently: true,
+  });
   pngCanvasCtx.fillStyle = "#ffffff";
   pngCanvasCtx.fillRect(0, 0, imageWidth, imageHeight);
 
