@@ -236,8 +236,8 @@ Neo.DrawToolBase.prototype.freeHandDownHandler = function (oe) {
     var rect = oe.getBound(oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, r);
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
   }
-  if (!Neo.isMobile()){
-	this.drawCursor(oe);
+  if (!Neo.isMobile()) {
+    this.drawCursor(oe);
   }
 };
 
@@ -273,8 +273,8 @@ Neo.DrawToolBase.prototype.freeHandMoveHandler = function (oe) {
   var r = Math.ceil(oe.lineWidth / 2);
   var rect = oe.getBound(oe.mouseX, oe.mouseY, oe.prevMouseX, oe.prevMouseY, r);
   oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
-  if (!Neo.isMobile()){
-	this.drawCursor(oe);
+  if (!Neo.isMobile()) {
+    this.drawCursor(oe);
   }
 };
 
@@ -465,7 +465,7 @@ Neo.DrawToolBase.prototype.bezierUpMoveHandler = function (oe) {
 };
 
 Neo.DrawToolBase.prototype.bezierKeyDownHandler = function (e) {
-  if (e.key == 'Escape') {
+  if (e.key == "Escape") {
     //Escでキャンセル
     this.step = 0;
 
@@ -1164,7 +1164,7 @@ Neo.PasteTool.prototype.moveHandler = function (oe) {
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
-  if (e.key == 'Escape') {
+  if (e.key == "Escape") {
     //Escでキャンセル
     var oe = Neo.painter;
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
@@ -1306,7 +1306,7 @@ Neo.TextTool.prototype.rollOverHandler = function (oe) {};
 Neo.TextTool.prototype.rollOutHandler = function (oe) {};
 
 Neo.TextTool.prototype.keyDownHandler = function (e) {
-  if (e.key == 'Enter') {
+  if (e.key == "Enter") {
     // Returnで確定
     e.preventDefault();
 
