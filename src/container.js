@@ -108,7 +108,6 @@ Neo.init2 = function () {
   Neo.animation = Neo.config.thumbnail_type == "animation";
 
   // 続きから描く
-
   Neo.storage = localStorage; //PCの時にもlocalStorageを使用
 
   var filename = Neo.getFilename();
@@ -117,7 +116,18 @@ Neo.init2 = function () {
       ? "描きかけの画像があります。復元しますか？"
       : "描きかけの画像があります。動画の読み込みを中止して復元しますか？";
 
-  if (Neo.storage.getItem("timestamp") && confirm(Neo.translate(message))) {
+  let storageTimestamp = Neo.storage.getItem("timestamp");
+  const nowTimestamp = new Date().getTime();
+
+  if (
+    Number.isInteger(Number(storageTimestamp)) &&
+    nowTimestamp - storageTimestamp > 3 * 86400 * 1000
+  ) {
+    //3日経過した復元データは破棄
+    Neo.painter.clearSession();
+    storageTimestamp = null;
+  }
+  if (storageTimestamp && confirm(Neo.translate(message))) {
     var oe = Neo.painter;
     setTimeout(function () {
       oe.loadSession(function () {

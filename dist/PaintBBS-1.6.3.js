@@ -108,6 +108,7 @@ Neo.init2 = function () {
   Neo.animation = Neo.config.thumbnail_type == "animation";
 
   // 続きから描く
+
   Neo.storage = localStorage; //PCの時にもlocalStorageを使用
 
   var filename = Neo.getFilename();
@@ -2280,6 +2281,10 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   this.prevMouseX = this.mouseX;
   this.prevMouseY = this.mouseY;
   this.securityCount++;
+  let autosaveCount = this.securityCount;
+  if (autosaveCount % 10 === 0 && Neo.painter.isDirty()) {
+    Neo.painter.saveSession(); //10ストロークごとに自動バックアップ
+  }
 
   if (this.isMouseDownRight) {
     this.isMouseDownRight = false;
