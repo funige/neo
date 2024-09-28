@@ -2721,7 +2721,7 @@ Neo.Painter.prototype.loadSession = function (callback) {
 
 Neo.Painter.prototype.saveSession = function () {
   if (Neo.storage) {
-    Neo.storage.setItem("timestamp", +new Date());
+    Neo.storage.setItem("timestamp", new Date().getTime());
     Neo.storage.setItem("layer0", this.canvas[0].toDataURL("image/png"));
     Neo.storage.setItem("layer1", this.canvas[1].toDataURL("image/png"));
   }
