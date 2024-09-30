@@ -138,7 +138,7 @@ Neo.init2 = function () {
         oe.dirty = false;
       });
     }, 1);
-} else {
+  } else {
     //復元しないを選択した時
     Neo.painter.clearSession();
     if (filename) {
@@ -151,13 +151,13 @@ Neo.init2 = function () {
   }
   window.addEventListener(
     // "pagehide",
-    "beforeunload",//ブラウザを終了した時にも復元データを保存
+    "beforeunload", //ブラウザを終了した時にも復元データを保存
     function (e) {
       if (!Neo.uploaded && Neo.painter.isDirty()) {
         Neo.painter.saveSession();
-	} else if (Neo.uploaded) {
-         //投稿完了時にクリア
-		 Neo.painter.clearSession();
+      } else if (Neo.uploaded) {
+        //投稿完了時にクリア
+        Neo.painter.clearSession();
       }
     },
     false
