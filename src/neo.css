@@ -36,6 +36,7 @@
     position:absolute;
     top: 0;
     right: -3px;
+    z-index: 5000;
 }
 
 .NEO #tools{
@@ -61,10 +62,10 @@
 .NEO #upper {
     position: absolute;
     right: 0;
-
     height:30px;
     padding-right: 75px; /* 20px; */
     text-align:right;
+    width: max-content;
 }
 
 .NEO #lower {
