@@ -254,7 +254,7 @@
 }
 
 .NEO #right {
-    display: inline-block;
+    display: block;
     float: right;
     margin-left: 10px;
 }
