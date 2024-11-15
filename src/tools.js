@@ -290,10 +290,11 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
 };
 
 Neo.DrawToolBase.prototype.drawCursor = function (oe) {
-  if (oe.lineWidth <= 8) return;
+  // if (oe.lineWidth <= 8) return;
   var mx = oe.mouseX;
   var my = oe.mouseY;
   var d = oe.lineWidth;
+  d = d == 1 ? 2 : d; //1pxの時は2px相当の円カーソルを表示
 
   var x = (mx - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) * oe.zoom;
   var y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
