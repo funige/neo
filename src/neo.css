@@ -36,7 +36,7 @@
     position: absolute;
     top: 0;
     right: -3px;
-    z-index: 5000;
+    z-index: 100;
 }
 
 .NEO #tools {
@@ -65,7 +65,7 @@
     height: 30px;
     padding-right: 75px; /* 20px; */
     text-align: right;
-    width: max-content;
+    width: max-content; /* コンテンツを折り返さない */
 }
 
 .NEO #lower {
@@ -90,6 +90,7 @@
     position: absolute;
     top: 5px;
     left: 5px;
+    z-index: 100;
 }
 
 .NEO #footerButtons {
@@ -190,8 +191,8 @@
     height: 50px;
 }
 
-/* .NEO #scrollH div:hover {}
-.NEO #scrollV div:hover {} */
+/* .NEO #scrollH div:hover {} */
+/* .NEO #scrollV div:hover {} */
 
 .NEO #neoWarning {
     position: absolute;
