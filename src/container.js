@@ -1311,22 +1311,20 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
         );
       });
   };
-  if (Neo.config.neo_send_with_formdata == "true") {
-    if (pchFileNotAppended) {
-      if (
-        window.confirm(
-          Neo.translate(
-            "画像のみが送信されます。\nレイヤー情報は保持されません。"
-          )
-        )
-      ) {
-        postData(url, formData);
-      } else {
-        console.log("中止しました。");
-      }
-    } else {
-      postData(url, formData);
+
+  if (Neo.config.neo_confirm_layer_info_notsaved && (!thumbnail2 || pchFileNotAppended)) {
+    const isConfirmed = window.confirm(
+      Neo.translate("レイヤー情報は保存されません。\n続行してよろしいですか?")
+    );
+  
+    if (!isConfirmed) {
+      console.log("中止しました。");
+      return;  // ユーザーが続行しない場合、処理を中断
     }
+  }
+
+  if (Neo.config.neo_send_with_formdata == "true") {
+    postData(url, formData);
   } else {
     postData(url, body);
   }
