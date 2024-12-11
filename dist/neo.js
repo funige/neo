@@ -1318,6 +1318,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     );
   
     if (!isConfirmed) {
+      Neo.submitButton.enable();
       console.log("中止しました。");
       return;  // ユーザーが続行しない場合、処理を中断
     }
