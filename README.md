@@ -93,7 +93,7 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 
 ## <a name="history">履歴</a>
 #### ver1.6.10 (2024/12/12)
-- オリジナルのPaintBBSに存在していたパラメータ **&lt;PARAM NAME="animation_max" VALUE="true">** を実装しました。
+- オリジナルのPaintBBSに存在していたパラメータ **&lt;PARAM NAME="animation_max" VALUE="(file size 単位kb)">** を実装しました。
 > animation_max length of data for animaion(KByte. default value is 0)  
 > アニメーションデーターの最大値をKByte単位で指定します。  
 > 大体の目安でこの値に制限する為、多少前後します。  
