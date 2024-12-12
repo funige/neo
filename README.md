@@ -92,6 +92,19 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 -->
 
 ## <a name="history">履歴</a>
+#### ver1.6.10 (2024/12/12)
+- オリジナルのPaintBBSに存在していたパラメータ **&lt;PARAM NAME="animation_max" VALUE="true">** を実装しました。
+> animation_max length of data for animaion(KByte. default value is 0)  
+> アニメーションデーターの最大値をKByte単位で指定します。  
+> 大体の目安でこの値に制限する為、多少前後します。  
+> 0で制限無し。  
+
+([Readme_Shichan.html](Readme_Shichan.html))
+  
+- NEOの独自パラメータ **&lt;PARAM NAME="neo_max_pch" VALUE="(post_max_size 単位MB)">**  
+よりも**animation_max**が優先されます。 
+また、**neo_max_pch**は、formDataによる送信時にのみ動画ファイルの投稿を制限しますが**animation_max**は、送信方式に関係なく制限します。  
+
 #### ver1.6.9 (2024/12/10)
 - **&lt;PARAM NAME="neo_confirm_layer_info_notsaved" VALUE="true">**  
   このフラグを true にすると、「動画」が記録されていない時に「レイヤー情報は保存されません。続行してよろしいですか?」という警告を出します。  
