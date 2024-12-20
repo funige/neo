@@ -698,20 +698,20 @@ Neo.ActionManager.prototype.restore = function () {
     var callback = arguments[1];
 
     var img0 = new Image();
-    img0.src = item[1];
     img0.onload = function () {
       var img1 = new Image();
-      img1.src = item[2];
       img1.onload = function () {
         oe.canvasCtx[0].clearRect(0, 0, width, height);
         oe.canvasCtx[1].clearRect(0, 0, width, height);
         oe.canvasCtx[0].drawImage(img0, 0, 0);
         oe.canvasCtx[1].drawImage(img1, 0, 0);
         oe.updateDestCanvas(0, 0, width, height);
-
+        
         if (callback && typeof callback == "function") callback(true);
       };
+      img1.src = item[2];
     };
+    img0.src = item[1];
   }
 };
 

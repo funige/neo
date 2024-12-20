@@ -2676,12 +2676,12 @@ Neo.Painter.prototype.cancelTool = function (e) {
 Neo.Painter.prototype.loadImage = function (filename) {
   console.log("loadImage " + filename);
   var img = new Image();
-  img.src = filename;
   img.onload = function () {
     var oe = Neo.painter;
     oe.canvasCtx[0].drawImage(img, 0, 0);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
   };
+  img.src = filename;
 };
 
 Neo.Painter.prototype.loadAnimation = function (filename) {
@@ -2701,10 +2701,8 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
 Neo.Painter.prototype.loadSession = function (callback) {
   if (Neo.storage) {
     var img0 = new Image();
-    img0.src = Neo.storage.getItem("layer0");
     img0.onload = function () {
       var img1 = new Image();
-      img1.src = Neo.storage.getItem("layer1");
       img1.onload = function () {
         var oe = Neo.painter;
         oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -2712,10 +2710,12 @@ Neo.Painter.prototype.loadSession = function (callback) {
         oe.canvasCtx[0].drawImage(img0, 0, 0);
         oe.canvasCtx[1].drawImage(img1, 0, 0);
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
-
+        
         if (callback) callback();
       };
+      img1.src = Neo.storage.getItem("layer1");
     };
+    img0.src = Neo.storage.getItem("layer0");
   }
 };
 
