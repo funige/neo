@@ -6261,49 +6261,7 @@ Neo.ActionManager.prototype.play = function () {
     return;
   }
 
-  if (this._head < this._items.length && this._head < this._mark) {
-    var item = this._items[this._head];
-
-    if (!Neo.viewer) {
-      Neo.painter._pushUndo(
-        0,
-        0,
-        Neo.painter.canvasWidth,
-        Neo.painter.canvasHeight,
-        true,
-      );
-    }
-
-    if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
-      Neo.viewerSpeed.update();
-      //console.log("play", item[0], this._head + 1, this._items.length);
-    }
-
-    var func = item[0] && this[item[0]] ? item[0] : "dummy";
-    var that = this;
-    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-
-    this[func](item, function (result) {
-      if (result) {
-        if (
-          Neo.painter.busySkipped &&
-          that._head < that._mark - 2 &&
-          that._mark - 2 >= 0 &&
-          that._items[that._mark - 1][0] == "restore"
-        ) {
-          that._head = that._mark - 2;
-        } else {
-          that._head++;
-        }
-        that._index = 0;
-        that._prevSpeed = Neo.speed;
-      }
-
-      setTimeout(function () {
-        Neo.painter._actionMgr.play();
-      }, wait);
-    });
-  } else {
+  if (this._head >= this._items.length || this._head >= this._mark) {
     Neo.painter.dirty = false;
     Neo.painter.busy = false;
 
@@ -6313,9 +6271,51 @@ Neo.ActionManager.prototype.play = function () {
     } else {
       console.log("animation finished");
     }
+    return;
   }
-};
 
+  var item = this._items[this._head];
+
+  if (!Neo.viewer) {
+    Neo.painter._pushUndo(
+      0,
+      0,
+      Neo.painter.canvasWidth,
+      Neo.painter.canvasHeight,
+      true,
+    );
+  }
+
+  if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
+    Neo.viewerSpeed.update();
+    //console.log("play", item[0], this._head + 1, this._items.length);
+  }
+
+  var func = item[0] && this[item[0]] ? item[0] : "dummy";
+  var that = this;
+  var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
+
+  this[func](item, function (result) {
+    if (result) {
+      if (
+        Neo.painter.busySkipped &&
+        that._head < that._mark - 2 &&
+        that._mark - 2 >= 0 &&
+        that._items[that._mark - 1][0] == "restore"
+      ) {
+        that._head = that._mark - 2;
+      } else {
+        that._head++;
+      }
+      that._index = 0;
+      that._prevSpeed = Neo.speed;
+    }
+
+    setTimeout(function () {
+      Neo.painter._actionMgr.play();
+    }, wait);
+  });
+};
 /*
 -------------------------------------------------------------------------
     Action
