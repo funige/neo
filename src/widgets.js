@@ -47,14 +47,14 @@ Neo.Button.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
   this.element.addEventListener(
     "touchend",
     function (e) {
       ref._mouseUpHandler(e);
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
 
   this.element.className = !this.params.type == "fill" ? "button" : "buttonOff";
@@ -213,14 +213,14 @@ Neo.ColorTip.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
   this.element.addEventListener(
     "touchend",
     function (e) {
       ref._mouseUpHandler(e);
     },
-    true
+    true,
   );
 
   this.element.className = "colorTipOff";
@@ -348,14 +348,14 @@ Neo.ToolTip.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
   this.element.addEventListener(
     "touchend",
     function (e) {
       ref._mouseUpHandler(e);
     },
-    true
+    true,
   );
 
   this.selected = this.params.type == "pen" ? true : false;
@@ -439,12 +439,12 @@ Neo.ToolTip.prototype.draw = function (c) {
       this.prevMode = this.mode;
 
       var img = new Image();
-      img.src = this.toolIcons[this.mode];
       img.onload = function () {
         var ref = this;
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawTintImage(ctx, img, c, 0, 0);
       }.bind(this);
+      img.src = this.toolIcons[this.mode];
     } else {
       Neo.tintImage(ctx, c);
     }
@@ -687,10 +687,10 @@ Neo.EraserTip.prototype.draw = function () {
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   var img = new Image();
 
-  img.src = Neo.ToolTip.eraser;
   img.onload = function () {
     ctx.drawImage(img, 0, 0);
   };
+  img.src = Neo.ToolTip.eraser;
 };
 
 /*
@@ -1208,7 +1208,7 @@ Neo.LayerControl.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
 
   this.element.className = "layerControl";
@@ -1248,7 +1248,7 @@ Neo.LayerControl.prototype._mouseDownHandler = function (e) {
     0,
     0,
     Neo.painter.canvasWidth,
-    Neo.painter.canvasHeight
+    Neo.painter.canvasHeight,
   );
   if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
     Neo.painter.tool.drawCursor(Neo.painter);
@@ -1289,7 +1289,7 @@ Neo.ReserveControl.prototype.init = function (name, params) {
       ref._mouseDownHandler(e);
       e.preventDefault();
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
 
   this.element.className = "reserve";
@@ -1407,13 +1407,13 @@ Neo.ViewerButton.prototype.init = function (name, params) {
     });
 
     var img = new Image();
-    img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, "")];
     img.onload = function () {
       var ref = this;
       ctx.clearRect(0, 0, 24, 24);
       ctx.drawImage(img, 0, 0);
       Neo.tintImage(ctx, Neo.config.color_text);
     }.bind(this);
+    img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, "")];
   } else {
     this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>";
     this.update();
@@ -1493,7 +1493,7 @@ Neo.ViewerBar.prototype.init = function (name, params) {
       ref._touchHandler(e);
       e.preventDefault();
     },
-    { passive: false, capture: true }
+    { passive: false, capture: true },
   );
 
   this.update();

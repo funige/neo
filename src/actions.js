@@ -119,7 +119,7 @@ Neo.ActionManager.prototype.play = function () {
         0,
         Neo.painter.canvasWidth,
         Neo.painter.canvasHeight,
-        true
+        true,
       );
     }
 
@@ -376,7 +376,7 @@ Neo.ActionManager.prototype.bezier = function (
   y2,
   x3,
   y3,
-  lineType
+  lineType,
 ) {
   var oe = Neo.painter;
   var layer = oe.current;
@@ -413,7 +413,7 @@ Neo.ActionManager.prototype.bezier = function (
     x3,
     y3,
     lineType,
-    isReplay
+    isReplay,
   );
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -656,7 +656,7 @@ Neo.ActionManager.prototype.text = function (
   alpha,
   string,
   size,
-  family
+  family,
 ) {
   var oe = Neo.painter;
   var layer = oe.current;
@@ -706,7 +706,7 @@ Neo.ActionManager.prototype.restore = function () {
         oe.canvasCtx[0].drawImage(img0, 0, 0);
         oe.canvasCtx[1].drawImage(img1, 0, 0);
         oe.updateDestCanvas(0, 0, width, height);
-        
+
         if (callback && typeof callback == "function") callback(true);
       };
       img1.src = item[2];
@@ -820,7 +820,7 @@ Neo.initViewer = function (pch) {
     function () {
       Neo.painter._actionMgr.isMouseDown = true;
     },
-    false
+    false,
   );
 
   document.addEventListener(
@@ -833,7 +833,7 @@ Neo.initViewer = function (pch) {
         Neo.painter.setZoomPosition(x, y);
       }
     },
-    false
+    false,
   );
   document.addEventListener(
     "mouseup",
@@ -841,7 +841,7 @@ Neo.initViewer = function (pch) {
       Neo.painter._actionMgr.isMouseDown = false;
       Neo.viewerBar.isMouseDown = false;
     },
-    false
+    false,
   );
 
   if (pch) {
@@ -870,63 +870,63 @@ Neo.startViewer = function () {
   Neo.addRule(
     ".NEO #viewerButtonsWrapper",
     "border",
-    "1px solid " + Neo.config.color_frame + " !important"
+    "1px solid " + Neo.config.color_frame + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons",
     "border",
-    "1px solid " + Neo.config.color_back + " !important"
+    "1px solid " + Neo.config.color_back + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons",
     "border-left",
-    "1px solid " + lightBack + " !important"
+    "1px solid " + lightBack + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons",
     "border-top",
-    "1px solid " + lightBack + " !important"
+    "1px solid " + lightBack + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff",
     "background-color",
-    Neo.config.color_icon + " !important"
+    Neo.config.color_icon + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff:active",
     "background-color",
-    darkBack + " !important"
+    darkBack + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOn",
     "background-color",
-    darkBack + " !important"
+    darkBack + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div",
     "border",
-    "1px solid " + Neo.config.color_frame + " !important"
+    "1px solid " + Neo.config.color_frame + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff:hover",
     "border",
-    "1px solid" + Neo.config.color_bar_select + " !important"
+    "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff:active",
     "border",
-    "1px solid" + Neo.config.color_bar_select + " !important"
+    "1px solid" + Neo.config.color_bar_select + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOn",
     "border",
-    "1px solid" + Neo.config.color_bar_select + " !important"
+    "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
   Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
@@ -934,7 +934,7 @@ Neo.startViewer = function () {
   Neo.addRule(
     ".NEO #viewerBarMark",
     "background-color",
-    Neo.config.color_text + " !important"
+    Neo.config.color_text + " !important",
   );
 
   setTimeout(function () {
@@ -1054,7 +1054,7 @@ Neo.setVisit = function (layer, value) {
     0,
     0,
     Neo.painter.canvasWidth,
-    Neo.painter.canvasHeight
+    Neo.painter.canvasHeight,
   );
 };
 
