@@ -90,8 +90,8 @@ Neo.CopyrightCommand.prototype.execute = function () {
   if (
     confirm(
       Neo.translate(
-        "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？"
-      ) + "\n"
+        "PaintBBS NEOは、お絵描きしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？",
+      ) + "\n",
     )
   ) {
     Neo.openURL(url);

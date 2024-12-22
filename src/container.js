@@ -160,7 +160,7 @@ Neo.init2 = function () {
         Neo.painter.clearSession();
       }
     },
-    false
+    false,
   );
 };
 
@@ -276,12 +276,12 @@ Neo.initSkin = function () {
   Neo.addRule(
     ".NEO .layerControl .label1",
     "color",
-    Neo.config.tool_color_text
+    Neo.config.tool_color_text,
   );
   Neo.addRule(
     ".NEO .layerControl .label0",
     "color",
-    Neo.config.tool_color_text
+    Neo.config.tool_color_text,
   );
   Neo.addRule(".NEO .toolTipOn .label", "color", Neo.config.tool_color_text);
   Neo.addRule(".NEO .toolTipOff .label", "color", Neo.config.tool_color_text);
@@ -291,7 +291,7 @@ Neo.initSkin = function () {
   Neo.addRule(
     ".NEO .layerControl .bg",
     "border-bottom",
-    "1px solid " + Neo.config.tool_color_text
+    "1px solid " + Neo.config.tool_color_text,
   );
 
   Neo.addRule(".NEO .buttonOn", "color", Neo.config.color_text);
@@ -302,13 +302,13 @@ Neo.initSkin = function () {
     ".NEO .buttonOff",
     "border-top",
     "1px solid ",
-    Neo.config.color_icon
+    Neo.config.color_icon,
   );
   Neo.addRule(
     ".NEO .buttonOff",
     "border-left",
     "1px solid ",
-    Neo.config.color_icon
+    Neo.config.color_icon,
   );
   Neo.addRule(
     ".NEO .buttonOff",
@@ -316,23 +316,23 @@ Neo.initSkin = function () {
     "0 0 0 1px " +
       Neo.config.color_icon +
       ", 0 0 0 2px " +
-      Neo.config.color_frame
+      Neo.config.color_frame,
   );
 
   Neo.addRule(
     ".NEO .buttonOff:hover",
     "background-color",
-    Neo.config.color_icon
+    Neo.config.color_icon,
   );
   Neo.addRule(
     ".NEO .buttonOff:hover",
     "border-top",
-    "1px solid " + lightBorder
+    "1px solid " + lightBorder,
   );
   Neo.addRule(
     ".NEO .buttonOff:hover",
     "border-left",
-    "1px solid " + lightBorder
+    "1px solid " + lightBorder,
   );
   Neo.addRule(
     ".NEO .buttonOff:hover",
@@ -340,23 +340,23 @@ Neo.initSkin = function () {
     "0 0 0 1px " +
       Neo.config.color_iconselect +
       ", 0 0 0 2px " +
-      Neo.config.color_frame
+      Neo.config.color_frame,
   );
 
   Neo.addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "background-color",
-    darkBorder
+    darkBorder,
   );
   Neo.addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "border-top",
-    "1px solid " + darkBorder
+    "1px solid " + darkBorder,
   );
   Neo.addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "border-left",
-    "1px solid " + darkBorder
+    "1px solid " + darkBorder,
   );
   Neo.addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
@@ -364,129 +364,129 @@ Neo.initSkin = function () {
     "0 0 0 1px " +
       Neo.config.color_iconselect +
       ", 0 0 0 2px " +
-      Neo.config.color_frame
+      Neo.config.color_frame,
   );
 
   Neo.addRule(".NEO #canvas", "border", "1px solid " + Neo.config.color_frame);
   Neo.addRule(
     ".NEO #scrollH, .NEO #scrollV",
     "background-color",
-    Neo.config.color_icon
+    Neo.config.color_icon,
   );
   Neo.addRule(
     ".NEO #scrollH, .NEO #scrollV",
     "box-shadow",
-    "0 0 0 1px white" + ", 0 0 0 2px " + Neo.config.color_frame
+    "0 0 0 1px white" + ", 0 0 0 2px " + Neo.config.color_frame,
   );
 
   Neo.addRule(
     ".NEO #scrollH div, .NEO #scrollV div",
     "background-color",
-    Neo.config.color_bar
+    Neo.config.color_bar,
   );
   Neo.addRule(
     ".NEO #scrollH div, .NEO #scrollV div",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.color_icon
+    "0 0 0 1px " + Neo.config.color_icon,
   );
   Neo.addRule(
     ".NEO #scrollH div:hover, .NEO #scrollV div:hover",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.color_iconselect
+    "0 0 0 1px " + Neo.config.color_iconselect,
   );
 
   Neo.addRule(
     ".NEO #scrollH div, .NEO #scrollV div",
     "border-top",
-    "1px solid " + lightBar
+    "1px solid " + lightBar,
   );
   Neo.addRule(
     ".NEO #scrollH div, .NEO #scrollV div",
     "border-left",
-    "1px solid " + lightBar
+    "1px solid " + lightBar,
   );
   Neo.addRule(
     ".NEO #scrollH div, .NEO #scrollV div",
     "border-right",
-    "1px solid " + darkBar
+    "1px solid " + darkBar,
   );
   Neo.addRule(
     ".NEO #scrollH div, .NEO #scrollV div",
     "border-bottom",
-    "1px solid " + darkBar
+    "1px solid " + darkBar,
   );
 
   Neo.addRule(
     ".NEO .toolTipOn",
     "background-color",
-    Neo.multColor(Neo.config.tool_color_button, 0.7)
+    Neo.multColor(Neo.config.tool_color_button, 0.7),
   );
   Neo.addRule(
     ".NEO .toolTipOff",
     "background-color",
-    Neo.config.tool_color_button
+    Neo.config.tool_color_button,
   );
   Neo.addRule(
     ".NEO .toolTipFixed",
     "background-color",
-    Neo.config.tool_color_button2
+    Neo.config.tool_color_button2,
   );
 
   Neo.addRule(
     ".NEO .colorSlider, .NEO .sizeSlider",
     "background-color",
-    Neo.config.tool_color_bar
+    Neo.config.tool_color_bar,
   );
   Neo.addRule(
     ".NEO .reserveControl",
     "background-color",
-    Neo.config.tool_color_bar
+    Neo.config.tool_color_bar,
   );
   Neo.addRule(
     ".NEO .reserveControl",
     "background-color",
-    Neo.config.tool_color_bar
+    Neo.config.tool_color_bar,
   );
   Neo.addRule(
     ".NEO .layerControl",
     "background-color",
-    Neo.config.tool_color_bar
+    Neo.config.tool_color_bar,
   );
 
   Neo.addRule(
     ".NEO .colorTipOn, .NEO .colorTipOff",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.tool_color_frame
+    "0 0 0 1px " + Neo.config.tool_color_frame,
   );
   Neo.addRule(
     ".NEO .toolTipOn, .NEO .toolTipOff",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.tool_color_frame
+    "0 0 0 1px " + Neo.config.tool_color_frame,
   );
   Neo.addRule(
     ".NEO .toolTipFixed",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.tool_color_frame
+    "0 0 0 1px " + Neo.config.tool_color_frame,
   );
   Neo.addRule(
     ".NEO .colorSlider, .NEO .sizeSlider",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.tool_color_frame
+    "0 0 0 1px " + Neo.config.tool_color_frame,
   );
   Neo.addRule(
     ".NEO .reserveControl",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.tool_color_frame
+    "0 0 0 1px " + Neo.config.tool_color_frame,
   );
   Neo.addRule(
     ".NEO .layerControl",
     "box-shadow",
-    "0 0 0 1px " + Neo.config.tool_color_frame
+    "0 0 0 1px " + Neo.config.tool_color_frame,
   );
   Neo.addRule(
     ".NEO .reserveControl .reserve",
     "border",
-    "1px solid " + Neo.config.tool_color_frame
+    "1px solid " + Neo.config.tool_color_frame,
   );
 
   if (navigator.language.indexOf("ja") != 0) {
@@ -771,14 +771,14 @@ Neo.initComponents = function () {
         container.style.borderColor = Neo.config.inherit_color;
         e.stopPropagation();
       },
-      false
+      false,
     );
     document.addEventListener(
       "mousedown",
       function (e) {
         container.style.borderColor = "transparent";
       },
-      false
+      false,
     );
   }
 
@@ -790,7 +790,7 @@ Neo.initComponents = function () {
         Neo.painter.cancelTool(e.target);
       }
     },
-    false
+    false,
   );
 
   // 投稿に失敗する可能性があるときは警告を表示する
@@ -865,14 +865,14 @@ Neo.initButtons = function () {
   });
   Neo.sliders[Neo.SLIDERTYPE_GREEN] = new Neo.ColorSlider().init(
     "sliderGreen",
-    { type: Neo.SLIDERTYPE_GREEN }
+    { type: Neo.SLIDERTYPE_GREEN },
   );
   Neo.sliders[Neo.SLIDERTYPE_BLUE] = new Neo.ColorSlider().init("sliderBlue", {
     type: Neo.SLIDERTYPE_BLUE,
   });
   Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new Neo.ColorSlider().init(
     "sliderAlpha",
-    { type: Neo.SLIDERTYPE_ALPHA }
+    { type: Neo.SLIDERTYPE_ALPHA },
   );
 
   // sizeSlider
@@ -954,7 +954,7 @@ Neo.showWarning = function () {
   if (futaba || samplebbs) {
     if (ms || (edge && edge < 15)) {
       str = Neo.translate(
-        "このブラウザでは<br>投稿に失敗することがあります<br>"
+        "このブラウザでは<br>投稿に失敗することがあります<br>",
       );
     }
   }
@@ -1188,7 +1188,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     // 動画容量を制限するオリジナルのPaintBBSのパラメータ
     // 単位KB
     if (!isNaN(Neo.config.animation_max) && Number(Neo.config.animation_max)) {
-      const maxSize = Number(Neo.config.animation_max)*1024;
+      const maxSize = Number(Neo.config.animation_max) * 1024;
       if (maxSize < thumbnailSize) {
         thumbnail2 = null;
       }
@@ -1204,9 +1204,9 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
       thumbnail_size = thumbnail.size;
     }
     if (thumbnail2) {
-    // 動画容量を制限するNEO独自のパラメータ
-    // 単位MB
-    if (
+      // 動画容量を制限するNEO独自のパラメータ
+      // 単位MB
+      if (
         !Neo.config.neo_max_pch ||
         isNaN(Neo.config.neo_max_pch) ||
         Number(Neo.config.neo_max_pch) * 1024 * 1024 >
@@ -1297,20 +1297,20 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
             return alert(
               errorMessage +
                 Neo.translate(
-                  "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。"
-                )
+                  "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。",
+                ),
             );
           }
           if (response_status === 404) {
             return alert(
-              errorMessage + Neo.translate("ファイルが見当たりません。")
+              errorMessage + Neo.translate("ファイルが見当たりません。"),
             );
           }
           return alert(
             errorMessage +
               Neo.translate(
-                "投稿に失敗。時間を置いて再度投稿してみてください。"
-              )
+                "投稿に失敗。時間を置いて再度投稿してみてください。",
+              ),
           );
         }
       })
@@ -1318,20 +1318,20 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
         Neo.submitButton.enable();
         return alert(
           errorMessage +
-            Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")
+            Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"),
         );
       });
   };
 
   if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
     const isConfirmed = window.confirm(
-      Neo.translate("レイヤー情報は保存されません。\n続行してよろしいですか?")
+      Neo.translate("レイヤー情報は保存されません。\n続行してよろしいですか?"),
     );
-  
+
     if (!isConfirmed) {
       Neo.submitButton.enable();
       console.log("中止しました。");
-      return;  // ユーザーが続行しない場合、処理を中断
+      return; // ユーザーが続行しない場合、処理を中断
     }
   }
 

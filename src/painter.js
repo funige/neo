@@ -337,21 +337,21 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       function (e) {
         ref._mouseDownHandler(e);
       },
-      { passive: false, capture: false }
+      { passive: false, capture: false },
     );
     container.addEventListener(
       "touchmove",
       function (e) {
         ref._mouseMoveHandler(e);
       },
-      { passive: false, capture: false }
+      { passive: false, capture: false },
     );
     container.addEventListener(
       "touchend",
       function (e) {
         ref._mouseUpHandler(e);
       },
-      { passive: false, capture: false }
+      { passive: false, capture: false },
     );
 
     document.onkeydown = function (e) {
@@ -765,7 +765,7 @@ Neo.Painter.prototype.undo = function () {
       undoItem.x,
       undoItem.y,
       undoItem.width,
-      undoItem.height
+      undoItem.height,
     );
   }
 };
@@ -783,7 +783,7 @@ Neo.Painter.prototype.redo = function () {
       undoItem.x,
       undoItem.y,
       undoItem.width,
-      undoItem.height
+      undoItem.height,
     );
   }
 };
@@ -1017,7 +1017,7 @@ Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
       0,
       0,
       imageWidth,
-      imageHeight
+      imageHeight,
     );
   }
   if (this.visible[1]) {
@@ -1030,7 +1030,7 @@ Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
       0,
       0,
       imageWidth,
-      imageHeight
+      imageHeight,
     );
   }
   return pngCanvas;
@@ -1124,7 +1124,7 @@ Neo.Painter.prototype.updateDestCanvas = function (
   y,
   width,
   height,
-  useTemp
+  useTemp,
 ) {
   var canvasWidth = this.canvasWidth;
   var canvasHeight = this.canvasHeight;
@@ -1181,7 +1181,7 @@ Neo.Painter.prototype.updateDestCanvas = function (
       x + this.tempX,
       y + this.tempY,
       width,
-      height
+      height,
     );
   }
   ctx.restore();
@@ -1353,7 +1353,7 @@ Neo.Painter.prototype.setPoint = function (
   y0,
   left,
   top,
-  type
+  type,
 ) {
   var x = x0 - left;
   var y = y0 - top;
@@ -1730,7 +1730,7 @@ Neo.Painter.prototype.getBezierPoint = function (
   x2,
   y2,
   x3,
-  y3
+  y3,
 ) {
   var a0 = (1 - t) * (1 - t) * (1 - t);
   var a1 = (1 - t) * (1 - t) * t * 3;
@@ -1754,7 +1754,7 @@ Neo.Painter.prototype.drawBezier = function (
   y3,
   type,
   isReplay,
-  isPreview
+  isPreview,
 ) {
   var points = [
     [x0, y0],
@@ -1898,7 +1898,7 @@ Neo.Painter.prototype.xorRect = function (
   y,
   width,
   height,
-  c
+  c,
 ) {
   var index = y * bufWidth + x;
   for (var j = 0; j < height; j++) {
@@ -1917,7 +1917,7 @@ Neo.Painter.prototype.drawXORRect = function (
   width,
   height,
   isFill,
-  c
+  c,
 ) {
   x = Math.round(x);
   y = Math.round(y);
@@ -1973,7 +1973,7 @@ Neo.Painter.prototype.drawXOREllipse = function (
   width,
   height,
   isFill,
-  c
+  c,
 ) {
   x = Math.round(x);
   y = Math.round(y);
@@ -2612,7 +2612,7 @@ Neo.Painter.prototype.getDestCanvasPosition = function (
   mx,
   my,
   isClip,
-  isCenter
+  isCenter,
 ) {
   var mx = Math.floor(mx); //Math.round(mx);
   var my = Math.floor(my); //Math.round(my);
@@ -2676,19 +2676,20 @@ Neo.Painter.prototype.cancelTool = function (e) {
 Neo.Painter.prototype.loadImage = function (filename) {
   console.log("loadImage " + filename);
   var img = new Image();
-  img.src = filename;
   img.onload = function () {
     var oe = Neo.painter;
     oe.canvasCtx[0].drawImage(img, 0, 0);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
   };
+  img.src = filename;
 };
 
 Neo.Painter.prototype.loadAnimation = function (filename) {
   console.log("loadAnimation " + filename);
 
   Neo.painter.busy = true;
-  Neo.painter.busySkipped = false;
+  //続きを描く画面で動画をスキップする時はbusySkippedをtrueにする
+  Neo.painter.busySkipped = Neo.config.neo_animation_skip == "true";
 
   Neo.getPCH(filename, function (pch) {
     //console.log(pch);
@@ -2701,10 +2702,8 @@ Neo.Painter.prototype.loadAnimation = function (filename) {
 Neo.Painter.prototype.loadSession = function (callback) {
   if (Neo.storage) {
     var img0 = new Image();
-    img0.src = Neo.storage.getItem("layer0");
     img0.onload = function () {
       var img1 = new Image();
-      img1.src = Neo.storage.getItem("layer1");
       img1.onload = function () {
         var oe = Neo.painter;
         oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -2715,7 +2714,9 @@ Neo.Painter.prototype.loadSession = function (callback) {
 
         if (callback) callback();
       };
+      img1.src = Neo.storage.getItem("layer1");
     };
+    img0.src = Neo.storage.getItem("layer0");
   }
 };
 
@@ -2750,7 +2751,7 @@ Neo.Painter.prototype.doText = function (
   alpha,
   string,
   fontSize,
-  fontFamily
+  fontFamily,
 ) {
   //テキスト描画
   if (string.length <= 0) return;
@@ -2807,7 +2808,7 @@ Neo.Painter.prototype.doText = function (
     0,
     0,
     this.canvasWidth,
-    this.canvasHeight
+    this.canvasHeight,
   );
 
   this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);

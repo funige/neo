@@ -423,7 +423,7 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function (oe) {
         this.y2,
         this.x3,
         this.y3,
-        this.lineType
+        this.lineType,
       );
       oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -509,7 +509,7 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function (oe) {
     this.y3,
     Neo.Painter.LINETYPE_PEN, //this.lineType,
     false,
-    true
+    true,
   );
   ctx.save();
   ctx.translate(oe.destCanvas.width * 0.5, oe.destCanvas.height * 0.5);
@@ -524,7 +524,7 @@ Neo.DrawToolBase.prototype.drawBezierCursor1 = function (oe) {
     0,
     0,
     oe.canvasWidth,
-    oe.canvasHeight
+    oe.canvasHeight,
   );
 
   ctx.restore();
@@ -566,7 +566,7 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function (oe) {
     this.y3,
     Neo.Painter.LINETYPE_PEN, //this.lineType,
     false,
-    true
+    true,
   );
   ctx.save();
   ctx.translate(oe.destCanvas.width * 0.5, oe.destCanvas.height * 0.5);
@@ -581,7 +581,7 @@ Neo.DrawToolBase.prototype.drawBezierCursor2 = function (oe) {
     0,
     0,
     oe.canvasWidth,
-    oe.canvasHeight
+    oe.canvasHeight,
   );
   ctx.restore();
 };
@@ -799,7 +799,7 @@ Neo.SliderTool.prototype.downHandler = function (oe) {
   var sliderType = this.alt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
   Neo.sliders[sliderType].downHandler(
     oe.rawMouseX - rect.left,
-    oe.rawMouseY - rect.top
+    oe.rawMouseY - rect.top,
   );
 };
 
@@ -811,7 +811,7 @@ Neo.SliderTool.prototype.upHandler = function (oe) {
   var sliderType = this.alt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
   Neo.sliders[sliderType].upHandler(
     oe.rawMouseX - rect.left,
-    oe.rawMouseY - rect.top
+    oe.rawMouseY - rect.top,
   );
 };
 
@@ -823,7 +823,7 @@ Neo.SliderTool.prototype.moveHandler = function (oe) {
       : this.target["data-slider"];
     Neo.sliders[sliderType].moveHandler(
       oe.rawMouseX - rect.left,
-      oe.rawMouseY - rect.top
+      oe.rawMouseY - rect.top,
     );
   }
 };
@@ -1188,7 +1188,7 @@ Neo.PasteTool.prototype.drawCursor = function (oe) {
   var end = oe.getDestCanvasPosition(
     this.x + this.width,
     this.y + this.height,
-    true
+    true,
   );
 
   var x = start.x + oe.tempX * oe.zoom;
@@ -1335,7 +1335,7 @@ Neo.TextTool.prototype.keyDownHandler = function (e) {
         alpha,
         string,
         size,
-        family
+        family,
       );
 
       text.style.display = "none";

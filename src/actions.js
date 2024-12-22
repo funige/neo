@@ -110,49 +110,7 @@ Neo.ActionManager.prototype.play = function () {
     return;
   }
 
-  if (this._head < this._items.length && this._head < this._mark) {
-    var item = this._items[this._head];
-
-    if (!Neo.viewer) {
-      Neo.painter._pushUndo(
-        0,
-        0,
-        Neo.painter.canvasWidth,
-        Neo.painter.canvasHeight,
-        true
-      );
-    }
-
-    if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
-      Neo.viewerSpeed.update();
-      //console.log("play", item[0], this._head + 1, this._items.length);
-    }
-
-    var func = item[0] && this[item[0]] ? item[0] : "dummy";
-    var that = this;
-    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-
-    this[func](item, function (result) {
-      if (result) {
-        if (
-          Neo.painter.busySkipped &&
-          that._head < that._mark - 2 &&
-          that._mark - 2 >= 0 &&
-          that._items[that._mark - 1][0] == "restore"
-        ) {
-          that._head = that._mark - 2;
-        } else {
-          that._head++;
-        }
-        that._index = 0;
-        that._prevSpeed = Neo.speed;
-      }
-
-      setTimeout(function () {
-        Neo.painter._actionMgr.play();
-      }, wait);
-    });
-  } else {
+  if (this._head >= this._items.length || this._head >= this._mark) {
     Neo.painter.dirty = false;
     Neo.painter.busy = false;
 
@@ -162,9 +120,58 @@ Neo.ActionManager.prototype.play = function () {
     } else {
       console.log("animation finished");
     }
+    return;
   }
-};
 
+  var item = this._items[this._head];
+
+  if (!Neo.viewer) {
+    Neo.painter._pushUndo(
+      0,
+      0,
+      Neo.painter.canvasWidth,
+      Neo.painter.canvasHeight,
+      true,
+    );
+  }
+
+  if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
+    Neo.viewerSpeed.update();
+    //console.log("play", item[0], this._head + 1, this._items.length);
+  }
+
+  var func;
+  if (Neo.painter.busySkipped) {
+    //アニメーションをスキップする時はrestoreのみを関数として扱う
+    func = item[0] && this[item[0]] && item[0] == "restore" ? item[0] : "dummy";
+  } else {
+    func = item[0] && this[item[0]] ? item[0] : "dummy";
+  }
+
+  var that = this;
+  var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
+
+  this[func](item, function (result) {
+    if (result) {
+      if (
+        Neo.painter.busySkipped &&
+        that._head < that._mark - 2 &&
+        that._mark - 2 >= 0 &&
+        that._items[that._mark - 1][0] == "restore"
+      ) {
+        that._head = that._mark - 2;
+      } else {
+        that._head++;
+      }
+      that._index = 0;
+      that._prevSpeed = Neo.speed;
+    }
+
+    setTimeout(function () {
+      Neo.painter._actionMgr.play();
+    }, wait);
+  });
+};
 /*
 -------------------------------------------------------------------------
     Action
@@ -376,7 +383,7 @@ Neo.ActionManager.prototype.bezier = function (
   y2,
   x3,
   y3,
-  lineType
+  lineType,
 ) {
   var oe = Neo.painter;
   var layer = oe.current;
@@ -413,7 +420,7 @@ Neo.ActionManager.prototype.bezier = function (
     x3,
     y3,
     lineType,
-    isReplay
+    isReplay,
   );
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -656,7 +663,7 @@ Neo.ActionManager.prototype.text = function (
   alpha,
   string,
   size,
-  family
+  family,
 ) {
   var oe = Neo.painter;
   var layer = oe.current;
@@ -698,10 +705,8 @@ Neo.ActionManager.prototype.restore = function () {
     var callback = arguments[1];
 
     var img0 = new Image();
-    img0.src = item[1];
     img0.onload = function () {
       var img1 = new Image();
-      img1.src = item[2];
       img1.onload = function () {
         oe.canvasCtx[0].clearRect(0, 0, width, height);
         oe.canvasCtx[1].clearRect(0, 0, width, height);
@@ -711,7 +716,9 @@ Neo.ActionManager.prototype.restore = function () {
 
         if (callback && typeof callback == "function") callback(true);
       };
+      img1.src = item[2];
     };
+    img0.src = item[1];
   }
 };
 
@@ -820,7 +827,7 @@ Neo.initViewer = function (pch) {
     function () {
       Neo.painter._actionMgr.isMouseDown = true;
     },
-    false
+    false,
   );
 
   document.addEventListener(
@@ -833,7 +840,7 @@ Neo.initViewer = function (pch) {
         Neo.painter.setZoomPosition(x, y);
       }
     },
-    false
+    false,
   );
   document.addEventListener(
     "mouseup",
@@ -841,7 +848,7 @@ Neo.initViewer = function (pch) {
       Neo.painter._actionMgr.isMouseDown = false;
       Neo.viewerBar.isMouseDown = false;
     },
-    false
+    false,
   );
 
   if (pch) {
@@ -870,63 +877,63 @@ Neo.startViewer = function () {
   Neo.addRule(
     ".NEO #viewerButtonsWrapper",
     "border",
-    "1px solid " + Neo.config.color_frame + " !important"
+    "1px solid " + Neo.config.color_frame + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons",
     "border",
-    "1px solid " + Neo.config.color_back + " !important"
+    "1px solid " + Neo.config.color_back + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons",
     "border-left",
-    "1px solid " + lightBack + " !important"
+    "1px solid " + lightBack + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons",
     "border-top",
-    "1px solid " + lightBack + " !important"
+    "1px solid " + lightBack + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff",
     "background-color",
-    Neo.config.color_icon + " !important"
+    Neo.config.color_icon + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff:active",
     "background-color",
-    darkBack + " !important"
+    darkBack + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOn",
     "background-color",
-    darkBack + " !important"
+    darkBack + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div",
     "border",
-    "1px solid " + Neo.config.color_frame + " !important"
+    "1px solid " + Neo.config.color_frame + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff:hover",
     "border",
-    "1px solid" + Neo.config.color_bar_select + " !important"
+    "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOff:active",
     "border",
-    "1px solid" + Neo.config.color_bar_select + " !important"
+    "1px solid" + Neo.config.color_bar_select + " !important",
   );
   Neo.addRule(
     ".NEO #viewerButtons >div.buttonOn",
     "border",
-    "1px solid" + Neo.config.color_bar_select + " !important"
+    "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
   Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
@@ -934,7 +941,7 @@ Neo.startViewer = function () {
   Neo.addRule(
     ".NEO #viewerBarMark",
     "background-color",
-    Neo.config.color_text + " !important"
+    Neo.config.color_text + " !important",
   );
 
   setTimeout(function () {
@@ -1054,7 +1061,7 @@ Neo.setVisit = function (layer, value) {
     0,
     0,
     Neo.painter.canvasWidth,
-    Neo.painter.canvasHeight
+    Neo.painter.canvasHeight,
   );
 };
 
