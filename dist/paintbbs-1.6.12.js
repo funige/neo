@@ -6333,7 +6333,6 @@ Neo.ActionManager.prototype.play = function () {
 
     if (Neo.painter.busySkipped) {
       Neo.painter.busySkipped = false;
-      Neo.painter.dirty = true;
       console.log("animation skipped");
     } else {
       console.log("animation finished");
