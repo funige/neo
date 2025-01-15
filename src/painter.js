@@ -502,6 +502,14 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   if ((e.ctrlKey || e.metaKey) && keys.includes(e.key.toLowerCase())) {
     e.preventDefault();
   }
+  //FirefoxのメニューがAltキーで開閉しないようにする
+  document.addEventListener("keyup", (e) => {
+    // e.key を利用して特定のキーのアップイベントを検知する
+    if (e.key.toLowerCase() === "alt") {
+      e.preventDefault(); // Altキーのデフォルトの動作をキャンセル
+    }
+  });
+
   //text入力と、入力フォーム以外はすべてのキーボードイベントを無効化
   if (document.activeElement != this.inputText) {
     if (

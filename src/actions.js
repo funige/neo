@@ -125,7 +125,7 @@ Neo.ActionManager.prototype.play = function () {
 
   var item = this._items[this._head];
 
-  if (!Neo.viewer) {
+  if (!Neo.viewer && !Neo.painter.busySkipped) {
     Neo.painter._pushUndo(
       0,
       0,
