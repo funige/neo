@@ -62,7 +62,7 @@ Chrome(80 以降？)で横に長い線を引くとジェスチャーと誤認識
 まだ古い POTI-baord を稼働中の方のための[移行ガイド](README-potiboard.md)  
 (古い PHP のコードには色々問題がありますので、お勧めできません)
 
-- PaintBBS オリジナルの起動オプションについては[オリジナルの README](https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)
+- PaintBBS オリジナルの起動オプションについては[オリジナルの README](https://web.archive.org/web/20070822002857/https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)
 - NEO 独自のオプションについては、[NEO の独自拡張について](README-params.md)を参照してください。
 
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
