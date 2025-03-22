@@ -102,15 +102,15 @@ PHP等で、`die("ok")`のように指定する必要があるため、対応し
 
 - 各ステータスコードとその内容を｢投稿に失敗。時間を置いて再度投稿してください。｣と組み合わせて表示します。
   
-![Screen-2025-03-22_15-37-49](https://github.com/user-attachments/assets/648f019b-a6c8-4e41-bb3f-0219d04d4920)   
-↑  
-日本語。  
-![Screen-2025-03-22_15-36-25](https://github.com/user-attachments/assets/ff779ab5-dae7-42c4-8874-df7473f14124)  
-↑  
-英語。  
-![Screen-2025-03-22_15-35-24](https://github.com/user-attachments/assets/1bd343b7-fe31-459e-8b0d-54093141553c)
-↑  
-スペイン語。  
+   ![Screen-2025-03-22_15-37-49](https://github.com/user-attachments/assets/648f019b-a6c8-4e41-bb3f-0219d04d4920)  
+    ↑  
+  日本語。  
+  ![Screen-2025-03-22_15-36-25](https://github.com/user-attachments/assets/ff779ab5-dae7-42c4-8874-df7473f14124)  
+  ↑  
+  英語。  
+  ![Screen-2025-03-22_15-35-24](https://github.com/user-attachments/assets/1bd343b7-fe31-459e-8b0d-54093141553c)  
+  ↑  
+  スペイン語。    
 
 #### ver1.6.12 (2025/1/15)
 - **&lt;PARAM NAME="neo_disable_grid_touch_move" VALUE="true">**  
