@@ -976,20 +976,6 @@ Neo.start = function (isApp) {
   }
 };
 
-Neo.isIE = function () {
-  var ms = false;
-  if (/MSIE 10/i.test(navigator.userAgent)) {
-    ms = true; // This is internet explorer 10
-  }
-  if (
-    /MSIE 9/i.test(navigator.userAgent) ||
-    /rv:11.0/i.test(navigator.userAgent)
-  ) {
-    ms = true; // This is internet explorer 9 or 11
-  }
-  return ms;
-};
-
 Neo.isMobile = function () {
   if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
   if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
@@ -1006,11 +992,9 @@ Neo.showWarning = function () {
   var edge = navigator.userAgent.match(/Edge\/(\d+)/i);
   if (edge && edge.length > 1) edge = edge[1];
 
-  var ms = Neo.isIE();
-
   var str = "";
   if (futaba || samplebbs) {
-    if (ms || (edge && edge < 15)) {
+    if (edge && edge < 15) {
       str = Neo.translate(
         "このブラウザでは<br>投稿に失敗することがあります<br>",
       );
@@ -1330,6 +1314,17 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
               Neo.submitButton.enable();
               return alert(text.replace(/^error\n/m, ""));
             }
+            if(Neo.config.neo_validate_exact_ok_text_in_response === "true") {
+              if (text !== "ok") {
+                Neo.submitButton.enable();
+                return alert(
+                  errorMessage +
+                    Neo.translate(
+                      "投稿に失敗。時間を置いて再度投稿してみてください。",
+                    ),
+                );
+              }
+            }
             var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
             var responseURL = text.replace(/&amp;/g, "&");
 
@@ -1350,26 +1345,35 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
           });
         } else {
           Neo.submitButton.enable();
-          let response_status = response.status;
-          if (response_status == 403) {
-            return alert(
-              errorMessage +
-                Neo.translate(
-                  "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。",
-                ),
-            );
-          }
-          if (response_status === 404) {
-            return alert(
-              errorMessage + Neo.translate("ファイルが見当たりません。"),
-            );
-          }
-          return alert(
-            errorMessage +
-              Neo.translate(
-                "投稿に失敗。時間を置いて再度投稿してみてください。",
-              ),
-          );
+          const response_status = response.status;
+          let httpErrorMessag="";
+          switch (response_status) {
+            case 400:
+                httpErrorMessag = "Bad Request";
+                break;
+            case 401:
+                httpErrorMessag = "Unauthorized";
+                break;
+            case 403:
+                httpErrorMessag = "Forbidden";
+                break;
+            case 404:
+                httpErrorMessag = "Not Found";
+                break;
+            case 500:
+                httpErrorMessag = "Internal Server Error";
+                break;
+            case 502:
+                httpErrorMessag = "Bad gateway";
+                break;
+            case 503:
+                httpErrorMessag = "Service Unavailable";
+                break;
+            default:
+                httpErrorMessag = "Unknown Error";
+                break;
+        }
+            return alert(`${Neo.translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`);
         }
       })
       .catch((error) => {

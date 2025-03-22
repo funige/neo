@@ -56,12 +56,11 @@ Neo.dictionary = {
     既: "M",
     鈍: "L",
     "投稿に失敗。時間を置いて再度投稿してみてください。":
-      "Please push send button again.",
-    "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
-      "It may be a WAF false positive.\nTry to draw a little more.",
-    "ファイルが見当たりません。": "File not found",
+    "Please push send button again.",
+    "HTTPステータスコード":
+    "HTTP status code",
     "レイヤー情報は保存されません。\n続行してよろしいですか?":
-      "Layer information will not be saved.\nAre you sure you want to continue?",
+    "Layer information will not be saved.\nAre you sure you want to continue?",
   },
   enx: {
     やり直し: "Redo",
@@ -120,11 +119,10 @@ Neo.dictionary = {
     鈍: "L",
     "投稿に失敗。時間を置いて再度投稿してみてください。":
       "Failed to upload image. please try again.",
-    "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
-      "It may be a WAF false positive.\nTry to draw a little more.",
-    "ファイルが見当たりません。": "File not found.",
+    "HTTPステータスコード":
+    "HTTP status code",
     "レイヤー情報は保存されません。\n続行してよろしいですか?":
-      "Layer information will not be saved.\nAre you sure you want to continue?",
+    "Layer information will not be saved.\nAre you sure you want to continue?",
   },
   es: {
     やり直し: "Rehacer",
@@ -182,12 +180,11 @@ Neo.dictionary = {
     既: "M",
     鈍: "L",
     "投稿に失敗。時間を置いて再度投稿してみてください。":
-      "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
-    "投稿に失敗。\nWAFの誤検知かもしれません。\nもう少し描いてみてください。":
-      "Puede ser un falso positivo de WAF.\nIntenta dibujar un poco más.",
-    "ファイルが見当たりません。": "Archivo no encontrado.",
+    "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
+    "HTTPステータスコード":
+    "Código de estado HTTP",
     "レイヤー情報は保存されません。\n続行してよろしいですか?":
-      "La información de las capas no se guardará.\n¿Está seguro de que desea continuar?",
+    "La información de las capas no se guardará.\n¿Está seguro de que desea continuar?",
   },
 };
 

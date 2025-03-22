@@ -161,7 +161,7 @@ var LZString = (function () {
           if (
             Object.prototype.hasOwnProperty.call(
               context_dictionaryToCreate,
-              context_w
+              context_w,
             )
           ) {
             if (context_w.charCodeAt(0) < 256) {
@@ -249,7 +249,7 @@ var LZString = (function () {
         if (
           Object.prototype.hasOwnProperty.call(
             context_dictionaryToCreate,
-            context_w
+            context_w,
           )
         ) {
           if (context_w.charCodeAt(0) < 256) {
