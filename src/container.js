@@ -273,34 +273,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const elementNeo = document.getElementById("NEO");
   // グリッド部分の touchmove イベントをキャンセルする関数をイベントリスナーに追加
-      Neo.add_touch_move_grid_control = function () {
-        if (Neo.config.neo_disable_grid_touch_move) {
-          // すでにリスナーが追加されていない場合のみ追加
-        if (!elementNeo?._touchMoveListenerAdded) {
-          elementNeo?.addEventListener("touchmove", Neo.touch_move_grid_control, {
-            passive: false,
-          });
-          elementNeo._touchMoveListenerAdded = true; // リスナーが追加されたことを記録
-        }
+  Neo.add_touch_move_grid_control = function () {
+    if (Neo.config.neo_disable_grid_touch_move) {
+      // すでにリスナーが追加されていない場合のみ追加
+      if (!elementNeo?._touchMoveListenerAdded) {
+        elementNeo?.addEventListener("touchmove", Neo.touch_move_grid_control, {
+          passive: false,
+        });
+        elementNeo._touchMoveListenerAdded = true; // リスナーが追加されたことを記録
       }
-    };
+    }
+  };
 
   // グリッド部分の touchmove イベントをキャンセルする関数の追加とリムーブ
   elementNeo?.addEventListener("touchmove", function (e) {
-      if (Neo.config.neo_disable_grid_touch_move) {
-        Neo.add_touch_move_grid_control();
-        if (Neo.isPinchZooming()) {
-          elementNeo.removeEventListener(
-            "touchmove",
-            Neo.touch_move_grid_control,
-            {
-              passive: false,
-            },
-          );
-          elementNeo._touchMoveListenerAdded = false; // リスナーが削除されたことを記録
-        }
+    if (Neo.config.neo_disable_grid_touch_move) {
+      Neo.add_touch_move_grid_control();
+      if (Neo.isPinchZooming()) {
+        elementNeo.removeEventListener(
+          "touchmove",
+          Neo.touch_move_grid_control,
+          {
+            passive: false,
+          },
+        );
+        elementNeo._touchMoveListenerAdded = false; // リスナーが削除されたことを記録
       }
-    });
+    }
+  });
   // 初期化
   Neo.add_touch_move_grid_control();
 });
@@ -982,7 +982,7 @@ Neo.isMobile = function () {
 };
 
 Neo.showWarning = function () {
-  var futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);//サブドメインありなし両方に対応
+  var futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
   var samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
 
   var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
@@ -1313,7 +1313,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
               Neo.submitButton.enable();
               return alert(text.replace(/^error\n/m, ""));
             }
-            if(Neo.config.neo_validate_exact_ok_text_in_response === "true") {
+            if (Neo.config.neo_validate_exact_ok_text_in_response === "true") {
               if (text !== "ok") {
                 Neo.submitButton.enable();
                 return alert(
@@ -1345,34 +1345,36 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
         } else {
           Neo.submitButton.enable();
           const response_status = response.status;
-          let httpErrorMessag="";
+          let httpErrorMessag = "";
           switch (response_status) {
             case 400:
-                httpErrorMessag = "Bad Request";
-                break;
+              httpErrorMessag = "Bad Request";
+              break;
             case 401:
-                httpErrorMessag = "Unauthorized";
-                break;
+              httpErrorMessag = "Unauthorized";
+              break;
             case 403:
-                httpErrorMessag = "Forbidden";
-                break;
+              httpErrorMessag = "Forbidden";
+              break;
             case 404:
-                httpErrorMessag = "Not Found";
-                break;
+              httpErrorMessag = "Not Found";
+              break;
             case 500:
-                httpErrorMessag = "Internal Server Error";
-                break;
+              httpErrorMessag = "Internal Server Error";
+              break;
             case 502:
-                httpErrorMessag = "Bad Gateway";
-                break;
+              httpErrorMessag = "Bad Gateway";
+              break;
             case 503:
-                httpErrorMessag = "Service Unavailable";
-                break;
+              httpErrorMessag = "Service Unavailable";
+              break;
             default:
-                httpErrorMessag = "Unknown Error";
-                break;
-        }
-            return alert(`${Neo.translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`);
+              httpErrorMessag = "Unknown Error";
+              break;
+          }
+          return alert(
+            `${Neo.translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`,
+          );
         }
       })
       .catch((error) => {
