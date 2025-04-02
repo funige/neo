@@ -56,11 +56,10 @@ Neo.dictionary = {
     既: "M",
     鈍: "L",
     "投稿に失敗。時間を置いて再度投稿してみてください。":
-    "Please push send button again.",
-    "HTTPステータスコード":
-    "HTTP status code",
+      "Please push send button again.",
+    HTTPステータスコード: "HTTP status code",
     "レイヤー情報は保存されません。\n続行してよろしいですか?":
-    "Layer information will not be saved.\nAre you sure you want to continue?",
+      "Layer information will not be saved.\nAre you sure you want to continue?",
   },
   enx: {
     やり直し: "Redo",
@@ -119,10 +118,9 @@ Neo.dictionary = {
     鈍: "L",
     "投稿に失敗。時間を置いて再度投稿してみてください。":
       "Failed to upload image. please try again.",
-    "HTTPステータスコード":
-    "HTTP status code",
+    HTTPステータスコード: "HTTP status code",
     "レイヤー情報は保存されません。\n続行してよろしいですか?":
-    "Layer information will not be saved.\nAre you sure you want to continue?",
+      "Layer information will not be saved.\nAre you sure you want to continue?",
   },
   es: {
     やり直し: "Rehacer",
@@ -180,11 +178,10 @@ Neo.dictionary = {
     既: "M",
     鈍: "L",
     "投稿に失敗。時間を置いて再度投稿してみてください。":
-    "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
-    "HTTPステータスコード":
-    "Código de estado HTTP",
+      "No se pudo cargar la imagen. por favor, inténtalo de nuevo.",
+    HTTPステータスコード: "Código de estado HTTP",
     "レイヤー情報は保存されません。\n続行してよろしいですか?":
-    "La información de las capas no se guardará.\n¿Está seguro de que desea continuar?",
+      "La información de las capas no se guardará.\n¿Está seguro de que desea continuar?",
   },
 };
 
