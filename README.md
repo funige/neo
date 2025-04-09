@@ -92,6 +92,23 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 -->
 
 ## <a name="history">履歴</a>
+
+#### ver1.6.16 (2025/4/10)
+Chrome135のデフォルトフォントが"Noto Sans JP"に変わり文字がかすれて読めなくなってしまったため、
+`neo.css`から
+
+> font-weight: 100;
+
+を削除しました。  
+  
+![image](https://github.com/user-attachments/assets/ce0ca032-cef1-4e41-89e6-4d440070f487)  
+↑  
+Chrome135で文字のかすれが発生。    
+  
+![image](https://github.com/user-attachments/assets/60b82f48-4b78-40b1-ab24-9fb601433ea9)  
+↑  
+修正後。  
+
 #### ver1.6.15 (2025/3/24)
 - **&lt;PARAM NAME="neo_validate_exact_ok_text_in_response" VALUE="true">**  
 このフラグを true にするとサーバから返って来た文字列が"ok"では無かった時にエラーメッセージをアラートで表示して描画中の画面から移動しません。    
