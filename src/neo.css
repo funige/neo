@@ -217,7 +217,7 @@
     padding: 3px;
     height: 16px;
     font-size: 15px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     margin-right: 4px;
@@ -241,7 +241,7 @@
     padding: 3px;
     height: 16px;
     font-size: 15px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     margin-right: 4px;
@@ -306,7 +306,7 @@
     bottom: -4px;
     left: 1px;
     font-size: 12px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: -1px;
     overflow: hidden !important;
@@ -367,7 +367,7 @@
     left: 2px;
     bottom: -3px;
     font-size: 12px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     vertical-align: middle;
@@ -404,7 +404,7 @@
     left: 2px;
     bottom: -3px;
     font-size: 12px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     vertical-align: middle;
@@ -503,7 +503,7 @@
     left: 2px;
     top: -4px;
     font-size: 11px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     vertical-align: baseline;
@@ -514,7 +514,7 @@
     left: 2px;
     top: 6px;
     font-size: 11px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     vertical-align: baseline;
@@ -608,7 +608,7 @@
     margin-left: 2px;
 
     font-size: 14px;
-    font-weight: 100;
+    /* font-weight: 100; */
     font-family: "Arial";
     letter-spacing: 0;
     -webkit-font-smoothing: antialiased;
