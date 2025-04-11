@@ -1476,11 +1476,11 @@ Neo.ViewerBar.prototype.init = function (name, params) {
   this.seek = 0;
 
   var ref = this;
-  this.element.onmousedown = function (e) {
+  this.element.onpointerdown = function (e) {
     ref.isMouseDown = true;
     ref._touchHandler(e);
   };
-  this.element.onmousemove = function (e) {
+  this.element.onpointermove = function (e) {
     if (ref.isMouseDown) {
       ref._touchHandler(e);
     }
