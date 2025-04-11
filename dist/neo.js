@@ -7044,16 +7044,24 @@ Neo.initViewer = function (pch) {
   };
 
   painter.addEventListener(
-    "mousedown",
+    "pointerdown",
     function () {
       Neo.painter._actionMgr.isMouseDown = true;
     },
     false,
   );
+  painter.addEventListener(
+    "touchmove",
+    function (e) {
+      e.preventDefault();
+    },
+    { passive: false, capture: false },
+  );
 
   document.addEventListener(
-    "mousemove",
+    "pointermove",
     function (e) {
+      e.preventDefault();
       if (Neo.painter._actionMgr.isMouseDown) {
         var zoom = Neo.painter.zoom;
         var x = Neo.painter.zoomX - e.movementX / zoom;
@@ -7061,10 +7069,10 @@ Neo.initViewer = function (pch) {
         Neo.painter.setZoomPosition(x, y);
       }
     },
-    false,
+    { passive: false, capture: false },
   );
   document.addEventListener(
-    "mouseup",
+    "pointerup",
     function () {
       Neo.painter._actionMgr.isMouseDown = false;
       Neo.viewerBar.isMouseDown = false;
