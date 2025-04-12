@@ -8790,6 +8790,7 @@ Neo.ViewerBar.prototype.init = function (name, params) {
     ref._touchHandler(e);
   };
   this.element.onpointermove = function (e) {
+    e.preventDefault();
     if (ref.isMouseDown) {
       ref._touchHandler(e);
     }
@@ -8822,9 +8823,12 @@ Neo.ViewerBar.prototype.update = function () {
 };
 
 Neo.ViewerBar.prototype._touchHandler = function (e) {
+  if (e.offsetX === undefined) {
+    return;
+  }
+
   var x = e.offsetX / this.width;
   x = Math.max(Math.min(x, 1), 0);
-
   Neo.painter._actionMgr._mark = Math.round(x * this.length);
   //this.update();
   //  console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
