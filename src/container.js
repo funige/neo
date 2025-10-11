@@ -982,8 +982,8 @@ Neo.isMobile = function () {
 };
 
 Neo.showWarning = function () {
-  var futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
-  var samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
+  const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
+  const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
 
   var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
   if (chrome && chrome.length > 1) chrome = chrome[1];
@@ -1284,7 +1284,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     array.push(thumbnail2Length, thumbnail2);
   }
 
-  var futaba = location.hostname.match(/2chan.net/i);
+  const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
   var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
   var body = new Blob(array, { type: "application/" + subtype });
 
