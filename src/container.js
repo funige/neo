@@ -1109,8 +1109,22 @@ Neo.resizeCanvas = function () {
   Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d", {
     willReadFrequently: true,
   });
-  Neo.painter.destCanvasCtx.imageSmoothingEnabled = false;
-  //Neo.painter.destCanvasCtx.mozImageSmoothingEnabled = false;
+
+  const ctx = Neo.painter.destCanvasCtx;
+  if (Neo.painter.zoom < 1) {
+    // 表示用アンチエイリアスを有効化
+    ctx.imageSmoothingEnabled = true;
+    ctx.mozImageSmoothingEnabled = true;
+    ctx.webkitImageSmoothingEnabled = true;
+    ctx.msImageSmoothingEnabled = true;
+
+    // 品質を指定（対応ブラウザのみ有効）
+    if ("imageSmoothingQuality" in ctx) {
+      ctx.imageSmoothingQuality = "high";
+    }
+  } else {
+    ctx.imageSmoothingEnabled = false;
+  }
 
   Neo.canvas.style.width = width + "px";
   Neo.canvas.style.height = height + "px";

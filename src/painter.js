@@ -896,11 +896,17 @@ Neo.Painter.prototype.setZoom = function (value) {
   this.zoom = value;
 
   var container = document.getElementById("container");
-  var width = this.canvasWidth * this.zoom;
-  var height = this.canvasHeight * this.zoom;
+  var width = Math.round(this.canvasWidth * this.zoom);
+  var height = Math.round(this.canvasHeight * this.zoom);
+
   if (width > container.clientWidth - 100) width = container.clientWidth - 100;
   if (height > container.clientHeight - 130)
     height = container.clientHeight - 130;
+
+  // width, heightは偶数でないと誤差が出るため
+  width = Math.floor(width / 2) * 2;
+  height = Math.floor(height / 2) * 2;
+
   this.destWidth = width;
   this.destHeight = height;
 
@@ -1134,15 +1140,19 @@ Neo.Painter.prototype.updateDestCanvas = function (
   height,
   useTemp,
 ) {
+  // 元座標は整数化（元キャンバス側）
+  x = Math.floor(x);
+  y = Math.floor(y);
+  width = Math.floor(width);
+  height = Math.floor(height);
+
   var canvasWidth = this.canvasWidth;
   var canvasHeight = this.canvasHeight;
-  var updateAll = false;
-  if (x == 0 && y == 0 && width == canvasWidth && height == canvasHeight) {
-    updateAll = true;
-  }
+  var updateAll =
+    x === 0 && y === 0 && width === canvasWidth && height === canvasHeight;
 
-  if (x + width > this.canvasWidth) width = this.canvasWidth - x;
-  if (y + height > this.canvasHeight) height = this.canvasHeight - y;
+  if (x + width > canvasWidth) width = canvasWidth - x;
+  if (y + height > canvasHeight) height = canvasHeight - y;
   if (x < 0) x = 0;
   if (y < 0) y = 0;
   if (width <= 0 || height <= 0) return;
@@ -1150,46 +1160,54 @@ Neo.Painter.prototype.updateDestCanvas = function (
   var ctx = this.destCanvasCtx;
   ctx.save();
   ctx.fillStyle = "#ffffff";
+  ctx.globalAlpha = 1.0;
 
-  var fillWidth = width;
-  var fillHeight = height;
+  const zoom = this.zoom;
+  // ---- 描画先座標（拡大／縮小後のキャンバス側） ----
+  // scrollBarX/Y は 0～1 の比率
+  this.scrollBarX = isNaN(this.scrollBarX) ? 0 : this.scrollBarX;
+  this.scrollBarY = isNaN(this.scrollBarY) ? 0 : this.scrollBarY;
+  const offsetX = Math.floor(
+    this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width),
+  );
+  const offsetY = Math.floor(
+    this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height),
+  );
 
+  const zx = Math.floor(x * zoom - offsetX);
+  const zy = Math.floor(y * zoom - offsetY);
+
+  // 端にピクセル欠けが出ないよう少し広げる
+  const zw = Math.ceil((x + width) * zoom) - Math.floor(x * zoom);
+  const zh = Math.ceil((y + height) * zoom) - Math.floor(y * zoom);
+
+  // ---- 背景クリア ----
   if (updateAll) {
     ctx.fillRect(0, 0, this.destCanvas.width, this.destCanvas.height);
   } else {
-    //カーソルの描画ゴミが残るのをごまかすため
-    if (x + width == this.canvasWidth) fillWidth = width + 1;
-    if (y + height == this.canvasHeight) fillHeight = height + 1;
+    ctx.fillRect(zx, zy, zw, zh);
   }
 
-  ctx.translate(this.destCanvas.width * 0.5, this.destCanvas.height * 0.5);
-  ctx.scale(this.zoom, this.zoom);
-  ctx.translate(-this.zoomX, -this.zoomY);
-  ctx.globalAlpha = 1.0;
-  ctx.msImageSmoothingEnabled = 0;
+  // ---- レイヤー描画 ----
+  if (this.visible[0])
+    ctx.drawImage(this.canvas[0], x, y, width, height, zx, zy, zw, zh);
+  if (this.visible[1])
+    ctx.drawImage(this.canvas[1], x, y, width, height, zx, zy, zw, zh);
 
-  if (!updateAll) {
-    ctx.fillRect(x, y, fillWidth, fillHeight);
-  }
-
-  if (this.visible[0]) {
-    ctx.drawImage(this.canvas[0], x, y, width, height, x, y, width, height);
-  }
-  if (this.visible[1]) {
-    ctx.drawImage(this.canvas[1], x, y, width, height, x, y, width, height);
-  }
+  // ---- テンポラリレイヤー ----
   if (useTemp) {
-    ctx.globalAlpha = 1.0; //this.alpha;
+    const tempX = Math.floor(this.tempX * zoom);
+    const tempY = Math.floor(this.tempY * zoom);
     ctx.drawImage(
       this.tempCanvas,
       x,
       y,
       width,
       height,
-      x + this.tempX,
-      y + this.tempY,
-      width,
-      height,
+      zx + tempX,
+      zy + tempY,
+      zw,
+      zh,
     );
   }
   ctx.restore();
