@@ -1143,8 +1143,8 @@ Neo.Painter.prototype.updateDestCanvas = function (
   // 元座標は整数化（元キャンバス側）
   x = Math.floor(x);
   y = Math.floor(y);
-  width = Math.floor(width);
-  height = Math.floor(height);
+  width = Math.ceil(width);
+  height = Math.ceil(height);
 
   var canvasWidth = this.canvasWidth;
   var canvasHeight = this.canvasHeight;
@@ -1819,6 +1819,11 @@ Neo.Painter.prototype.drawBezier = function (
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
 Neo.Painter.prototype.drawLine = function (ctx, x0, y0, x1, y1, type) {
+  x0 = Math.floor(x0);
+  y0 = Math.floor(y0);
+  x1 = Math.floor(x1);
+  y1 = Math.floor(y1);
+
   var points = [
     [x0, y0],
     [x1, y1],
