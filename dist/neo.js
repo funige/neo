@@ -2949,8 +2949,8 @@ Neo.Painter.prototype.updateDestCanvas = function (
   // 元座標は整数化（元キャンバス側）
   x = Math.floor(x);
   y = Math.floor(y);
-  width = Math.floor(width);
-  height = Math.floor(height);
+  width = Math.ceil(width);
+  height = Math.ceil(height);
 
   var canvasWidth = this.canvasWidth;
   var canvasHeight = this.canvasHeight;
@@ -3625,6 +3625,11 @@ Neo.Painter.prototype.drawBezier = function (
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
 Neo.Painter.prototype.drawLine = function (ctx, x0, y0, x1, y1, type) {
+  x0 = Math.floor(x0);
+  y0 = Math.floor(y0);
+  x1 = Math.floor(x1);
+  y1 = Math.floor(y1);
+
   var points = [
     [x0, y0],
     [x1, y1],
@@ -5035,13 +5040,16 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
   }
-  this.drawCursor(oe);
+  //縮小時+トーンの時は浮動カーソルを表示しない モワレ防止
+  if (oe.zoom >= 1 && this.lineType !== 4) {
+    this.drawCursor(oe);
+  }
 };
 
 Neo.DrawToolBase.prototype.drawCursor = function (oe) {
   // if (oe.lineWidth <= 8) return;
-  var mx = Math.ceil(oe.mouseX);
-  var my = Math.ceil(oe.mouseY);
+  var mx = Math.floor(oe.mouseX);
+  var my = Math.floor(oe.mouseY);
 
   var d = oe.lineWidth;
   d = d == 1 ? 2 : d; //1pxの時は2px相当の円カーソルを表示
