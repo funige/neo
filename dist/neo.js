@@ -6163,13 +6163,9 @@ Neo.ZoomPlusCommand = function (data) {
 };
 Neo.ZoomPlusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomPlusCommand.prototype.execute = function () {
-  if (this.data.zoom === 0.5 && !Neo.viewer && Neo.config.neo_enable_zoom_out) {
+  if (this.data.zoom === 0.5 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(1);
-  } else if (
-    this.data.zoom === 0.25 &&
-    !Neo.viewer &&
-    Neo.config.neo_enable_zoom_out
-  ) {
+  } else if (this.data.zoom === 0.25 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.5);
   } else if (this.data.zoom < 12) {
     this.data.setZoom(this.data.zoom + 1);
@@ -6185,17 +6181,9 @@ Neo.ZoomMinusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomMinusCommand.prototype.execute = function () {
   if (this.data.zoom >= 2) {
     this.data.setZoom(this.data.zoom - 1);
-  } else if (
-    this.data.zoom === 1 &&
-    !Neo.viewer &&
-    Neo.config.neo_enable_zoom_out
-  ) {
+  } else if (this.data.zoom === 1 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.5);
-  } else if (
-    this.data.zoom === 0.5 &&
-    !Neo.viewer &&
-    Neo.config.neo_enable_zoom_out
-  ) {
+  } else if (this.data.zoom === 0.5 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.25);
   }
   Neo.resizeCanvas();
