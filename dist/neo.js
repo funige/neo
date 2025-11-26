@@ -1114,16 +1114,14 @@ Neo.resizeCanvas = function () {
   if (Neo.painter.zoom < 1) {
     // 表示用アンチエイリアスを有効化
     ctx.imageSmoothingEnabled = true;
-    ctx.mozImageSmoothingEnabled = true;
-    ctx.webkitImageSmoothingEnabled = true;
-    ctx.msImageSmoothingEnabled = true;
-
+    Neo.painter.destCanvas.style.imageRendering = "smooth";
     // 品質を指定（対応ブラウザのみ有効）
     if ("imageSmoothingQuality" in ctx) {
       ctx.imageSmoothingQuality = "high";
     }
   } else {
     ctx.imageSmoothingEnabled = false;
+    Neo.painter.destCanvas.style.imageRendering = "pixelated";
   }
 
   Neo.canvas.style.width = width + "px";
@@ -2087,7 +2085,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
 
     this.canvas[i].style.imageRendering = "pixelated";
     this.canvasCtx[i].imageSmoothingEnabled = false;
-    this.canvasCtx[i].mozImageSmoothingEnabled = false;
     this.visible[i] = true;
   }
 
@@ -2116,7 +2113,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
 
   this.destCanvas.style.imageRendering = "pixelated";
   this.destCanvasCtx.imageSmoothingEnabled = false;
-  this.destCanvasCtx.mozImageSmoothingEnabled = false;
 
   var ref = this;
 
@@ -2514,7 +2510,7 @@ Neo.Painter.prototype._updateMousePosition = function (e) {
     this.prevMouseX = this.mouseX;
   }
   if (isNaN(this.prevMouseY)) {
-    this.prevMosueY = this.mouseY;
+    this.prevMouseY = this.mouseY;
   }
 
   /*
@@ -4457,6 +4453,8 @@ Neo.Painter.prototype.getDestCanvasPosition = function (
     mx += 0.499;
     my += 0.499;
   }
+
+  // マウス座標（描画先キャンバス座標）を計算
   var x =
     (mx - this.zoomX + (this.destCanvas.width * 0.5) / this.zoom) * this.zoom;
   var y =
@@ -5040,10 +5038,12 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
   }
-  //縮小時+トーンの時は浮動カーソルを表示しない モワレ防止
-  if (oe.zoom >= 1 && this.lineType !== 4) {
-    this.drawCursor(oe);
+  //縮小時は円カーソルを表示しない 浮動時のモワレ発生を防止
+  if (oe.zoom < 1) {
+    return;
   }
+  //円カーソルを表示
+  this.drawCursor(oe);
 };
 
 Neo.DrawToolBase.prototype.drawCursor = function (oe) {

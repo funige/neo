@@ -281,7 +281,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
 
     this.canvas[i].style.imageRendering = "pixelated";
     this.canvasCtx[i].imageSmoothingEnabled = false;
-    this.canvasCtx[i].mozImageSmoothingEnabled = false;
     this.visible[i] = true;
   }
 
@@ -310,7 +309,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
 
   this.destCanvas.style.imageRendering = "pixelated";
   this.destCanvasCtx.imageSmoothingEnabled = false;
-  this.destCanvasCtx.mozImageSmoothingEnabled = false;
 
   var ref = this;
 
@@ -708,7 +706,7 @@ Neo.Painter.prototype._updateMousePosition = function (e) {
     this.prevMouseX = this.mouseX;
   }
   if (isNaN(this.prevMouseY)) {
-    this.prevMosueY = this.mouseY;
+    this.prevMouseY = this.mouseY;
   }
 
   /*
@@ -2651,6 +2649,8 @@ Neo.Painter.prototype.getDestCanvasPosition = function (
     mx += 0.499;
     my += 0.499;
   }
+
+  // マウス座標（描画先キャンバス座標）を計算
   var x =
     (mx - this.zoomX + (this.destCanvas.width * 0.5) / this.zoom) * this.zoom;
   var y =

@@ -286,10 +286,12 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
   }
-  //縮小時+トーンの時は浮動カーソルを表示しない モワレ防止
-  if (oe.zoom >= 1 && this.lineType !== 4) {
-    this.drawCursor(oe);
+  //縮小時は円カーソルを表示しない 浮動時のモワレ発生を防止
+  if (oe.zoom < 1) {
+    return;
   }
+  //円カーソルを表示
+  this.drawCursor(oe);
 };
 
 Neo.DrawToolBase.prototype.drawCursor = function (oe) {

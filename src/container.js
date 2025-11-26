@@ -1114,16 +1114,14 @@ Neo.resizeCanvas = function () {
   if (Neo.painter.zoom < 1) {
     // 表示用アンチエイリアスを有効化
     ctx.imageSmoothingEnabled = true;
-    ctx.mozImageSmoothingEnabled = true;
-    ctx.webkitImageSmoothingEnabled = true;
-    ctx.msImageSmoothingEnabled = true;
-
+    Neo.painter.destCanvas.style.imageRendering = "smooth";
     // 品質を指定（対応ブラウザのみ有効）
     if ("imageSmoothingQuality" in ctx) {
       ctx.imageSmoothingQuality = "high";
     }
   } else {
     ctx.imageSmoothingEnabled = false;
+    Neo.painter.destCanvas.style.imageRendering = "pixelated";
   }
 
   Neo.canvas.style.width = width + "px";
