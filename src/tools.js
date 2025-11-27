@@ -249,8 +249,10 @@ Neo.DrawToolBase.prototype.freeHandUpHandler = function (oe) {
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
   }
-
-  //  oe.updateDestCanvas(0,0,oe.canvasWidth, oe.canvasHeight, true);
+  if (oe.zoom < 1) {
+    //縮小時はポインターアップで全体更新
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+  }
   //  this.drawCursor(oe);
   oe.prevLine = null;
 };
@@ -286,13 +288,23 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
   }
+  //縮小時は浮動円カーソルを非表示 部分更新のグリッチが出るため
+  if (oe.zoom < 1) {
+    return;
+  }
+  //円カーソルを表示
   this.drawCursor(oe);
 };
 
 Neo.DrawToolBase.prototype.drawCursor = function (oe) {
+  if (oe.zoom < 0.5) {
+    //0.2倍時にカーソルのゴミが出るため
+    return;
+  }
   // if (oe.lineWidth <= 8) return;
-  var mx = oe.mouseX;
-  var my = oe.mouseY;
+  var mx = Math.floor(oe.mouseX);
+  var my = Math.floor(oe.mouseY);
+
   var d = oe.lineWidth;
   d = d == 1 ? 2 : d; //1pxの時は2px相当の円カーソルを表示
 
