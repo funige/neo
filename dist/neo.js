@@ -1141,7 +1141,7 @@ Neo.resizeCanvas = function () {
   }
 
   Neo.painter.setZoom(Neo.painter.zoom);
-  Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight);
+  Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
 };
 
 /*
@@ -2945,20 +2945,16 @@ Neo.Painter.prototype.updateDestCanvas = function (
   // 元座標は整数化（元キャンバス側）
   x = Math.floor(x);
   y = Math.floor(y);
-  width = Math.ceil(width);
-  height = Math.ceil(height);
 
   var canvasWidth = this.canvasWidth;
   var canvasHeight = this.canvasHeight;
   var updateAll =
     x === 0 && y === 0 && width === canvasWidth && height === canvasHeight;
-
   if (x + width > canvasWidth) width = canvasWidth - x;
   if (y + height > canvasHeight) height = canvasHeight - y;
   if (x < 0) x = 0;
   if (y < 0) y = 0;
   if (width <= 0 || height <= 0) return;
-
   var ctx = this.destCanvasCtx;
   ctx.save();
   ctx.fillStyle = "#ffffff";
@@ -2969,19 +2965,19 @@ Neo.Painter.prototype.updateDestCanvas = function (
   // scrollBarX/Y は 0～1 の比率
   this.scrollBarX = isNaN(this.scrollBarX) ? 0 : this.scrollBarX;
   this.scrollBarY = isNaN(this.scrollBarY) ? 0 : this.scrollBarY;
-  const offsetX = Math.floor(
-    this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width),
-  );
-  const offsetY = Math.floor(
-    this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height),
-  );
+  const offsetX =
+    this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width);
+  const offsetY =
+    this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height);
 
-  const zx = Math.floor(x * zoom - offsetX);
-  const zy = Math.floor(y * zoom - offsetY);
+  const zx = Math.round(x * zoom - offsetX);
+  const zy = Math.round(y * zoom - offsetY);
 
-  // 端にピクセル欠けが出ないよう少し広げる
-  const zw = Math.ceil((x + width) * zoom) - Math.floor(x * zoom);
-  const zh = Math.ceil((y + height) * zoom) - Math.floor(y * zoom);
+  const zx2 = Math.round((x + width) * zoom - offsetX);
+  const zy2 = Math.round((y + height) * zoom - offsetY);
+
+  const zw = zx2 - zx;
+  const zh = zy2 - zy;
 
   // ---- 背景クリア ----
   if (updateAll) {
@@ -4202,7 +4198,6 @@ Neo.Painter.prototype.doFloodFill = function (layer, x, y, fillColor) {
   if ((baseColor & 0xff000000) == 0 || baseColor != fillColor) {
     while (stack.length > 0) {
       if (stack.length > 1000000) {
-        console.log("too much stack");
         break;
       }
       var point = stack.pop();
@@ -5037,10 +5032,6 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
     var rect = oe.cursorRect;
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
-  }
-  //縮小時は円カーソルを表示しない 浮動時のモワレ発生を防止
-  if (oe.zoom < 1) {
-    return;
   }
   //円カーソルを表示
   this.drawCursor(oe);
@@ -6173,13 +6164,14 @@ Neo.ZoomPlusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomPlusCommand.prototype.execute = function () {
   if (this.data.zoom === 0.5 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(1);
-  } else if (this.data.zoom === 0.25 && Neo.config.neo_enable_zoom_out) {
+  } else if (this.data.zoom === 0.2 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.5);
   } else if (this.data.zoom < 12) {
     this.data.setZoom(this.data.zoom + 1);
   }
   Neo.resizeCanvas();
-  Neo.painter.updateDestCanvas();
+  // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
+  // Neo.painter.updateDestCanvas();
 };
 
 Neo.ZoomMinusCommand = function (data) {
@@ -6192,10 +6184,11 @@ Neo.ZoomMinusCommand.prototype.execute = function () {
   } else if (this.data.zoom === 1 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.5);
   } else if (this.data.zoom === 0.5 && Neo.config.neo_enable_zoom_out) {
-    this.data.setZoom(0.25);
+    this.data.setZoom(0.2);
   }
   Neo.resizeCanvas();
-  Neo.painter.updateDestCanvas();
+  // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
+  // Neo.painter.updateDestCanvas();
 };
 
 /*

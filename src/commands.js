@@ -16,7 +16,7 @@ Neo.ZoomPlusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomPlusCommand.prototype.execute = function () {
   if (this.data.zoom === 0.5 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(1);
-  } else if (this.data.zoom === 0.25 && Neo.config.neo_enable_zoom_out) {
+  } else if (this.data.zoom === 0.2 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.5);
   } else if (this.data.zoom < 12) {
     this.data.setZoom(this.data.zoom + 1);
@@ -36,7 +36,7 @@ Neo.ZoomMinusCommand.prototype.execute = function () {
   } else if (this.data.zoom === 1 && Neo.config.neo_enable_zoom_out) {
     this.data.setZoom(0.5);
   } else if (this.data.zoom === 0.5 && Neo.config.neo_enable_zoom_out) {
-    this.data.setZoom(0.25);
+    this.data.setZoom(0.2);
   }
   Neo.resizeCanvas();
   // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト

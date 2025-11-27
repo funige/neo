@@ -2394,7 +2394,6 @@ Neo.Painter.prototype.doFloodFill = function (layer, x, y, fillColor) {
   if ((baseColor & 0xff000000) == 0 || baseColor != fillColor) {
     while (stack.length > 0) {
       if (stack.length > 1000000) {
-        console.log("too much stack");
         break;
       }
       var point = stack.pop();
