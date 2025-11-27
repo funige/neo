@@ -1141,20 +1141,16 @@ Neo.Painter.prototype.updateDestCanvas = function (
   // 元座標は整数化（元キャンバス側）
   x = Math.floor(x);
   y = Math.floor(y);
-  width = Math.ceil(width);
-  height = Math.ceil(height);
 
   var canvasWidth = this.canvasWidth;
   var canvasHeight = this.canvasHeight;
   var updateAll =
     x === 0 && y === 0 && width === canvasWidth && height === canvasHeight;
-
   if (x + width > canvasWidth) width = canvasWidth - x;
   if (y + height > canvasHeight) height = canvasHeight - y;
   if (x < 0) x = 0;
   if (y < 0) y = 0;
   if (width <= 0 || height <= 0) return;
-
   var ctx = this.destCanvasCtx;
   ctx.save();
   ctx.fillStyle = "#ffffff";
@@ -1165,12 +1161,10 @@ Neo.Painter.prototype.updateDestCanvas = function (
   // scrollBarX/Y は 0～1 の比率
   this.scrollBarX = isNaN(this.scrollBarX) ? 0 : this.scrollBarX;
   this.scrollBarY = isNaN(this.scrollBarY) ? 0 : this.scrollBarY;
-  const offsetX = Math.floor(
-    this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width),
-  );
-  const offsetY = Math.floor(
-    this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height),
-  );
+  const offsetX =
+    this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width);
+  const offsetY =
+    this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height);
 
   const zx = Math.round(x * zoom - offsetX);
   const zy = Math.round(y * zoom - offsetY);

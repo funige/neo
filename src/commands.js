@@ -22,7 +22,8 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
     this.data.setZoom(this.data.zoom + 1);
   }
   Neo.resizeCanvas();
-  Neo.painter.updateDestCanvas();
+  // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
+  // Neo.painter.updateDestCanvas();
 };
 
 Neo.ZoomMinusCommand = function (data) {
@@ -38,7 +39,8 @@ Neo.ZoomMinusCommand.prototype.execute = function () {
     this.data.setZoom(0.25);
   }
   Neo.resizeCanvas();
-  Neo.painter.updateDestCanvas();
+  // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
+  // Neo.painter.updateDestCanvas();
 };
 
 /*

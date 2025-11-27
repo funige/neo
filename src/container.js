@@ -1141,7 +1141,7 @@ Neo.resizeCanvas = function () {
   }
 
   Neo.painter.setZoom(Neo.painter.zoom);
-  Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight);
+  Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
 };
 
 /*
