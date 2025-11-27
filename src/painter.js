@@ -1172,12 +1172,14 @@ Neo.Painter.prototype.updateDestCanvas = function (
     this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height),
   );
 
-  const zx = Math.floor(x * zoom - offsetX);
-  const zy = Math.floor(y * zoom - offsetY);
+  const zx = Math.round(x * zoom - offsetX);
+  const zy = Math.round(y * zoom - offsetY);
 
-  // 端にピクセル欠けが出ないよう少し広げる
-  const zw = Math.ceil((x + width) * zoom) - Math.floor(x * zoom);
-  const zh = Math.ceil((y + height) * zoom) - Math.floor(y * zoom);
+  const zx2 = Math.round((x + width) * zoom - offsetX);
+  const zy2 = Math.round((y + height) * zoom - offsetY);
+
+  const zw = zx2 - zx;
+  const zh = zy2 - zy;
 
   // ---- 背景クリア ----
   if (updateAll) {
