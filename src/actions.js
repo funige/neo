@@ -873,7 +873,10 @@ Neo.initViewer = function (pch) {
   if (pch) {
     //Neo.config.pch_file) {
     Neo.painter._actionMgr._items = pch.data;
-    Neo.painter.play();
+    Neo.startViewer();
+    setTimeout(() => {
+      Neo.painter.play();
+    }, 50);
   }
 };
 

@@ -78,7 +78,9 @@ Neo.init = function () {
             Neo.config.width = pch.width;
             Neo.config.height = pch.height;
             Neo.initViewer(pch);
-            Neo.startViewer();
+            // Neo.initViewer()内へ移動
+            // ボタンが表示される前に再生される事があるため
+            // Neo.startViewer();
           }
         });
       }
