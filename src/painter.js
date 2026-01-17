@@ -173,7 +173,7 @@ Neo.Painter.prototype.getCurrentTool = function () {
   }
   return null;
 };
-
+Neo.CurrentToolType = 1;
 Neo.Painter.prototype.setToolByType = function (toolType) {
   switch (parseInt(toolType)) {
     case Neo.Painter.TOOLTYPE_PEN:
@@ -253,8 +253,8 @@ Neo.Painter.prototype.setToolByType = function (toolType) {
       console.log("unknown toolType " + toolType);
       break;
   }
+  Neo.CurrentToolType = toolType;
 };
-
 Neo.Painter.prototype._initCanvas = function (div, width, height) {
   width = parseInt(width);
   height = parseInt(height);
@@ -318,8 +318,22 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     container.onmousedown = function (e) {
       ref._mouseDownHandler(e);
     };
-    container.onmousemove = function (e) {
-      ref._mouseMoveHandler(e);
+    container.onpointermove = function (e) {
+      //フリーハンドモード?
+      const freeHandMode = ref.drawType === 0;
+      //ツールは鉛筆･消しゴムまたは水彩?
+      const usesHighPrecisionTool = [1, 2, 14].includes(Neo.CurrentToolType);
+      //ブラシサイズは10px以下?
+      const smallbrush = Neo.painter.lineWidth <= 10;
+      //上記条件が揃う時はポインター追従性を高くする
+      if (freeHandMode && usesHighPrecisionTool && smallbrush) {
+        const events = e.getCoalescedEvents?.() ?? [e];
+        for (const ev of events) {
+          ref._mouseMoveHandler(ev);
+        }
+      } else {
+        ref._mouseMoveHandler(e);
+      }
     };
     container.onmouseup = function (e) {
       ref._mouseUpHandler(e);
