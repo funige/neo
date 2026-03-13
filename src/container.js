@@ -1116,9 +1116,9 @@ Neo.resizeCanvas = function () {
   if (Neo.painter.zoom < 1) {
     // 表示用アンチエイリアスを有効化
     ctx.imageSmoothingEnabled = true;
-    Neo.painter.destCanvas.style.imageRendering = "smooth";
     // 品質を指定（対応ブラウザのみ有効）
-    if ("imageSmoothingQuality" in ctx) {
+    if (Neo.painter.zoom < 0.5 && "imageSmoothingQuality" in ctx) {
+      Neo.painter.destCanvas.style.imageRendering = "smooth";
       ctx.imageSmoothingQuality = "high";
     }
   } else {
