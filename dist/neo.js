@@ -5518,6 +5518,7 @@ Neo.HandTool.prototype.downHandler = function (oe) {
   oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   this.isDrag = true;
+  this.ticking = false;
   this.startX = oe.rawMouseX;
   this.startY = oe.rawMouseY;
 };
@@ -5528,9 +5529,18 @@ Neo.HandTool.prototype.upHandler = function (oe) {
 };
 
 Neo.HandTool.prototype.moveHandler = function (oe) {
-  if (this.isDrag) {
-    var dx = this.startX - oe.rawMouseX;
-    var dy = this.startY - oe.rawMouseY;
+  if (!this.isDrag) return;
+
+  this.latestX = oe.rawMouseX;
+  this.latestY = oe.rawMouseY;
+
+  if (this.ticking) return;
+
+  this.ticking = true;
+
+  requestAnimationFrame(() => {
+    var dx = this.startX - this.latestX;
+    var dy = this.startY - this.latestY;
 
     var ax = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
     var ay = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
@@ -5549,11 +5559,12 @@ Neo.HandTool.prototype.moveHandler = function (oe) {
 
     oe.setZoomPosition(oe.zoomX - dx, oe.zoomY - dy);
 
-    this.startX = oe.rawMouseX;
-    this.startY = oe.rawMouseY;
-  }
-};
+    this.startX = this.latestX;
+    this.startY = this.latestY;
 
+    this.ticking = false;
+  });
+};
 Neo.HandTool.prototype.upMoveHandler = function (oe) {};
 Neo.HandTool.prototype.rollOverHandler = function (oe) {};
 Neo.HandTool.prototype.rollOutHandler = function (oe) {};
