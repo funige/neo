@@ -2485,7 +2485,7 @@ Neo.Painter.prototype._mouseMoveHandler = function (e) {
 
   // 画面外をタップした時スクロール可能にするため
   //  console.warn("move -" + e.target.id + e.target.className)
-  if (!(e.target.className == "o" && e.type == "touchmove")) {
+  if (e.cancelable && !(e.target.className == "o" && e.type == "touchmove")) {
     e.preventDefault();
   }
 };
