@@ -925,6 +925,7 @@ Neo.EffectToolBase.prototype.isUpMove = false;
 
 Neo.EffectToolBase.prototype.downHandler = function (oe) {
   this.isUpMove = false;
+  this.ticking = false;
 
   this.startX = this.endX = oe.clipMouseX;
   this.startY = this.endY = oe.clipMouseY;
@@ -962,13 +963,22 @@ Neo.EffectToolBase.prototype.upHandler = function (oe) {
 };
 
 Neo.EffectToolBase.prototype.moveHandler = function (oe) {
-  this.endX = oe.clipMouseX;
-  this.endY = oe.clipMouseY;
+  this.latestX = oe.clipMouseX;
+  this.latestY = oe.clipMouseY;
 
-  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-  this.drawCursor(oe);
+  if (this.ticking) return;
+  this.ticking = true;
+
+  requestAnimationFrame(() => {
+    this.endX = this.latestX;
+    this.endY = this.latestY;
+
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    this.drawCursor(oe);
+
+    this.ticking = false;
+  });
 };
-
 Neo.EffectToolBase.prototype.rollOutHandler = function (oe) {};
 Neo.EffectToolBase.prototype.upMoveHandler = function (oe) {};
 Neo.EffectToolBase.prototype.rollOverHandler = function (oe) {};
@@ -1160,6 +1170,7 @@ Neo.PasteTool.prototype = new Neo.ToolBase();
 Neo.PasteTool.prototype.type = Neo.Painter.TOOLTYPE_PASTE;
 
 Neo.PasteTool.prototype.downHandler = function (oe) {
+  this.ticking = false;
   this.startX = oe.mouseX;
   this.startY = oe.mouseY;
   this.drawCursor(oe);
@@ -1180,11 +1191,20 @@ Neo.PasteTool.prototype.upHandler = function (oe) {
 Neo.PasteTool.prototype.moveHandler = function (oe) {
   var dx = Math.floor(oe.mouseX - this.startX);
   var dy = Math.floor(oe.mouseY - this.startY);
-  oe.tempX = dx;
-  oe.tempY = dy;
 
-  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-  //  this.drawCursor(oe);
+  this.latestDX = dx;
+  this.latestDY = dy;
+
+  if (this.ticking) return;
+  this.ticking = true;
+
+  requestAnimationFrame(() => {
+    oe.tempX = this.latestDX;
+    oe.tempY = this.latestDY;
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    //  this.drawCursor(oe);
+    this.ticking = false;
+  });
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
