@@ -958,7 +958,9 @@ Neo.EffectToolBase.prototype.upHandler = function (oe) {
   }
 
   if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    setTimeout(() => {
+      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    }, 10);
   }
 };
 
@@ -1120,6 +1122,9 @@ Neo.TurnTool.prototype.upHandler = function (oe) {
     //      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.turn(x, y, width, height);
   }
+  setTimeout(() => {
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+  }, 10);
 };
 
 /*
