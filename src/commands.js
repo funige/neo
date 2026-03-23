@@ -31,7 +31,7 @@ Neo.ZoomMinusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomMinusCommand.prototype.execute = function () {
   if (this.data.zoom >= 2) {
     this.data.setZoom(this.data.zoom - 1);
-  } else if (Neo.config.neo_enable_zoom_out && this.data.zoom >= 0.3) {
+  } else if (Neo.config.neo_enable_zoom_out && this.data.zoom >= 0.4) {
     this.data.setZoom(this.data.zoom - 0.2);
   }
   Neo.resizeCanvas();
