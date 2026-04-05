@@ -745,9 +745,9 @@ Neo.createViewer = function (applet) {
 
   var html =
     '<div id="pageView" style="margin:auto;">' +
-    '<div id="container" style="visibility:visible;" class="o">' +
+    '<div id="neo-container" style="visibility:visible;" class="o">' +
     '<div id="painter" style="background-color:white;">' +
-    '<div id="canvas" style="background-color:white;">' +
+    '<div id="neo-canvas" style="background-color:white;">' +
     "</div>" +
     "</div>" +
     '<div id="viewerButtonsWrapper" style="display:block;">' +
@@ -792,8 +792,8 @@ Neo.initViewer = function (pch) {
   pageview.style.width = pageWidth + "px";
   pageview.style.height = pageHeight + "px";
 
-  Neo.canvas = document.getElementById("canvas");
-  Neo.container = document.getElementById("container");
+  Neo.canvas = document.getElementById("neo-canvas");
+  Neo.container = document.getElementById("neo-container");
   Neo.container.style.backgroundColor = Neo.config.color_back;
   Neo.container.style.border = "0";
 
