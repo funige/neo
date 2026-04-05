@@ -16,14 +16,14 @@
     cursor: default;
 }
 
-.NEO #container {
+.NEO #neo-container {
     width: 100%;
     height: 100%;
     position: relative;
     border: 1px dotted transparent;
 }
 
-.NEO #center {
+.NEO #neo-center {
     display: table;
     position: relative;
     height: 100%;
@@ -59,7 +59,7 @@
     float: right; /* なぜかChrome55でずれるので対策 */
 }
 
-.NEO #upper {
+.NEO #neo-upper {
     position: absolute;
     right: 0;
     height: 30px;
@@ -79,7 +79,7 @@
     margin-top: 30px;
 }
 
-.NEO #canvas {
+.NEO #neo-canvas {
     position: relative;
     width: 200px;
     height: 400px;
@@ -254,7 +254,7 @@
     margin: 1px;
 }
 
-.NEO #right {
+.NEO #neo-right {
     display: block;
     float: right;
     margin-left: 10px;

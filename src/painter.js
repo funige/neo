@@ -313,7 +313,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   var ref = this;
 
   if (!Neo.viewer) {
-    var container = document.getElementById("container");
+    var container = document.getElementById("neo-container");
 
     container.onmousedown = function (e) {
       ref._mouseDownHandler(e);
@@ -645,8 +645,7 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
   this.isMouseDownRight = false;
   this.tool.upHandler(this);
   //  document.onmouseup = undefined;
-
-  if (e.target.id != "right") {
+  if (e.target.id != "neo-right") {
     this.virtualRight = false;
     Neo.RightButton.clear();
   }
@@ -912,7 +911,7 @@ Neo.UndoItem.prototype.height;
 Neo.Painter.prototype.setZoom = function (value) {
   this.zoom = value;
 
-  var container = document.getElementById("container");
+  var container = document.getElementById("neo-container");
   var width = Math.round(this.canvasWidth * this.zoom);
   var height = Math.round(this.canvasHeight * this.zoom);
 
@@ -2679,7 +2678,11 @@ Neo.Painter.prototype.getDestCanvasPosition = function (
 
 Neo.Painter.prototype.isWidget = function (element) {
   while (1) {
-    if (element == null || element.id == "canvas" || element.id == "container")
+    if (
+      element == null ||
+      element.id == "neo-canvas" ||
+      element.id == "neo-container"
+    )
       break;
 
     if (
@@ -2698,7 +2701,7 @@ Neo.Painter.prototype.isWidget = function (element) {
 Neo.Painter.prototype.isContainer = function (element) {
   while (1) {
     if (element == null) break;
-    if (element.id == "container") return true;
+    if (element.id == "neo-container") return true;
     element = element.parentNode;
   }
   return false;
