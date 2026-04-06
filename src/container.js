@@ -958,7 +958,7 @@ Neo.initButtons = function () {
 
   // reserveControl
   for (var i = 1; i <= 3; i++) {
-    new Neo.ReserveControl().init("reserve" + i, { index: i });
+    new Neo.ReserveControl().init("neo-reserve" + i, { index: i });
   }
 
   new Neo.LayerControl().init("neo-layerControl");
@@ -1532,9 +1532,9 @@ Neo.createContainer = function (applet) {
     '<div id="neo-sliderAlpha"></div>' +
     '<div id="neo-sliderSize"></div>' +
     '<div class="reserveControl" style="margin-top:4px;">' +
-    '<div id="reserve1"></div>' +
-    '<div id="reserve2"></div>' +
-    '<div id="reserve3"></div>' +
+    '<div id="neo-reserve1"></div>' +
+    '<div id="neo-reserve2"></div>' +
+    '<div id="neo-reserve3"></div>' +
     "</div>" +
     '<div id="neo-layerControl" style="margin-top:6px;"></div>' +
     "</div>" +

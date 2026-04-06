@@ -1294,7 +1294,7 @@ Neo.ReserveControl.prototype.init = function (name, params) {
 
   this.element.className = "reserve";
 
-  var index = parseInt(this.name.slice(7)) - 1;
+  var index = parseInt(this.name.slice(11)) - 1; //neo-reserve なので11文字目
   this.element.style.top = "1px";
   this.element.style.left = index * 15 + 2 + "px";
 
