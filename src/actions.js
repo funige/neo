@@ -744,9 +744,9 @@ Neo.createViewer = function (applet) {
   neo.id = "NEO";
 
   var html =
-    '<div id="pageView" style="margin:auto;">' +
+    '<div id="neo-pageView" style="margin:auto;">' +
     '<div id="neo-container" style="visibility:visible;" class="o">' +
-    '<div id="painter" style="background-color:white;">' +
+    '<div id="neo-painter" style="background-color:white;">' +
     '<div id="neo-canvas" style="background-color:white;">' +
     "</div>" +
     "</div>" +
@@ -786,7 +786,7 @@ Neo.createViewer = function (applet) {
 };
 
 Neo.initViewer = function (pch) {
-  var pageview = document.getElementById("pageView");
+  var pageview = document.getElementById("neo-pageView");
   var pageWidth = Neo.config.applet_width;
   var pageHeight = Neo.config.applet_height;
   pageview.style.width = pageWidth + "px";
@@ -800,7 +800,7 @@ Neo.initViewer = function (pch) {
   var dx = (pageWidth - Neo.config.width) / 2;
   var dy = (pageHeight - Neo.config.height - 26) / 2;
 
-  var painter = document.getElementById("painter");
+  var painter = document.getElementById("neo-painter");
 
   const viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
@@ -993,7 +993,9 @@ Neo.startViewer = function () {
     };
 
     var length = Neo.painter._actionMgr._items.length;
-    Neo.viewerBar = new Neo.ViewerBar().init("viewerBar", { length: length });
+    Neo.viewerBar = new Neo.ViewerBar().init("viewerBar", {
+      length: length,
+    });
   }, 0);
 };
 

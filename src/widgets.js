@@ -191,6 +191,7 @@ Neo.ColorTip.prototype.init = function (name, params) {
   this.params = params || {};
   this.name = name;
 
+  console.log(this.name);
   this.selected = this.name == "color1" ? true : false;
   this.isMouseDown = false;
 
@@ -1274,6 +1275,7 @@ Neo.reserveControls = [];
 
 Neo.ReserveControl = function () {};
 Neo.ReserveControl.prototype.init = function (name, params) {
+  console.log("name", name);
   this.element = document.getElementById(name);
   this.params = params || {};
   this.name = name;
@@ -1364,13 +1366,13 @@ Neo.ScrollBarButton.prototype.init = function (name, params) {
   this.element["data-bar"] = true;
   this.barButton["data-bar"] = true;
 
-  if (name == "scrollH") Neo.scrollH = this;
-  if (name == "scrollV") Neo.scrollV = this;
+  if (name == "neo-scrollH") Neo.scrollH = this;
+  if (name == "neo-scrollV") Neo.scrollV = this;
   return this;
 };
 
 Neo.ScrollBarButton.prototype.update = function (oe) {
-  if (this.name == "scrollH") {
+  if (this.name == "neo-scrollH") {
     var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
     var barWidth = Math.ceil(oe.destCanvas.width * a);
     var barX = oe.scrollBarX * (oe.destCanvas.width - barWidth);
