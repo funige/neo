@@ -572,7 +572,7 @@
 -----------------------
 */
 
-.NEO #neo-viewerButtonsWrapper {
+.NEO #viewerButtonsWrapper {
     position: absolute;
     bottom: 0px;
     left: 0px;
@@ -583,7 +583,7 @@
     padding: 0;
 }
 
-.NEO #neo-viewerButtons {
+.NEO #viewerButtons {
     width: calc(100% - 2px);
     height: 22px;
     border: 1px solid white;
@@ -598,7 +598,7 @@
     overflow: hidden;
 }
 
-.NEO #neo-viewerButtons > div {
+.NEO #viewerButtons > div {
     margin: 0;
     padding: 0;
     width: 18px;
@@ -615,7 +615,7 @@
     font-smoothing: antialiased;
 }
 
-.NEO #neo-viewerButtons > div.buttonOff {
+.NEO #viewerButtons > div.buttonOff {
     display: inline-block;
     border: 1px solid black;
     width: 18px;
@@ -628,10 +628,10 @@
     border-bottom: 1px solid rgba(0, 0, 0, 1);
 }
 
-/* .NEO #neo-viewerButtons >div.buttonOff:hover {} */
+/* .NEO #viewerButtons >div.buttonOff:hover {} */
 
-.NEO #neo-viewerButtons > div.buttonOff:active,
-.NEO #neo-viewerButtons > div.buttonOn {
+.NEO #viewerButtons > div.buttonOff:active,
+.NEO #viewerButtons > div.buttonOn {
     display: inline-block;
     border: 1px solid black;
     width: 18px;
@@ -642,13 +642,13 @@
     border-bottom: 1px solid rgba(0, 0, 0, 1);
 }
 
-.NEO #neo-viewerButtons canvas {
+.NEO #viewerButtons canvas {
     max-width: 24px;
     margin-left: 1px;
     margin-top: 1px;
 }
 
-.NEO #neo-viewerBarLeft {
+.NEO #viewerBarLeft {
     pointer-events: none;
     width: calc(100% - 2px);
     height: 16px;
@@ -657,7 +657,7 @@
     left: 1px;
 }
 
-.NEO #neo-viewerBarMark {
+.NEO #viewerBarMark {
     pointer-events: none;
     width: 1px;
     height: 16px;
@@ -666,7 +666,7 @@
     left: 1px;
 }
 
-.NEO #neo-viewerBarText {
+.NEO #viewerBarText {
     pointer-events: none;
     position: absolute;
     top: 0px;

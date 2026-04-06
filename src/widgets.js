@@ -1424,7 +1424,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 };
 
 Neo.ViewerButton.prototype.update = function () {
-  if (this.name == "neo-viewerSpeed") {
+  if (this.name == "viewerSpeed") {
     var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
@@ -1464,9 +1464,9 @@ Neo.ViewerBar.prototype.init = function (name, params) {
 
   this.element.style.display = "inline-block";
   this.element.innerHTML =
-    "<div id='neo-viewerBarLeft'></div>" +
-    "<div id='neo-viewerBarMark'></div>" +
-    "<div id='neo-viewerBarText'>hoge</div>";
+    "<div id='viewerBarLeft'></div>" +
+    "<div id='viewerBarMark'></div>" +
+    "<div id='viewerBarText'>hoge</div>";
   this.seekElement = this.element.children[0];
   this.markElement = this.element.children[1];
   this.textElement = this.element.children[2];

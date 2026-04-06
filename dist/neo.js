@@ -7093,15 +7093,15 @@ Neo.createViewer = function (applet) {
     '<div id="neo-canvas" style="background-color:white;">' +
     "</div>" +
     "</div>" +
-    '<div id="neo-viewerButtonsWrapper" style="display:block;">' +
-    '<div id="neo-viewerButtons" style="display:block;">' +
-    '<div id="neo-viewerPlay"></div>' +
-    '<div id="neo-viewerStop"></div>' +
-    '<div id="neo-viewerRewind"></div>' +
-    '<div id="neo-viewerSpeed" style="padding-left:2px; margin-top: 1px;"></div>' +
-    '<div id="neo-viewerPlus"></div>' +
-    '<div id="neo-viewerMinus"></div>' +
-    '<div id="neo-viewerBar" style="display:inline-block;">' +
+    '<div id="viewerButtonsWrapper" style="display:block;">' +
+    '<div id="viewerButtons" style="display:block;">' +
+    '<div id="viewerPlay"></div>' +
+    '<div id="viewerStop"></div>' +
+    '<div id="viewerRewind"></div>' +
+    '<div id="viewerSpeed" style="padding-left:2px; margin-top: 1px;"></div>' +
+    '<div id="viewerPlus"></div>' +
+    '<div id="viewerMinus"></div>' +
+    '<div id="viewerBar" style="display:inline-block;">' +
     "</div>" +
     "</div>" +
     "</div>" +
@@ -7155,14 +7155,12 @@ Neo.initViewer = function (pch) {
   painter.style.bottom = viewerWrapperOnTop ? 0 : dy + 26 + "px";
   painter.style.left = dx + "px";
 
-  var viewerButtonsWrapper = document.getElementById(
-    "neo-viewerButtonsWrapper",
-  );
+  var viewerButtonsWrapper = document.getElementById("viewerButtonsWrapper");
   viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
   viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
   viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0px" : "";
 
-  var viewerBar = document.getElementById("neo-viewerBar");
+  var viewerBar = document.getElementById("viewerBar");
   viewerBar.style.position = "absolute";
   viewerBar.style.right = "2px";
   viewerBar.style.top = "1px";
@@ -7238,115 +7236,107 @@ Neo.startViewer = function () {
   var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
   var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
 
-  Neo.addRule(".NEO #neo-viewerButtons", "color", Neo.config.color_text);
-  Neo.addRule(
-    ".NEO #neo-viewerButtons",
-    "background-color",
-    Neo.config.color_back,
-  );
+  Neo.addRule(".NEO #viewerButtons", "color", Neo.config.color_text);
+  Neo.addRule(".NEO #viewerButtons", "background-color", Neo.config.color_back);
 
   Neo.addRule(
-    ".NEO #neo-viewerButtonsWrapper",
+    ".NEO #viewerButtonsWrapper",
     "border",
     "1px solid " + Neo.config.color_frame + " !important",
   );
 
   Neo.addRule(
-    ".NEO #neo-viewerButtons",
+    ".NEO #viewerButtons",
     "border",
     "1px solid " + Neo.config.color_back + " !important",
   );
   Neo.addRule(
-    ".NEO #neo-viewerButtons",
+    ".NEO #viewerButtons",
     "border-left",
     "1px solid " + lightBack + " !important",
   );
   Neo.addRule(
-    ".NEO #neo-viewerButtons",
+    ".NEO #viewerButtons",
     "border-top",
     "1px solid " + lightBack + " !important",
   );
 
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div.buttonOff",
+    ".NEO #viewerButtons >div.buttonOff",
     "background-color",
     Neo.config.color_icon + " !important",
   );
 
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div.buttonOff:active",
+    ".NEO #viewerButtons >div.buttonOff:active",
     "background-color",
     darkBack + " !important",
   );
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div.buttonOn",
+    ".NEO #viewerButtons >div.buttonOn",
     "background-color",
     darkBack + " !important",
   );
 
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div",
+    ".NEO #viewerButtons >div",
     "border",
     "1px solid " + Neo.config.color_frame + " !important",
   );
 
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div.buttonOff:hover",
+    ".NEO #viewerButtons >div.buttonOff:hover",
     "border",
     "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div.buttonOff:active",
+    ".NEO #viewerButtons >div.buttonOff:active",
     "border",
     "1px solid" + Neo.config.color_bar_select + " !important",
   );
   Neo.addRule(
-    ".NEO #neo-viewerButtons >div.buttonOn",
+    ".NEO #viewerButtons >div.buttonOn",
     "border",
     "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
+  Neo.addRule(".NEO #viewerBar >div", "background-color", Neo.config.color_bar);
+  //  Neo.addRule(".NEO #viewerBar:active", "background-color", darkBack);
   Neo.addRule(
-    ".NEO #neo-viewerBar >div",
-    "background-color",
-    Neo.config.color_bar,
-  );
-  //  Neo.addRule(".NEO #neo-viewerBar:active", "background-color", darkBack);
-  Neo.addRule(
-    ".NEO #neo-viewerBarMark",
+    ".NEO #viewerBarMark",
     "background-color",
     Neo.config.color_text + " !important",
   );
 
   setTimeout(function () {
-    Neo.viewerPlay = new Neo.ViewerButton().init("neo-viewerPlay");
+    Neo.viewerPlay = new Neo.ViewerButton().init("viewerPlay");
     Neo.viewerPlay.setSelected(true);
     Neo.viewerPlay.onmouseup = function () {
       Neo.painter.onplay();
     };
-    Neo.viewerStop = new Neo.ViewerButton().init("neo-viewerStop");
+    Neo.viewerStop = new Neo.ViewerButton().init("viewerStop");
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
-    Neo.viewerSpeed = new Neo.ViewerButton().init("neo-viewerSpeed");
+    Neo.viewerSpeed = new Neo.ViewerButton().init("viewerSpeed");
     Neo.viewerSpeed.onmouseup = function () {
       Neo.painter.onspeed();
       this.update();
     };
 
-    new Neo.ViewerButton().init("neo-viewerRewind").onmouseup = function () {
+    new Neo.ViewerButton().init("viewerRewind").onmouseup = function () {
       Neo.painter.onrewind();
     };
-    new Neo.ViewerButton().init("neo-viewerPlus").onmouseup = function () {
+    new Neo.ViewerButton().init("viewerPlus").onmouseup = function () {
       new Neo.ZoomPlusCommand(Neo.painter).execute();
     };
-    new Neo.ViewerButton().init("neo-viewerMinus").onmouseup = function () {
+    new Neo.ViewerButton().init("viewerMinus").onmouseup = function () {
       new Neo.ZoomMinusCommand(Neo.painter).execute();
     };
 
     var length = Neo.painter._actionMgr._items.length;
-    Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {
+    Neo.viewerBar = new Neo.ViewerBar().init("viewerBar", {
       length: length,
     });
   }, 0);
@@ -8881,7 +8871,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 };
 
 Neo.ViewerButton.prototype.update = function () {
-  if (this.name == "neo-viewerSpeed") {
+  if (this.name == "viewerSpeed") {
     var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
@@ -8921,9 +8911,9 @@ Neo.ViewerBar.prototype.init = function (name, params) {
 
   this.element.style.display = "inline-block";
   this.element.innerHTML =
-    "<div id='neo-viewerBarLeft'></div>" +
-    "<div id='neo-viewerBarMark'></div>" +
-    "<div id='neo-viewerBarText'>hoge</div>";
+    "<div id='viewerBarLeft'></div>" +
+    "<div id='viewerBarMark'></div>" +
+    "<div id='viewerBarText'>hoge</div>";
   this.seekElement = this.element.children[0];
   this.markElement = this.element.children[1];
   this.textElement = this.element.children[2];
