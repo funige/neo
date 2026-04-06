@@ -923,7 +923,7 @@ Neo.initButtons = function () {
 
   // colorTip
   for (var i = 1; i <= 14; i++) {
-    new Neo.ColorTip().init("color" + i, { index: i });
+    new Neo.ColorTip().init("neo-color" + i, { index: i });
   }
 
   // colorSlider
@@ -958,7 +958,7 @@ Neo.initButtons = function () {
 
   // reserveControl
   for (var i = 1; i <= 3; i++) {
-    new Neo.ReserveControl().init("reserve" + i, { index: i });
+    new Neo.ReserveControl().init("neo-reserve" + i, { index: i });
   }
 
   new Neo.LayerControl().init("neo-layerControl");
@@ -1518,13 +1518,13 @@ Neo.createContainer = function (applet) {
     '<div id="neo-draw"></div>' +
     '<div id="neo-mask"></div>' +
     '<div class="colorTips">' +
-    '<div id="color2"></div><div id="color1"></div><br>' +
-    '<div id="color4"></div><div id="color3"></div><br>' +
-    '<div id="color6"></div><div id="color5"></div><br>' +
-    '<div id="color8"></div><div id="color7"></div><br>' +
-    '<div id="color10"></div><div id="color9"></div><br>' +
-    '<div id="color12"></div><div id="color11"></div><br>' +
-    '<div id="color14"></div><div id="color13"></div>' +
+    '<div id="neo-color2"></div><div id="neo-color1"></div><br>' +
+    '<div id="neo-color4"></div><div id="neo-color3"></div><br>' +
+    '<div id="neo-color6"></div><div id="neo-color5"></div><br>' +
+    '<div id="neo-color8"></div><div id="neo-color7"></div><br>' +
+    '<div id="neo-color10"></div><div id="neo-color9"></div><br>' +
+    '<div id="neo-color12"></div><div id="neo-color11"></div><br>' +
+    '<div id="neo-color14"></div><div id="neo-color13"></div>' +
     "</div>" +
     '<div id="neo-sliderRed"></div>' +
     '<div id="neo-sliderGreen"></div>' +
@@ -1532,9 +1532,9 @@ Neo.createContainer = function (applet) {
     '<div id="neo-sliderAlpha"></div>' +
     '<div id="neo-sliderSize"></div>' +
     '<div class="reserveControl" style="margin-top:4px;">' +
-    '<div id="reserve1"></div>' +
-    '<div id="reserve2"></div>' +
-    '<div id="reserve3"></div>' +
+    '<div id="neo-reserve1"></div>' +
+    '<div id="neo-reserve2"></div>' +
+    '<div id="neo-reserve3"></div>' +
     "</div>" +
     '<div id="neo-layerControl" style="margin-top:6px;"></div>' +
     "</div>" +

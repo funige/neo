@@ -191,8 +191,7 @@ Neo.ColorTip.prototype.init = function (name, params) {
   this.params = params || {};
   this.name = name;
 
-  console.log(this.name);
-  this.selected = this.name == "color1" ? true : false;
+  this.selected = this.name == "neo-color1" ? true : false;
   this.isMouseDown = false;
 
   var ref = this;
@@ -226,7 +225,7 @@ Neo.ColorTip.prototype.init = function (name, params) {
 
   this.element.className = "colorTipOff";
 
-  var index = parseInt(this.name.slice(5)) - 1;
+  var index = parseInt(this.name.slice(9)) - 1; // "neo-color"なので9文字目
   this.element.style.left = index % 2 ? "0px" : "26px";
   this.element.style.top = Math.floor(index / 2) * 21 + "px";
 
@@ -1275,7 +1274,6 @@ Neo.reserveControls = [];
 
 Neo.ReserveControl = function () {};
 Neo.ReserveControl.prototype.init = function (name, params) {
-  console.log("name", name);
   this.element = document.getElementById(name);
   this.params = params || {};
   this.name = name;
@@ -1296,7 +1294,7 @@ Neo.ReserveControl.prototype.init = function (name, params) {
 
   this.element.className = "reserve";
 
-  var index = parseInt(this.name.slice(7)) - 1;
+  var index = parseInt(this.name.slice(11)) - 1; //neo-reserve なので11文字目
   this.element.style.top = "1px";
   this.element.style.left = index * 15 + 2 + "px";
 
