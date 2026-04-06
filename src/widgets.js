@@ -1399,7 +1399,7 @@ Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 Neo.ViewerButton.prototype.init = function (name, params) {
   Neo.Button.prototype.init.call(this, name, params);
 
-  if (name != "viewerSpeed") {
+  if (name != "neo-viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
     var ctx = this.canvas.getContext("2d", {
@@ -1413,7 +1413,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
       ctx.drawImage(img, 0, 0);
       Neo.tintImage(ctx, Neo.config.color_text);
     }.bind(this);
-    img.src = Neo.ViewerButton[name.toLowerCase().replace(/viewer/, "")];
+    img.src = Neo.ViewerButton[name.toLowerCase().replace(/neo-viewer/, "")];
   } else {
     this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>";
     this.update();
@@ -1422,7 +1422,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 };
 
 Neo.ViewerButton.prototype.update = function () {
-  if (this.name == "viewerSpeed") {
+  if (this.name == "neo-viewerSpeed") {
     var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
@@ -1462,9 +1462,9 @@ Neo.ViewerBar.prototype.init = function (name, params) {
 
   this.element.style.display = "inline-block";
   this.element.innerHTML =
-    "<div id='viewerBarLeft'></div>" +
-    "<div id='viewerBarMark'></div>" +
-    "<div id='viewerBarText'>hoge</div>";
+    "<div id='neo-viewerBarLeft'></div>" +
+    "<div id='neo-viewerBarMark'></div>" +
+    "<div id='neo-viewerBarText'>hoge</div>";
   this.seekElement = this.element.children[0];
   this.markElement = this.element.children[1];
   this.textElement = this.element.children[2];
