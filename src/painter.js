@@ -443,12 +443,12 @@ Neo.Painter.prototype.getToneData = function (alpha) {
 };
 
 Neo.Painter.prototype._initInputText = function () {
-  var text = document.getElementById("inputtext");
+  var text = document.getElementById("neo-inputText");
   if (!text) {
     text = document.createElement("div");
   }
 
-  text.id = "inputext";
+  text.id = "neo-inputText";
   text.setAttribute("contentEditable", true);
   text.spellcheck = false;
   text.className = "inputText";
@@ -645,6 +645,7 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
   this.isMouseDownRight = false;
   this.tool.upHandler(this);
   //  document.onmouseup = undefined;
+
   if (e.target.id != "neo-right") {
     this.virtualRight = false;
     Neo.RightButton.clear();
@@ -2686,7 +2687,7 @@ Neo.Painter.prototype.isWidget = function (element) {
       break;
 
     if (
-      element.id == "tools" ||
+      element.id == "neo-tools" ||
       element.className == "buttonOn" ||
       element.className == "buttonOff" ||
       element.className == "inputText"
