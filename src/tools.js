@@ -474,7 +474,19 @@ Neo.DrawToolBase.prototype.bezierMoveHandler = function (oe) {
 };
 
 Neo.DrawToolBase.prototype.bezierUpMoveHandler = function (oe) {
-  this.bezierMoveHandler(oe);
+  if (this.step === 3) {
+    //Bz確定時はそのままmove
+    this.bezierMoveHandler(oe);
+    return;
+  }
+
+  if (this.ticking) return;
+  this.ticking = true;
+
+  setTimeout(() => {
+    this.bezierMoveHandler(oe);
+    this.ticking = false;
+  }, 30);
 };
 
 Neo.DrawToolBase.prototype.bezierKeyDownHandler = function (e) {
