@@ -602,6 +602,16 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     Neo.painter.saveSession(); //10ストロークごとに自動バックアップ
   }
 
+  if (
+    this.drawType == Neo.Painter.DRAWTYPE_BEZIER &&
+    this.tool.isBezierActive &&
+    this.isMouseDownRight
+  ) {
+    this.isMouseDownRight = false;
+    this.tool.cancelBezier();
+    return;
+  }
+
   if (this.isMouseDownRight) {
     this.isMouseDownRight = false;
     if (!this.isWidget(e.target)) {
