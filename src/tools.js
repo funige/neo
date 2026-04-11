@@ -394,6 +394,7 @@ Neo.DrawToolBase.prototype.drawLineCursor = function (oe, mx, my) {
 /* Bezier (BZ曲線) */
 
 Neo.DrawToolBase.prototype.bezierDownHandler = function (oe) {
+  this.isBezierActive = true;
   this.isUpMove = false;
 
   if (this.step == 0) {
@@ -401,6 +402,14 @@ Neo.DrawToolBase.prototype.bezierDownHandler = function (oe) {
     this.startY = this.y0 = Math.floor(oe.mouseY);
   }
   oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+};
+Neo.DrawToolBase.prototype.cancelBezier = function (oe) {
+  this.step = 0;
+  this.isBezierActive = false;
+
+  var oe = Neo.painter;
+  oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
 
 Neo.DrawToolBase.prototype.bezierUpHandler = function (oe) {
@@ -445,10 +454,12 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function (oe) {
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 
       this.step = 0;
+      this.isBezierActive = false;
       break;
 
     default:
       this.step = 0;
+      this.isBezierActive = false;
       break;
   }
 };
@@ -492,11 +503,7 @@ Neo.DrawToolBase.prototype.bezierUpMoveHandler = function (oe) {
 Neo.DrawToolBase.prototype.bezierKeyDownHandler = function (e) {
   if (e.key == "Escape") {
     //Escでキャンセル
-    this.step = 0;
-
-    var oe = Neo.painter;
-    oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    this.cancelBezier();
   }
 };
 
