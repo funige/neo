@@ -394,7 +394,7 @@ Neo.DrawToolBase.prototype.drawLineCursor = function (oe, mx, my) {
 /* Bezier (BZ曲線) */
 
 Neo.DrawToolBase.prototype.bezierDownHandler = function (oe) {
-  this.isBezierActive = true;
+  oe.isBezierActive = true;
   this.isUpMove = false;
 
   if (this.step == 0) {
@@ -403,11 +403,12 @@ Neo.DrawToolBase.prototype.bezierDownHandler = function (oe) {
   }
   oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 };
-Neo.DrawToolBase.prototype.cancelBezier = function (oe) {
-  this.step = 0;
-  this.isBezierActive = false;
-
+Neo.DrawToolBase.prototype.cancelBezier = function () {
   var oe = Neo.painter;
+
+  this.step = 0;
+  oe.isBezierActive = false;
+
   oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 };
@@ -454,12 +455,12 @@ Neo.DrawToolBase.prototype.bezierUpHandler = function (oe) {
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 
       this.step = 0;
-      this.isBezierActive = false;
+      oe.isBezierActive = false;
       break;
 
     default:
       this.step = 0;
-      this.isBezierActive = false;
+      oe.isBezierActive = false;
       break;
   }
 };
@@ -1174,6 +1175,8 @@ Neo.CopyTool.prototype = new Neo.EffectToolBase();
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
+  oe.isCopyActive = true;
+
   //  oe.copy(oe.current, x, y, width, height);
   oe._actionMgr.copy(x, y, width, height);
   oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
@@ -1195,6 +1198,7 @@ Neo.PasteTool.prototype.type = Neo.Painter.TOOLTYPE_PASTE;
 
 Neo.PasteTool.prototype.downHandler = function (oe) {
   this.ticking = false;
+  oe.isCopyActive = false;
   this.startX = oe.mouseX;
   this.startY = oe.mouseY;
   this.drawCursor(oe);
@@ -1230,13 +1234,17 @@ Neo.PasteTool.prototype.moveHandler = function (oe) {
     this.ticking = false;
   });
 };
+Neo.PasteTool.prototype.cancelCopy = function () {
+  var oe = Neo.painter;
+  oe.isCopyActive = false;
+  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+  oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+};
 
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
   if (e.key == "Escape") {
     //Escでキャンセル
-    var oe = Neo.painter;
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+    this.cancelCopy();
   }
 };
 

@@ -603,8 +603,18 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   }
 
   if (
+    //キャンセル操作時の右クリックでコピーツールからペーストツールに切り替わる
+    this.tool.type == Neo.Painter.TOOLTYPE_PASTE &&
+    this.isCopyActive &&
+    this.isMouseDownRight
+  ) {
+    this.isMouseDownRight = false;
+    this.tool.cancelCopy();
+    return;
+  }
+  if (
     this.drawType == Neo.Painter.DRAWTYPE_BEZIER &&
-    this.tool.isBezierActive &&
+    this.isBezierActive &&
     this.isMouseDownRight
   ) {
     this.isMouseDownRight = false;
