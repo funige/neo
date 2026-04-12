@@ -5308,7 +5308,7 @@ Neo.DrawToolBase.prototype.bezierUpMoveHandler = function (oe) {
   setTimeout(() => {
     this.bezierMoveHandler(oe);
     this.ticking = false;
-  }, 30);
+  }, 10);
 };
 
 Neo.DrawToolBase.prototype.bezierKeyDownHandler = function (e) {
@@ -5805,9 +5805,11 @@ Neo.EffectToolBase.prototype.moveHandler = function (oe) {
     this.endX = this.latestX;
     this.endY = this.latestY;
 
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    this.drawCursor(oe);
-
+    //ペーストの時はカーソルを描画しない
+    if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
+      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+      this.drawCursor(oe);
+    }
     this.ticking = false;
   });
 };
@@ -6046,9 +6048,12 @@ Neo.PasteTool.prototype.moveHandler = function (oe) {
 };
 Neo.PasteTool.prototype.cancelCopy = function () {
   var oe = Neo.painter;
+  this.ticking = false;
   oe.isCopyActive = false;
-  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
   oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+  setTimeout(() => {
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+  }, 30);
 };
 
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
