@@ -480,6 +480,15 @@ Neo.Painter.prototype.updateInputText = function () {
   text.style.marginTop = -fontSize + "px";
 };
 
+Neo.Painter.prototype.cancelCopy = function () {
+  if (!this.isCopyActive) return;
+  this.isCopyActive = false;
+  setTimeout(() => {
+    this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
+  }, 30);
+};
+
 /*
    -----------------------------------------------------------------------
    Mouse Event Handling
@@ -495,7 +504,10 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
 
   if (!this.isShiftDown && this.isCtrlDown) {
     if (!this.isAltDown) {
-      if (key === "z" || key === "u") this.undo(); // Ctrl+Z, Ctrl+U
+      if (key === "z" || key === "u") {
+        this.cancelCopy();
+        this.undo(); // Ctrl+Z, Ctrl+U
+      }
       if (key === "y") this.redo(); // Ctrl+Y
     } else {
       if (key === "z") this.redo(); // Ctrl+Alt+Z
@@ -602,14 +614,8 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     Neo.painter.saveSession(); //10ストロークごとに自動バックアップ
   }
 
-  if (
-    //キャンセル操作時の右クリックでコピーツールからペーストツールに切り替わる
-    this.tool.type == Neo.Painter.TOOLTYPE_PASTE &&
-    this.isCopyActive &&
-    this.isMouseDownRight
-  ) {
+  if (this.isMouseDownRight && this.cancelCopy()) {
     this.isMouseDownRight = false;
-    this.tool.cancelCopy();
     return;
   }
   if (
