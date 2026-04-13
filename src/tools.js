@@ -1178,7 +1178,6 @@ Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
   oe.isCopyActive = true;
-
   //  oe.copy(oe.current, x, y, width, height);
   oe._actionMgr.copy(x, y, width, height);
   oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
@@ -1236,20 +1235,13 @@ Neo.PasteTool.prototype.moveHandler = function (oe) {
     this.ticking = false;
   });
 };
-Neo.PasteTool.prototype.cancelCopy = function () {
-  var oe = Neo.painter;
-  this.ticking = false;
-  oe.isCopyActive = false;
-  oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
-  setTimeout(() => {
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-  }, 30);
-};
 
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
+  var oe = Neo.painter;
+
   if (e.key == "Escape") {
     //Escでキャンセル
-    this.cancelCopy();
+    oe.cancelCopy();
   }
 };
 
