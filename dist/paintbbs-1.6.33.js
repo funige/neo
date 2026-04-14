@@ -1862,8 +1862,8 @@ Neo.Painter.prototype.zoom = 1;
 Neo.Painter.prototype.zoomX = 0;
 Neo.Painter.prototype.zoomY = 0;
 
-Neo.Painter.prototype.isMouseDown;
-Neo.Painter.prototype.isMouseDownRight;
+Neo.Painter.prototype.isMouseDown = false;
+Neo.Painter.prototype.isMouseDownRight = false;
 
 Neo.Painter.prototype.isBezierActive = false;
 
@@ -2440,7 +2440,8 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     Neo.painter.saveSession(); //10ストロークごとに自動バックアップ
   }
 
-  if (this.isMouseDownRight && this.cancelCopy()) {
+  if (this.tool.type === Neo.Painter.TOOLTYPE_PASTE && this.isMouseDownRight) {
+    this.cancelCopy();
     this.isMouseDownRight = false;
     return;
   }
