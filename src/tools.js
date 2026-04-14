@@ -1177,7 +1177,6 @@ Neo.CopyTool.prototype = new Neo.EffectToolBase();
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
-  oe.isCopyActive = true;
   //  oe.copy(oe.current, x, y, width, height);
   oe._actionMgr.copy(x, y, width, height);
   oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
@@ -1199,7 +1198,6 @@ Neo.PasteTool.prototype.type = Neo.Painter.TOOLTYPE_PASTE;
 
 Neo.PasteTool.prototype.downHandler = function (oe) {
   this.ticking = false;
-  oe.isCopyActive = false;
   this.startX = oe.mouseX;
   this.startY = oe.mouseY;
   this.drawCursor(oe);
