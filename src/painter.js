@@ -40,6 +40,9 @@ Neo.Painter.prototype.zoomY = 0;
 
 Neo.Painter.prototype.isMouseDown;
 Neo.Painter.prototype.isMouseDownRight;
+
+Neo.Painter.prototype.isBezierActive = false;
+
 Neo.Painter.prototype.prevMouseX;
 Neo.Painter.prototype.prevMouseY;
 Neo.Painter.prototype.mouseX;
@@ -481,8 +484,7 @@ Neo.Painter.prototype.updateInputText = function () {
 };
 
 Neo.Painter.prototype.cancelCopy = function () {
-  if (!this.isCopyActive) return;
-  this.isCopyActive = false;
+  if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
   setTimeout(() => {
     this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
