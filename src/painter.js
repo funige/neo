@@ -42,6 +42,7 @@ Neo.Painter.prototype.isMouseDown = false;
 Neo.Painter.prototype.isMouseDownRight = false;
 
 Neo.Painter.prototype.isBezierActive = false;
+Neo.Painter.prototype.isCopyActive = false;
 
 Neo.Painter.prototype.prevMouseX;
 Neo.Painter.prototype.prevMouseY;
@@ -484,7 +485,8 @@ Neo.Painter.prototype.updateInputText = function () {
 };
 
 Neo.Painter.prototype.cancelCopy = function () {
-  if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
+  if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE && !this.isCopyActive)
+    return;
   setTimeout(() => {
     this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
@@ -616,7 +618,11 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     Neo.painter.saveSession(); //10ストロークごとに自動バックアップ
   }
 
-  if (this.tool.type === Neo.Painter.TOOLTYPE_PASTE && this.isMouseDownRight) {
+  if (
+    this.tool.type === Neo.Painter.TOOLTYPE_PASTE &&
+    this.isCopyActive &&
+    this.isMouseDownRight
+  ) {
     this.cancelCopy();
     this.isMouseDownRight = false;
     return;
