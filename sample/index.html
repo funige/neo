@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEO Test</title>
-    <link rel="stylesheet" href="../dist/neo.css" type="text/css">
-    <script src="../dist/neo.js" charset="UTF-8"></script>
-    <script>
-      const params = location.search.substring(1).split('&').reduce((result, query) => {
-        const [k, v] = query.split('=');
-        result[k] = decodeURI(v);
-        return result;
-      }, {});
-      const w = params.w || 400;
-      const h = params.h || 460;
-      const iw = params.iw || 300;
-      const ih = params.ih || 300;
-    </script>
-  </head>
-  <body>
-    <a href="viewer.html">PCH Test</a>
-    <h1>PaintBBS Test</h1>
 
-    <script>
-      document.write(`
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEO Test</title>
+  <link rel="stylesheet" href="../dist/neo.css" type="text/css">
+  <script src="../dist/neo.js" charset="UTF-8"></script>
+  <script>
+    const params = location.search.substring(1).split('&').reduce((result, query) => {
+      const [k, v] = query.split('=');
+      result[k] = decodeURI(v);
+      return result;
+    }, {});
+    const w = params.w || 400;
+    const h = params.h || 460;
+    const iw = params.iw || 300;
+    const ih = params.ih || 300;
+  </script>
+</head>
+
+<body>
+  <a href="viewer.html">PCH Test</a>
+  <h1>PaintBBS Test</h1>
+
+  <script>
+    document.write(`
         <applet-dummy name="paintbbs" width="${w}" height="${h}" >
           <param name="image_width" value="${iw}">
           <param name="image_height" value="${ih}">
@@ -41,40 +43,43 @@
         </form>
       `)
 
-      document.paintBBSCallback = function (str) {
-        if (str === 'check') {
-          const image = Neo.painter.getImage();
-          const animation = Neo.painter.getThumbnail('animation');
+    document.paintBBSCallback = function(str) {
+      if (str === 'check') {
+        const image = Neo.painter.getImage();
+        const animation = Neo.painter.getThumbnail('animation');
 
-          const img = document.createElement('img');
-          img.src = image.toDataURL('image/png');
-          img.className = "sample";
+        const img = document.createElement('img');
+        img.src = image.toDataURL('image/png');
+        img.className = "sample";
 
-          const a = document.createElement('a');
-          a.href= URL.createObjectURL(animation);
-          a.innerHTML = a.download = (new Date() - 0) + ".pch";
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(animation);
+        a.innerHTML = a.download = (new Date() - 0) + ".pch";
 
-          const top = document.querySelector('img.sample')
-          document.body.insertBefore(img, top);
-          document.body.insertBefore(a, top);
-          return false;
-        }
+        const top = document.querySelector('img.sample')
+        document.body.insertBefore(img, top);
+        document.body.insertBefore(a, top);
+        return false;
       }
-    </script>
-    <br>
+    }
+  </script>
+  <br>
 
-    <style>
-      img.sample {
-        border: 1px solid black;
-        margin-bottom: 5px;
-        display: block;
-      }
-      input {
-        width: 100px;
-      }
-      #pageView {
-        margin: 0 !important;
-      }
-    </style>
-  </body>
+  <style>
+    img.sample {
+      border: 1px solid black;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    input {
+      width: 100px;
+    }
+
+    #pageView {
+      margin: 0 !important;
+    }
+  </style>
+</body>
+
 </html>
