@@ -786,7 +786,8 @@ Neo.createViewer = function (applet) {
 };
 
 Neo.initViewer = function (pch) {
-  var pageview = document.getElementById("neo-pageView");
+  const pageview = document.getElementById("neo-pageView");
+  if (!pageview) return;
   var pageWidth = Neo.config.applet_width;
   var pageHeight = Neo.config.applet_height;
   pageview.style.width = pageWidth + "px";
@@ -884,7 +885,7 @@ Neo.initViewer = function (pch) {
 
 Neo.startViewer = function () {
   if (Neo.applet) {
-    var name = Neo.applet.attributes.name.value || "pch";
+    var name = Neo.applet.getAttribute("name") || "pch";
     if (!document[name]) document[name] = Neo;
     if (Neo.applet.parentNode) {
       Neo.applet.parentNode.removeChild(Neo.applet);

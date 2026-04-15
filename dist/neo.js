@@ -11,12 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
 var Neo = function () {};
 
 Neo.version = "1.6.34";
-Neo.painter = {};
+Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
 Neo.toolSide = false;
-
+Neo.elementNeo = null;
 Neo.config = {
   width: 300,
   height: 300,
@@ -51,14 +51,17 @@ Neo.SLIDERTYPE_SIZE = 4;
 document.neo = Neo;
 
 Neo.init = function () {
-  var applets = document.getElementsByTagName("applet");
+  // 「appletタグ」でかつ「属性に .class か .jar を含む」もの
+  let applets = document.querySelectorAll(
+    'applet[code*=".class" i], applet[archive*=".jar" i]',
+  );
   if (applets.length == 0) {
     applets = document.getElementsByTagName("applet-dummy");
   }
 
   for (var i = 0; i < applets.length; i++) {
     var applet = applets[i];
-    var name = applet.attributes.name.value;
+    var name = applet.getAttribute("name");
 
     if (name == "paintbbs" || name == "pch") {
       Neo.applet = applet;
@@ -72,7 +75,7 @@ Neo.init = function () {
         Neo.initConfig(applet);
 
         var filename = Neo.getFilename();
-        var pch = Neo.getPCH(filename, function (pch) {
+        Neo.getPCH(filename, function (pch) {
           if (pch) {
             Neo.createViewer(applet);
             Neo.config.width = pch.width;
@@ -91,7 +94,8 @@ Neo.init = function () {
 };
 
 Neo.init2 = function () {
-  var pageview = document.getElementById("neo-pageView");
+  const pageview = document.getElementById("neo-pageView");
+  if (!pageview) return;
   pageview.style.width = Neo.config.applet_width + "px";
   pageview.style.height = Neo.config.applet_height + "px";
 
@@ -168,7 +172,6 @@ Neo.init2 = function () {
 
 Neo.initConfig = function (applet) {
   if (applet) {
-    var name = applet.attributes.name.value || "neo";
     var appletWidth = applet.attributes.width;
     var appletHeight = applet.attributes.height;
     if (appletWidth) Neo.config.applet_width = parseInt(appletWidth.value);
@@ -273,33 +276,37 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  const elementNeo = document.getElementById("NEO");
+  Neo.elementNeo = document.getElementById("NEO");
   // グリッド部分の touchmove イベントをキャンセルする関数をイベントリスナーに追加
   Neo.add_touch_move_grid_control = function () {
-    if (Neo.config.neo_disable_grid_touch_move) {
+    if (Neo.elementNeo && Neo.config.neo_disable_grid_touch_move) {
       // すでにリスナーが追加されていない場合のみ追加
-      if (!elementNeo?._touchMoveListenerAdded) {
-        elementNeo?.addEventListener("touchmove", Neo.touch_move_grid_control, {
-          passive: false,
-        });
-        elementNeo._touchMoveListenerAdded = true; // リスナーが追加されたことを記録
-      }
-    }
-  };
-
-  // グリッド部分の touchmove イベントをキャンセルする関数の追加とリムーブ
-  elementNeo?.addEventListener("touchmove", function (e) {
-    if (Neo.config.neo_disable_grid_touch_move) {
-      Neo.add_touch_move_grid_control();
-      if (Neo.isPinchZooming()) {
-        elementNeo.removeEventListener(
+      if (!Neo.elementNeo?._touchMoveListenerAdded) {
+        Neo.elementNeo?.addEventListener(
           "touchmove",
           Neo.touch_move_grid_control,
           {
             passive: false,
           },
         );
-        elementNeo._touchMoveListenerAdded = false; // リスナーが削除されたことを記録
+        Neo.elementNeo._touchMoveListenerAdded = true; // リスナーが追加されたことを記録
+      }
+    }
+  };
+
+  // グリッド部分の touchmove イベントをキャンセルする関数の追加とリムーブ
+  Neo.elementNeo?.addEventListener("touchmove", function (e) {
+    if (Neo.elementNeo && Neo.config.neo_disable_grid_touch_move) {
+      Neo.add_touch_move_grid_control();
+      if (Neo.isPinchZooming()) {
+        Neo.elementNeo.removeEventListener(
+          "touchmove",
+          Neo.touch_move_grid_control,
+          {
+            passive: false,
+          },
+        );
+        Neo.elementNeo._touchMoveListenerAdded = false; // リスナーが削除されたことを記録
       }
     }
   });
@@ -652,17 +659,17 @@ Neo.backgroundImage = function () {
     }
   }
   imageData.data.set(buf8);
-  ctx.putImageData(imageData, 0, 0);
+  ctx?.putImageData(imageData, 0, 0);
   return bgCanvas.toDataURL("image/png");
 };
 
 Neo.multColor = function (c, scale) {
-  var r = Math.round(parseInt(c.slice(1, 3), 16) * scale);
-  var g = Math.round(parseInt(c.slice(3, 5), 16) * scale);
-  var b = Math.round(parseInt(c.slice(5, 7), 16) * scale);
-  r = ("0" + Math.min(Math.max(r, 0), 255).toString(16)).slice(-2);
-  g = ("0" + Math.min(Math.max(g, 0), 255).toString(16)).slice(-2);
-  b = ("0" + Math.min(Math.max(b, 0), 255).toString(16)).slice(-2);
+  const rNum = Math.round(parseInt(c.slice(1, 3), 16) * scale);
+  const gNum = Math.round(parseInt(c.slice(3, 5), 16) * scale);
+  const bNum = Math.round(parseInt(c.slice(5, 7), 16) * scale);
+  const r = ("0" + Math.min(Math.max(rNum, 0), 255).toString(16)).slice(-2);
+  const g = ("0" + Math.min(Math.max(gNum, 0), 255).toString(16)).slice(-2);
+  const b = ("0" + Math.min(Math.max(bNum, 0), 255).toString(16)).slice(-2);
   return "#" + r + g + b;
 };
 
@@ -831,8 +838,9 @@ Neo.initComponents = function () {
 
   // アプレットのborderの動作をエミュレート
   if (navigator.userAgent.search("FireFox") > -1) {
-    var container = document.getElementById("neo-container");
-    container.addEventListener(
+    const container = document.getElementById("neo-container");
+    if (!container) return;
+    container?.addEventListener(
       "mousedown",
       function (e) {
         container.style.borderColor = Neo.config.inherit_color;
@@ -976,7 +984,7 @@ Neo.start = function (isApp) {
 
   Neo.isApp = isApp;
   if (Neo.applet) {
-    var name = Neo.applet.attributes.name.value || "paintbbs";
+    var name = Neo.applet.getAttribute("name") || "paintbbs";
     Neo.applet.outerHTML = "";
     document[name] = Neo;
 
@@ -1088,12 +1096,19 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
  */
 
 Neo.updateWindow = function () {
+  const windowView = document.getElementById("neo-windowView");
+  const pageView = document.getElementById("neo-pageView");
   if (Neo.fullScreen) {
-    document.getElementById("neo-windowView").style.display = "block";
-    document.getElementById("neo-windowView").appendChild(Neo.container);
+    if (!windowView) return;
+    windowView.style.display = "block";
+    windowView.appendChild(Neo.container);
   } else {
-    document.getElementById("neo-windowView").style.display = "none";
-    document.getElementById("neo-pageView").appendChild(Neo.container);
+    if (windowView) {
+      windowView.style.display = "none";
+    }
+    if (pageView) {
+      pageView.appendChild(Neo.container);
+    }
   }
   Neo.resizeCanvas();
 };
@@ -1267,8 +1282,9 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
       }
     }
   }
+  let formData = null;
   if (Neo.config.neo_send_with_formdata == "true") {
-    var formData = new FormData();
+    formData = new FormData();
     formData.append("header", headerString);
     formData.append("picture", blob, blob);
     let thumbnail_size = 0;
@@ -2141,7 +2157,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   const ref = this;
 
   if (!Neo.viewer) {
-    var container = document.getElementById("neo-container");
+    const container = document.getElementById("neo-container");
     if (!container) return;
     container.onmousedown = function (e) {
       ref._mouseDownHandler(e);
@@ -2772,7 +2788,8 @@ Neo.UndoItem.prototype.height;
 Neo.Painter.prototype.setZoom = function (value) {
   this.zoom = value;
 
-  var container = document.getElementById("neo-container");
+  const container = document.getElementById("neo-container");
+  if (!container) return;
   var width = Math.round(this.canvasWidth * this.zoom);
   var height = Math.round(this.canvasHeight * this.zoom);
 
@@ -7192,7 +7209,8 @@ Neo.createViewer = function (applet) {
 };
 
 Neo.initViewer = function (pch) {
-  var pageview = document.getElementById("neo-pageView");
+  const pageview = document.getElementById("neo-pageView");
+  if (!pageview) return;
   var pageWidth = Neo.config.applet_width;
   var pageHeight = Neo.config.applet_height;
   pageview.style.width = pageWidth + "px";
@@ -7290,7 +7308,7 @@ Neo.initViewer = function (pch) {
 
 Neo.startViewer = function () {
   if (Neo.applet) {
-    var name = Neo.applet.attributes.name.value || "pch";
+    var name = Neo.applet.getAttribute("name") || "pch";
     if (!document[name]) document[name] = Neo;
     if (Neo.applet.parentNode) {
       Neo.applet.parentNode.removeChild(Neo.applet);

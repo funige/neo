@@ -317,7 +317,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   const ref = this;
 
   if (!Neo.viewer) {
-    var container = document.getElementById("neo-container");
+    const container = document.getElementById("neo-container");
     if (!container) return;
     container.onmousedown = function (e) {
       ref._mouseDownHandler(e);
@@ -948,7 +948,8 @@ Neo.UndoItem.prototype.height;
 Neo.Painter.prototype.setZoom = function (value) {
   this.zoom = value;
 
-  var container = document.getElementById("neo-container");
+  const container = document.getElementById("neo-container");
+  if (!container) return;
   var width = Math.round(this.canvasWidth * this.zoom);
   var height = Math.round(this.canvasHeight * this.zoom);
 
