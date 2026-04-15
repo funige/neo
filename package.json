@@ -8,8 +8,7 @@
   },
   "scripts": {
     "app": "electron .",
-    "format": "prettier --write src/[^l]*.js"
-  },
+ "format": "prettier --write \"src/!(lz-string).js\" \"sample/*.html\""},
   "devDependencies": {
     "gulp": "^5.0.0",
     "gulp-concat": "^2.6.1",
