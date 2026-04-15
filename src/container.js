@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
 var Neo = function () {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
-Neo.painter;
+Neo.painter = {};
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;

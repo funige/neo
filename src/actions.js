@@ -153,23 +153,23 @@ Neo.ActionManager.prototype.play = function () {
     func = item[0] && this[item[0]] ? item[0] : "dummy";
   }
 
-  var that = this;
+  var ref = this;
   var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
   this[func](item, function (result) {
     if (result) {
       if (
         Neo.painter.busySkipped &&
-        that._head < that._mark - 2 &&
-        that._mark - 2 >= 0 &&
-        that._items[that._mark - 1][0] == "restore"
+        ref._head < ref._mark - 2 &&
+        ref._mark - 2 >= 0 &&
+        ref._items[ref._mark - 1][0] == "restore"
       ) {
-        that._head = that._mark - 2;
+        ref._head = ref._mark - 2;
       } else {
-        that._head++;
+        ref._head++;
       }
-      that._index = 0;
-      that._prevSpeed = Neo.speed;
+      ref._index = 0;
+      ref._prevSpeed = Neo.speed;
     }
 
     setTimeout(function () {
