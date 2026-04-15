@@ -1,49 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
-    <link rel="stylesheet" href="../dist/neo.css" type="text/css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PCH Test</title>
+
+    <link rel="stylesheet" href="../dist/neo.css" />
     <script src="../dist/neo.js" charset="UTF-8"></script>
     <script>
-     const params = location.search.substring(1).split('&').reduce((result, query) => {
-       const [k, v] = query.split('=');
-       result[k] = decodeURI(v);
-       return result;
-     }, {});
-     const w = params.w || 400;
-     const h = params.h || 450;
+      const params = location.search
+        .substring(1)
+        .split("&")
+        .reduce((result, query) => {
+          const [k, v] = query.split("=");
+          result[k] = decodeURI(v);
+          return result;
+        }, {});
+      const w = params.w || 400;
+      const h = params.h || 450;
     </script>
   </head>
   <body>
     <a href="index.html">PaintBBS Test</a>
     <h1>PCH Test</h1>
 
+    <div id="appletdummy"></div>
     <script>
-     document.write(`
+      const html = `
        <applet-dummy name="pch" width="${w}" height="${h}" >
        </applet-dummy>
 
        <br>
        <input type="file" name="file" onchange="loadFile(this)"><br>
-     `)
+     `;
 
-     const loadFile = function (e) {
-       const data = e.files[0]
-       const reader = new FileReader();
-       reader.onload = function () {
-         const pch = Neo.decodePCH(reader.result);
-         console.log(pch)
+      const appletdummy = document.getElementById("appletdummy");
+      appletdummy.insertAdjacentHTML("afterbegin", html);
 
-         Neo.createViewer(document.querySelector('input'));
-         Neo.config.width = pch.width;
-         Neo.config.height = pch.height;
-         Neo.initViewer(pch);
-         Neo.startViewer();
-       }
-       reader.readAsArrayBuffer(data);
-     }
+      const loadFile = function (e) {
+        const data = e.files[0];
+        const reader = new FileReader();
+        reader.onload = function () {
+          const pch = Neo.decodePCH(reader.result);
+          console.log(pch);
+
+          Neo.createViewer(document.querySelector("input"));
+          Neo.config.width = pch.width;
+          Neo.config.height = pch.height;
+          Neo.initViewer(pch);
+          Neo.startViewer();
+        };
+        reader.readAsArrayBuffer(data);
+      };
     </script>
-    <br>
-    
+    <br />
+
     <style>
       input {
         margin-top: 1em;
