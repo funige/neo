@@ -1862,10 +1862,11 @@ Neo.Painter.prototype.zoom = 1;
 Neo.Painter.prototype.zoomX = 0;
 Neo.Painter.prototype.zoomY = 0;
 
-Neo.Painter.prototype.isMouseDown;
-Neo.Painter.prototype.isMouseDownRight;
+Neo.Painter.prototype.isMouseDown = false;
+Neo.Painter.prototype.isMouseDownRight = false;
 
 Neo.Painter.prototype.isBezierActive = false;
+Neo.Painter.prototype.isCopyActive = false;
 
 Neo.Painter.prototype.prevMouseX;
 Neo.Painter.prototype.prevMouseY;
@@ -2308,8 +2309,9 @@ Neo.Painter.prototype.updateInputText = function () {
 };
 
 Neo.Painter.prototype.cancelCopy = function () {
-  if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
+  if (!this.isCopyActive) return;
   setTimeout(() => {
+    if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
     this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
   }, 30);
@@ -2440,7 +2442,12 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     Neo.painter.saveSession(); //10ストロークごとに自動バックアップ
   }
 
-  if (this.isMouseDownRight && this.cancelCopy()) {
+  if (
+    this.tool.type === Neo.Painter.TOOLTYPE_PASTE &&
+    this.isCopyActive &&
+    this.isMouseDownRight
+  ) {
+    this.cancelCopy();
     this.isMouseDownRight = false;
     return;
   }
@@ -5654,8 +5661,9 @@ Neo.SliderTool.prototype.alt = false;
 Neo.SliderTool.prototype.downHandler = function (oe) {
   if (!oe.isShiftDown) this.isDrag = true;
 
-  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-
+  if (!oe.isCopyActive) {
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+  }
   var rect = this.target.getBoundingClientRect();
   var sliderType = this.alt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
   Neo.sliders[sliderType].downHandler(
@@ -5995,6 +6003,7 @@ Neo.CopyTool.prototype = new Neo.EffectToolBase();
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
 Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
+  oe.isCopyActive = true;
   //  oe.copy(oe.current, x, y, width, height);
   oe._actionMgr.copy(x, y, width, height);
   oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
@@ -6016,6 +6025,7 @@ Neo.PasteTool.prototype.type = Neo.Painter.TOOLTYPE_PASTE;
 
 Neo.PasteTool.prototype.downHandler = function (oe) {
   this.ticking = false;
+  oe.isCopyActive = false;
   this.startX = oe.mouseX;
   this.startY = oe.mouseY;
   this.drawCursor(oe);
