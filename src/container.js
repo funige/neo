@@ -15,8 +15,19 @@ Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
+Neo.container = null;
+Neo.center = null;
+Neo.canvas = null;
+Neo.toolsWrapper = null;
 Neo.toolSide = false;
+Neo.applet = null;
+Neo.animation = null;
+Neo.storage = null;
 Neo.elementNeo = null;
+Neo.translate = function (str) {
+  return str;
+};
+
 Neo.config = {
   width: 300,
   height: 300,
@@ -48,8 +59,7 @@ Neo.SLIDERTYPE_BLUE = 2;
 Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
 
-document.neo = Neo;
-
+/** @type {any} */ (document).neo = Neo;
 Neo.init = function () {
   // 「appletタグ」でかつ「属性に .class か .jar を含む」もの
   let applets = document.querySelectorAll(
@@ -102,6 +112,15 @@ Neo.init2 = function () {
   Neo.canvas = document.getElementById("neo-canvas");
   Neo.container = document.getElementById("neo-container");
   Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
+  Neo.center = document.getElementById("neo-center");
+  if (
+    Neo.center &&
+    Neo.container.clientWidth &&
+    Neo.container.clientWidth >= 400 &&
+    Neo.config.neo_disable_neo_center_min_width != "true"
+  ) {
+    Neo.center.style.minWidth = "397px";
+  }
 
   Neo.painter = new Neo.Painter();
   Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
@@ -1012,15 +1031,14 @@ Neo.showWarning = function () {
   const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
   const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
 
-  var chrome = navigator.userAgent.match(/Chrome\/(\d+)/i);
-  if (chrome && chrome.length > 1) chrome = chrome[1];
-
-  var edge = navigator.userAgent.match(/Edge\/(\d+)/i);
-  if (edge && edge.length > 1) edge = edge[1];
-
+  var edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
+  var edgeVersion = 0; // 数値として初期化
+  if (edgeMatch && edgeMatch.length > 1) {
+    edgeVersion = parseInt(edgeMatch[1], 10);
+  }
   var str = "";
   if (futaba || samplebbs) {
-    if (edge && edge < 15) {
+    if (edgeVersion && edgeVersion < 15) {
       str = Neo.translate(
         "このブラウザでは<br>投稿に失敗することがあります<br>",
       );
@@ -1469,7 +1487,7 @@ Neo.getColors = function () {
 };
 
 Neo.setColors = function (colors) {
-  console.log("setColors");
+  // console.log("setColors");
   var array = colors.split("\n");
   for (var i = 0; i < 14; i++) {
     var color = array[i];

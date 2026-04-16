@@ -20,7 +20,21 @@ Neo.getModifier = function (e) {
   -------------------------------------------------------------------------
 */
 
-Neo.Button = function () {};
+Neo.Button = function () {
+  this.element = null;
+  this.params = null;
+  this.name = "";
+  this.selected = false;
+  this.isMouseDown = false;
+  /** @type {((Button: Neo.Button) => void) | null} */
+  this.onmousedown = null;
+  /** @type {((Button: Neo.Button) => void) | null} */
+  this.onmouseup = null;
+  /** @type {((Button: Neo.Button) => void) | null} */
+  this.onmouseover = null;
+  /** @type {((Button: Neo.Button) => void) | null} */
+  this.onmouseout = null;
+};
 Neo.Button.prototype.init = function (name, params) {
   this.element = document.getElementById(name);
   this.params = params || {};
@@ -57,7 +71,7 @@ Neo.Button.prototype.init = function (name, params) {
     { passive: false, capture: true },
   );
 
-  this.element.className = !this.params.type == "fill" ? "button" : "buttonOff";
+  this.element.className = "buttonOff";
 
   this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
@@ -125,11 +139,20 @@ Neo.Button.prototype.update = function () {};
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton;
+Neo.RightButton = null;
 
-Neo.RightButton = function () {};
+Neo.RightButton = function () {
+  this.params = null;
+  this.element = null;
+  this.selected = "";
+};
 Neo.RightButton.prototype = new Neo.Button();
 
+/**
+ * @param {any} name
+ * @param {any} params
+ * @returns {any}
+ */
 Neo.RightButton.prototype.init = function (name, params) {
   Neo.Button.prototype.init.call(this, name, params);
   this.params.type = "right";
@@ -185,7 +208,13 @@ Neo.FillButton.prototype.init = function (name, params) {
 
 Neo.colorTips = [];
 
-Neo.ColorTip = function () {};
+Neo.ColorTip = function () {
+  this.element = null;
+  this.params = null;
+  this.name = "";
+  this.selected = false;
+  this.isMouseDown = false;
+};
 Neo.ColorTip.prototype.init = function (name, params) {
   this.element = document.getElementById(name);
   this.params = params || {};
@@ -316,7 +345,17 @@ Neo.ColorTip.getCurrent = function () {
 Neo.toolTips = [];
 Neo.toolButtons = [];
 
-Neo.ToolTip = function () {};
+Neo.ToolTip = function () {
+  this.element = null;
+  this.params = null;
+  this.name = "";
+  this.mode = 0;
+  this.isMouseDown = false;
+  this.onmousedown = null;
+  this.onmouseup = null;
+  this.onmouseout = null;
+  this.onmouseover = null;
+};
 
 Neo.ToolTip.prototype.prevMode = -1;
 
@@ -807,7 +846,11 @@ Neo.Effect2Tip.prototype.update = function () {
 
 Neo.maskTip;
 
-Neo.MaskTip = function () {};
+Neo.MaskTip = function () {
+  this.isMouseDown = false;
+  this.onmousedown = null;
+  this.canvas = null;
+};
 Neo.MaskTip.prototype = new Neo.ToolTip();
 
 Neo.MaskTip.prototype.init = function (name, params) {
