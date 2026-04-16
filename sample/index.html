@@ -35,7 +35,21 @@
 						<param name="neo_show_right_button" value="true">
 						<param name="neo_disable_grid_touch_move" value="true">
 						<param name="neo_enable_zoom_out" value="true">
-						</applet-dummy>`;
+            <param name="neo_disable_neo_center_min_width" value="true">
+            
+						</applet-dummy>
+            
+                   <br>
+        <form>
+          <input type="number" name="w" value="${appw}"> x
+          <input type="number" name="h" value="${apph}"> Applet<br>
+          <input type="number" name="iw" value="${w}"> x
+          <input type="number" name="ih" value="${h}"> Canvas<br>
+          <input type="reset" value="RESET"><br>
+          <input type="submit" value="RELOAD">
+        </form>
+ 
+            `;
 
       const appletdummy = document.getElementById("appletdummy");
       appletdummy.insertAdjacentHTML("afterbegin", html);
