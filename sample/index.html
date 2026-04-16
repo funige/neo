@@ -29,17 +29,15 @@
 
     <script>
       const html = `<applet-dummy name="paintbbs" width="${appw}" height="${apph}" >
-						<param name="image_width" value="${w}">
-						<param name="image_height" value="${h}">
-						<param name="thumbnail_type" value="animation">
-						<param name="neo_show_right_button" value="true">
-						<param name="neo_disable_grid_touch_move" value="true">
-						<param name="neo_enable_zoom_out" value="true">
-            <param name="neo_disable_neo_center_min_width" value="true">
+            <param name="image_width" value="${w}">
+            <param name="image_height" value="${h}">
+            <param name="thumbnail_type" value="animation">
+            <param name="neo_show_right_button" value="true">
+            <param name="neo_disable_grid_touch_move" value="true">
+            <param name="neo_enable_zoom_out" value="true">
+            </applet-dummy>
             
-						</applet-dummy>
-            
-                   <br>
+        <br>
         <form>
           <input type="number" name="w" value="${appw}"> x
           <input type="number" name="h" value="${apph}"> Applet<br>
@@ -48,8 +46,7 @@
           <input type="reset" value="RESET"><br>
           <input type="submit" value="RELOAD">
         </form>
- 
-            `;
+      `;
 
       const appletdummy = document.getElementById("appletdummy");
       appletdummy.insertAdjacentHTML("afterbegin", html);
