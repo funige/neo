@@ -113,7 +113,8 @@ Neo.init2 = function () {
   Neo.container = document.getElementById("neo-container");
   Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
   Neo.center = document.getElementById("neo-center");
-  if (Neo.center &&
+  if (
+    Neo.center &&
     Neo.container.clientWidth &&
     Neo.container.clientWidth >= 400 &&
     Neo.config.neo_disable_neo_center_min_width != "true"
@@ -7911,8 +7912,6 @@ Neo.ToolTip = function () {
   this.onmouseout = null;
   this.onmouseover = null;
 };
-
-Neo.ToolTip.prototype._mouseUpHandler = function (e) {};
 
 Neo.ToolTip.prototype.prevMode = -1;
 

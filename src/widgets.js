@@ -357,8 +357,6 @@ Neo.ToolTip = function () {
   this.onmouseover = null;
 };
 
-Neo.ToolTip.prototype._mouseUpHandler = function (e) {};
-
 Neo.ToolTip.prototype.prevMode = -1;
 
 Neo.ToolTip.prototype.init = function (name, params) {
