@@ -49,6 +49,12 @@ Neo.Painter.prototype.prevMouseY = null;
 Neo.Painter.prototype.mouseX = null;
 Neo.Painter.prototype.mouseY = null;
 
+Neo.Painter.prototype.stabilizedX = null;
+Neo.Painter.prototype.stabilizedY = null;
+
+Neo.Painter.prototype.prevMouseX = null;
+Neo.Painter.prototype.prevMouseY = null;
+
 Neo.Painter.prototype.securityTimer = 0;
 Neo.Painter.prototype.securityCount = 0;
 
@@ -85,14 +91,6 @@ Neo.Painter.prototype.aerr;
 Neo.Painter.prototype.dirty = false;
 Neo.Painter.prototype.busy = false;
 Neo.Painter.prototype.busySkipped = false;
-
-Neo.Painter.prototype.stabilizedX = null;
-Neo.Painter.prototype.stabilizedY = null;
-
-Neo.Painter.prototype.prevMouseX = null;
-Neo.Painter.prototype.mouseX = null;
-Neo.Painter.prototype.prevMouseY = null;
-Neo.Painter.prototype.mouseY = null;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
