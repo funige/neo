@@ -59,7 +59,11 @@ id `neo-center`の最小幅を300pxのキャンバスの時と同じ幅にする
 しかしながら、もとに戻したい場合もありえます。  
 このフラグをtrueにする事で`minWidth="397px"`を無効化しv1.6.34以前の表示に戻します。  
 **デフォルトは false です**  
-APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効化します。  
+APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効化します。
+- **&lt;PARAM NAME="neo_disable_stabilizer" VALUE="true">**  
+このフラグをtrueにすると、v1.6.36で追加した手ぶれ補正機能を無効化します。  
+**デフォルトは false です**    
+
 
 # 動画の仕様の違い
 
