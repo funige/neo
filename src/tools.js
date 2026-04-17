@@ -288,7 +288,7 @@ Neo.DrawToolBase.prototype.freeHandUpMoveHandler = function (oe) {
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     oe.cursorRect = null;
   }
-  //縮小時は浮動円カーソルを非表示 部分更新のグリッチが出るため
+  //縮小時は円カーソルを非表示 部分更新のグリッチが出るため
   if (oe.zoom < 1) {
     return;
   }
