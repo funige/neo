@@ -5,15 +5,13 @@ Neo.Painter = function () {
   this._actionMgr = new Neo.ActionManager();
 };
 
-Neo.Painter.prototype.container;
+Neo.Painter.prototype.container = null;
 Neo.Painter.prototype._undoMgr;
 Neo.Painter.prototype._actionMgr;
 Neo.Painter.prototype.tool;
 Neo.Painter.prototype.inputText;
 
 //Canvas Info
-Neo.Painter.prototype.canvasWidth;
-Neo.Painter.prototype.canvasHeight;
 Neo.Painter.prototype.canvas = [];
 Neo.Painter.prototype.canvasCtx = [];
 Neo.Painter.prototype.visible = [];
@@ -40,6 +38,8 @@ Neo.Painter.prototype.zoomY = 0;
 
 Neo.Painter.prototype.isMouseDown = false;
 Neo.Painter.prototype.isMouseDownRight = false;
+Neo.Painter.prototype.isSpaceDown = false;
+Neo.Painter.prototype.inputText = null;
 
 Neo.Painter.prototype.isBezierActive = false;
 Neo.Painter.prototype.isCopyActive = false;
