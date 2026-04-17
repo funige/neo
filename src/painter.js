@@ -48,6 +48,8 @@ Neo.Painter.prototype.prevMouseX = null;
 Neo.Painter.prototype.prevMouseY = null;
 Neo.Painter.prototype.mouseX = null;
 Neo.Painter.prototype.mouseY = null;
+Neo.Painter.prototype.rawMouseX = null;
+Neo.Painter.prototype.rawMouseY = null;
 
 Neo.Painter.prototype.stabilizedX = null;
 Neo.Painter.prototype.stabilizedY = null;
@@ -702,6 +704,8 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
     Neo.RightButton.clear();
   }
 
+  this._updateMousePosition(e);
+
   //  if (e.changedTouches) {
   //      for (var i = 0; i < e.changedTouches.length; i++) {
   //          var touch = e.changedTouches[i];
@@ -714,35 +718,6 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
 
 Neo.Painter.prototype._mouseMoveHandler = function (e) {
   this._updateMousePosition(e);
-
-  // 指数移動平均による手ブレ補正
-  if (
-    Neo.config.neo_disable_stabilizer != "true" &&
-    e.type != "touchmove" &&
-    this.isMouseDown
-  ) {
-    // 0.0〜0.99 0.0で補正なし
-    const stability = 0.8;
-    const factor = 1.0 - stability;
-
-    // moothXが未定義なら現在の位置で初期化
-    if (typeof this.stabilizedX !== "number" || isNaN(this.stabilizedX)) {
-      this.stabilizedX = this.mouseX;
-      this.stabilizedY = this.mouseY;
-    } else {
-      //補間計算
-      this.stabilizedX = factor * this.mouseX + stability * this.stabilizedX;
-      this.stabilizedY = factor * this.mouseY + stability * this.stabilizedY;
-    }
-
-    // 手ブレ補正後の数値に差し替え
-    this.mouseX = this.stabilizedX;
-    this.mouseY = this.stabilizedY;
-  } else {
-    // マウスを離している時はリセット
-    this.stabilizedX = null;
-    this.stabilizedY = null;
-  }
 
   if (e.type == "touchmove" && e.touches.length > 1) return;
 
@@ -782,6 +757,38 @@ Neo.Painter.prototype.getPosition = function (e) {
   }
 };
 
+// 手ぶれ補正
+Neo.Painter.prototype._stabilizer = function (e) {
+  const rawX = this.mouseX;
+  const rawY = this.mouseY;
+  const freeHandMode = this.drawType === 0;
+  if (Neo.config.neo_disable_stabilizer != "true" && freeHandMode) {
+    if (this.isMouseDown) {
+      // 0.0〜0.99 最大
+      const stability = 0.8;
+      const factor = 1.0 - stability;
+
+      // moothXが未定義なら現在の位置で初期化
+      if (typeof this.stabilizedX !== "number" || isNaN(this.stabilizedX)) {
+        this.stabilizedX = this.mouseX;
+        this.stabilizedY = this.mouseY;
+      } else {
+        this.stabilizedX = factor * this.mouseX + stability * this.stabilizedX;
+        this.stabilizedY = factor * this.mouseY + stability * this.stabilizedY;
+      }
+      // 手ブレ補正後の数値に差し替え
+      this.mouseX = this.stabilizedX;
+      this.mouseY = this.stabilizedY;
+    } else {
+      // マウスを離している時はリセット
+      this.stabilizedX = null;
+      this.stabilizedY = null;
+      this.mouseX = rawX;
+      this.mouseY = rawY;
+    }
+  }
+};
+
 Neo.Painter.prototype._updateMousePosition = function (e) {
   var rect = this.destCanvas.getBoundingClientRect();
   //  var x = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
@@ -807,6 +814,9 @@ Neo.Painter.prototype._updateMousePosition = function (e) {
   if (isNaN(this.prevMouseY)) {
     this.prevMouseY = this.mouseY;
   }
+
+  //手ぶれ補正
+  this._stabilizer(e);
 
   /*
      this.slowX = this.slowX * 0.8 + this.mouseX * 0.2;
