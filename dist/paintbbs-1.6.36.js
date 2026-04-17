@@ -2574,7 +2574,7 @@ Neo.Painter.prototype._mouseMoveHandler = function (e) {
   this._updateMousePosition(e);
 
   // 指数移動平均による手ブレ補正
-  if (Neo.config.neo_disable_neo_stabilizer != "true" && this.isMouseDown) {
+  if (Neo.config.neo_disable_stabilizer != "true" && this.isMouseDown) {
     // 0.0〜0.99 0.0で補正なし
     const stability = 0.8;
     const factor = 1.0 - stability;
