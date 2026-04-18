@@ -21,9 +21,18 @@ Neo.canvas = null;
 Neo.toolsWrapper = null;
 Neo.toolSide = false;
 Neo.applet = null;
-Neo.animation = null;
+Neo.isAnimation = false;
 Neo.storage = null;
 Neo.elementNeo = null;
+Neo.getPCH = null;
+Neo.getFilename = null;
+Neo.createViewer = null;
+Neo.createViewer = null;
+Neo.initViewer = null;
+Neo.isPinchZooming = null;
+Neo.touch_move_grid_control = function () {};
+Neo.add_touch_move_grid_control = function () {};
+Neo.updateUI = function () {};
 Neo.translate = function (str) {
   return str;
 };
@@ -130,7 +139,7 @@ Neo.init2 = function () {
   };
 
   // 動画記録
-  Neo.animation = Neo.config.thumbnail_type == "animation";
+  Neo.isAnimation = Neo.config.thumbnail_type == "animation";
 
   // 続きから描く
   Neo.storage = localStorage; //PCの時にもlocalStorageを使用
