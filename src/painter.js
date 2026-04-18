@@ -766,11 +766,12 @@ Neo.Painter.prototype._stabilizer = function (e) {
   const freeHandMode = this.drawType === 0;
   if (Neo.config.neo_disable_stabilizer != "true" && freeHandMode) {
     if (this.isMouseDown) {
-      // 0.0〜0.99 最大
+      // 手ぶれ補正の強さ
+      // 補正なし 0.0 最強 0.99
       const stability = 0.8;
       const factor = 1.0 - stability;
 
-      // moothXが未定義なら現在の位置で初期化
+      // stabilizedX が未定義なら現在の位置で初期化
       if (typeof this.stabilizedX !== "number" || isNaN(this.stabilizedX)) {
         this.stabilizedX = this.mouseX;
         this.stabilizedY = this.mouseY;
@@ -778,7 +779,7 @@ Neo.Painter.prototype._stabilizer = function (e) {
         this.stabilizedX = factor * this.mouseX + stability * this.stabilizedX;
         this.stabilizedY = factor * this.mouseY + stability * this.stabilizedY;
       }
-      // 手ブレ補正後の数値に差し替え
+      // 手ぶれ補正後の数値に差し替え
       this.mouseX = this.stabilizedX;
       this.mouseY = this.stabilizedY;
     } else {
