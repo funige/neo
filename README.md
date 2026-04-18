@@ -67,14 +67,17 @@ PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/
   
 ### お絵かき掲示板PHPスクリプトのサポートについて
 - それぞれのスクリプトのライセンスに記載されている通り、明示的であるか黙示的であるかを問わず、いかなる種類の保証もありません。   
-サポートは、義務ではないという事をご理解いただけている事を前提とした上で、対応可能な内容の場合にのみ対応させていただいています。            
+対応可能な内容の場合にのみ対応させていただいています。              
 
-- Javaアプレットを前提とした古い掲示板でNEOを使うための[移行ガイド](README-potiboard.md)      
+### Javaアプレットを前提とした古い掲示板でNEOを使うための[移行ガイド](README-potiboard.md)      
 (古い PHP のコードには色々問題がありますので、お勧めできません)
 
+
+### 起動オプション
 - PaintBBS オリジナルの起動オプションについては[オリジナルの README](https://web.archive.org/web/20070822002857/https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)
 - NEO 独自のオプションについては、[NEO の独自拡張について](README-params.md)を参照してください。
 
+### PaintBBS NEOのサポート
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
 
 ## [動作確認用掲示板](http://futabize.websozai.jp)
