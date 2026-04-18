@@ -8,8 +8,8 @@ Neo.Painter = function () {
 Neo.Painter.prototype.container = null;
 Neo.Painter.prototype._undoMgr;
 Neo.Painter.prototype._actionMgr;
-Neo.Painter.prototype.tool;
-Neo.Painter.prototype.inputText;
+Neo.Painter.prototype.tool = null;
+Neo.Painter.prototype.inputText = null;
 
 //Canvas Info
 Neo.Painter.prototype.canvas = [];
@@ -18,14 +18,15 @@ Neo.Painter.prototype.visible = [];
 Neo.Painter.prototype.current = 0;
 
 //Temp Canvas Info
-Neo.Painter.prototype.tempCanvas;
-Neo.Painter.prototype.tempCanvasCtx;
+Neo.Painter.prototype.tempCanvas = null;
+Neo.Painter.prototype.tempCanvasCtx = null;
 Neo.Painter.prototype.tempX = 0;
 Neo.Painter.prototype.tempY = 0;
+Neo.Painter.prototype.temp = null;
 
 //Destination Canvas for display
-Neo.Painter.prototype.destCanvas;
-Neo.Painter.prototype.destCanvasCtx;
+Neo.Painter.prototype.destCanvas = null;
+Neo.Painter.prototype.destCanvasCtx = null;
 
 Neo.Painter.prototype.backgroundColor = "#ffffff";
 Neo.Painter.prototype.foregroundColor = "#000000";
@@ -39,7 +40,6 @@ Neo.Painter.prototype.zoomY = 0;
 Neo.Painter.prototype.isMouseDown = false;
 Neo.Painter.prototype.isMouseDownRight = false;
 Neo.Painter.prototype.isSpaceDown = false;
-Neo.Painter.prototype.inputText = null;
 
 Neo.Painter.prototype.isBezierActive = false;
 Neo.Painter.prototype.isCopyActive = false;
@@ -66,6 +66,8 @@ Neo.Painter.prototype.destHeight = 0;
 Neo.Painter.prototype.canvasWidth = 0;
 Neo.Painter.prototype.canvasHeight = 0;
 
+Neo.Painter.prototype._currentWidth = null;
+Neo.Painter.prototype._currentMaskType = 0;
 //Neo.Painter.prototype.slowX = 0;
 //Neo.Painter.prototype.slowY = 0;
 //Neo.Painter.prototype.stab = null;
@@ -89,7 +91,7 @@ Neo.Painter.prototype.maskColor = "#000000";
 Neo.Painter.prototype._currentColor = [];
 Neo.Painter.prototype._currentMask = [];
 
-Neo.Painter.prototype.aerr;
+Neo.Painter.prototype.aerr = 0;
 Neo.Painter.prototype.dirty = false;
 Neo.Painter.prototype.busy = false;
 Neo.Painter.prototype.busySkipped = false;
@@ -565,8 +567,8 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   if (document.activeElement != this.inputText) {
     if (
       !(
-        document.activeElement.tagName.toLocaleUpperCase() === "INPUT" ||
-        document.activeElement.tagName.toLocaleUpperCase() === "TEXTAREA"
+        document.activeElement?.tagName.toLocaleUpperCase() === "INPUT" ||
+        document.activeElement?.tagName.toLocaleUpperCase() === "TEXTAREA"
       )
     ) {
       e.preventDefault();
@@ -1053,7 +1055,7 @@ Neo.Painter.prototype.setZoomPosition = function (x, y) {
  */
 
 Neo.Painter.prototype.submit = function (board) {
-  if (Neo.animation) {
+  if (Neo.isAnimation) {
     // neo_save_layers
     var items = this._actionMgr._items;
     if (items.length > 0 && items[items.length - 1][0] != "restore") {
@@ -1548,12 +1550,15 @@ Neo.Painter.prototype.setPenPoint = function (buf8, width, x, y) {
         var a0 = buf8[index + 3] / 255.0;
 
         var a = a0 + a1 - a0 * a1;
+        let r = r0,
+          g = g0,
+          b = b0;
         if (a > 0) {
           var a1x = Math.max(a1, 1.0 / 255);
 
-          var r = (r1 * a1x + r0 * a0 * (1 - a1x)) / a;
-          var g = (g1 * a1x + g0 * a0 * (1 - a1x)) / a;
-          var b = (b1 * a1x + b0 * a0 * (1 - a1x)) / a;
+          r = (r1 * a1x + r0 * a0 * (1 - a1x)) / a;
+          g = (g1 * a1x + g0 * a0 * (1 - a1x)) / a;
+          b = (b1 * a1x + b0 * a0 * (1 - a1x)) / a;
 
           r = r1 > r0 ? Math.ceil(r) : Math.floor(r);
           g = g1 > g0 ? Math.ceil(g) : Math.floor(g);
@@ -1575,8 +1580,8 @@ Neo.Painter.prototype.setPenPoint = function (buf8, width, x, y) {
 };
 
 Neo.Painter.prototype.setBrushPoint = function (buf8, width, x, y) {
-  var d = this._currentWidth;
-  var r0 = Math.floor(d / 2);
+  const d = this._currentWidth;
+  let r0 = Math.floor(d / 2);
   x -= r0;
   y -= r0;
 
@@ -1594,18 +1599,21 @@ Neo.Painter.prototype.setBrushPoint = function (buf8, width, x, y) {
   for (var i = 0; i < d; i++) {
     for (var j = 0; j < d; j++) {
       if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-        var r0 = buf8[index + 0];
-        var g0 = buf8[index + 1];
-        var b0 = buf8[index + 2];
-        var a0 = buf8[index + 3] / 255.0;
+        let r0 = buf8[index + 0];
+        let g0 = buf8[index + 1];
+        let b0 = buf8[index + 2];
+        let a0 = buf8[index + 3] / 255.0;
 
-        var a = a0 + a1 - a0 * a1;
+        let a = a0 + a1 - a0 * a1;
+        let r = r0,
+          g = g0,
+          b = b0;
         if (a > 0) {
-          var a1x = Math.max(a1, 1.0 / 255);
+          let a1x = Math.max(a1, 1.0 / 255);
 
-          var r = (r1 * a1x + r0 * a0) / (a0 + a1x);
-          var g = (g1 * a1x + g0 * a0) / (a0 + a1x);
-          var b = (b1 * a1x + b0 * a0) / (a0 + a1x);
+          r = (r1 * a1x + r0 * a0) / (a0 + a1x);
+          g = (g1 * a1x + g0 * a0) / (a0 + a1x);
+          b = (b1 * a1x + b0 * a0) / (a0 + a1x);
 
           r = r1 > r0 ? Math.ceil(r) : Math.floor(r);
           g = g1 > g0 ? Math.ceil(g) : Math.floor(g);
@@ -2507,6 +2515,9 @@ Neo.Painter.prototype.doFloodFill = function (layer, x, y, fillColor) {
         break;
       }
       var point = stack.pop();
+      if (!point) {
+        break;
+      }
       var x = point.x;
       var y = point.y;
       var x0 = x;

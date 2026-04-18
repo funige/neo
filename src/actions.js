@@ -33,7 +33,7 @@ Neo.ActionManager.prototype.speedMode = function () {
 };
 
 Neo.ActionManager.prototype.step = function () {
-  if (!Neo.animation) return;
+  if (!Neo.isAnimation) return;
 
   if (this._items.length > this._head) {
     this._items.length = this._head;
@@ -44,7 +44,7 @@ Neo.ActionManager.prototype.step = function () {
 };
 
 Neo.ActionManager.prototype.back = function () {
-  if (!Neo.animation) return;
+  if (!Neo.isAnimation) return;
 
   if (this._head > 0) {
     this._head--;
@@ -52,7 +52,7 @@ Neo.ActionManager.prototype.back = function () {
 };
 
 Neo.ActionManager.prototype.forward = function () {
-  if (!Neo.animation) return;
+  if (!Neo.isAnimation) return;
 
   if (this._head < this._items.length) {
     this._head++;
@@ -60,7 +60,7 @@ Neo.ActionManager.prototype.forward = function () {
 };
 
 Neo.ActionManager.prototype.push = function () {
-  if (!Neo.animation) return;
+  if (!Neo.isAnimation) return;
 
   var head = this._items[this._head - 1];
   for (var i = 0; i < arguments.length; i++) {
@@ -69,7 +69,7 @@ Neo.ActionManager.prototype.push = function () {
 };
 
 Neo.ActionManager.prototype.pushCurrent = function () {
-  if (!Neo.animation) return;
+  if (!Neo.isAnimation) return;
 
   var oe = Neo.painter;
   var head = this._items[this._head - 1];
@@ -329,7 +329,7 @@ Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
       this.push("freeHand", layer);
       this.pushCurrent();
       this.push(lineType, x1, y1, x0, y0);
-    } else if (Neo.animation) {
+    } else if (Neo.isAnimation) {
       head.push(x0, y0);
 
       // 記録漏れがないか確認
