@@ -24,7 +24,7 @@
 
   <body>
     <a href="viewer.html">PCH Test</a>
-    <h1>PaintBBS Test</h1>
+    <h1>PaintBBS NEO Test</h1>
     <div id="appletdummy"></div>
 
     <script>
@@ -47,7 +47,6 @@
           <input type="submit" value="RELOAD">
         </form>
       `;
-
       const appletdummy = document.getElementById("appletdummy");
       appletdummy.insertAdjacentHTML("afterbegin", html);
 
@@ -71,7 +70,18 @@
         }
       };
     </script>
-    <br />
+
+<br>
+<select onchange="Neo.setStabilizLevel(this.value)">
+  <option value="0">0</option>
+  <option value="1" selected>1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+</select> Stabilizer
+<p>
+</p>
 
     <style>
       img.sample {
