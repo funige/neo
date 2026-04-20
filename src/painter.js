@@ -507,6 +507,7 @@ Neo.Painter.prototype.updateInputText = function () {
 Neo.Painter.prototype.cancelCopy = function () {
   if (!this.isCopyActive) return;
   if (Neo.CurrentToolType !== Neo.Painter.TOOLTYPE_PASTE) return;
+  this.popTool();
   this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
   this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
 };
