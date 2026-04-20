@@ -49,7 +49,7 @@ Neo.UndoCommand = function (data) {
 };
 Neo.UndoCommand.prototype = new Neo.CommandBase();
 Neo.UndoCommand.prototype.execute = function () {
-  this.data.cancelCopy();
+  // this.data.cancelCopy();
   this.data.undo();
 };
 

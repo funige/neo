@@ -978,7 +978,7 @@ Neo.EffectToolBase.prototype.upHandler = function (oe) {
     this.doEffect(oe, x, y, width, height);
   }
 
-  if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
+  if (Neo.CurrentToolType != Neo.Painter.TOOLTYPE_PASTE) {
     setTimeout(() => {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }, 10);
