@@ -506,11 +506,9 @@ Neo.Painter.prototype.updateInputText = function () {
 
 Neo.Painter.prototype.cancelCopy = function () {
   if (!this.isCopyActive) return;
-  setTimeout(() => {
-    if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
-    this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
-    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
-  }, 30);
+  if (Neo.CurrentToolType !== Neo.Painter.TOOLTYPE_PASTE) return;
+  this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
 };
 
 /*
@@ -555,13 +553,6 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   if ((e.ctrlKey || e.metaKey) && keys.includes(e.key.toLowerCase())) {
     e.preventDefault();
   }
-  //FirefoxのメニューがAltキーで開閉しないようにする
-  document.addEventListener("keyup", (e) => {
-    // e.key を利用して特定のキーのアップイベントを検知する
-    if (e.key.toLowerCase() === "alt") {
-      e.preventDefault(); // Altキーのデフォルトの動作をキャンセル
-    }
-  });
 
   //text入力と、入力フォーム以外はすべてのキーボードイベントを無効化
   if (document.activeElement != this.inputText) {
@@ -580,6 +571,11 @@ Neo.Painter.prototype._keyUpHandler = function (e) {
   this.isCtrlDown = e.ctrlKey;
   this.isAltDown = e.altKey;
   if (e.key == " ") this.isSpaceDown = false;
+
+  //FirefoxのメニューがAltキーで開閉しないようにする
+  if (e.key.toLowerCase() === "alt") {
+    e.preventDefault(); // Altキーのデフォルトの動作をキャンセル
+  }
 
   if (this.tool.keyUpHandler) {
     this.tool.keyUpHandler(oe);
@@ -639,7 +635,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   }
 
   if (
-    this.tool.type === Neo.Painter.TOOLTYPE_PASTE &&
+    Neo.CurrentToolType === Neo.Painter.TOOLTYPE_PASTE &&
     this.isCopyActive &&
     this.isMouseDownRight
   ) {
@@ -775,7 +771,7 @@ Neo.Painter.prototype._stabilizer = function (e) {
     Neo.Painter.TOOLTYPE_BURN,
   ];
 
-  const isDrawTool = freeHandMode && toolTypes.includes(this.tool.type);
+  const isDrawTool = freeHandMode && toolTypes.includes(Neo.CurrentToolType);
 
   if (Neo.config.neo_disable_stabilizer == "true" || !isDrawTool) {
     return;
