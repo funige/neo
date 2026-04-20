@@ -1974,7 +1974,6 @@ Neo.Painter.prototype.aerr = 0;
 Neo.Painter.prototype.dirty = false;
 Neo.Painter.prototype.busy = false;
 Neo.Painter.prototype.busySkipped = false;
-Neo.Painter.prototype.e = null;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -2386,9 +2385,11 @@ Neo.Painter.prototype.updateInputText = function () {
 
 Neo.Painter.prototype.cancelCopy = function () {
   if (!this.isCopyActive) return;
-  if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
-  this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
-  this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
+  setTimeout(() => {
+    if (this.tool.type !== Neo.Painter.TOOLTYPE_PASTE) return;
+    this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+    this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
+  }, 30);
 };
 
 /*
@@ -2397,7 +2398,7 @@ Neo.Painter.prototype.cancelCopy = function () {
    -----------------------------------------------------------------------
  */
 
-Neo.Painter.prototype._keyDownHandler = function (e, options = {}) {
+Neo.Painter.prototype._keyDownHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
   this.isAltDown = e.altKey;
@@ -2433,6 +2434,13 @@ Neo.Painter.prototype._keyDownHandler = function (e, options = {}) {
   if ((e.ctrlKey || e.metaKey) && keys.includes(e.key.toLowerCase())) {
     e.preventDefault();
   }
+  //FirefoxのメニューがAltキーで開閉しないようにする
+  document.addEventListener("keyup", (e) => {
+    // e.key を利用して特定のキーのアップイベントを検知する
+    if (e.key.toLowerCase() === "alt") {
+      e.preventDefault(); // Altキーのデフォルトの動作をキャンセル
+    }
+  });
 
   //text入力と、入力フォーム以外はすべてのキーボードイベントを無効化
   if (document.activeElement != this.inputText) {
@@ -2452,11 +2460,6 @@ Neo.Painter.prototype._keyUpHandler = function (e) {
   this.isAltDown = e.altKey;
   if (e.key == " ") this.isSpaceDown = false;
 
-  //FirefoxのメニューがAltキーで開閉しないようにする
-  if (e.key.toLowerCase() === "alt") {
-    e.preventDefault(); // Altキーのデフォルトの動作をキャンセル
-  }
-
   if (this.tool.keyUpHandler) {
     this.tool.keyUpHandler(oe);
   }
@@ -2475,8 +2478,6 @@ Neo.Painter.prototype._rollOutHandler = function (e) {
 };
 
 Neo.Painter.prototype._mouseDownHandler = function (e) {
-  this.e = e;
-
   if (this.busy) {
     // loadAnimation実行中は何もしない
     if (e.target == this.destCanvas) {
@@ -2574,8 +2575,6 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
 };
 
 Neo.Painter.prototype._mouseUpHandler = function (e) {
-  this.e = e;
-
   this.isMouseDown = false;
   this.isMouseDownRight = false;
   this.tool.upHandler(this);
@@ -2600,8 +2599,6 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
 
 Neo.Painter.prototype._mouseMoveHandler = function (e) {
   this._updateMousePosition(e);
-
-  this.e = e;
 
   if (e.type == "touchmove" && e.touches.length > 1) return;
 
@@ -5737,8 +5734,6 @@ Neo.HandTool.prototype.isUpMove = false;
 Neo.HandTool.prototype.reverse = false;
 
 Neo.HandTool.prototype.downHandler = function (oe) {
-  // oe._updateMousePosition(oe.e);
-
   oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   this.isDrag = true;
@@ -5748,14 +5743,11 @@ Neo.HandTool.prototype.downHandler = function (oe) {
 };
 
 Neo.HandTool.prototype.upHandler = function (oe) {
-  // oe._updateMousePosition(oe.e);
   this.isDrag = false;
   oe.popTool();
 };
 
 Neo.HandTool.prototype.moveHandler = function (oe) {
-  // oe._updateMousePosition(oe.e);
-
   if (!this.isDrag) return;
 
   this.latestX = oe.rawMouseX;
@@ -5809,8 +5801,6 @@ Neo.SliderTool.prototype.isUpMove = false;
 Neo.SliderTool.prototype.alt = false;
 
 Neo.SliderTool.prototype.downHandler = function (oe) {
-  oe._updateMousePosition(oe.e);
-
   if (!oe.isShiftDown) this.isDrag = true;
 
   if (!oe.isCopyActive) {
@@ -5825,7 +5815,6 @@ Neo.SliderTool.prototype.downHandler = function (oe) {
 };
 
 Neo.SliderTool.prototype.upHandler = function (oe) {
-  oe._updateMousePosition(oe.e);
   this.isDrag = false;
   oe.popTool();
 
@@ -5838,7 +5827,6 @@ Neo.SliderTool.prototype.upHandler = function (oe) {
 };
 
 Neo.SliderTool.prototype.moveHandler = function (oe) {
-  oe._updateMousePosition(oe.e);
   if (this.isDrag) {
     var rect = this.target.getBoundingClientRect();
     var sliderType = this.alt
@@ -6500,6 +6488,7 @@ Neo.UndoCommand = function (data) {
 };
 Neo.UndoCommand.prototype = new Neo.CommandBase();
 Neo.UndoCommand.prototype.execute = function () {
+  this.data.cancelCopy();
   this.data.undo();
 };
 
