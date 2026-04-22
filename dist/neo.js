@@ -2662,8 +2662,8 @@ Neo.Painter.prototype._stabilizer = function (e) {
     const level = Neo.stabiliz_level;
     //手ぶれ補正のレベルを6段階に分けたテーブル
     //0で補正なし、5で最強
-    // [0:無効, 1:0.68, 2:0.8, 3:0.86, 4:0.91, 5:0.95]
-    const stabilityTable = [0.0, 0.68, 0.8, 0.86, 0.91, 0.95];
+    // [0:無効, 1:0.6, 2:0.8, 3:0.85, 4:0.9, 5:0.96]
+    const stabilityTable = [0.0, 0.6, 0.8, 0.85, 0.9, 0.96];
     const stability = stabilityTable[Math.max(0, Math.min(level, 5))];
     const factor = 1.0 - stability;
 
