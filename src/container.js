@@ -1167,9 +1167,10 @@ Neo.resizeCanvas = function () {
   Neo.painter.destWidth = width;
   Neo.painter.destHeight = height;
 
-  Neo.painter.destCanvas.width = width;
-  Neo.painter.destCanvas.height = height;
-  Neo.painter.destCanvasCtx = Neo.painter.destCanvas.getContext("2d", {
+  const destCanvas = Neo.painter.destCanvas;
+  destCanvas.width = width;
+  destCanvas.height = height;
+  Neo.painter.destCanvasCtx = destCanvas.getContext("2d", {
     willReadFrequently: true,
   });
 
@@ -1179,13 +1180,14 @@ Neo.resizeCanvas = function () {
     ctx.imageSmoothingEnabled = true;
     // 品質を指定（対応ブラウザのみ有効）
     if (Neo.painter.zoom < 0.5 && "imageSmoothingQuality" in ctx) {
-      Neo.painter.destCanvas.style.imageRendering = "smooth";
+      destCanvas.style.imageRendering = "smooth";
       ctx.imageSmoothingQuality = "high";
     }
   } else {
     ctx.imageSmoothingEnabled = false;
-    Neo.painter.destCanvas.style.imageRendering = "pixelated";
+    destCanvas.style.imageRendering = "pixelated";
   }
+  destCanvas.style.touchAction = "none";
 
   Neo.canvas.style.width = width + "px";
   Neo.canvas.style.height = height + "px";

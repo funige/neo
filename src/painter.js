@@ -574,7 +574,7 @@ Neo.Painter.prototype._keyUpHandler = function (e) {
   if (e.key == " ") this.isSpaceDown = false;
 
   //FirefoxのメニューがAltキーで開閉しないようにする
-  if (e.key.toLowerCase() === "alt") {
+  if (e.key && e.key.toLowerCase() === "alt") {
     e.preventDefault(); // Altキーのデフォルトの動作をキャンセル
   }
 

@@ -836,14 +836,14 @@ Neo.initViewer = function (pch) {
     return false;
   };
 
-  painter.addEventListener(
+  painter?.addEventListener(
     "pointerdown",
     function () {
       Neo.painter._actionMgr.isMouseDown = true;
     },
     false,
   );
-  painter.addEventListener(
+  painter?.addEventListener(
     "touchmove",
     function (e) {
       e.preventDefault();
