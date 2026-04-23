@@ -363,7 +363,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
         ref._mouseMoveHandler(e);
       }
     };
-    container.onmouseup = function (e) {
+    container.onpointerup = function (e) {
       ref._mouseUpHandler(e);
     };
     container.onmouseover = function (e) {
