@@ -96,6 +96,8 @@ Neo.Painter.prototype.dirty = false;
 Neo.Painter.prototype.busy = false;
 Neo.Painter.prototype.busySkipped = false;
 
+Neo.Painter.prototype.touchlength = 0;
+
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
 Neo.Painter.LINETYPE_ERASER = 2;
@@ -338,34 +340,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   if (!Neo.viewer) {
     const container = document.getElementById("neo-container");
     if (!container) return;
-    container.onmousedown = function (e) {
-      ref._mouseDownHandler(e);
-    };
-    container.onpointermove = function (e) {
-      //フリーハンドモード?
-      const freeHandMode = ref.drawType === 0;
-      //ツールは鉛筆･消しゴムまたは水彩?
-      const usesHighPrecisionTool = [1, 2, 14].includes(Neo.CurrentToolType);
-      //ブラシサイズは16px以下?
-      const smallbrush = ref.lineWidth <= 16;
-      //上記条件が揃う時はポインター追従性を高くする
-      if (
-        ref.isMouseDown &&
-        freeHandMode &&
-        usesHighPrecisionTool &&
-        smallbrush
-      ) {
-        const events = e.getCoalescedEvents?.() ?? [e];
-        for (const ev of events) {
-          ref._mouseMoveHandler(ev);
-        }
-      } else {
-        ref._mouseMoveHandler(e);
-      }
-    };
-    container.onmouseup = function (e) {
-      ref._mouseUpHandler(e);
-    };
     container.onmouseover = function (e) {
       ref._rollOverHandler(e);
     };
@@ -373,25 +347,70 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       ref._rollOutHandler(e);
     };
     container.addEventListener(
-      "touchstart",
+      "mousedown",
       function (e) {
         ref._mouseDownHandler(e);
       },
       { passive: false, capture: false },
     );
     container.addEventListener(
-      "touchmove",
+      "mouseup",
       function (e) {
-        ref._mouseMoveHandler(e);
+        ref.touchlength = 0;
+        ref._mouseUpHandler(e);
+      },
+      { passive: false, capture: false },
+    );
+    container.addEventListener(
+      "touchstart",
+      function (e) {
+        ref.touchlength = e.touches?.length;
+        ref._mouseDownHandler(e);
       },
       { passive: false, capture: false },
     );
     container.addEventListener(
       "touchend",
       function (e) {
+        ref.touchlength = 0;
         ref._mouseUpHandler(e);
       },
       { passive: false, capture: false },
+    );
+    container.addEventListener(
+      "pointermove",
+      function (e) {
+        //フリーハンドモード?
+        const freeHandMode = ref.drawType === 0;
+        //ツールは鉛筆･消しゴムまたは水彩?
+        const usesHighPrecisionTool = [1, 2, 14].includes(Neo.CurrentToolType);
+        //ブラシサイズは16px以下?
+        const smallbrush = ref.lineWidth <= 16;
+        //上記条件が揃う時はポインター追従性を高くする
+        if (
+          ref.isMouseDown &&
+          freeHandMode &&
+          usesHighPrecisionTool &&
+          smallbrush
+        ) {
+          const events = e.getCoalescedEvents?.() ?? [e];
+          for (const ev of events) {
+            ref._mouseMoveHandler(ev);
+          }
+        } else {
+          ref._mouseMoveHandler(e);
+        }
+      },
+      { passive: false, capture: false },
+    );
+    container.addEventListener(
+      "pointercancel",
+      function (e) {
+        ref.touchlength = 0;
+        ref.isMouseDown = false; // 強制的にフラグを折る
+        ref._mouseUpHandler(e);
+      },
+      { capture: false },
     );
 
     document.onkeydown = function (e) {
@@ -718,7 +737,7 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
 Neo.Painter.prototype._mouseMoveHandler = function (e) {
   this._updateMousePosition(e);
 
-  if (e.type == "touchmove" && e.touches.length > 1) return;
+  if (this.touchlength > 1) return;
 
   if (this.isMouseDown || this.isMouseDownRight) {
     this.tool.moveHandler(this);
@@ -733,7 +752,7 @@ Neo.Painter.prototype._mouseMoveHandler = function (e) {
 
   // 画面外をタップした時スクロール可能にするため
   //  console.warn("move -" + e.target.id + e.target.className)
-  if (e.cancelable && !(e.target.className == "o" && e.type == "touchmove")) {
+  if (e.cancelable && e.target.className != "o") {
     e.preventDefault();
   }
 };

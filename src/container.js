@@ -19,6 +19,7 @@ Neo.container = null;
 Neo.center = null;
 Neo.canvas = null;
 Neo.toolsWrapper = null;
+Neo.tools = null;
 Neo.toolSide = false;
 Neo.applet = null;
 Neo.isAnimation = false;
@@ -123,6 +124,7 @@ Neo.init2 = function () {
   Neo.canvas = document.getElementById("neo-canvas");
   Neo.container = document.getElementById("neo-container");
   Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
+  Neo.tools = document.getElementById("neo-tools");
   Neo.center = document.getElementById("neo-center");
   if (
     Neo.center &&
@@ -1189,7 +1191,13 @@ Neo.resizeCanvas = function () {
   }
 
   destCanvas.style.touchAction = "none";
+  destCanvas.style.pointerEvents = "auto";
+
   Neo.canvas.style.touchAction = "none";
+  Neo.canvas.style.pointerEvents = "auto";
+
+  Neo.tools.style.touchAction = "none";
+  Neo.tools.style.pointerEvents = "auto";
 
   Neo.canvas.style.width = width + "px";
   Neo.canvas.style.height = height + "px";
