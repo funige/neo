@@ -347,14 +347,14 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       ref._rollOutHandler(e);
     };
     container.addEventListener(
-      "mousedown",
+      "pointerdown",
       function (e) {
         ref._mouseDownHandler(e);
       },
       { passive: false, capture: false },
     );
     container.addEventListener(
-      "mouseup",
+      "pointerup",
       function (e) {
         ref.touchlength = 0;
         ref._mouseUpHandler(e);
@@ -365,7 +365,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       "touchstart",
       function (e) {
         ref.touchlength = e.touches?.length;
-        ref._mouseDownHandler(e);
       },
       { passive: false, capture: false },
     );
@@ -373,7 +372,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       "touchend",
       function (e) {
         ref.touchlength = 0;
-        ref._mouseUpHandler(e);
       },
       { passive: false, capture: false },
     );
@@ -406,8 +404,10 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     container.addEventListener(
       "pointercancel",
       function (e) {
+        //Eventがキャンセルされた時はUp時と同じ処理を行う
         ref.touchlength = 0;
-        ref.isMouseDown = false; // 強制的にフラグを折る
+        ref.isMouseDown = false;
+        ref.tool.upHandler(ref);
         ref._mouseUpHandler(e);
       },
       { capture: false },
@@ -541,7 +541,7 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
   this.isAltDown = e.altKey;
-  var key = e.key.toLowerCase();
+  var key = e.key ? e.key.toLowerCase() : null;
   if (key === " ") this.isSpaceDown = true;
 
   if (!this.isShiftDown && this.isCtrlDown) {
@@ -570,7 +570,7 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   //ctrlキーとの組み合わせのブラウザデフォルトのショートカットキーを無効化
   //但しctrl+v,ctrl+x,ctrl+aは使用可能
   const keys = ["+", ";", "=", "-", "s", "h", "r", "y", "z", "u", "o"];
-  if ((e.ctrlKey || e.metaKey) && keys.includes(e.key.toLowerCase())) {
+  if ((e.ctrlKey || e.metaKey) && e.key && keys.includes(e.key.toLowerCase())) {
     e.preventDefault();
   }
 
@@ -598,7 +598,7 @@ Neo.Painter.prototype._keyUpHandler = function (e) {
   }
 
   if (this.tool.keyUpHandler) {
-    this.tool.keyUpHandler(oe);
+    this.tool.keyUpHandler(e);
   }
 };
 
@@ -700,10 +700,9 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     }
   }
 
+  // console.log("down -" + e.type + " - " + e.target.id + e.target.className);
   //  console.warn("down -" + e.target.id + e.target.className)
-  if (!(e.target.className == "o" && e.type == "touchdown")) {
-    this.tool.downHandler(this);
-  }
+  this.tool.downHandler(this);
 
   //  var ref = this;
   //  document.onmouseup = function(e) {
@@ -802,8 +801,8 @@ Neo.Painter.prototype._stabilizer = function (e) {
     const level = Neo.stabiliz_level;
     //手ぶれ補正のレベルを6段階に分けたテーブル
     //0で補正なし、5で最強
-    // [0:無効, 1:0.6, 2:0.8, 3:0.85, 4:0.9, 5:0.96]
-    const stabilityTable = [0.0, 0.6, 0.8, 0.85, 0.9, 0.96];
+    // [0:無効, 1:0.55, 2:0.8, 3:0.85, 4:0.9, 5:0.96]
+    const stabilityTable = [0.0, 0.55, 0.8, 0.85, 0.9, 0.96];
     const stability = stabilityTable[Math.max(0, Math.min(level, 5))];
     const factor = 1.0 - stability;
 

@@ -1196,8 +1196,11 @@ Neo.resizeCanvas = function () {
   Neo.canvas.style.touchAction = "none";
   Neo.canvas.style.pointerEvents = "auto";
 
-  Neo.tools.style.touchAction = "none";
-  Neo.tools.style.pointerEvents = "auto";
+  const tools = Neo.tools ?? "";
+  if (tools) {
+    tools.style.touchAction = "none";
+    tools.style.pointerEvents = "auto";
+  }
 
   Neo.canvas.style.width = width + "px";
   Neo.canvas.style.height = height + "px";
