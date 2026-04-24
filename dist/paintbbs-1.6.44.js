@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 var Neo = function () {};
 
-Neo.version = "1.6.45";
+Neo.version = "1.6.44";
 Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1187,9 +1187,7 @@ Neo.resizeCanvas = function () {
     ctx.imageSmoothingEnabled = false;
     destCanvas.style.imageRendering = "pixelated";
   }
-
   destCanvas.style.touchAction = "none";
-  Neo.canvas.style.touchAction = "none";
 
   Neo.canvas.style.width = width + "px";
   Neo.canvas.style.height = height + "px";
@@ -2221,7 +2219,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   if (!Neo.viewer) {
     const container = document.getElementById("neo-container");
     if (!container) return;
-    container.onmousedown = function (e) {
+    container.onpointerdown = function (e) {
       ref._mouseDownHandler(e);
     };
     container.onpointermove = function (e) {
@@ -2246,7 +2244,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
         ref._mouseMoveHandler(e);
       }
     };
-    container.onmouseup = function (e) {
+    container.onpointerup = function (e) {
       ref._mouseUpHandler(e);
     };
     container.onmouseover = function (e) {
@@ -2255,28 +2253,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     container.onmouseout = function (e) {
       ref._rollOutHandler(e);
     };
-    container.addEventListener(
-      "touchstart",
-      function (e) {
-        ref._mouseDownHandler(e);
-      },
-      { passive: false, capture: false },
-    );
-    container.addEventListener(
-      "touchmove",
-      function (e) {
-        ref._mouseMoveHandler(e);
-      },
-      { passive: false, capture: false },
-    );
-    container.addEventListener(
-      "touchend",
-      function (e) {
-        ref._mouseUpHandler(e);
-      },
-      { passive: false, capture: false },
-    );
-
     document.onkeydown = function (e) {
       ref._keyDownHandler(e);
     };

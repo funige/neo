@@ -1187,7 +1187,9 @@ Neo.resizeCanvas = function () {
     ctx.imageSmoothingEnabled = false;
     destCanvas.style.imageRendering = "pixelated";
   }
+
   destCanvas.style.touchAction = "none";
+  Neo.canvas.style.touchAction = "none";
 
   Neo.canvas.style.width = width + "px";
   Neo.canvas.style.height = height + "px";
