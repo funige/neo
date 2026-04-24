@@ -26,6 +26,9 @@ Neo.Button = function () {
   this.name = "";
   this.selected = false;
   this.isMouseDown = false;
+  this.disable = function () {};
+  this.enable = function () {};
+
   /** @type {((Button: Neo.Button) => void) | null} */
   this.onmousedown = null;
   /** @type {((Button: Neo.Button) => void) | null} */
