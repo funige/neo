@@ -629,7 +629,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     e.preventDefault();
   }
 
-  if (e.type == "touchstart" && e.touches.length > 1) return;
+  if (this.touchlength > 1) return;
 
   if (e.button == 2 || this.virtualRight) {
     this.isMouseDownRight = true;
