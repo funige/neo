@@ -1,11 +1,21 @@
 "use strict";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
       Neo.start();
     }
   }
+  document.addEventListener(
+    "dblclick",
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    {
+      passive: false,
+    },
+  );
 });
 
 var Neo = function () {};
