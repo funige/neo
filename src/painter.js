@@ -98,6 +98,33 @@ Neo.Painter.prototype.busySkipped = false;
 
 Neo.Painter.prototype.touchlength = 0;
 
+Neo.Painter.prototype.penTool = null;
+Neo.Painter.prototype.eraserTool = null;
+Neo.Painter.prototype.handTool = null;
+Neo.Painter.prototype.fillTool = null;
+Neo.Painter.prototype.eraseAllTool = null;
+Neo.Painter.prototype.eraseRectTool = null;
+
+Neo.Painter.prototype.copyTool = null;
+Neo.Painter.prototype.pasteTool = null;
+Neo.Painter.prototype.mergeTool = null;
+Neo.Painter.prototype.flipHTool = null;
+Neo.Painter.prototype.flipVTool = null;
+
+Neo.Painter.prototype.brushTool = null;
+Neo.Painter.prototype.textTool = null;
+Neo.Painter.prototype.toneTool = null;
+Neo.Painter.prototype.blurTool = null;
+Neo.Painter.prototype.dodgeTool = null;
+Neo.Painter.prototype.burnTool = null;
+
+Neo.Painter.prototype.rectTool = null;
+Neo.Painter.prototype.rectFillTool = null;
+Neo.Painter.prototype.ellipseTool = null;
+Neo.Painter.prototype.ellipseFillTool = null;
+Neo.Painter.prototype.blurRectTool = null;
+Neo.Painter.prototype.turnTool = null;
+
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
 Neo.Painter.LINETYPE_ERASER = 2;
@@ -156,6 +183,7 @@ Neo.Painter.prototype.build = function (div, width, height) {
   this._initRoundData();
   this._initToneData();
   this._initInputText();
+  this._initTools();
 
   this.setTool(new Neo.PenTool());
 };
@@ -163,6 +191,10 @@ Neo.Painter.prototype.build = function (div, width, height) {
 Neo.Painter.prototype.setTool = function (tool) {
   if (this.tool && this.tool.saveStates) this.tool.saveStates();
 
+  //テキストツール以外のツールに切り替えるときは、テキストツールを終了する
+  if (tool !== this.textTool) {
+    this.textTool.kill();
+  }
   if (this.tool && this.tool.kill) {
     this.tool.kill();
   }
@@ -504,6 +536,35 @@ Neo.Painter.prototype._initInputText = function () {
   this.inputText = text;
 
   this.updateInputText();
+};
+
+Neo.Painter.prototype._initTools = function () {
+  this.penTool = new Neo.PenTool();
+  this.eraserTool = new Neo.EraserTool();
+  this.handTool = new Neo.HandTool();
+  this.fillTool = new Neo.FillTool();
+  this.eraseAllTool = new Neo.EraseAllTool();
+  this.eraseRectTool = new Neo.EraseRectTool();
+
+  this.copyTool = new Neo.CopyTool();
+  this.pasteTool = new Neo.PasteTool();
+  this.mergeTool = new Neo.MergeTool();
+  this.flipHTool = new Neo.FlipHTool();
+  this.flipVTool = new Neo.FlipVTool();
+
+  this.brushTool = new Neo.BrushTool();
+  this.textTool = new Neo.TextTool();
+  this.toneTool = new Neo.ToneTool();
+  this.blurTool = new Neo.BlurTool();
+  this.dodgeTool = new Neo.DodgeTool();
+  this.burnTool = new Neo.BurnTool();
+
+  this.rectTool = new Neo.RectTool();
+  this.rectFillTool = new Neo.RectFillTool();
+  this.ellipseTool = new Neo.EllipseTool();
+  this.ellipseFillTool = new Neo.EllipseFillTool();
+  this.blurRectTool = new Neo.BlurRectTool();
+  this.turnTool = new Neo.TurnTool();
 };
 
 Neo.Painter.prototype.hideInputText = function () {
