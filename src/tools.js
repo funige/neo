@@ -2,10 +2,17 @@
 
 Neo.ToolBase = function () {};
 
-Neo.ToolBase.prototype.startX;
-Neo.ToolBase.prototype.startY;
+Neo.ToolBase.prototype.isDrag = false;
+Neo.ToolBase.prototype.isUpMove = false;
+Neo.ToolBase.prototype.ticking = false;
+Neo.ToolBase.prototype.startX = null;
+Neo.ToolBase.prototype.startY = null;
+Neo.ToolBase.prototype.type = null;
+Neo.ToolBase.prototype.step = 0;
+
 Neo.ToolBase.prototype.init = function (oe) {};
 Neo.ToolBase.prototype.kill = function (oe) {};
+Neo.ToolBase.prototype.transformForZoom = function (oe) {};
 Neo.ToolBase.prototype.lineType = Neo.Painter.LINETYPE_NONE;
 
 Neo.ToolBase.prototype.downHandler = function (oe) {
@@ -943,6 +950,16 @@ Neo.EraseAllTool.prototype.rollOverHandler = function (oe) {};
 Neo.EffectToolBase = function () {};
 Neo.EffectToolBase.prototype = new Neo.ToolBase();
 Neo.EffectToolBase.prototype.isUpMove = false;
+Neo.EffectToolBase.prototype.startX = 0;
+Neo.EffectToolBase.prototype.startY = 0;
+Neo.EffectToolBase.prototype.endX = 0;
+Neo.EffectToolBase.prototype.endY = 0;
+Neo.EffectToolBase.prototype.ticking = false;
+Neo.EffectToolBase.prototype.isEllipse = false;
+Neo.EffectToolBase.prototype.isFill = false;
+Neo.EffectToolBase.prototype.type = null;
+
+Neo.EffectToolBase.prototype.doEffect = function (oe, x, y, width, height) {};
 
 Neo.EffectToolBase.prototype.downHandler = function (oe) {
   this.isUpMove = false;
