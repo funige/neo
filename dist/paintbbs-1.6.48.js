@@ -1692,7 +1692,7 @@ Neo.setStabilizLevel = function (level) {
   Neo.stabiliz_level = level;
 };
 
-"use strict";
+("use strict");
 
 Neo.dictionary = {
   ja: {},
@@ -1904,7 +1904,7 @@ Neo.translate = (function () {
   };
 })();
 
-"use strict";
+("use strict");
 
 Neo.Painter = function () {
   this._undoMgr = new Neo.UndoManager(50);
@@ -5008,7 +5008,7 @@ Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
 };
 
-"use strict";
+("use strict");
 
 Neo.ToolBase = function () {};
 
@@ -6480,7 +6480,7 @@ Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
-"use strict";
+("use strict");
 
 Neo.CommandBase = function () {};
 Neo.CommandBase.prototype.data;
@@ -6587,7 +6587,7 @@ Neo.CopyrightCommand.prototype.execute = function () {
   }
 };
 
-"use strict";
+("use strict");
 
 /*
   -----------------------------------------------------------------------
@@ -7702,7 +7702,7 @@ Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };
 
-"use strict";
+("use strict");
 
 Neo.getModifier = function (e) {
   if (e.shiftKey) {

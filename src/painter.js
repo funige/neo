@@ -280,6 +280,7 @@ Neo.Painter.prototype.setToolByType = function (toolType) {
   }
   Neo.CurrentToolType = toolType;
 };
+
 Neo.Painter.prototype._initCanvas = function (div, width, height) {
   width = parseInt(width);
   height = parseInt(height);

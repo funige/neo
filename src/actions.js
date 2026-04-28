@@ -641,6 +641,7 @@ Neo.ActionManager.prototype.paste = function (x, y, width, height, dx, dy) {
 };
 
 Neo.ActionManager.prototype.turn = function (x, y, width, height) {
+  console.log("Turning canvas...", x, y, width, height);
   var oe = Neo.painter;
   var layer = oe.current;
 
