@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 var Neo = function () {};
 
-Neo.version = "1.6.48";
+Neo.version = "1.6.50";
 Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -1692,7 +1692,7 @@ Neo.setStabilizLevel = function (level) {
   Neo.stabiliz_level = level;
 };
 
-("use strict");
+"use strict";
 
 Neo.dictionary = {
   ja: {},
@@ -1904,7 +1904,7 @@ Neo.translate = (function () {
   };
 })();
 
-("use strict");
+"use strict";
 
 Neo.Painter = function () {
   this._undoMgr = new Neo.UndoManager(50);
@@ -2186,6 +2186,7 @@ Neo.Painter.prototype.setToolByType = function (toolType) {
   }
   Neo.CurrentToolType = toolType;
 };
+
 Neo.Painter.prototype._initCanvas = function (div, width, height) {
   width = parseInt(width);
   height = parseInt(height);
@@ -5008,12 +5009,13 @@ Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
 };
 
-("use strict");
+"use strict";
 
 Neo.ToolBase = function () {};
 
-Neo.ToolBase.prototype.startX;
-Neo.ToolBase.prototype.startY;
+Neo.ToolBase.prototype.startX = null;
+Neo.ToolBase.prototype.startY = null;
+
 Neo.ToolBase.prototype.init = function (oe) {};
 Neo.ToolBase.prototype.kill = function (oe) {};
 Neo.ToolBase.prototype.lineType = Neo.Painter.LINETYPE_NONE;
@@ -6480,7 +6482,7 @@ Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
-("use strict");
+"use strict";
 
 Neo.CommandBase = function () {};
 Neo.CommandBase.prototype.data;
@@ -6587,7 +6589,7 @@ Neo.CopyrightCommand.prototype.execute = function () {
   }
 };
 
-("use strict");
+"use strict";
 
 /*
   -----------------------------------------------------------------------
@@ -7230,6 +7232,7 @@ Neo.ActionManager.prototype.paste = function (x, y, width, height, dx, dy) {
 };
 
 Neo.ActionManager.prototype.turn = function (x, y, width, height) {
+  console.log("Turning canvas...", x, y, width, height);
   var oe = Neo.painter;
   var layer = oe.current;
 
@@ -7702,7 +7705,7 @@ Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };
 
-("use strict");
+"use strict";
 
 Neo.getModifier = function (e) {
   if (e.shiftKey) {
@@ -9204,6 +9207,19 @@ Neo.ViewerButton.rewind =
 // update
 
 Neo.ViewerBar = function () {};
+Neo.ViewerBar.prototype.element = null;
+Neo.ViewerBar.prototype.seekElement = null;
+Neo.ViewerBar.prototype.params = null;
+Neo.ViewerBar.prototype.name = null;
+Neo.ViewerBar.prototype.isMouseDown = false;
+Neo.ViewerBar.prototype.seekElement = null;
+Neo.ViewerBar.prototype.markElement = null;
+Neo.ViewerBar.prototype.textElement = null;
+Neo.ViewerBar.prototype.width = 0;
+Neo.ViewerBar.prototype.length = 0;
+Neo.ViewerBar.prototype.mark = 0;
+Neo.ViewerBar.prototype.seek = 0;
+
 Neo.ViewerBar.prototype.init = function (name, params) {
   this.element = document.getElementById(name);
   this.params = params || {};
@@ -9226,16 +9242,24 @@ Neo.ViewerBar.prototype.init = function (name, params) {
   this.seek = 0;
 
   var ref = this;
-  this.element.onpointerdown = function (e) {
-    ref.isMouseDown = true;
-    ref._touchHandler(e);
-  };
-  this.element.onpointermove = function (e) {
-    e.preventDefault();
-    if (ref.isMouseDown) {
+  this.element.addEventListener(
+    "pointerdown",
+    function (e) {
+      ref.isMouseDown = true;
       ref._touchHandler(e);
-    }
-  };
+    },
+    { passive: false, capture: true },
+  );
+  this.element.addEventListener(
+    "pointermove",
+    function (e) {
+      e.preventDefault();
+      if (ref.isMouseDown) {
+        ref._touchHandler(e);
+      }
+    },
+    { passive: false, capture: true },
+  );
   //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
   //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
   this.element.addEventListener(

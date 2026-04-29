@@ -399,8 +399,8 @@ Neo.ToolTip.prototype.init = function (name, params) {
     },
     true,
   );
-
-  this.selected = this.params.type == "pen" ? true : false;
+  // console.log("this.params.type", this.params.type);
+  this.selected = this.params.type == "neo-pen" ? true : false;
   this.setSelected(this.selected);
 
   this.element.innerHTML =
@@ -1500,6 +1500,19 @@ Neo.ViewerButton.rewind =
 // update
 
 Neo.ViewerBar = function () {};
+Neo.ViewerBar.prototype.element = null;
+Neo.ViewerBar.prototype.seekElement = null;
+Neo.ViewerBar.prototype.params = null;
+Neo.ViewerBar.prototype.name = null;
+Neo.ViewerBar.prototype.isMouseDown = false;
+Neo.ViewerBar.prototype.seekElement = null;
+Neo.ViewerBar.prototype.markElement = null;
+Neo.ViewerBar.prototype.textElement = null;
+Neo.ViewerBar.prototype.width = 0;
+Neo.ViewerBar.prototype.length = 0;
+Neo.ViewerBar.prototype.mark = 0;
+Neo.ViewerBar.prototype.seek = 0;
+
 Neo.ViewerBar.prototype.init = function (name, params) {
   this.element = document.getElementById(name);
   this.params = params || {};
@@ -1522,16 +1535,24 @@ Neo.ViewerBar.prototype.init = function (name, params) {
   this.seek = 0;
 
   var ref = this;
-  this.element.onpointerdown = function (e) {
-    ref.isMouseDown = true;
-    ref._touchHandler(e);
-  };
-  this.element.onpointermove = function (e) {
-    e.preventDefault();
-    if (ref.isMouseDown) {
+  this.element.addEventListener(
+    "pointerdown",
+    function (e) {
+      ref.isMouseDown = true;
       ref._touchHandler(e);
-    }
-  };
+    },
+    { passive: false, capture: true },
+  );
+  this.element.addEventListener(
+    "pointermove",
+    function (e) {
+      e.preventDefault();
+      if (ref.isMouseDown) {
+        ref._touchHandler(e);
+      }
+    },
+    { passive: false, capture: true },
+  );
   //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
   //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
   this.element.addEventListener(

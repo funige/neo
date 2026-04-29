@@ -1,11 +1,18 @@
 "use strict";
 
 Neo.ToolBase = function () {};
+Neo.ToolBase.prototype.isDrag = false;
+Neo.ToolBase.prototype.isUpMove = false;
+Neo.ToolBase.prototype.ticking = false;
 
-Neo.ToolBase.prototype.startX;
-Neo.ToolBase.prototype.startY;
+Neo.ToolBase.prototype.startX = null;
+Neo.ToolBase.prototype.startY = null;
+Neo.ToolBase.prototype.type = null;
+Neo.ToolBase.prototype.step = 0;
+
 Neo.ToolBase.prototype.init = function (oe) {};
 Neo.ToolBase.prototype.kill = function (oe) {};
+Neo.ToolBase.prototype.transformForZoom = function (oe) {};
 Neo.ToolBase.prototype.lineType = Neo.Painter.LINETYPE_NONE;
 
 Neo.ToolBase.prototype.downHandler = function (oe) {
@@ -1126,7 +1133,7 @@ Neo.TurnTool = function () {};
 Neo.TurnTool.prototype = new Neo.EffectToolBase();
 Neo.TurnTool.prototype.type = Neo.Painter.TOOLTYPE_TURN;
 
-Neo.TurnTool.prototype.upHandler = function (oe) {
+Neo.TurnTool.prototype.doEffect = function (oe) {
   this.isUpMove = true;
 
   this.startX = Math.floor(this.startX);
