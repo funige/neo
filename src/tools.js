@@ -1133,7 +1133,7 @@ Neo.TurnTool = function () {};
 Neo.TurnTool.prototype = new Neo.EffectToolBase();
 Neo.TurnTool.prototype.type = Neo.Painter.TOOLTYPE_TURN;
 
-Neo.TurnTool.prototype.upHandler = function (oe) {
+Neo.TurnTool.prototype.doEffect = function (oe) {
   this.isUpMove = true;
 
   this.startX = Math.floor(this.startX);

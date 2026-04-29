@@ -399,8 +399,8 @@ Neo.ToolTip.prototype.init = function (name, params) {
     },
     true,
   );
-
-  this.selected = this.params.type == "pen" ? true : false;
+  // console.log("this.params.type", this.params.type);
+  this.selected = this.params.type == "neo-pen" ? true : false;
   this.setSelected(this.selected);
 
   this.element.innerHTML =

@@ -185,7 +185,7 @@ Neo.Painter.prototype.build = function (div, width, height) {
   this._initInputText();
   this._initTools();
 
-  this.setTool(new Neo.PenTool());
+  this.setTool(this.penTool);
 };
 
 Neo.Painter.prototype.setTool = function (tool) {
@@ -194,6 +194,9 @@ Neo.Painter.prototype.setTool = function (tool) {
   //テキストツール以外のツールに切り替えるときは、テキストツールを終了する
   if (tool !== this.textTool) {
     this.textTool.kill();
+  }
+  if (tool !== this.pasteTool) {
+    this.pasteTool.kill();
   }
   if (this.tool && this.tool.kill) {
     this.tool.kill();
@@ -234,76 +237,76 @@ Neo.CurrentToolType = 1;
 Neo.Painter.prototype.setToolByType = function (toolType) {
   switch (parseInt(toolType)) {
     case Neo.Painter.TOOLTYPE_PEN:
-      this.setTool(new Neo.PenTool());
+      this.setTool(this.penTool);
       break;
     case Neo.Painter.TOOLTYPE_ERASER:
-      this.setTool(new Neo.EraserTool());
+      this.setTool(this.eraserTool);
       break;
     case Neo.Painter.TOOLTYPE_HAND:
-      this.setTool(new Neo.HandTool());
+      this.setTool(this.handTool);
       break;
     case Neo.Painter.TOOLTYPE_FILL:
-      this.setTool(new Neo.FillTool());
+      this.setTool(this.fillTool);
       break;
     case Neo.Painter.TOOLTYPE_ERASEALL:
-      this.setTool(new Neo.EraseAllTool());
+      this.setTool(this.eraseAllTool);
       break;
     case Neo.Painter.TOOLTYPE_ERASERECT:
-      this.setTool(new Neo.EraseRectTool());
+      this.setTool(this.eraseRectTool);
       break;
 
     case Neo.Painter.TOOLTYPE_COPY:
-      this.setTool(new Neo.CopyTool());
+      this.setTool(this.copyTool);
       break;
     case Neo.Painter.TOOLTYPE_PASTE:
-      this.setTool(new Neo.PasteTool());
+      this.setTool(this.pasteTool);
       break;
     case Neo.Painter.TOOLTYPE_MERGE:
-      this.setTool(new Neo.MergeTool());
+      this.setTool(this.mergeTool);
       break;
     case Neo.Painter.TOOLTYPE_FLIP_H:
-      this.setTool(new Neo.FlipHTool());
+      this.setTool(this.flipHTool);
       break;
     case Neo.Painter.TOOLTYPE_FLIP_V:
-      this.setTool(new Neo.FlipVTool());
+      this.setTool(this.flipVTool);
       break;
 
     case Neo.Painter.TOOLTYPE_BRUSH:
-      this.setTool(new Neo.BrushTool());
+      this.setTool(this.brushTool);
       break;
     case Neo.Painter.TOOLTYPE_TEXT:
-      this.setTool(new Neo.TextTool());
+      this.setTool(this.textTool);
       break;
     case Neo.Painter.TOOLTYPE_TONE:
-      this.setTool(new Neo.ToneTool());
+      this.setTool(this.toneTool);
       break;
     case Neo.Painter.TOOLTYPE_BLUR:
-      this.setTool(new Neo.BlurTool());
+      this.setTool(this.blurTool);
       break;
     case Neo.Painter.TOOLTYPE_DODGE:
-      this.setTool(new Neo.DodgeTool());
+      this.setTool(this.dodgeTool);
       break;
     case Neo.Painter.TOOLTYPE_BURN:
-      this.setTool(new Neo.BurnTool());
+      this.setTool(this.burnTool);
       break;
 
     case Neo.Painter.TOOLTYPE_RECT:
-      this.setTool(new Neo.RectTool());
+      this.setTool(this.rectTool);
       break;
     case Neo.Painter.TOOLTYPE_RECTFILL:
-      this.setTool(new Neo.RectFillTool());
+      this.setTool(this.rectFillTool);
       break;
     case Neo.Painter.TOOLTYPE_ELLIPSE:
-      this.setTool(new Neo.EllipseTool());
+      this.setTool(this.ellipseTool);
       break;
     case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
-      this.setTool(new Neo.EllipseFillTool());
+      this.setTool(this.ellipseFillTool);
       break;
     case Neo.Painter.TOOLTYPE_BLURRECT:
-      this.setTool(new Neo.BlurRectTool());
+      this.setTool(this.blurRectTool);
       break;
     case Neo.Painter.TOOLTYPE_TURN:
-      this.setTool(new Neo.TurnTool());
+      this.setTool(this.turnTool);
       break;
 
     default:
@@ -380,14 +383,14 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       ref._rollOutHandler(e);
     };
     container.addEventListener(
-      "pointerdown",
+      "mousedown",
       function (e) {
         ref._mouseDownHandler(e);
       },
       { passive: false, capture: false },
     );
     container.addEventListener(
-      "pointerup",
+      "mouseup",
       function (e) {
         ref.touchlength = 0;
         ref._mouseUpHandler(e);
@@ -398,6 +401,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       "touchstart",
       function (e) {
         ref.touchlength = e.touches?.length;
+        ref._mouseDownHandler(e);
       },
       { passive: false, capture: false },
     );
@@ -405,6 +409,7 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
       "touchend",
       function (e) {
         ref.touchlength = 0;
+        ref._mouseUpHandler(e);
       },
       { passive: false, capture: false },
     );
@@ -440,7 +445,6 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
         //Eventがキャンセルされた時はUp時と同じ処理を行う
         ref.touchlength = 0;
         ref.isMouseDown = false;
-        ref.tool.upHandler(ref);
         ref._mouseUpHandler(e);
       },
       { capture: false },
@@ -2702,12 +2706,29 @@ Neo.Painter.prototype.turn = function (layer, x, y, width, height) {
   var buf8 = new Uint8ClampedArray(imageData.data.buffer);
   var temp = new Uint32Array(buf32.length);
 
+  // 設定によって「塗りつぶし関数」を切り替える
+  let fillPixel;
+  if (Neo.config.neo_disable_turn_original_glitch) {
+    // 常に透明(0)を返す
+    // オリジナルのPaintBBSのグリッジ
+    // 傾けのバグストライプを再現しない
+    fillPixel = function (idx) {
+      return 0;
+    };
+  } else {
+    // オリジナルのPaintBBSのグリッジ
+    // 傾けのバグストライプを再現
+    fillPixel = function (idx) {
+      return buf32[idx % width];
+    };
+  }
+
   var index = 0;
   for (var j = 0; j < height; j++) {
     for (var i = 0; i < width; i++) {
       temp[index] = buf32[index];
       if (index >= width) {
-        buf32[index] = buf32[index % width];
+        buf32[index] = fillPixel(index);
       }
       index++;
     }
