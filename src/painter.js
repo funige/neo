@@ -117,6 +117,8 @@ Neo.Painter.prototype.toneTool = null;
 Neo.Painter.prototype.blurTool = null;
 Neo.Painter.prototype.dodgeTool = null;
 Neo.Painter.prototype.burnTool = null;
+Neo.Painter.prototype.sliderTool = null;
+Neo.Painter.prototype.dummyTool = null;
 
 Neo.Painter.prototype.rectTool = null;
 Neo.Painter.prototype.rectFillTool = null;
@@ -569,6 +571,9 @@ Neo.Painter.prototype._initTools = function () {
   this.ellipseFillTool = new Neo.EllipseFillTool();
   this.blurRectTool = new Neo.BlurRectTool();
   this.turnTool = new Neo.TurnTool();
+
+  this.sliderTool = new Neo.SliderTool();
+  this.dummyTool = new Neo.DummyTool();
 };
 
 Neo.Painter.prototype.hideInputText = function () {
@@ -749,20 +754,20 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
 
   if (!this.isUIPaused()) {
     if (e.target["data-bar"]) {
-      this.pushTool(new Neo.HandTool());
+      this.pushTool(this.handTool);
     } else if (this.isSpaceDown && document.activeElement != this.inputText) {
-      this.pushTool(new Neo.HandTool());
+      this.pushTool(this.handTool);
       this.tool.reverse = true;
     } else if (e.target["data-slider"] != undefined) {
-      this.pushTool(new Neo.SliderTool());
+      this.pushTool(this.sliderTool);
       this.tool.target = e.target;
     } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
-      this.pushTool(new Neo.SliderTool());
+      this.pushTool(this.sliderTool);
       this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
       this.tool.alt = true;
     } else if (this.isWidget(e.target)) {
       this.isMouseDown = false;
-      this.pushTool(new Neo.DummyTool());
+      this.pushTool(this.dummyTool);
     }
   }
 
