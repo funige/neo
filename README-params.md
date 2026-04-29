@@ -63,7 +63,14 @@ APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効
 - **&lt;PARAM NAME="neo_disable_stabilizer" VALUE="true">**  
 このフラグをtrueにすると、v1.6.36で追加した手ぶれ補正機能を無効化します。  
 **デフォルトは false です**    
-
+- **&lt;PARAM NAME="neo_disable_turn_original_glitch" VALUE="true">**  
+このフラグをtrueにすると、｢傾け｣を使った時に出るバグストライプが発生しなくなります。  
+｢傾け｣のバグを使ったストライプ模様の作成を利用したい場合もあれば、傾けたいだけなのにストライプ模様が出現して、それを消す作業が必要になる場合もあります。    
+そのため、バグストライプが発生しないようにするオプションを追加します。  
+[ぴくらぼ](http://piclab.sakura.ne.jp/kouza/straip/straip.htm)  
+バグストライプ使用例。  
+オリジナルのPaintBBSではバグストライプが発生するため  
+**デフォルトはfalse** です。  
 
 # 動画の仕様の違い
 
