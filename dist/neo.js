@@ -4809,32 +4809,31 @@ Neo.Painter.prototype.getDestCanvasPosition = function (
 };
 
 Neo.Painter.prototype.isWidget = function (element) {
-  while (1) {
-    if (
-      element == null ||
-      element.id == "neo-canvas" ||
-      element.id == "neo-container"
-    )
-      break;
+  if (!element || !(element instanceof Element)) return false;
 
-    if (
-      element.id == "neo-tools" ||
-      element.className == "buttonOn" ||
-      element.className == "buttonOff" ||
-      element.className == "inputText"
-    ) {
-      return true;
-    }
-    element = element.parentNode;
+  // #NEO の外側を除外
+  const root = element.closest("#NEO");
+  if (!root) return false;
+
+  //  ツール領域・ボタン類
+  if (
+    element.closest(
+      "#neo-tools, .NEO .buttonOn, .NEO .buttonOff, .NEO .inputText",
+    )
+  ) {
+    return true;
   }
+
   return false;
 };
 
 Neo.Painter.prototype.isContainer = function (element) {
-  while (1) {
-    if (element == null) break;
-    if (element.id == "neo-container") return true;
-    element = element.parentNode;
+  if (!element || !(element instanceof Element)) return false;
+  // #NEO の外側を除外
+  const root = element.closest("#NEO");
+  if (!root) return false;
+  if (element.closest("#neo-container")) {
+    return true;
   }
   return false;
 };
