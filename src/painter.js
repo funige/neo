@@ -384,8 +384,10 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
     container.onmouseout = function (e) {
       ref._rollOutHandler(e);
     };
+    // 先にNeo.Buttonのtouchstart()がトリガーされる
+    // 将来線幅が保存できなくなった時は、rafで遅延させる
     container.addEventListener(
-      "mousedown",
+      "mousedown", //pointerdownに変更するとここが先にトリガーされ、線幅を保存できなくなる
       function (e) {
         ref._mouseDownHandler(e);
       },
