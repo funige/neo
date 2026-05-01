@@ -756,12 +756,14 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   if (!this.isUIPaused()) {
     if (e.target["data-bar"]) {
       this.pushTool(this.handTool);
+      this.tool.reverse = false;
     } else if (this.isSpaceDown && document.activeElement != this.inputText) {
       this.pushTool(this.handTool);
       this.tool.reverse = true;
     } else if (e.target["data-slider"] != undefined) {
       this.pushTool(this.sliderTool);
       this.tool.target = e.target;
+      this.tool.alt = false;
     } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
       this.pushTool(this.sliderTool);
       this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;

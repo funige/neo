@@ -2480,6 +2480,7 @@ Neo.Painter.prototype._initTools = function () {
   this.turnTool = new Neo.TurnTool();
 
   this.sliderTool = new Neo.SliderTool();
+  this.sliderToolKey = new Neo.SliderTool();
   this.dummyTool = new Neo.DummyTool();
 };
 
@@ -2668,6 +2669,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     } else if (e.target["data-slider"] != undefined) {
       this.pushTool(this.sliderTool);
       this.tool.target = e.target;
+      this.tool.alt = false;
     } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
       this.pushTool(this.sliderTool);
       this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;

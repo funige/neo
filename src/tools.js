@@ -9,6 +9,7 @@ Neo.ToolBase.prototype.startX = null;
 Neo.ToolBase.prototype.startY = null;
 Neo.ToolBase.prototype.type = null;
 Neo.ToolBase.prototype.step = 0;
+Neo.ToolBase.prototype.reverse = false;
 
 Neo.ToolBase.prototype.init = function (oe) {};
 Neo.ToolBase.prototype.kill = function (oe) {};
