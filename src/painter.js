@@ -756,18 +756,18 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   if (!this.isUIPaused()) {
     if (e.target["data-bar"]) {
       this.pushTool(this.handTool);
-      this.tool.reverse = false;
+      this.handTool.reverse = false;
     } else if (this.isSpaceDown && document.activeElement != this.inputText) {
       this.pushTool(this.handTool);
-      this.tool.reverse = true;
+      this.handTool.reverse = true;
     } else if (e.target["data-slider"] != undefined) {
       this.pushTool(this.sliderTool);
-      this.tool.target = e.target;
-      this.tool.alt = false;
+      this.sliderTool.target = e.target;
+      this.sliderTool.alt = false;
     } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
       this.pushTool(this.sliderTool);
-      this.tool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-      this.tool.alt = true;
+      this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
+      this.sliderTool.alt = true;
     } else if (this.isWidget(e.target)) {
       this.isMouseDown = false;
       this.pushTool(this.dummyTool);
