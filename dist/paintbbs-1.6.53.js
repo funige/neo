@@ -2760,6 +2760,7 @@ Neo.Painter.prototype._stabilizer = function (e) {
   const rawY = this.mouseY;
   const freeHandMode = this.drawType === 0;
 
+  console.log();
   const toolTypes = [
     Neo.Painter.TOOLTYPE_PEN,
     Neo.Painter.TOOLTYPE_ERASER,
@@ -2778,12 +2779,18 @@ Neo.Painter.prototype._stabilizer = function (e) {
   if (this.isMouseDown) {
     // 手ぶれ補正の強さ
     // 補正なし 0.0 最強 0.99
-    const level = Neo.stabiliz_level;
+    const level = Math.max(0, Math.min(Neo.stabiliz_level, 5));
     //手ぶれ補正のレベルを6段階に分けたテーブル
     //0で補正なし、5で最強
     // [0:無効, 1:0.55, 2:0.8, 3:0.85, 4:0.9, 5:0.96]
-    const stabilityTable = [0.0, 0.55, 0.8, 0.85, 0.9, 0.96];
-    const stability = stabilityTable[Math.max(0, Math.min(level, 5))];
+    //等倍･縮小時の補正レベル
+    const stabilityTable1 = [0.0, 0.55, 0.8, 0.85, 0.9, 0.96];
+    const stability1 = stabilityTable1[level];
+    //拡大時の補正レベル
+    // [0:無効, 1:0.3, 2:0.5, 3:0.7, 4:0.8, 5:0.85]
+    const stabilityTable2 = [0.0, 0.3, 0.5, 0.7, 0.8, 0.85];
+    const stability2 = stabilityTable2[level];
+    const stability = this.zoom <= 1 ? stability1 : stability2;
     const factor = 1.0 - stability;
 
     // stabilizedX が未定義なら現在の位置で初期化
