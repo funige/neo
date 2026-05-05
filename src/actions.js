@@ -806,25 +806,30 @@ Neo.initViewer = function (pch) {
   const viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
     window.innerHeight < pageHeight + 100;
-
-  painter.style.marginTop = "0";
-  painter.style.position = "absolute";
-  painter.style.padding = "0";
-  painter.style.bottom = viewerWrapperOnTop ? 0 : dy + 26 + "px";
-  painter.style.left = dx + "px";
+  if (painter) {
+    painter.style.marginTop = "0";
+    painter.style.position = "absolute";
+    painter.style.padding = "0";
+    painter.style.bottom = viewerWrapperOnTop ? "0" : dy + 26 + "px";
+    painter.style.left = dx + "px";
+  }
 
   var viewerButtonsWrapper = document.getElementById(
     "neo-viewerButtonsWrapper",
   );
-  viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
-  viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
-  viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0px" : "";
+  if (viewerButtonsWrapper) {
+    viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
+    viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
+    viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0" : "";
+  }
 
   var viewerBar = document.getElementById("neo-viewerBar");
-  viewerBar.style.position = "absolute";
-  viewerBar.style.right = "2px";
-  viewerBar.style.top = "1px";
-  viewerBar.style.width = pageWidth - 24 * 6 - 2 + "px";
+  if (viewerBar) {
+    viewerBar.style.position = "absolute";
+    viewerBar.style.right = "2px";
+    viewerBar.style.top = "1px";
+    viewerBar.style.width = pageWidth - 24 * 6 - 2 + "px";
+  }
 
   Neo.canvas.style.width = Neo.config.width + "px";
   Neo.canvas.style.height = Neo.config.height + "px";

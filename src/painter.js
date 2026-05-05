@@ -2825,27 +2825,28 @@ Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
             var a1x = a1;
             var ax = 1 + a0 * (1 - a1x);
 
-            var r = (r1 + r0 * a0 * (1 - a1x)) / ax;
-            var g = (g1 + g0 * a0 * (1 - a1x)) / ax;
-            var b = (b1 + b0 * a0 * (1 - a1x)) / ax;
+            let r = (r1 + r0 * a0 * (1 - a1x)) / ax;
+            let g = (g1 + g0 * a0 * (1 - a1x)) / ax;
+            let b = (b1 + b0 * a0 * (1 - a1x)) / ax;
 
             r = r1 > r0 ? Math.ceil(r) : Math.floor(r);
             g = g1 > g0 ? Math.ceil(g) : Math.floor(g);
             b = b1 > b0 ? Math.ceil(b) : Math.floor(b);
+
+            var tmp = a * 255;
+            a = Math.ceil(tmp);
+
+            buf8[index + 0] = r;
+            buf8[index + 1] = g;
+            buf8[index + 2] = b;
+            buf8[index + 3] = a;
           }
-
-          var tmp = a * 255;
-          a = Math.ceil(tmp);
-
-          buf8[index + 0] = r;
-          buf8[index + 1] = g;
-          buf8[index + 2] = b;
-          buf8[index + 3] = a;
         }
       }
       index += 4;
     }
   }
+  //透明なピクセルの場合はもとのbuf8が入る
   imageData.data.set(buf8);
   ctx.putImageData(imageData, x, y);
 };
@@ -2898,13 +2899,13 @@ Neo.Painter.prototype.ellipseMask = function (x, y, width, height) {
  */
 
 Neo.Painter.prototype.getDestCanvasPosition = function (
-  mx,
-  my,
+  _mx,
+  _my,
   isClip,
   isCenter,
 ) {
-  var mx = Math.floor(mx); //Math.round(mx);
-  var my = Math.floor(my); //Math.round(my);
+  var mx = Math.floor(_mx); //Math.round(mx);
+  var my = Math.floor(_my); //Math.round(my);
   if (isCenter) {
     mx += 0.499;
     my += 0.499;
