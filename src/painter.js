@@ -630,6 +630,20 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
   if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
     if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
     if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
+    //鉛筆
+    if (key == "b") this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
+    //水彩
+    if (key == "w") this.setToolByType(Neo.Painter.TOOLTYPE_BRUSH);
+    //消しゴム
+    if (key == "e") this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
+    //全消し
+    if (
+      document.activeElement != this.inputText &&
+      ["delete", "backspace"].includes(key)
+    ) {
+      this._pushUndo();
+      this._actionMgr.eraseAll();
+    }
   }
 
   if (this.tool.keyDownHandler) {
@@ -849,9 +863,7 @@ Neo.Painter.prototype.getPosition = function (e) {
 };
 
 // 手ぶれ補正
-Neo.Painter.prototype._stabilizer = function (e) {
-  const rawX = this.mouseX;
-  const rawY = this.mouseY;
+Neo.Painter.prototype._stabilizer = function () {
   const freeHandMode = this.drawType === 0;
 
   const toolTypes = [
@@ -899,8 +911,6 @@ Neo.Painter.prototype._stabilizer = function (e) {
     // マウスを離している時はリセット
     this.stabilizedX = null;
     this.stabilizedY = null;
-    this.mouseX = rawX;
-    this.mouseY = rawY;
   }
 };
 
@@ -931,7 +941,7 @@ Neo.Painter.prototype._updateMousePosition = function (e) {
   }
 
   //手ぶれ補正
-  this._stabilizer(e);
+  this._stabilizer();
 
   /*
      this.slowX = this.slowX * 0.8 + this.mouseX * 0.2;
