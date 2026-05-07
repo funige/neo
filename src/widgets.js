@@ -142,8 +142,6 @@ Neo.Button.prototype.update = function () {};
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton = null;
-
 Neo.RightButton = function () {
   this.params = null;
   this.element = null;
@@ -217,6 +215,7 @@ Neo.ColorTip = function () {
   this.name = "";
   this.selected = false;
   this.isMouseDown = false;
+  this.color = null;
 };
 Neo.ColorTip.prototype.init = function (name, params) {
   this.element = document.getElementById(name);
@@ -629,7 +628,8 @@ Neo.Pen2Tip.prototype.update = function () {
 
   switch (this.tools[this.mode]) {
     case Neo.Painter.TOOLTYPE_TONE:
-      this.drawTone(Neo.painter.foregroundColor);
+      // this.drawTone(Neo.painter.foregroundColor);
+      this.drawTone();
       break;
 
     case Neo.Painter.TOOLTYPE_DODGE:
