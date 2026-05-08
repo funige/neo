@@ -23,7 +23,7 @@ Neo.getModifier = function (e) {
 Neo.Button = function () {
   this.element = null;
   this.params = null;
-  this.name = "";
+  this.elementID = "";
   this.selected = false;
   this.isMouseDown = false;
   this.disable = function () {};
@@ -38,10 +38,10 @@ Neo.Button = function () {
   /** @type {((Button: Neo.Button) => void) | null} */
   this.onmouseout = null;
 };
-Neo.Button.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.Button.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
   this.selected = false;
   this.isMouseDown = false;
 
@@ -143,19 +143,21 @@ Neo.Button.prototype.update = function () {};
 */
 
 Neo.RightButton = function () {
+  Neo.Button.call(this);
   this.params = null;
   this.element = null;
   this.selected = "";
 };
-Neo.RightButton.prototype = new Neo.Button();
+Neo.RightButton.prototype = Object.create(Neo.Button.prototype);
+Neo.RightButton.prototype.constructor = Neo.RightButton;
 
 /**
- * @param {any} name
+ * @param {any} elementID
  * @param {any} params
  * @returns {any}
  */
-Neo.RightButton.prototype.init = function (name, params) {
-  Neo.Button.prototype.init.call(this, name, params);
+Neo.RightButton.prototype.init = function (elementID, params) {
+  Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
   return this;
 };
@@ -192,11 +194,14 @@ Neo.RightButton.clear = function () {
 
 Neo.FillButton;
 
-Neo.FillButton = function () {};
-Neo.FillButton.prototype = new Neo.Button();
+Neo.FillButton = function () {
+  Neo.Button.call(this);
+};
+Neo.FillButton.prototype = Object.create(Neo.Button.prototype);
+Neo.FillButton.prototype.constructor = Neo.FillButton;
 
-Neo.FillButton.prototype.init = function (name, params) {
-  Neo.Button.prototype.init.call(this, name, params);
+Neo.FillButton.prototype.init = function (elementID, params) {
+  Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "fill";
   return this;
 };
@@ -212,17 +217,17 @@ Neo.colorTips = [];
 Neo.ColorTip = function () {
   this.element = null;
   this.params = null;
-  this.name = "";
+  this.elementID = "";
   this.selected = false;
   this.isMouseDown = false;
   this.color = null;
 };
-Neo.ColorTip.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.ColorTip.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
 
-  this.selected = this.name == "neo-color1" ? true : false;
+  this.selected = this.elementID == "neo-color1" ? true : false;
   this.isMouseDown = false;
 
   var ref = this;
@@ -256,7 +261,7 @@ Neo.ColorTip.prototype.init = function (name, params) {
 
   this.element.className = "colorTipOff";
 
-  var index = parseInt(this.name.slice(9)) - 1; // "neo-color"なので9文字目
+  var index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
   this.element.style.left = index % 2 ? "0px" : "26px";
   this.element.style.top = Math.floor(index / 2) * 21 + "px";
 
@@ -350,7 +355,7 @@ Neo.toolButtons = [];
 Neo.ToolTip = function () {
   this.element = null;
   this.params = null;
-  this.name = "";
+  this.elementID = "";
   this.mode = 0;
   this.isMouseDown = false;
   this.onmousedown = null;
@@ -361,11 +366,11 @@ Neo.ToolTip = function () {
 
 Neo.ToolTip.prototype.prevMode = -1;
 
-Neo.ToolTip.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.ToolTip.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
   this.params.type = this.element.id;
-  this.name = name;
+  this.elementID = elementID;
   this.mode = 0;
 
   this.isMouseDown = false;
@@ -544,8 +549,11 @@ Neo.ToolTip.tone =
 
 Neo.penTip;
 
-Neo.PenTip = function () {};
-Neo.PenTip.prototype = new Neo.ToolTip();
+Neo.PenTip = function () {
+  Neo.ToolTip.call(this);
+};
+Neo.PenTip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.PenTip.prototype.constructor = Neo.PenTip;
 
 Neo.PenTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_PEN,
@@ -560,14 +568,14 @@ Neo.PenTip.prototype.toolIcons = [
   Neo.ToolTip.text,
 ];
 
-Neo.PenTip.prototype.init = function (name, params) {
+Neo.PenTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("鉛筆"),
     Neo.translate("水彩"),
     Neo.translate("ﾃｷｽﾄ"),
   ];
   this.isTool = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
   return this;
 };
 
@@ -590,8 +598,11 @@ Neo.PenTip.prototype.update = function () {
 
 Neo.pen2Tip;
 
-Neo.Pen2Tip = function () {};
-Neo.Pen2Tip.prototype = new Neo.ToolTip();
+Neo.Pen2Tip = function () {
+  Neo.ToolTip.call(this);
+};
+Neo.Pen2Tip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.Pen2Tip.prototype.constructor = Neo.Pen2Tip;
 
 Neo.Pen2Tip.prototype.tools = [
   Neo.Painter.TOOLTYPE_TONE,
@@ -608,7 +619,7 @@ Neo.Pen2Tip.prototype.toolIcons = [
   Neo.ToolTip.burn,
 ];
 
-Neo.Pen2Tip.prototype.init = function (name, params) {
+Neo.Pen2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("トーン"),
     Neo.translate("ぼかし"),
@@ -617,7 +628,7 @@ Neo.Pen2Tip.prototype.init = function (name, params) {
   ];
 
   this.isTool = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
   return this;
 };
 
@@ -688,8 +699,11 @@ Neo.Pen2Tip.prototype.drawTone = function () {
 
 Neo.eraserTip;
 
-Neo.EraserTip = function () {};
-Neo.EraserTip.prototype = new Neo.ToolTip();
+Neo.EraserTip = function () {
+  Neo.ToolTip.call(this);
+};
+Neo.EraserTip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.EraserTip.prototype.constructor = Neo.EraserTip;
 
 Neo.EraserTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_ERASER,
@@ -697,7 +711,7 @@ Neo.EraserTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_ERASEALL,
 ];
 
-Neo.EraserTip.prototype.init = function (name, params) {
+Neo.EraserTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("消しペン"),
     Neo.translate("消し四角"),
@@ -706,7 +720,7 @@ Neo.EraserTip.prototype.init = function (name, params) {
 
   this.drawOnce = false;
   this.isTool = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
   return this;
 };
 
@@ -743,8 +757,11 @@ Neo.EraserTip.prototype.draw = function () {
 
 Neo.effectTip;
 
-Neo.EffectTip = function () {};
-Neo.EffectTip.prototype = new Neo.ToolTip();
+Neo.EffectTip = function () {
+  Neo.ToolTip.call(this);
+};
+Neo.EffectTip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.EffectTip.prototype.constructor = Neo.EffectTip;
 
 Neo.EffectTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_RECTFILL,
@@ -761,7 +778,7 @@ Neo.EffectTip.prototype.toolIcons = [
   Neo.ToolTip.ellipse,
 ];
 
-Neo.EffectTip.prototype.init = function (name, params) {
+Neo.EffectTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("四角"),
     Neo.translate("線四角"),
@@ -770,7 +787,7 @@ Neo.EffectTip.prototype.init = function (name, params) {
   ];
 
   this.isTool = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
   return this;
 };
 
@@ -791,8 +808,11 @@ Neo.EffectTip.prototype.update = function () {
 
 Neo.effect2Tip;
 
-Neo.Effect2Tip = function () {};
-Neo.Effect2Tip.prototype = new Neo.ToolTip();
+Neo.Effect2Tip = function () {
+  Neo.ToolTip.call(this);
+};
+Neo.Effect2Tip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.Effect2Tip.prototype.constructor = Neo.Effect2Tip;
 
 Neo.Effect2Tip.prototype.tools = [
   Neo.Painter.TOOLTYPE_COPY,
@@ -813,7 +833,7 @@ Neo.Effect2Tip.prototype.toolIcons = [
   Neo.ToolTip.flip,
 ];
 
-Neo.Effect2Tip.prototype.init = function (name, params) {
+Neo.Effect2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("コピー"),
     Neo.translate("ﾚｲﾔ結合"),
@@ -824,7 +844,7 @@ Neo.Effect2Tip.prototype.init = function (name, params) {
   ];
 
   this.isTool = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
 
   this.img = document.createElement("img");
   this.img.src = Neo.ToolTip.copy2;
@@ -850,13 +870,15 @@ Neo.Effect2Tip.prototype.update = function () {
 Neo.maskTip;
 
 Neo.MaskTip = function () {
+  Neo.ToolTip.call(this);
   this.isMouseDown = false;
   this.onmousedown = null;
   this.canvas = null;
 };
-Neo.MaskTip.prototype = new Neo.ToolTip();
+Neo.MaskTip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.MaskTip.prototype.constructor = Neo.MaskTip;
 
-Neo.MaskTip.prototype.init = function (name, params) {
+Neo.MaskTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("通常"),
     Neo.translate("マスク"),
@@ -866,7 +888,7 @@ Neo.MaskTip.prototype.init = function (name, params) {
   ];
 
   this.fixed = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
   return this;
 };
 
@@ -910,8 +932,11 @@ Neo.MaskTip.prototype.draw = function (c) {
 
 Neo.drawTip;
 
-Neo.DrawTip = function () {};
-Neo.DrawTip.prototype = new Neo.ToolTip();
+Neo.DrawTip = function () {
+  Neo.ToolTip.call(this);
+};
+Neo.DrawTip.prototype = Object.create(Neo.ToolTip.prototype);
+Neo.DrawTip.prototype.constructor = Neo.DrawTip;
 
 Neo.DrawTip.prototype.hasTintImage = true;
 Neo.DrawTip.prototype.toolIcons = [
@@ -920,7 +945,7 @@ Neo.DrawTip.prototype.toolIcons = [
   Neo.ToolTip.bezier,
 ];
 
-Neo.DrawTip.prototype.init = function (name, params) {
+Neo.DrawTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("手書き"),
     Neo.translate("直線"),
@@ -928,7 +953,7 @@ Neo.DrawTip.prototype.init = function (name, params) {
   ];
 
   this.fixed = true;
-  Neo.ToolTip.prototype.init.call(this, name, params);
+  Neo.ToolTip.prototype.init.call(this, elementID, params);
   return this;
 };
 
@@ -966,10 +991,10 @@ Neo.sliders = [];
 
 Neo.ColorSlider = function () {};
 
-Neo.ColorSlider.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.ColorSlider.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
   this.isMouseDown = false;
   this.value = 0;
   this.type = this.params.type;
@@ -1124,10 +1149,10 @@ Neo.ColorSlider.prototype.update = function () {
 
 Neo.SizeSlider = function () {};
 
-Neo.SizeSlider.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.SizeSlider.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
   this.isMouseDown = false;
   this.value = this.value0 = 1;
 
@@ -1237,10 +1262,10 @@ Neo.SizeSlider.prototype.update = function () {
 */
 
 Neo.LayerControl = function () {};
-Neo.LayerControl.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.LayerControl.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
   this.isMouseDown = false;
 
   var ref = this;
@@ -1319,10 +1344,10 @@ Neo.LayerControl.prototype.update = function () {
 Neo.reserveControls = [];
 
 Neo.ReserveControl = function () {};
-Neo.ReserveControl.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.ReserveControl.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
 
   var ref = this;
 
@@ -1340,7 +1365,7 @@ Neo.ReserveControl.prototype.init = function (name, params) {
 
   this.element.className = "reserve";
 
-  var index = parseInt(this.name.slice(11)) - 1; //neo-reserve なので11文字目
+  var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
   this.element.style.top = "1px";
   this.element.style.left = index * 15 + 2 + "px";
 
@@ -1400,23 +1425,23 @@ Neo.scrollH;
 Neo.scrollV;
 
 Neo.ScrollBarButton = function () {};
-Neo.ScrollBarButton.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.ScrollBarButton.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
 
   this.element.innerHTML = "<div></div>";
   this.barButton = this.element.getElementsByTagName("div")[0];
   this.element["data-bar"] = true;
   this.barButton["data-bar"] = true;
 
-  if (name == "neo-scrollH") Neo.scrollH = this;
-  if (name == "neo-scrollV") Neo.scrollV = this;
+  if (elementID == "neo-scrollH") Neo.scrollH = this;
+  if (elementID == "neo-scrollV") Neo.scrollV = this;
   return this;
 };
 
 Neo.ScrollBarButton.prototype.update = function (oe) {
-  if (this.name == "neo-scrollH") {
+  if (this.elementID == "neo-scrollH") {
     var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
     var barWidth = Math.ceil(oe.destCanvas.width * a);
     var barX = oe.scrollBarX * (oe.destCanvas.width - barWidth);
@@ -1437,15 +1462,18 @@ Neo.ScrollBarButton.prototype.update = function (oe) {
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton = function () {};
-Neo.ViewerButton.prototype = new Neo.Button();
+Neo.ViewerButton = function () {
+  Neo.Button.call(this);
+};
+Neo.ViewerButton.prototype = Object.create(Neo.Button.prototype);
+Neo.ViewerButton.prototype.constructor = Neo.ViewerButton;
 
 Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 
-Neo.ViewerButton.prototype.init = function (name, params) {
-  Neo.Button.prototype.init.call(this, name, params);
+Neo.ViewerButton.prototype.init = function (elementID, params) {
+  Neo.Button.prototype.init.call(this, elementID, params);
 
-  if (name != "neo-viewerSpeed") {
+  if (elementID != "neo-viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
     var ctx = this.canvas.getContext("2d", {
@@ -1459,7 +1487,8 @@ Neo.ViewerButton.prototype.init = function (name, params) {
       ctx.drawImage(img, 0, 0);
       Neo.tintImage(ctx, Neo.config.color_text);
     }.bind(this);
-    img.src = Neo.ViewerButton[name.toLowerCase().replace(/neo-viewer/, "")];
+    img.src =
+      Neo.ViewerButton[elementID.toLowerCase().replace(/neo-viewer/, "")];
   } else {
     this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>";
     this.update();
@@ -1468,7 +1497,7 @@ Neo.ViewerButton.prototype.init = function (name, params) {
 };
 
 Neo.ViewerButton.prototype.update = function () {
-  if (this.name == "neo-viewerSpeed") {
+  if (this.elementID == "neo-viewerSpeed") {
     var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
     this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
@@ -1503,7 +1532,7 @@ Neo.ViewerBar = function () {};
 Neo.ViewerBar.prototype.element = null;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.params = null;
-Neo.ViewerBar.prototype.name = null;
+Neo.ViewerBar.prototype.elementID = null;
 Neo.ViewerBar.prototype.isMouseDown = false;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.markElement = null;
@@ -1513,10 +1542,10 @@ Neo.ViewerBar.prototype.length = 0;
 Neo.ViewerBar.prototype.mark = 0;
 Neo.ViewerBar.prototype.seek = 0;
 
-Neo.ViewerBar.prototype.init = function (name, params) {
-  this.element = document.getElementById(name);
+Neo.ViewerBar.prototype.init = function (elementID, params) {
+  this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.name = name;
+  this.elementID = elementID;
   this.isMouseDown = false;
 
   this.element.style.display = "inline-block";

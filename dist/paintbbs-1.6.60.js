@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 var Neo = function () {};
 
-Neo.version = "1.6.59";
+Neo.version = "1.6.60";
 Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
