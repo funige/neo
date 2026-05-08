@@ -3560,7 +3560,7 @@ Neo.Painter.prototype.setPoint = function (
 
 Neo.Painter.prototype.setPenPoint = function (buf8, width, x, y) {
   var d = this._currentWidth;
-  var r0 = Math.floor(d / 2);
+  const r0 = Math.floor(d / 2);
   x -= r0;
   y -= r0;
 
@@ -3578,10 +3578,10 @@ Neo.Painter.prototype.setPenPoint = function (buf8, width, x, y) {
   for (var i = 0; i < d; i++) {
     for (var j = 0; j < d; j++) {
       if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-        var r0 = buf8[index + 0];
-        var g0 = buf8[index + 1];
-        var b0 = buf8[index + 2];
-        var a0 = buf8[index + 3] / 255.0;
+        let r0 = buf8[index + 0];
+        let g0 = buf8[index + 1];
+        let b0 = buf8[index + 2];
+        let a0 = buf8[index + 3] / 255.0;
 
         var a = a0 + a1 - a0 * a1;
         let r = r0,
@@ -3785,7 +3785,7 @@ Neo.Painter.prototype.setBlurPoint = function (buf8, width, x, y, x0, y0) {
 
 Neo.Painter.prototype.setDodgePoint = function (buf8, width, x, y) {
   var d = this._currentWidth;
-  var r0 = Math.floor(d / 2);
+  const r0 = Math.floor(d / 2);
   x -= r0;
   y -= r0;
 
@@ -3800,10 +3800,10 @@ Neo.Painter.prototype.setDodgePoint = function (buf8, width, x, y) {
   for (var i = 0; i < d; i++) {
     for (var j = 0; j < d; j++) {
       if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-        var r0 = buf8[index + 0];
-        var g0 = buf8[index + 1];
-        var b0 = buf8[index + 2];
-        var a0 = buf8[index + 3] / 255.0;
+        let r0 = buf8[index + 0];
+        let g0 = buf8[index + 1];
+        let b0 = buf8[index + 2];
+        let a0 = buf8[index + 3] / 255.0;
 
         if (a1 != 255.0) {
           var r1 = (r0 * 255) / (255 - a1);
@@ -3836,7 +3836,7 @@ Neo.Painter.prototype.setDodgePoint = function (buf8, width, x, y) {
 
 Neo.Painter.prototype.setBurnPoint = function (buf8, width, x, y) {
   var d = this._currentWidth;
-  var r0 = Math.floor(d / 2);
+  const r0 = Math.floor(d / 2);
   x -= r0;
   y -= r0;
 
@@ -3851,10 +3851,10 @@ Neo.Painter.prototype.setBurnPoint = function (buf8, width, x, y) {
   for (var i = 0; i < d; i++) {
     for (var j = 0; j < d; j++) {
       if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-        var r0 = buf8[index + 0];
-        var g0 = buf8[index + 1];
-        var b0 = buf8[index + 2];
-        var a0 = buf8[index + 3] / 255.0;
+        let r0 = buf8[index + 0];
+        let g0 = buf8[index + 1];
+        let b0 = buf8[index + 2];
+        let a0 = buf8[index + 3] / 255.0;
 
         if (a1 != 255.0) {
           var r1 = 255 - ((255 - r0) * 255) / (255 - a1);
@@ -7972,8 +7972,6 @@ Neo.Button.prototype.update = function () {};
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton = null;
-
 Neo.RightButton = function () {
   this.params = null;
   this.element = null;
@@ -8047,6 +8045,7 @@ Neo.ColorTip = function () {
   this.name = "";
   this.selected = false;
   this.isMouseDown = false;
+  this.color = null;
 };
 Neo.ColorTip.prototype.init = function (name, params) {
   this.element = document.getElementById(name);
@@ -8459,7 +8458,8 @@ Neo.Pen2Tip.prototype.update = function () {
 
   switch (this.tools[this.mode]) {
     case Neo.Painter.TOOLTYPE_TONE:
-      this.drawTone(Neo.painter.foregroundColor);
+      // this.drawTone(Neo.painter.foregroundColor);
+      this.drawTone();
       break;
 
     case Neo.Painter.TOOLTYPE_DODGE:
