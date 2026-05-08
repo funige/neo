@@ -1687,8 +1687,10 @@ Neo.setStabilizeLevel = function (level) {
 };
 
 /**
- * エイリアスの設定
- * 正しいスペルでも呼び出せるようにし、内部的には同じ関数を実行する
+ * エイリアス
+ * v1.6.58以前との互換性を維持するため
+ * 外部から呼び出す関数名がNeo.setStabilizLevel()でも、Neo.setStabilizeLevel()でも内部的には同じ関数を実行する
+ *
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
