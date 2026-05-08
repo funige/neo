@@ -1685,3 +1685,9 @@ Neo.setStabilizeLevel = function (level) {
   }
   Neo.stabilize_level = level;
 };
+
+/**
+ * エイリアス
+ * スペルミスの関数名がでも内部的には同じ関数を実行できるようにする
+ */
+Neo.setStabilizLevel = Neo.setStabilizeLevel;
