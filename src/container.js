@@ -42,8 +42,8 @@ Neo.updateUI = function () {};
 Neo.translate = function (str) {
   return str;
 };
-Neo.setStabilizLevel = function () {};
-Neo.stabiliz_level = 1;
+Neo.setStabilizeLevel = function () {};
+Neo.stabilize_level = 1;
 Neo.styleSheet = null;
 Neo.rules = null;
 Neo.config = {
@@ -1676,12 +1676,12 @@ Neo.setToolSide = function (side) {
   }
 };
 //手ぶれ補正の強さ
-Neo.setStabilizLevel = function (level) {
+Neo.setStabilizeLevel = function (level) {
   level = parseInt(level);
   if (isNaN(level) || level < 0) {
     level = 1; //デフォルトは1
   } else if (level > 5) {
     level = 5; //最大5
   }
-  Neo.stabiliz_level = level;
+  Neo.stabilize_level = level;
 };

@@ -884,7 +884,7 @@ Neo.Painter.prototype._stabilizer = function () {
   if (this.isMouseDown) {
     // 手ぶれ補正の強さ
     // 補正なし 0.0 最強 0.99
-    const level = Math.max(0, Math.min(Neo.stabiliz_level, 5));
+    const level = Math.max(0, Math.min(Neo.stabilize_level, 5));
     //手ぶれ補正のレベルを6段階に分けたテーブル
     //0で補正なし、5で最強
     // [0:無効, 1:0.55, 2:0.8, 3:0.85, 4:0.9, 5:0.96]
