@@ -188,9 +188,7 @@ Neo.dictionary = {
 Neo.translate = (function () {
   var language =
     (window.navigator.languages && window.navigator.languages[0]) ||
-    window.navigator.language ||
-    window.navigator.userLanguage ||
-    window.navigator.browserLanguage;
+    window.navigator.language;
 
   var lang = "en";
   for (var key in Neo.dictionary) {
