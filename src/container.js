@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
+/** @type {any} */
 var Neo = function () {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
@@ -294,7 +295,7 @@ Neo.initConfig = function (applet) {
 document.addEventListener("DOMContentLoaded", () => {
   // ピンチズーム検出
   Neo.isPinchZooming = function () {
-    if ("visualViewport" in window) {
+    if ("visualViewport" in window && window.visualViewport) {
       return window.visualViewport.scale > 1;
     } else {
       return document.documentElement.clientWidth > window.innerWidth;
@@ -687,6 +688,9 @@ Neo.backgroundImage = function () {
   var ctx = bgCanvas.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!ctx) {
+    return "";
+  }
   var imageData = ctx.getImageData(0, 0, 16, 16);
   var buf32 = new Uint32Array(imageData.data.buffer);
   var buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -697,7 +701,7 @@ Neo.backgroundImage = function () {
     }
   }
   imageData.data.set(buf8);
-  ctx?.putImageData(imageData, 0, 0);
+  ctx.putImageData(imageData, 0, 0);
   return bgCanvas.toDataURL("image/png");
 };
 
@@ -1070,12 +1074,16 @@ Neo.showWarning = function () {
   }
 
   var warning = document.getElementById("neoWarning");
-  if (warning) {
-    warning.innerHTML = str;
-    setTimeout(function () {
-      warning.style.opacity = "0";
-    }, 15000);
+  if (!warning) {
+    return;
   }
+  warning.innerHTML = str;
+  setTimeout(function () {
+    if (!warning) {
+      return;
+    }
+    warning.style.opacity = "0";
+  }, 15000);
 };
 
 /*

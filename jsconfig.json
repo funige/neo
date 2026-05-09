@@ -6,5 +6,4 @@
     "noImplicitAny": false, // 型が不明な場合にanyを許容する
     "noUnusedLocals": false, // 未使用変数の警告を消す
   },
-  "exclude": ["node_modules"]
 }

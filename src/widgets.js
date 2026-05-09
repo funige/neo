@@ -485,11 +485,11 @@ Neo.ToolTip.prototype.draw = function (c) {
       this.prevMode = this.mode;
 
       var img = new Image();
+      var ref = this;
       img.onload = function () {
-        var ref = this;
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawTintImage(ctx, img, c, 0, 0);
-      }.bind(this);
+        ctx.clearRect(0, 0, ref.canvas.width, ref.canvas.height);
+        ref.drawTintImage(ctx, img, c, 0, 0);
+      };
       img.src = this.toolIcons[this.mode];
     } else {
       Neo.tintImage(ctx, c);
