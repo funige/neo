@@ -702,16 +702,16 @@ Neo.ActionManager.prototype.restore = function () {
   if (typeof arguments[0] != "object") {
     this.push("restore");
 
-    var img0 = oe.canvas[0].toDataURL("image/png");
-    var img1 = oe.canvas[1].toDataURL("image/png");
-    this.push(img0, img1);
+    const _img0 = oe.canvas[0].toDataURL("image/png");
+    const _img1 = oe.canvas[1].toDataURL("image/png");
+    this.push(_img0, _img1);
   } else {
     var item = arguments[0];
     var callback = arguments[1];
 
-    var img0 = new Image();
+    const img0 = new Image();
+    const img1 = new Image();
     img0.onload = function () {
-      var img1 = new Image();
       img1.onload = function () {
         oe.canvasCtx[0].clearRect(0, 0, width, height);
         oe.canvasCtx[1].clearRect(0, 0, width, height);
@@ -776,7 +776,9 @@ Neo.createViewer = function (applet) {
 
   // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
   setTimeout(function () {
-    var tmp = document.getElementsByClassName("NEO");
+    /** @type {NodeListOf<HTMLElement>} */
+    const tmp = document.querySelectorAll(".NEO");
+
     if (tmp.length > 1) {
       for (var i = 1; i < tmp.length; i++) {
         tmp[i].style.display = "none";
@@ -1041,7 +1043,9 @@ Neo.decodePCH = function (rawdata) {
   var byteArray = new Uint8Array(rawdata);
   var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
   var header = byteArray.subarray(0, 12);
-
+  if (!data) {
+    throw new Error("Failed to decompress data");
+  }
   if (
     header[0] == "N".charCodeAt(0) &&
     header[1] == "E".charCodeAt(0) &&
