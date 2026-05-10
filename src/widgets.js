@@ -1482,7 +1482,6 @@ Neo.ViewerButton.prototype.init = function (elementID, params) {
 
     var img = new Image();
     img.onload = function () {
-      var ref = this;
       ctx.clearRect(0, 0, 24, 24);
       ctx.drawImage(img, 0, 0);
       Neo.tintImage(ctx, Neo.config.color_text);

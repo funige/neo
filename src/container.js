@@ -85,11 +85,10 @@ Neo.init = function () {
     'applet[code*=".class" i], applet[archive*=".jar" i]',
   );
   if (applets.length == 0) {
-    applets = document.getElementsByTagName("applet-dummy");
+    applets = document.querySelectorAll("applet-dummy");
   }
 
-  for (var i = 0; i < applets.length; i++) {
-    var applet = applets[i];
+  for (const applet of applets) {
     var name = applet.getAttribute("name");
 
     if (name == "paintbbs" || name == "pch") {
@@ -1037,8 +1036,8 @@ Neo.start = function (isApp) {
       var ipc = require("electron").ipcRenderer;
       ipc.sendToHost("neo-status", "ok");
     } else {
-      if (document.paintBBSCallback) {
-        document.paintBBSCallback("start");
+      if (document["paintBBSCallback"]) {
+        document["paintBBSCallback"]("start");
       }
     }
   }
@@ -1279,13 +1278,13 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
   var headerString = Neo.str_header || "";
 
-  if (document.paintBBSCallback) {
-    var result = document.paintBBSCallback("check");
+  if (document["paintBBSCallback"]) {
+    var result = document["paintBBSCallback"]("check");
     if (result == 0 || result == "false") {
       return;
     }
 
-    result = document.paintBBSCallback("header");
+    result = document["paintBBSCallback"]("header");
     if (result && typeof result == "string") {
       headerString = result;
     }
@@ -1340,6 +1339,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
       }
     }
   }
+  /** @type {FormData | null} */
   let formData = null;
   if (Neo.config.neo_send_with_formdata == "true") {
     formData = new FormData();
@@ -1640,7 +1640,9 @@ Neo.createContainer = function (applet) {
 
   // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
   setTimeout(function () {
-    var tmp = document.getElementsByClassName("NEO");
+    /** @type {NodeListOf<HTMLElement>} */
+    const tmp = document.querySelectorAll(".NEO");
+
     if (tmp.length > 1) {
       for (var i = 1; i < tmp.length; i++) {
         tmp[i].style.display = "none";

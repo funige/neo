@@ -1323,8 +1323,8 @@ Neo.Painter.prototype.getThumbnail = function (type) {
     var dataURL = image.toDataURL("image/" + type);
     return this.dataURLtoBlob(dataURL);
   } else {
-    var data = JSON.stringify(this._actionMgr._items);
-    data = LZString.compressToUint8Array(data);
+    const jsonString = JSON.stringify(this._actionMgr._items);
+    const data = LZString.compressToUint8Array(jsonString);
 
     var magic = "NEO ";
     var w = this.canvasWidth;

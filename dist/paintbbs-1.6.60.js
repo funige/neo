@@ -85,11 +85,10 @@ Neo.init = function () {
     'applet[code*=".class" i], applet[archive*=".jar" i]',
   );
   if (applets.length == 0) {
-    applets = document.getElementsByTagName("applet-dummy");
+    applets = document.querySelectorAll("applet-dummy");
   }
 
-  for (var i = 0; i < applets.length; i++) {
-    var applet = applets[i];
+  for (const applet of applets) {
     var name = applet.getAttribute("name");
 
     if (name == "paintbbs" || name == "pch") {
@@ -1037,8 +1036,8 @@ Neo.start = function (isApp) {
       var ipc = require("electron").ipcRenderer;
       ipc.sendToHost("neo-status", "ok");
     } else {
-      if (document.paintBBSCallback) {
-        document.paintBBSCallback("start");
+      if (document["paintBBSCallback"]) {
+        document["paintBBSCallback"]("start");
       }
     }
   }
@@ -1279,13 +1278,13 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
   var headerString = Neo.str_header || "";
 
-  if (document.paintBBSCallback) {
-    var result = document.paintBBSCallback("check");
+  if (document["paintBBSCallback"]) {
+    var result = document["paintBBSCallback"]("check");
     if (result == 0 || result == "false") {
       return;
     }
 
-    result = document.paintBBSCallback("header");
+    result = document["paintBBSCallback"]("header");
     if (result && typeof result == "string") {
       headerString = result;
     }
@@ -1340,6 +1339,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
       }
     }
   }
+  /** @type {FormData | null} */
   let formData = null;
   if (Neo.config.neo_send_with_formdata == "true") {
     formData = new FormData();
@@ -1640,7 +1640,9 @@ Neo.createContainer = function (applet) {
 
   // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
   setTimeout(function () {
-    var tmp = document.getElementsByClassName("NEO");
+    /** @type {NodeListOf<HTMLElement>} */
+    const tmp = document.querySelectorAll(".NEO");
+
     if (tmp.length > 1) {
       for (var i = 1; i < tmp.length; i++) {
         tmp[i].style.display = "none";
@@ -3237,8 +3239,8 @@ Neo.Painter.prototype.getThumbnail = function (type) {
     var dataURL = image.toDataURL("image/" + type);
     return this.dataURLtoBlob(dataURL);
   } else {
-    var data = JSON.stringify(this._actionMgr._items);
-    data = LZString.compressToUint8Array(data);
+    const jsonString = JSON.stringify(this._actionMgr._items);
+    const data = LZString.compressToUint8Array(jsonString);
 
     var magic = "NEO ";
     var w = this.canvasWidth;
@@ -7515,16 +7517,16 @@ Neo.ActionManager.prototype.restore = function () {
   if (typeof arguments[0] != "object") {
     this.push("restore");
 
-    var img0 = oe.canvas[0].toDataURL("image/png");
-    var img1 = oe.canvas[1].toDataURL("image/png");
-    this.push(img0, img1);
+    const _img0 = oe.canvas[0].toDataURL("image/png");
+    const _img1 = oe.canvas[1].toDataURL("image/png");
+    this.push(_img0, _img1);
   } else {
     var item = arguments[0];
     var callback = arguments[1];
 
-    var img0 = new Image();
+    const img0 = new Image();
+    const img1 = new Image();
     img0.onload = function () {
-      var img1 = new Image();
       img1.onload = function () {
         oe.canvasCtx[0].clearRect(0, 0, width, height);
         oe.canvasCtx[1].clearRect(0, 0, width, height);
@@ -7589,7 +7591,9 @@ Neo.createViewer = function (applet) {
 
   // NEOを組み込んだURLをアプリ版で開くとDOMツリーが2重にできて格好悪いので消しておく
   setTimeout(function () {
-    var tmp = document.getElementsByClassName("NEO");
+    /** @type {NodeListOf<HTMLElement>} */
+    const tmp = document.querySelectorAll(".NEO");
+
     if (tmp.length > 1) {
       for (var i = 1; i < tmp.length; i++) {
         tmp[i].style.display = "none";
@@ -7854,7 +7858,9 @@ Neo.decodePCH = function (rawdata) {
   var byteArray = new Uint8Array(rawdata);
   var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
   var header = byteArray.subarray(0, 12);
-
+  if (!data) {
+    throw new Error("Failed to decompress data");
+  }
   if (
     header[0] == "N".charCodeAt(0) &&
     header[1] == "E".charCodeAt(0) &&
@@ -9415,7 +9421,6 @@ Neo.ViewerButton.prototype.init = function (elementID, params) {
 
     var img = new Image();
     img.onload = function () {
-      var ref = this;
       ctx.clearRect(0, 0, 24, 24);
       ctx.drawImage(img, 0, 0);
       Neo.tintImage(ctx, Neo.config.color_text);
