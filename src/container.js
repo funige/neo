@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-/** @type {any} */
-var Neo = function () {};
+/** @type {object} */
+var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
 Neo.painter = null;

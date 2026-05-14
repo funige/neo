@@ -6,18 +6,20 @@
   -----------------------------------------------------------------------
 */
 
-Neo.ActionManager = function () {
-  this._items = [];
-  this._head = 0;
-  this._index = 0;
+Neo.ActionManager = class {
+  constructor() {
+    this._items = [];
+    this._head = 0;
+    this._index = 0;
 
-  this._pause = false;
-  this._mark = 0;
+    this._pause = false;
+    this._mark = 0;
 
-  this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
+    this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
 
-  Neo.speed = parseInt(Neo.config.speed || 0);
-  this._prevSpeed = Neo.speed;
+    Neo.speed = parseInt(Neo.config.speed || 0);
+    this._prevSpeed = Neo.speed;
+  }
 };
 
 Neo.ActionManager.prototype.speedMode = function () {
