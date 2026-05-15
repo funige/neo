@@ -1,8 +1,10 @@
 "use strict";
 
-Neo.Painter = function () {
-  this._undoMgr = new Neo.UndoManager(50);
-  this._actionMgr = new Neo.ActionManager();
+Neo.Painter = class {
+  constructor() {
+    this._undoMgr = new Neo.UndoManager(50);
+    this._actionMgr = new Neo.ActionManager();
+  }
 };
 
 Neo.Painter.prototype.container = null;

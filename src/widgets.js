@@ -20,23 +20,25 @@ Neo.getModifier = function (e) {
   -------------------------------------------------------------------------
 */
 
-Neo.Button = function () {
-  this.element = null;
-  this.params = null;
-  this.elementID = "";
-  this.selected = false;
-  this.isMouseDown = false;
-  this.disable = function () {};
-  this.enable = function () {};
+Neo.Button = class {
+  constructor() {
+    this.element = null;
+    this.params = null;
+    this.elementID = "";
+    this.selected = false;
+    this.isMouseDown = false;
+    this.disable = function () {};
+    this.enable = function () {};
 
-  /** @type {((Button: Neo.Button) => void) | null} */
-  this.onmousedown = null;
-  /** @type {((Button: Neo.Button) => void) | null} */
-  this.onmouseup = null;
-  /** @type {((Button: Neo.Button) => void) | null} */
-  this.onmouseover = null;
-  /** @type {((Button: Neo.Button) => void) | null} */
-  this.onmouseout = null;
+    /** @type {((Button: Neo.Button) => void) | null} */
+    this.onmousedown = null;
+    /** @type {((Button: Neo.Button) => void) | null} */
+    this.onmouseup = null;
+    /** @type {((Button: Neo.Button) => void) | null} */
+    this.onmouseover = null;
+    /** @type {((Button: Neo.Button) => void) | null} */
+    this.onmouseout = null;
+  }
 };
 Neo.Button.prototype.init = function (elementID, params) {
   this.element = document.getElementById(elementID);
@@ -142,15 +144,14 @@ Neo.Button.prototype.update = function () {};
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton = function () {
-  Neo.Button.call(this);
-  this.params = null;
-  this.element = null;
-  this.selected = "";
+Neo.RightButton = class extends Neo.Button {
+  constructor() {
+    super();
+    this.params = null;
+    this.element = null;
+    this.selected = false;
+  }
 };
-Neo.RightButton.prototype = Object.create(Neo.Button.prototype);
-Neo.RightButton.prototype.constructor = Neo.RightButton;
-
 /**
  * @param {any} elementID
  * @param {any} params
@@ -192,13 +193,11 @@ Neo.RightButton.clear = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.FillButton;
-
-Neo.FillButton = function () {
-  Neo.Button.call(this);
+Neo.FillButton = class extends Neo.Button {
+  constructor() {
+    super();
+  }
 };
-Neo.FillButton.prototype = Object.create(Neo.Button.prototype);
-Neo.FillButton.prototype.constructor = Neo.FillButton;
 
 Neo.FillButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
@@ -352,16 +351,18 @@ Neo.ColorTip.getCurrent = function () {
 Neo.toolTips = [];
 Neo.toolButtons = [];
 
-Neo.ToolTip = function () {
-  this.element = null;
-  this.params = null;
-  this.elementID = "";
-  this.mode = 0;
-  this.isMouseDown = false;
-  this.onmousedown = null;
-  this.onmouseup = null;
-  this.onmouseout = null;
-  this.onmouseover = null;
+Neo.ToolTip = class {
+  constructor() {
+    this.element = null;
+    this.params = null;
+    this.elementID = "";
+    this.mode = 0;
+    this.isMouseDown = false;
+    this.onmousedown = null;
+    this.onmouseup = null;
+    this.onmouseout = null;
+    this.onmouseover = null;
+  }
 };
 
 Neo.ToolTip.prototype.prevMode = -1;
@@ -547,14 +548,11 @@ Neo.ToolTip.tone =
   -------------------------------------------------------------------------
 */
 
-Neo.penTip;
-
-Neo.PenTip = function () {
-  Neo.ToolTip.call(this);
+Neo.PenTip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+  }
 };
-Neo.PenTip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.PenTip.prototype.constructor = Neo.PenTip;
-
 Neo.PenTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_PEN,
   Neo.Painter.TOOLTYPE_BRUSH,
@@ -596,13 +594,11 @@ Neo.PenTip.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.pen2Tip;
-
-Neo.Pen2Tip = function () {
-  Neo.ToolTip.call(this);
+Neo.Pen2Tip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+  }
 };
-Neo.Pen2Tip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.Pen2Tip.prototype.constructor = Neo.Pen2Tip;
 
 Neo.Pen2Tip.prototype.tools = [
   Neo.Painter.TOOLTYPE_TONE,
@@ -697,13 +693,11 @@ Neo.Pen2Tip.prototype.drawTone = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.eraserTip;
-
-Neo.EraserTip = function () {
-  Neo.ToolTip.call(this);
+Neo.EraserTip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+  }
 };
-Neo.EraserTip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.EraserTip.prototype.constructor = Neo.EraserTip;
 
 Neo.EraserTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_ERASER,
@@ -755,13 +749,11 @@ Neo.EraserTip.prototype.draw = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.effectTip;
-
-Neo.EffectTip = function () {
-  Neo.ToolTip.call(this);
+Neo.EffectTip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+  }
 };
-Neo.EffectTip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.EffectTip.prototype.constructor = Neo.EffectTip;
 
 Neo.EffectTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_RECTFILL,
@@ -806,13 +798,11 @@ Neo.EffectTip.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.effect2Tip;
-
-Neo.Effect2Tip = function () {
-  Neo.ToolTip.call(this);
+Neo.Effect2Tip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+  }
 };
-Neo.Effect2Tip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.Effect2Tip.prototype.constructor = Neo.Effect2Tip;
 
 Neo.Effect2Tip.prototype.tools = [
   Neo.Painter.TOOLTYPE_COPY,
@@ -867,16 +857,14 @@ Neo.Effect2Tip.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.maskTip;
-
-Neo.MaskTip = function () {
-  Neo.ToolTip.call(this);
-  this.isMouseDown = false;
-  this.onmousedown = null;
-  this.canvas = null;
+Neo.MaskTip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+    this.isMouseDown = false;
+    this.onmousedown = null;
+    this.canvas = null;
+  }
 };
-Neo.MaskTip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.MaskTip.prototype.constructor = Neo.MaskTip;
 
 Neo.MaskTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
@@ -930,13 +918,11 @@ Neo.MaskTip.prototype.draw = function (c) {
   -------------------------------------------------------------------------
 */
 
-Neo.drawTip;
-
-Neo.DrawTip = function () {
-  Neo.ToolTip.call(this);
+Neo.DrawTip = class extends Neo.ToolTip {
+  constructor() {
+    super();
+  }
 };
-Neo.DrawTip.prototype = Object.create(Neo.ToolTip.prototype);
-Neo.DrawTip.prototype.constructor = Neo.DrawTip;
 
 Neo.DrawTip.prototype.hasTintImage = true;
 Neo.DrawTip.prototype.toolIcons = [
@@ -1462,11 +1448,11 @@ Neo.ScrollBarButton.prototype.update = function (oe) {
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton = function () {
-  Neo.Button.call(this);
+Neo.ViewerButton = class extends Neo.Button {
+  constructor() {
+    super();
+  }
 };
-Neo.ViewerButton.prototype = Object.create(Neo.Button.prototype);
-Neo.ViewerButton.prototype.constructor = Neo.ViewerButton;
 
 Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 
