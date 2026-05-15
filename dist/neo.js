@@ -6712,7 +6712,9 @@ Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
 "use strict";
 
-Neo.CommandBase = function () {};
+Neo.CommandBase = class {
+  constructor() {}
+};
 Neo.CommandBase.prototype.data;
 Neo.CommandBase.prototype.execute = function () {};
 
@@ -6721,10 +6723,12 @@ Neo.CommandBase.prototype.execute = function () {};
     ZOOM
   ---------------------------------------------------
 */
-Neo.ZoomPlusCommand = function (data) {
-  this.data = data;
+Neo.ZoomPlusCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.ZoomPlusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomPlusCommand.prototype.execute = function () {
   if (this.data.zoom >= 1 && this.data.zoom < 12) {
     this.data.setZoom(this.data.zoom + 1);
@@ -6736,10 +6740,12 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
   // Neo.painter.updateDestCanvas();
 };
 
-Neo.ZoomMinusCommand = function (data) {
-  this.data = data;
+Neo.ZoomMinusCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.ZoomMinusCommand.prototype = new Neo.CommandBase();
 Neo.ZoomMinusCommand.prototype.execute = function () {
   if (this.data.zoom >= 2) {
     this.data.setZoom(this.data.zoom - 1);
@@ -6756,27 +6762,33 @@ Neo.ZoomMinusCommand.prototype.execute = function () {
     UNDO
   ---------------------------------------------------
 */
-Neo.UndoCommand = function (data) {
-  this.data = data;
+Neo.UndoCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.UndoCommand.prototype = new Neo.CommandBase();
 Neo.UndoCommand.prototype.execute = function () {
   this.data.cancelCopy();
   this.data.undo();
 };
 
-Neo.RedoCommand = function (data) {
-  this.data = data;
+Neo.RedoCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.RedoCommand.prototype = new Neo.CommandBase();
 Neo.RedoCommand.prototype.execute = function () {
   this.data.redo();
 };
 
-Neo.WindowCommand = function (data) {
-  this.data = data;
+Neo.WindowCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.WindowCommand.prototype = new Neo.CommandBase();
 Neo.WindowCommand.prototype.execute = function () {
   if (Neo.fullScreen) {
     if (confirm(Neo.translate("ページビュー？"))) {
@@ -6791,19 +6803,23 @@ Neo.WindowCommand.prototype.execute = function () {
   }
 };
 
-Neo.SubmitCommand = function (data) {
-  this.data = data;
+Neo.SubmitCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.SubmitCommand.prototype = new Neo.CommandBase();
 Neo.SubmitCommand.prototype.execute = function () {
   var board = location.href.replace(/[^/]*$/, "");
   this.data.submit(board);
 };
 
-Neo.CopyrightCommand = function (data) {
-  this.data = data;
+Neo.CopyrightCommand = class extends Neo.CommandBase {
+  constructor(data) {
+    super();
+    this.data = data;
+  }
 };
-Neo.CopyrightCommand.prototype = new Neo.CommandBase();
 Neo.CopyrightCommand.prototype.execute = function () {
   var url = "http://github.com/funige/neo/";
   if (
