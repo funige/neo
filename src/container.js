@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-/** @type {object} */
+/** @type {any} */
 var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
