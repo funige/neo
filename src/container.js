@@ -1033,6 +1033,7 @@ Neo.start = function (isApp) {
     Neo.container.style.visibility = "visible";
 
     if (Neo.isApp) {
+      // @ts-ignore
       var ipc = require("electron").ipcRenderer;
       ipc.sendToHost("neo-status", "ok");
     } else {
@@ -1260,6 +1261,7 @@ Neo.getSizeString = function (len) {
 
 Neo.openURL = function (url) {
   if (Neo.isApp) {
+    // @ts-ignore
     require("electron").shell.openExternal(url);
   } else {
     window.open(url, "_blank");
