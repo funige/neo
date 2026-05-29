@@ -1,4 +1,5 @@
 "use strict";
+//@ts-check
 
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
@@ -78,7 +79,10 @@ Neo.SLIDERTYPE_BLUE = 2;
 Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
 
-/** @type {any} */ (document).neo = Neo;
+/**
+ * 初期化
+ * @returns {boolean}
+ */
 Neo.init = function () {
   // 「appletタグ」でかつ「属性に .class か .jar を含む」もの
   let applets = document.querySelectorAll(
@@ -207,7 +211,9 @@ Neo.init2 = function () {
     false,
   );
 };
-
+/**
+ * 初期設定
+ */
 Neo.initConfig = function (applet) {
   if (applet) {
     var appletWidth = applet.attributes.width;
@@ -352,6 +358,11 @@ document.addEventListener("DOMContentLoaded", () => {
   Neo.add_touch_move_grid_control();
 });
 
+/**
+ *
+ * @param {string} value
+ * @returns {string}
+ */
 Neo.fixConfig = function (value) {
   // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
   if (value.match(/^#[0-9a-fA-F]{5}$/)) {
@@ -611,14 +622,35 @@ Neo.initSkin = function () {
   Neo.setToolSide(Neo.toolSide);
 };
 
+/**
+ * 動的にスタイルシートにCSSルールを追加する
+ * @param {string} selector - CSSセレクタ (例: "body", ".paint-canvas")
+ * @param {string} styleName - CSSプロパティ名 (例: "letter-spacing")
+ * @param {string|number} value - 設定する値 (例: "0px !important")
+ * @param {CSSStyleSheet} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
+ */
 Neo.addRule = function (selector, styleName, value, sheet) {
-  if (!sheet) sheet = Neo.styleSheet;
-  if (sheet.addRule) {
-    sheet.addRule(selector, styleName + ":" + value, sheet.rules.length);
-  } else if (sheet.insertRule) {
-    var rule = selector + "{" + styleName + ":" + value + "}";
-    var index = sheet.cssRules.length;
-    sheet.insertRule(rule, index);
+  // 1. 省略時はデフォルトの stylesheet を適用
+  if (!sheet) {
+    sheet = Neo.styleSheet;
+  }
+
+  if (!sheet) {
+    throw new Error("Neo.addRule: Stylesheet is undefined.");
+  }
+  try {
+    if (sheet?.insertRule) {
+      sheet.insertRule(
+        selector + " { " + styleName + ": " + value + "; }",
+        sheet.cssRules.length,
+      );
+    }
+  } catch (e) {
+    // スタイル定義の内容による例外（無視しても動作に影響がない場合が多い）
+    console.error(
+      "Neo.addRule: Failed to insert rule for '" + selector + "'.",
+      e,
+    );
   }
 };
 
@@ -629,33 +661,45 @@ Neo.readStyles = function () {
   }
 };
 
+/**
+ * スタイルシートからカラー設定を読み込んで Neo.rules に格納する
+ * @param {CSSStyleSheet} sheet
+ */
 Neo.readStyle = function (sheet) {
   try {
     var rules = sheet.cssRules;
     for (var i = 0; i < rules.length; i++) {
       var rule = rules[i];
-      if (rule.styleSheet) {
+
+      if (rule instanceof CSSImportRule && rule.styleSheet) {
         Neo.readStyle(rule.styleSheet);
         continue;
       }
 
-      var selector = rule.selectorText;
-      if (selector) {
-        selector = selector.replace(/^(.NEO\s+)?\./, "");
+      if (rule instanceof CSSStyleRule) {
+        var selector = rule.selectorText;
+        if (selector) {
+          selector = selector.replace(/^(.NEO\s+)?\./, "");
 
-        var css = rule.cssText || rule.style.cssText;
-        var result = css.match(/color:\s*(.*)\s*;/);
-        if (result) {
-          var hex = Neo.colorNameToHex(result[1]);
-          if (hex) {
-            Neo.rules[selector] = hex;
+          var css = rule.cssText || rule.style.cssText;
+          var result = css.match(/color:\s*(.*)\s*;/);
+
+          if (result) {
+            var hex = Neo.colorNameToHex(result[1]);
+            if (hex) {
+              Neo.rules[selector] = hex;
+            }
           }
         }
       }
     }
   } catch (e) {}
 };
-
+/**
+ * 指定された設定名に色を適用する
+ * @param {string} name
+ * @param {string} defaultColor
+ */
 Neo.applyStyle = function (name, defaultColor) {
   if (Neo.config[name] == undefined) {
     Neo.config[name] = Neo.rules[name] || defaultColor;
@@ -703,7 +747,12 @@ Neo.backgroundImage = function () {
   ctx.putImageData(imageData, 0, 0);
   return bgCanvas.toDataURL("image/png");
 };
-
+/**
+ * カラーコードに倍率を掛け合わせて、明度を調整したカラーコードを返す
+ * @param {string} c - 16進数のカラーコード
+ * @param {number} scale - 明度の倍率
+ * @returns {string} 変換後の16進数カラーコード
+ */
 Neo.multColor = function (c, scale) {
   const rNum = Math.round(parseInt(c.slice(1, 3), 16) * scale);
   const gNum = Math.round(parseInt(c.slice(3, 5), 16) * scale);
@@ -714,6 +763,11 @@ Neo.multColor = function (c, scale) {
   return "#" + r + g + b;
 };
 
+/**
+ * 色の名前やrgb表記の文字列を16進数のカラーコードに変換する
+ * @param {string} name - 色の名前（"red"等）または "rgb(r,g,b)" 形式の文字列
+ * @returns {string|boolean} 変換後のカラーコード（失敗時は false）
+ */
 Neo.colorNameToHex = function (name) {
   var colors = {
     aliceblue: "#f0f8ff",
@@ -1015,6 +1069,10 @@ Neo.initButtons = function () {
   new Neo.ScrollBarButton().init("neo-scrollV");
 };
 
+/**
+ * @param {boolean} isApp
+ * @returns {void}
+ */
 Neo.start = function (isApp) {
   if (Neo.viewer) return;
 
@@ -1112,6 +1170,10 @@ Neo.updateUI = function () {
   Neo.updateUIColor(true, false);
 };
 
+/**
+ * @param {boolean} updateSlider
+ * @param {boolean} updateColorTip
+ */
 Neo.updateUIColor = function (updateSlider, updateColorTip) {
   for (var i = 0; i < Neo.toolButtons.length; i++) {
     var toolTip = Neo.toolButtons[i];
@@ -1243,6 +1305,11 @@ Neo.resizeCanvas = function () {
    -----------------------------------------------------------------------
  */
 
+/**
+ * オブジェクトのシャローコピーを作成する
+ * @param {Record<string, any>} src - コピー元のオブジェクト
+ * @returns {Record<string, any>} コピーされた新しいオブジェクト
+ */
 Neo.clone = function (src) {
   var dst = {};
   for (var k in src) {
@@ -1251,12 +1318,15 @@ Neo.clone = function (src) {
   return dst;
 };
 
+/**
+ * 渡された値（サイズ等）を、パケット通信ヘッダー用に「8文字固定」のゼロ埋め文字列に変換する
+ * * @example
+ * Neo.getSizeString(125); // "00000125"（8文字に固定される）
+ * * @param {number|string} len - 変換したいデータサイズ（数値または文字列）
+ * @returns {string} 8文字にゼロパディングされた文字列
+ */
 Neo.getSizeString = function (len) {
-  var result = String(len);
-  while (result.length < 8) {
-    result = "0" + result;
-  }
-  return result;
+  return String(len).padStart(8, "0");
 };
 
 Neo.openURL = function (url) {
@@ -1276,6 +1346,13 @@ Neo.getAbsoluteURL = function (board, url) {
   }
 };
 
+/**
+ * 描画されたイラストデータ（および各種サムネイル、動画データ）をサーバーに投稿する
+ * @param {*} board - お絵かき掲示板の設定やコンテキストオブジェクト
+ * @param {Blob} blob - 投稿するメインのイラスト画像データ (PNG等)
+ * @param {Blob|null} thumbnail - 通常のサムネイル画像データ（無い場合は null）
+ * @param {Blob|null} thumbnail2 - アニメーション動画（PCH）データ（無い場合は null）
+ */
 Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
   var headerString = Neo.str_header || "";
@@ -1346,10 +1423,10 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   if (Neo.config.neo_send_with_formdata == "true") {
     formData = new FormData();
     formData.append("header", headerString);
-    formData.append("picture", blob, blob);
+    formData.append("picture", blob, "blob");
     let thumbnail_size = 0;
     if (thumbnail) {
-      formData.append("thumbnail", thumbnail, blob);
+      formData.append("thumbnail", thumbnail, "blob");
       thumbnail_size = thumbnail.size;
     }
     if (thumbnail2) {
@@ -1361,7 +1438,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
         Number(Neo.config.neo_max_pch) * 1024 * 1024 >
           headerString.length + blob.size + thumbnail_size + thumbnail2.size
       ) {
-        formData.append("pch", thumbnail2, blob);
+        formData.append("pch", thumbnail2, "blob");
       } else {
         thumbnail2 = null;
       }
@@ -1396,6 +1473,10 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
   var body = new Blob(array, { type: "application/" + subtype });
 
+  /**
+   * @param {string} path
+   * @param {FormData|Blob} data
+   */
   const postData = (path, data) => {
     var errorMessage = path + "\n";
 
@@ -1508,7 +1589,11 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 
   // データ送信処理
   const data = Neo.config.neo_send_with_formdata === "true" ? formData : body;
-  postData(url, data);
+  if (data) {
+    postData(url, data);
+  } else {
+    console.error("failed to post data");
+  }
 };
 
 /*
@@ -1528,6 +1613,10 @@ Neo.getColors = function () {
   //  return Neo.config.colors.join('\n');
 };
 
+/**
+ * パレット全体のカラーを一括で設定し、UIのカラーチップに反映する
+ * @param {string} colors - 改行区切りの16進数カラーコードの文字列（14色分）
+ */
 Neo.setColors = function (colors) {
   // console.log("setColors");
   var array = colors.split("\n");
@@ -1653,6 +1742,11 @@ Neo.createContainer = function (applet) {
   }, 0);
 };
 
+/**
+ * 指定されたCanvas上の画像の形（アルファチャンネル）を維持したまま、指定した単色に置き換える
+ * @param {CanvasRenderingContext2D} ctx - 対象となるCanvasの2Dコンテキスト
+ * @param {string|number} c - 置き換えたい新しい色（カラーコードまたは数値）
+ */
 Neo.tintImage = function (ctx, c) {
   c = Neo.painter.getColor(c) & 0xffffff;
 
@@ -1670,9 +1764,19 @@ Neo.tintImage = function (ctx, c) {
   ctx.putImageData(imageData, 0, 0);
 };
 
-Neo.setToolSide = function (side) {
-  if (side === "left") side = true;
-  if (side === "right") side = false;
+/**
+ * HTML側からの指定に基づきツールの位置を変更する
+ * @param {boolean|string} htmlConfiguredSide - HTMLタグ等で設定された外部からのサイド指定
+ */
+Neo.setToolSide = function (htmlConfiguredSide) {
+  let side;
+  if (htmlConfiguredSide === "left") {
+    side = true;
+  } else if (htmlConfiguredSide === "right") {
+    side = false;
+  } else {
+    side = htmlConfiguredSide;
+  }
   Neo.toolSide = !!side;
 
   if (!Neo.toolSide) {
@@ -1687,9 +1791,14 @@ Neo.setToolSide = function (side) {
     Neo.addRule(".NEO #neo-upper", "padding-right", "20px !important");
   }
 };
-//手ぶれ補正の強さ
-Neo.setStabilizeLevel = function (level) {
-  level = parseInt(level);
+
+/**
+ * 手ぶれ補正の強さ
+ * @param {Number|string} htmlConfigured
+ * @note 0-5の範囲 デフォルト1
+ */
+Neo.setStabilizeLevel = function (htmlConfigured) {
+  let level = parseInt(String(htmlConfigured));
   if (isNaN(level) || level < 0) {
     level = 1; //デフォルトは1
   } else if (level > 5) {

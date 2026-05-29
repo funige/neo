@@ -1,4 +1,5 @@
 "use strict";
+//@ts-check
 
 Neo.getModifier = function (e) {
   if (e.shiftKey) {
@@ -152,11 +153,6 @@ Neo.RightButton = class extends Neo.Button {
     this.selected = false;
   }
 };
-/**
- * @param {any} elementID
- * @param {any} params
- * @returns {any}
- */
 Neo.RightButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
@@ -1191,6 +1187,11 @@ Neo.SizeSlider.prototype.shift = function (x, y) {
   }
 };
 
+/**
+ * スライダーのドラッグ操作によりブラシサイズを更新する。
+ * @param {number} x - 相対X座標
+ * @param {number} y - 相対Y座標
+ */
 Neo.SizeSlider.prototype.slide = function (x, y) {
   var value;
   if (!Neo.painter.tool.alt) {

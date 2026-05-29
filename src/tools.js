@@ -1,4 +1,5 @@
 "use strict";
+//@ts-check
 
 Neo.ToolBase = class {
   constructor() {}
@@ -14,7 +15,7 @@ Neo.ToolBase.prototype.step = 0;
 Neo.ToolBase.prototype.reverse = false;
 
 Neo.ToolBase.prototype.init = function (oe) {};
-Neo.ToolBase.prototype.kill = function (oe) {};
+Neo.ToolBase.prototype.kill = function () {};
 Neo.ToolBase.prototype.transformForZoom = function (oe) {};
 Neo.ToolBase.prototype.lineType = Neo.Painter.LINETYPE_NONE;
 
@@ -1108,6 +1109,15 @@ Neo.EraseRectTool = class extends Neo.EffectToolBase {
 };
 Neo.EraseRectTool.prototype.type = Neo.Painter.TOOLTYPE_ERASERECT;
 
+/**
+ * 矩形消去ツールの実行
+ * @description
+ * @param {object} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
+ * @param {number} x - 開始X座標
+ * @param {number} y - 開始Y座標
+ * @param {number} width - 消去する幅
+ * @param {number} height - 消去する高さ
+ */
 Neo.EraseRectTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.eraseRect(ctx, x, y, width, height);
@@ -1475,6 +1485,13 @@ Neo.TextTool.prototype.upMoveHandler = function (oe) {};
 Neo.TextTool.prototype.rollOverHandler = function (oe) {};
 Neo.TextTool.prototype.rollOutHandler = function (oe) {};
 
+/**
+ * テキスト入力の確定処理
+ * @description
+ * ユーザーがテキスト入力中にEnterキーを押した際、
+ * 入力された内容をキャンバスに描画し、入力UIを終了する。
+ * @param {KeyboardEvent} e - キーボードイベント
+ */
 Neo.TextTool.prototype.keyDownHandler = function (e) {
   if (e.key == "Enter") {
     // Returnで確定
@@ -1513,7 +1530,7 @@ Neo.TextTool.prototype.keyDownHandler = function (e) {
   }
 };
 
-Neo.TextTool.prototype.kill = function (oe) {
+Neo.TextTool.prototype.kill = function () {
   Neo.painter.hideInputText();
 };
 
