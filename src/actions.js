@@ -163,33 +163,26 @@ Neo.ActionManager.prototype.play = function () {
   var ref = this;
   var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
-  this[func](
-    item,
-    /**
-     * 描画関数側からトリガーされる、同期・進行管理用のコールバック
-     * @param {boolean} result - 描画処理が成功したかどうか
-     * @returns {void}
-     */ function (result) {
-      if (result) {
-        if (
-          Neo.painter.busySkipped &&
-          ref._head < ref._mark - 2 &&
-          ref._mark - 2 >= 0 &&
-          ref._items[ref._mark - 1][0] == "restore"
-        ) {
-          ref._head = ref._mark - 2;
-        } else {
-          ref._head++;
-        }
-        ref._index = 0;
-        ref._prevSpeed = Neo.speed;
+  this[func](item, function (result) {
+    if (result) {
+      if (
+        Neo.painter.busySkipped &&
+        ref._head < ref._mark - 2 &&
+        ref._mark - 2 >= 0 &&
+        ref._items[ref._mark - 1][0] == "restore"
+      ) {
+        ref._head = ref._mark - 2;
+      } else {
+        ref._head++;
       }
+      ref._index = 0;
+      ref._prevSpeed = Neo.speed;
+    }
 
-      setTimeout(function () {
-        Neo.painter._actionMgr.play();
-      }, wait);
-    },
-  );
+    setTimeout(function () {
+      Neo.painter._actionMgr.play();
+    }, wait);
+  });
 };
 /*
 -------------------------------------------------------------------------
@@ -390,12 +383,9 @@ Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
  * @param {string} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
-  const oe = Neo.painter;
-  let layer = oe.current;
-  let sx = 0;
-  let sy = 0;
-  let ex = 0;
-  let ey = 0;
+  var oe = Neo.painter;
+  var layer = oe.current;
+
   if (typeof arguments[0] != "object") {
     this.push("line", layer);
     this.pushCurrent();
@@ -407,13 +397,14 @@ Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
     this.getCurrent(item);
 
     lineType = item[11];
-    sx = item[12];
-    sy = item[13];
-    ex = item[14];
-    ey = item[15];
+    x0 = item[12];
+    y0 = item[13];
+    x1 = item[14];
+    y1 = item[15];
   }
-  if (ex === null) ex = sx;
-  if (ey === null) ey = sy;
+  if (x1 === null) x1 = x0;
+  if (y1 === null) y1 = y0;
+
   oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
