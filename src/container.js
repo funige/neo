@@ -1141,8 +1141,7 @@ Neo.start = function (isApp = false) {
 
   Neo.isApp = isApp;
   if (Neo.applet) {
-    var name =
-      Neo.applet.getAttribute("name") || Neo.applet.dataset.name || "paintbbs";
+    var name = Neo.applet.getAttribute("name") || "paintbbs";
     Neo.applet.outerHTML = "";
     document[name] = Neo;
 
