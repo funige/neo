@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-/** @type {any} */
+// /** @type {any} */
 var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
@@ -38,13 +38,7 @@ Neo.isAnimation = false;
 Neo.storage = null;
 Neo.elementNeo = null;
 Neo.isPinchZooming = null;
-Neo.touch_move_grid_control = function () {};
-Neo.add_touch_move_grid_control = function () {};
 Neo.updateUI = function () {};
-Neo.translate = function (str) {
-  return str;
-};
-Neo.setStabilizeLevel = function () {};
 Neo.stabilize_level = 1;
 Neo.styleSheet = null;
 Neo.rules = null;
@@ -80,68 +74,88 @@ Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
 
 /**
+ *  @type {any} *
+ *  @note ライブコネクト
+ */
+(document).neo = Neo;
+
+/**
  * 起動設定（paramの中身）を抽出する
- * @param {string} targetName
- * @note "paintbbs" | "pch"
+ * @param {string} targetName - "paintbbs" | "pch"
  */
 Neo.extractBootConfig = function (targetName) {
-  // 1. グローバルに Neo.bootConfig がある場合（Objectによる設定）
+  // 1. 外部で設定されたObjectの場合
   if (Neo.param && typeof Neo.param === "object") {
     return Neo.param[targetName] ? { ...Neo.param[targetName] } : {};
   }
 
-  // 2. DOM (appletタグのみ) の探索
-  const nodes = document.querySelectorAll("applet, applet-dummy,#neo-applet");
-  if (nodes.length === 0) return null;
+  // 2. DOMの探索（指定された名前を持つ要素を最初に1つ見つける）
+  // targetName が "paintbbs" なら .neo-applet-paintbbs を探す
+  const applet = `applet[name="${targetName}"], applet-dummy[name="${targetName}"], .neo-applet-${targetName}`;
+  const node = document.querySelector(applet);
 
-  const node = nodes[0];
-  const config = {};
+  if (!node) return {};
 
   // 3. paramタグの中身だけを抽出
-  const items = node.querySelectorAll("param");
-  for (const item of items) {
-    const key = item.getAttribute("name");
-    const val = item.getAttribute("value");
+  const config = {};
+  const params = node.querySelectorAll("param");
+  for (const param of params) {
+    const key = param.getAttribute("name");
+    const val = param.getAttribute("value");
     if (key) {
-      config[key] = Neo.fixConfig(val);
+      config[key] = Neo.fixConfig(String(val));
     }
   }
 
   return config;
 };
+
 Neo.init = function () {
-  // 「appletタグ」でかつ「属性に .class か .jar を含む」もの
-  let applets = document.querySelectorAll("applet,applet-dummy,#neo-applet");
+  //appletタグまたはそれに代わるdivタグのID
+  let applets = document.querySelectorAll(
+    "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch",
+  );
 
-  console.log(applets);
   for (const applet of applets) {
-    var name = applet.getAttribute("name") || applet.dataset.name;
-
-    if (name == "paintbbs" || name == "pch") {
-      Neo.applet = applet;
-
-      if (name == "paintbbs") {
-        Neo.initConfig(applet);
-        Neo.createContainer(applet);
-        Neo.init2();
-      } else {
-        Neo.viewer = true;
-        Neo.initConfig(applet);
-
-        var filename = Neo.getFilename();
-        Neo.getPCH(filename, function (pch) {
-          if (pch) {
-            Neo.createViewer(applet);
-            Neo.config.width = pch.width;
-            Neo.config.height = pch.height;
-            Neo.initViewer(pch);
-            // Neo.initViewer()内へ移動
-            // ボタンが表示される前に再生される事があるため
-            // Neo.startViewer();
+    if (applet instanceof HTMLElement) {
+      let name = applet.getAttribute("name");
+      // name属性がない場合、クラス名から探す
+      if (!name) {
+        for (const className of applet.classList) {
+          if (className.startsWith("neo-applet-")) {
+            name = className.replace("neo-applet-", "");
+            break; // 見つかったら終了
           }
-        });
+        }
       }
-      return true;
+      if (name == "paintbbs" || name == "pch") {
+        // console.log(name);
+
+        Neo.applet = applet;
+
+        if (name == "paintbbs") {
+          Neo.initConfig(applet);
+          Neo.createContainer(applet);
+          Neo.init2();
+        } else {
+          Neo.viewer = true;
+          Neo.initConfig(applet);
+
+          var filename = Neo.getFilename();
+          Neo.getPCH(filename, function (pch) {
+            if (pch) {
+              Neo.createViewer(applet);
+              Neo.config.width = pch.width;
+              Neo.config.height = pch.height;
+              Neo.initViewer(pch);
+              // Neo.initViewer()内へ移動
+              // ボタンが表示される前に再生される事があるため
+              // Neo.startViewer();
+            }
+          });
+        }
+        return true;
+      }
     }
   }
   return false;
@@ -241,11 +255,23 @@ Neo.initConfig = function (applet) {
     var appletHeight = applet.dataset.height || applet.attributes.height.value;
     if (appletWidth) Neo.config.applet_width = parseInt(appletWidth);
     if (appletHeight) Neo.config.applet_height = parseInt(appletHeight);
+    let targetName;
+    if (applet instanceof HTMLElement) {
+      targetName = applet.getAttribute("name");
+      // name属性がない場合、クラス名から探す
+      if (!targetName) {
+        for (const className of applet.classList) {
+          if (className.startsWith("neo-applet-")) {
+            targetName = className.replace("neo-applet-", "");
+            break; // 見つかったら終了
+          }
+        }
+      }
+    }
+    if (!targetName) {
+      targetName = "paintbbs";
+    }
 
-    const targetName =
-      Neo.applet.getAttribute("name") || Neo.applet.dataset.name || "paintbbs";
-
-    console.log("Neo.config.applet_width", Neo.config.applet_width);
     // 1. 設定値（paramの代わり）を抽出する
     const params = Neo.extractBootConfig(targetName);
 
@@ -255,10 +281,9 @@ Neo.initConfig = function (applet) {
         const value = String(params[key]);
 
         // 設定値を適用
-        console.log(value);
+        // console.log(value);
         Neo.config[key] = Neo.fixConfig(value);
 
-        // 特殊なプロパティ名のマッピングも維持
         if (key === "image_width") Neo.config.width = parseInt(value);
         if (key === "image_height") Neo.config.height = parseInt(value);
       }
@@ -1103,10 +1128,10 @@ Neo.initButtons = function () {
 };
 
 /**
- * @param {boolean} isApp
+ * @param {boolean} [isApp]
  * @returns {void}
  */
-Neo.start = function (isApp) {
+Neo.start = function (isApp = false) {
   if (Neo.viewer) return;
 
   Neo.initSkin();
@@ -1360,7 +1385,11 @@ Neo.clone = function (src) {
  * @returns {string} 8文字にゼロパディングされた文字列
  */
 Neo.getSizeString = function (len) {
-  return String(len).padStart(8, "0");
+  var result = String(len);
+  while (result.length < 8) {
+    result = "0" + result;
+  }
+  return result;
 };
 
 Neo.openURL = function (url) {
@@ -1637,8 +1666,8 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 */
 
 Neo.getColors = function () {
-  console.log("getColors");
-  console.log("defaultColors==", Neo.config.colors.join("\n"));
+  // console.log("getColors");
+  // console.log("defaultColors==", Neo.config.colors.join("\n"));
   var array = [];
   for (var i = 0; i < 14; i++) {
     array.push(Neo.colorTips[i].color);
@@ -1828,11 +1857,11 @@ Neo.setToolSide = function (htmlConfiguredSide) {
 
 /**
  * 手ぶれ補正の強さ
- * @param {Number|string} htmlConfigured
+ * @param {Number|string} htmlConfig
  * @note 0-5の範囲 デフォルト1
  */
-Neo.setStabilizeLevel = function (htmlConfigured) {
-  let level = parseInt(String(htmlConfigured));
+Neo.setStabilizeLevel = function (htmlConfig) {
+  let level = parseInt(String(htmlConfig));
   if (isNaN(level) || level < 0) {
     level = 1; //デフォルトは1
   } else if (level > 5) {

@@ -89,8 +89,8 @@ Neo.ToolBase.prototype.getReserve = function () {
     case Neo.Painter.TOOLTYPE_ERASEALL:
     case Neo.Painter.TOOLTYPE_COPY:
     case Neo.Painter.TOOLTYPE_MERGE:
-    case Neo.Painter.TOOLTYPE_FIP_H:
-    case Neo.Painter.TOOLTYPE_FIP_V:
+    case Neo.Painter.TOOLTYPE_FLIP_H:
+    case Neo.Painter.TOOLTYPE_FLIP_V:
 
     case Neo.Painter.TOOLTYPE_DODGE:
     case Neo.Painter.TOOLTYPE_BURN:

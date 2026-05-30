@@ -366,7 +366,7 @@ Neo.Painter.prototype.setToolByType = function (toolType) {
       console.log("unknown toolType " + toolType);
       break;
   }
-  Neo.CurrentToolType = toolType;
+  Neo.CurrentToolType = Number(toolType);
 };
 
 /**
@@ -1581,14 +1581,14 @@ Neo.Painter.prototype.clearCanvas = function (doConfirm) {
  * @param {number} y - 元キャンバスの取得開始Y
  * @param {number} width - 取得範囲の幅
  * @param {number} height - 取得範囲の高さ
- * @param {boolean} useTemp - 一時レイヤー（tempCanvas）を含めて描画するかどうか
+ * @param {boolean} [useTemp] - 一時レイヤー（tempCanvas）を含めて描画するかどうか
  */
 Neo.Painter.prototype.updateDestCanvas = function (
   x,
   y,
   width,
   height,
-  useTemp,
+  useTemp = false,
 ) {
   // 元座標は整数化（元キャンバス側）
   x = Math.floor(x);
