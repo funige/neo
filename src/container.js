@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-// /** @type {any} */
 var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
+/** @type {Neo.Painter} */
 Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;

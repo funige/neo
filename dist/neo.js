@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-// /** @type {any} */
 var Neo = {};
 
 Neo.version = "1.7.2";
+/** @type {Neo.Painter} */
 Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -2094,6 +2094,7 @@ Neo.translate = (function () {
 Neo.Painter = class {
   constructor() {
     this._undoMgr = new Neo.UndoManager(50);
+    /** @type {Neo.ActionManager} */
     this._actionMgr = new Neo.ActionManager();
   }
 };
