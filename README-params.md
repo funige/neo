@@ -70,7 +70,59 @@ APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効
 [ぴくらぼ](http://piclab.sakura.ne.jp/kouza/straip/straip.htm)  
 バグストライプ使用例。  
 オリジナルのPaintBBSではバグストライプが発生するため  
-**デフォルトはfalse** です。  
+**デフォルトはfalse** です。
+
+## applet-dummyタグとparamタグを使用しない新しい設定
+- paramタグは非推奨としてマークされているため、設定を読み込む事ができなくなるかもしれません。    
+そのため、v1.7.2でデーターセットとオブジェクトによる設定に対応しました。  
+既存のapplet、applet-dummy、paramによる従来の設定方法との互換性は確保していますので、いそいで書き換える必要はありません。  
+ただし、これから新しくお絵かき掲示板を開発するのであれば、新しい方式のほうが記述する文字数がすくなくてすみます。  
+
+### 描画画面の設定例
+```
+<div class="neo-applet-paintbbs" data-width="400" data-height="460" ></div>
+<script>
+ Neo.param = {
+    paintbbs:{
+    image_width:300,
+    image_height:300,
+    thumbnail_type:"animation",
+    neo_show_right_button:true,
+    neo_disable_grid_touch_move:true,
+    neo_disable_turn_original_glitch:true,
+    neo_enable_zoom_out:true,
+    neo_emulation_mode:2.04
+    }
+  }
+</script>
+```
+`class="neo-applet-paintbbs"`と`paintbbs:{`で、描画画面判定をしています。  
+別のclass名では動作しません。  
+
+### 動画再生画面の設定例
+  
+```
+<div class="neo-applet-pch" data-width="400" data-height="450" ></div>
+<script>
+  Neo.param = {
+    pch:{
+    neo_enable_zoom_out:true,
+    }
+  }
+</script>
+```
+`class="neo-applet-pch"`と`pch:{`で動画画面判定をしています。  
+```
+<script>
+Neo.param = {
+  paintbbs:{},
+  pch:{}
+}
+</script>
+```
+このようにひとつのオブジェクトに描画画面と動作再生のパラメータを同時に設定する事もできます。      
+
+このデーターセットとオブジェクトを使用した動作サンプルはsample2にあります。
 
 # 動画の仕様の違い
 
