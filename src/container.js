@@ -1013,7 +1013,11 @@ Neo.initComponents = function () {
   document.addEventListener(
     "mouseup",
     function (e) {
-      if (Neo.painter && !Neo.painter.isContainer(e.target)) {
+      if (
+        Neo.painter &&
+        e.target instanceof Element &&
+        !Neo.painter.isContainer(e.target)
+      ) {
         Neo.painter.cancelTool(e.target);
       }
     },

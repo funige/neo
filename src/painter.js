@@ -3379,7 +3379,7 @@ Neo.Painter.prototype.getMaskFunc = function (type) {
  * @param {number} layer - 対象レイヤーインデックス。
  * @param {number} x, y - 描画開始X/Y座標。
  * @param {number} width, height - 描画対象領域のサイズ。
- * @param {string|number} [type] - マスク形状タイプ(例: TOOLTYPE_RECT, TOOLTYPE_RECTFILLなど)。
+ * @param {string|number} type - マスク形状タイプ(例: TOOLTYPE_RECT, TOOLTYPE_RECTFILLなど)。
  */
 Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
   var ctx = this.canvasCtx[layer];
