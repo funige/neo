@@ -4,6 +4,7 @@
 Neo.Painter = class {
   constructor() {
     this._undoMgr = new Neo.UndoManager(50);
+    /** @type {Neo.ActionManager} */
     this._actionMgr = new Neo.ActionManager();
   }
 };
