@@ -79,6 +79,7 @@ Neo.Button.prototype.init = function (elementID, params) {
 
   this.element.className = "buttonOff";
 
+  /**@param {Number} wait */
   this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
     this.element.style.opacity = "0.5";
