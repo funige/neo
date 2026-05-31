@@ -1,5 +1,5 @@
 "use strict";
-
+//@ts-check
 Neo.CommandBase = class {
   constructor() {}
 };

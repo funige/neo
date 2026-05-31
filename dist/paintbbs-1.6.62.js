@@ -19,10 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-// /** @type {any} */
+/** @type {any} */
 var Neo = {};
 
-Neo.version = "1.7.2";
+Neo.version = "1.6.62";
 Neo.painter = null;
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -38,7 +38,13 @@ Neo.isAnimation = false;
 Neo.storage = null;
 Neo.elementNeo = null;
 Neo.isPinchZooming = null;
+Neo.touch_move_grid_control = function () {};
+Neo.add_touch_move_grid_control = function () {};
 Neo.updateUI = function () {};
+Neo.translate = function (str) {
+  return str;
+};
+Neo.setStabilizeLevel = function () {};
 Neo.stabilize_level = 1;
 Neo.styleSheet = null;
 Neo.rules = null;
@@ -74,92 +80,51 @@ Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
 
 /**
- *  @type {any} *
- *  @note ライブコネクト
+ * 初期化
+ * @returns {boolean}
  */
-(document).neo = Neo;
-
-/**
- * 起動設定（paramの中身）を抽出する
- * @param {string} targetName - "paintbbs" | "pch"
- */
-Neo.extractBootConfig = function (targetName) {
-  // 1. 外部で設定されたObjectの場合
-  if (Neo.param && typeof Neo.param === "object") {
-    return Neo.param[targetName] ? { ...Neo.param[targetName] } : {};
-  }
-
-  // 2. DOMの探索（指定された名前を持つ要素を最初に1つ見つける）
-  // targetName が "paintbbs" なら .neo-applet-paintbbs を探す
-  const applet = `applet[name="${targetName}"], applet-dummy[name="${targetName}"], .neo-applet-${targetName}`;
-  const node = document.querySelector(applet);
-
-  if (!node) return {};
-
-  // 3. paramタグの中身だけを抽出
-  const config = {};
-  const params = node.querySelectorAll("param");
-  for (const param of params) {
-    const key = param.getAttribute("name");
-    const val = param.getAttribute("value");
-    if (key) {
-      config[key] = Neo.fixConfig(String(val));
-    }
-  }
-
-  return config;
-};
-
 Neo.init = function () {
-  //appletタグまたはそれに代わるdivタグのID
+  // 「appletタグ」でかつ「属性に .class か .jar を含む」もの
   let applets = document.querySelectorAll(
-    "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch",
+    'applet[code*=".class" i], applet[archive*=".jar" i]',
   );
+  if (applets.length == 0) {
+    applets = document.querySelectorAll("applet-dummy");
+  }
 
   for (const applet of applets) {
-    if (applet instanceof HTMLElement) {
-      let name = applet.getAttribute("name");
-      // name属性がない場合、クラス名から探す
-      if (!name) {
-        for (const className of applet.classList) {
-          if (className.startsWith("neo-applet-")) {
-            name = className.replace("neo-applet-", "");
-            break; // 見つかったら終了
+    var name = applet.getAttribute("name");
+
+    if (name == "paintbbs" || name == "pch") {
+      Neo.applet = applet;
+
+      if (name == "paintbbs") {
+        Neo.initConfig(applet);
+        Neo.createContainer(applet);
+        Neo.init2();
+      } else {
+        Neo.viewer = true;
+        Neo.initConfig(applet);
+
+        var filename = Neo.getFilename();
+        Neo.getPCH(filename, function (pch) {
+          if (pch) {
+            Neo.createViewer(applet);
+            Neo.config.width = pch.width;
+            Neo.config.height = pch.height;
+            Neo.initViewer(pch);
+            // Neo.initViewer()内へ移動
+            // ボタンが表示される前に再生される事があるため
+            // Neo.startViewer();
           }
-        }
+        });
       }
-      if (name == "paintbbs" || name == "pch") {
-        // console.log(name);
-
-        Neo.applet = applet;
-
-        if (name == "paintbbs") {
-          Neo.initConfig(applet);
-          Neo.createContainer(applet);
-          Neo.init2();
-        } else {
-          Neo.viewer = true;
-          Neo.initConfig(applet);
-
-          var filename = Neo.getFilename();
-          Neo.getPCH(filename, function (pch) {
-            if (pch) {
-              Neo.createViewer(applet);
-              Neo.config.width = pch.width;
-              Neo.config.height = pch.height;
-              Neo.initViewer(pch);
-              // Neo.initViewer()内へ移動
-              // ボタンが表示される前に再生される事があるため
-              // Neo.startViewer();
-            }
-          });
-        }
-        return true;
-      }
+      return true;
     }
   }
   return false;
 };
+
 Neo.init2 = function () {
   const pageview = document.getElementById("neo-pageView");
   if (!pageview) return;
@@ -251,43 +216,20 @@ Neo.init2 = function () {
  */
 Neo.initConfig = function (applet) {
   if (applet) {
-    var appletWidth = applet.dataset.width || applet.attributes.width.value;
-    var appletHeight = applet.dataset.height || applet.attributes.height.value;
-    if (appletWidth) Neo.config.applet_width = parseInt(appletWidth);
-    if (appletHeight) Neo.config.applet_height = parseInt(appletHeight);
-    let targetName;
-    if (applet instanceof HTMLElement) {
-      targetName = applet.getAttribute("name");
-      // name属性がない場合、クラス名から探す
-      if (!targetName) {
-        for (const className of applet.classList) {
-          if (className.startsWith("neo-applet-")) {
-            targetName = className.replace("neo-applet-", "");
-            break; // 見つかったら終了
-          }
-        }
-      }
-    }
-    if (!targetName) {
-      targetName = "paintbbs";
+    var appletWidth = applet.attributes.width;
+    var appletHeight = applet.attributes.height;
+    if (appletWidth) Neo.config.applet_width = parseInt(appletWidth.value);
+    if (appletHeight) Neo.config.applet_height = parseInt(appletHeight.value);
+
+    var params = applet.getElementsByTagName("param");
+    for (var i = 0; i < params.length; i++) {
+      var p = params[i];
+      Neo.config[p.name] = Neo.fixConfig(p.value);
+
+      if (p.name == "image_width") Neo.config.width = parseInt(p.value);
+      if (p.name == "image_height") Neo.config.height = parseInt(p.value);
     }
 
-    // 1. 設定値（paramの代わり）を抽出する
-    const params = Neo.extractBootConfig(targetName);
-
-    // 2. 抽出した設定値をループして Neo.config に反映させる
-    if (params) {
-      for (const key in params) {
-        const value = String(params[key]);
-
-        // 設定値を適用
-        // console.log(value);
-        Neo.config[key] = Neo.fixConfig(value);
-
-        if (key === "image_width") Neo.config.width = parseInt(value);
-        if (key === "image_height") Neo.config.height = parseInt(value);
-      }
-    }
     var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
     Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
 
@@ -1128,10 +1070,10 @@ Neo.initButtons = function () {
 };
 
 /**
- * @param {boolean} [isApp]
+ * @param {boolean} isApp
  * @returns {void}
  */
-Neo.start = function (isApp = false) {
+Neo.start = function (isApp) {
   if (Neo.viewer) return;
 
   Neo.initSkin();
@@ -1384,11 +1326,7 @@ Neo.clone = function (src) {
  * @returns {string} 8文字にゼロパディングされた文字列
  */
 Neo.getSizeString = function (len) {
-  var result = String(len);
-  while (result.length < 8) {
-    result = "0" + result;
-  }
-  return result;
+  return String(len).padStart(8, "0");
 };
 
 Neo.openURL = function (url) {
@@ -1665,8 +1603,8 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
 */
 
 Neo.getColors = function () {
-  // console.log("getColors");
-  // console.log("defaultColors==", Neo.config.colors.join("\n"));
+  console.log("getColors");
+  console.log("defaultColors==", Neo.config.colors.join("\n"));
   var array = [];
   for (var i = 0; i < 14; i++) {
     array.push(Neo.colorTips[i].color);
@@ -1856,11 +1794,11 @@ Neo.setToolSide = function (htmlConfiguredSide) {
 
 /**
  * 手ぶれ補正の強さ
- * @param {Number|string} htmlConfig
+ * @param {Number|string} htmlConfigured
  * @note 0-5の範囲 デフォルト1
  */
-Neo.setStabilizeLevel = function (htmlConfig) {
-  let level = parseInt(String(htmlConfig));
+Neo.setStabilizeLevel = function (htmlConfigured) {
+  let level = parseInt(String(htmlConfigured));
   if (isNaN(level) || level < 0) {
     level = 1; //デフォルトは1
   } else if (level > 5) {
@@ -2456,7 +2394,7 @@ Neo.Painter.prototype.setToolByType = function (toolType) {
       console.log("unknown toolType " + toolType);
       break;
   }
-  Neo.CurrentToolType = Number(toolType);
+  Neo.CurrentToolType = toolType;
 };
 
 /**
@@ -3671,14 +3609,14 @@ Neo.Painter.prototype.clearCanvas = function (doConfirm) {
  * @param {number} y - 元キャンバスの取得開始Y
  * @param {number} width - 取得範囲の幅
  * @param {number} height - 取得範囲の高さ
- * @param {boolean} [useTemp] - 一時レイヤー（tempCanvas）を含めて描画するかどうか
+ * @param {boolean} useTemp - 一時レイヤー（tempCanvas）を含めて描画するかどうか
  */
 Neo.Painter.prototype.updateDestCanvas = function (
   x,
   y,
   width,
   height,
-  useTemp = false,
+  useTemp,
 ) {
   // 元座標は整数化（元キャンバス側）
   x = Math.floor(x);
@@ -6072,8 +6010,8 @@ Neo.ToolBase.prototype.getReserve = function () {
     case Neo.Painter.TOOLTYPE_ERASEALL:
     case Neo.Painter.TOOLTYPE_COPY:
     case Neo.Painter.TOOLTYPE_MERGE:
-    case Neo.Painter.TOOLTYPE_FLIP_H:
-    case Neo.Painter.TOOLTYPE_FLIP_V:
+    case Neo.Painter.TOOLTYPE_FIP_H:
+    case Neo.Painter.TOOLTYPE_FIP_V:
 
     case Neo.Painter.TOOLTYPE_DODGE:
     case Neo.Painter.TOOLTYPE_BURN:
@@ -7857,26 +7795,33 @@ Neo.ActionManager.prototype.play = function () {
   var ref = this;
   var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
-  this[func](item, function (result) {
-    if (result) {
-      if (
-        Neo.painter.busySkipped &&
-        ref._head < ref._mark - 2 &&
-        ref._mark - 2 >= 0 &&
-        ref._items[ref._mark - 1][0] == "restore"
-      ) {
-        ref._head = ref._mark - 2;
-      } else {
-        ref._head++;
+  this[func](
+    item,
+    /**
+     * 描画関数側からトリガーされる、同期・進行管理用のコールバック
+     * @param {boolean} result - 描画処理が成功したかどうか
+     * @returns {void}
+     */ function (result) {
+      if (result) {
+        if (
+          Neo.painter.busySkipped &&
+          ref._head < ref._mark - 2 &&
+          ref._mark - 2 >= 0 &&
+          ref._items[ref._mark - 1][0] == "restore"
+        ) {
+          ref._head = ref._mark - 2;
+        } else {
+          ref._head++;
+        }
+        ref._index = 0;
+        ref._prevSpeed = Neo.speed;
       }
-      ref._index = 0;
-      ref._prevSpeed = Neo.speed;
-    }
 
-    setTimeout(function () {
-      Neo.painter._actionMgr.play();
-    }, wait);
-  });
+      setTimeout(function () {
+        Neo.painter._actionMgr.play();
+      }, wait);
+    },
+  );
 };
 /*
 -------------------------------------------------------------------------
@@ -8077,9 +8022,12 @@ Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
  * @param {string} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
-  var oe = Neo.painter;
-  var layer = oe.current;
-
+  const oe = Neo.painter;
+  let layer = oe.current;
+  let sx = 0;
+  let sy = 0;
+  let ex = 0;
+  let ey = 0;
   if (typeof arguments[0] != "object") {
     this.push("line", layer);
     this.pushCurrent();
@@ -8091,14 +8039,13 @@ Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
     this.getCurrent(item);
 
     lineType = item[11];
-    x0 = item[12];
-    y0 = item[13];
-    x1 = item[14];
-    y1 = item[15];
+    sx = item[12];
+    sy = item[13];
+    ex = item[14];
+    ey = item[15];
   }
-  if (x1 === null) x1 = x0;
-  if (y1 === null) y1 = y0;
-
+  if (ex === null) ex = sx;
+  if (ey === null) ey = sy;
   oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
