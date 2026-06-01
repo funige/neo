@@ -21,7 +21,7 @@ Neo.ActionManager = class {
     this._prevSpeed = Neo.speed;
   }
 };
-
+Neo.ActionManager.prototype.isMouseDown = false;
 Neo.ActionManager.prototype.speedMode = function () {
   if (Neo.speed < 0) {
     return 0;
@@ -982,6 +982,7 @@ Neo.initViewer = function (pch) {
     return false;
   };
 
+  Neo.painter._actionMgr.isMouseDown = false;
   painter?.addEventListener(
     "pointerdown",
     function () {
@@ -1171,7 +1172,7 @@ Neo.getFilename = function () {
  * @description
  * 読み込み失敗時はコンソールにエラーを出力し、処理を終了する。
  * @param {string} filename - 対象のPCHファイルパス
- * @param {function(Object):void} callback - デコードされたPCHデータを受け取るコールバック
+ * @param {function({data: any[][], width: number, height: number}):void} callback - デコードされたPCHデータを受け取るコールバック
  */
 Neo.getPCH = function (filename, callback) {
   if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;

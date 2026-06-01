@@ -6,6 +6,12 @@ Neo.Painter = class {
     this._undoMgr = new Neo.UndoManager(50);
     /** @type {Neo.ActionManager} */
     this._actionMgr = new Neo.ActionManager();
+    this.clipMouseX = 0;
+    this.clipMouseY = 0;
+    this.scrollBarX = 0;
+    this.scrollBarY = 0;
+    this.scrollWidth = 0;
+    this.scrollHeight = 0;
   }
 };
 
@@ -1122,7 +1128,7 @@ Neo.Painter.prototype.redo = function () {
  * @param {number} [h=canvasHeight] - 取得範囲の高さ
  * @param {boolean} [holdRedo=false] - リドゥ履歴を保持するかどうか
  */
-Neo.Painter.prototype._pushUndo = function (x, y, w, h, holdRedo) {
+Neo.Painter.prototype._pushUndo = function (x, y, w, h, holdRedo = false) {
   x = x === undefined ? 0 : x;
   y = y === undefined ? 0 : y;
   w = w === undefined ? this.canvasWidth : w;
@@ -2372,7 +2378,7 @@ Neo.Painter.prototype.getBezierPoint = function (
  * @param {number} y3 - 終点のY座標。
  * @param {number} type - 使用するブラシやツールのタイプ。
  * @param {boolean} isReplay - リプレイ再生中かどうか。
- * @param {boolean} isPreview - プレビュー描画中かどうか（不透明度やマスクを一時解除）。
+ * @param {boolean} [isPreview=false] - プレビュー描画中かどうか（不透明度やマスクを一時解除）。
  * @returns {void}
  */
 Neo.Painter.prototype.drawBezier = function (
@@ -2387,7 +2393,7 @@ Neo.Painter.prototype.drawBezier = function (
   y3,
   type,
   isReplay,
-  isPreview,
+  isPreview = false,
 ) {
   var points = [
     [x0, y0],

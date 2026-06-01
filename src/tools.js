@@ -132,6 +132,16 @@ Neo.ToolBase.prototype.saveStates = function () {
 Neo.DrawToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.x0 = 0;
+    this.y0 = 0;
+    this.x1 = 0;
+    this.y1 = 0;
+    this.prevX = 0;
+    this.prevY = 0;
+    this.x2 = 0;
+    this.y2 = 0;
+    this.x3 = 0;
+    this.y3 = 0;
   }
 };
 
@@ -805,6 +815,8 @@ Neo.BurnTool.prototype.loadStates = function () {
 Neo.HandTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.latestX = 0;
+    this.latestY = 0;
   }
 };
 Neo.HandTool.prototype.type = Neo.Painter.TOOLTYPE_HAND;
@@ -875,6 +887,7 @@ Neo.HandTool.prototype.rollOutHandler = function (oe) {};
 Neo.SliderTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.target = null;
   }
 };
 Neo.SliderTool.prototype.type = Neo.Painter.TOOLTYPE_SLIDER;
@@ -997,6 +1010,13 @@ Neo.EraseAllTool.prototype.rollOverHandler = function (oe) {};
 Neo.EffectToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.isEllipse = false;
+    this.isFill = false;
+    this.endX = 0;
+    this.endY = 0;
+    this.latestX = 0;
+    this.latestY = 0;
+    this.defaultAlpha = null;
   }
 };
 Neo.EffectToolBase.prototype.isUpMove = false;
@@ -1285,6 +1305,12 @@ Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
 Neo.PasteTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.x = 0;
+    this.y = 0;
+    this.width = 0;
+    this.height = 0;
+    this.latestDX = 0;
+    this.latestDY = 0;
   }
 };
 Neo.PasteTool.prototype.type = Neo.Painter.TOOLTYPE_PASTE;

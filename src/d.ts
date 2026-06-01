@@ -1,22 +1,14 @@
-// 1. インスタンスの形（動的プロパティ）を定義
-interface DynamicProps {
+// 1. まず「Neo」という名前のインターフェースを定義し、それを拡張可能にする
+interface NeoInterface {
     [key: string]: any;
+    painter: any; // 必要に応じて具体的な型に置き換え
+    props: { [key: string]: any };
 }
 
-// 2. コンストラクターとしてのシグネチャを定義
-interface Constructor {
-    new (...args: any[]): any;
-}
-// 3. グローバル変数「Neo」を型として宣言
-declare var Neo: AnyFlexibleInterface & {
-    [key: string]: any;
-};
+// 2. グローバル変数「Neo」として宣言する
+// これにより「Neo」という変数名が使えるようになり、型は上記のインターフェースに従う
+declare var Neo: NeoInterface;
 
-// 4. 'oe' が出現した際、自動的に Neo.Painter 型として扱う。
-declare var oe: Neo.Painter;
-// 5. 'painter' が出現した際、自動的に Neo.Painter 型として扱う。
-declare namespace Neo {
-    let painter: Neo.Painter;
-}
-// 6. ライブラリを追加
+// 3. 他のグローバル変数の宣言
+declare var oe: any; // Painter型を別途定義しているならそれに置き換え
 declare var LZString: any;

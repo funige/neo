@@ -41,7 +41,12 @@ Neo.Button = class {
     this.onmouseout = null;
   }
 };
-Neo.Button.prototype.init = function (elementID, params) {
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns
+ */
+Neo.Button.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
@@ -210,15 +215,25 @@ Neo.FillButton.prototype.init = function (elementID, params) {
 
 Neo.colorTips = [];
 
-Neo.ColorTip = function () {
-  this.element = null;
-  this.params = null;
-  this.elementID = "";
-  this.selected = false;
-  this.isMouseDown = false;
-  this.color = null;
+Neo.ColorTip = class {
+  constructor() {
+    this.element = null;
+    this.params = null;
+    this.elementID = "";
+    this.selected = false;
+    this.isMouseDown = false;
+    this.color = null;
+    this.onmousedown = null;
+    this.onmouseup = null;
+    this.onmouseover = null;
+    this.onmouseout = null;
+  }
 };
-Neo.ColorTip.prototype.init = function (elementID, params) {
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ */
+Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
@@ -364,7 +379,17 @@ Neo.ToolTip = class {
 
 Neo.ToolTip.prototype.prevMode = -1;
 
-Neo.ToolTip.prototype.init = function (elementID, params) {
+/** @type {HTMLCanvasElement|null} */
+Neo.ToolTip.prototype.canvas = null;
+/** @type {HTMLElement|null} */
+Neo.ToolTip.prototype.label = null;
+
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ToolTip}
+ */
+Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.params.type = this.element.id;
@@ -594,6 +619,7 @@ Neo.PenTip.prototype.update = function () {
 Neo.Pen2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
   }
 };
 
@@ -693,6 +719,11 @@ Neo.Pen2Tip.prototype.drawTone = function () {
 Neo.EraserTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
+    this.drawOnce = false;
+    this.isTool = true;
+    this.label = null;
+    this.canvas = null;
   }
 };
 
@@ -749,6 +780,9 @@ Neo.EraserTip.prototype.draw = function () {
 Neo.EffectTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
+    this.label = null;
+    this.isTool = false;
   }
 };
 
@@ -798,6 +832,11 @@ Neo.EffectTip.prototype.update = function () {
 Neo.Effect2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
+    this.isTool = true;
+    this.img = null;
+    /**@type {HTMLElement|null} */
+    this.element = null;
   }
 };
 
@@ -972,16 +1011,50 @@ Neo.DrawTip.prototype.update = function () {
 
 Neo.sliders = [];
 
-Neo.ColorSlider = function () {};
+Neo.ColorSlider = class {
+  constructor() {
+    this.selected = false;
+    this.toolStrings = [];
+    this.type = 0;
+    this.prefix = "";
+    this.value0 = 0;
+    this.x0 = 0;
+  }
+};
 
-Neo.ColorSlider.prototype.init = function (elementID, params) {
+/** @type {Element|null} */
+Neo.ColorSlider.prototype.element = null;
+/** @type {string} */
+Neo.ColorSlider.prototype.elementID = /** @type {unknown} */ (null);
+/** @type {Object} */
+Neo.ColorSlider.prototype.params = /** @type {unknown} */ {};
+/** @type {number} */
+Neo.ColorSlider.prototype.value = 0;
+Neo.ColorSlider.prototype.isMouseDown = false;
+/** @type {Element|null} */
+Neo.ColorSlider.prototype.slider = null;
+/** @type {Element|null} */
+Neo.ColorSlider.prototype.label = null;
+/** @type {Element|null} */
+Neo.ColorSlider.prototype.hit = null;
+
+/**
+ * カラースライダーを初期化
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ColorSlider|null}
+ */
+Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
   this.isMouseDown = false;
   this.value = 0;
   this.type = this.params.type;
-
+  if (!this.element) {
+    console.error("Element not found: " + elementID);
+    return null;
+  }
   this.element.className = "colorSlider";
   this.element.innerHTML =
     "<div class='slider'></div><div class='label'></div>";
@@ -1130,15 +1203,48 @@ Neo.ColorSlider.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.SizeSlider = function () {};
+Neo.SizeSlider = class {
+  constructor() {
+    this.selected = false;
+    this.toolStrings = [];
+    this.y0 = 0;
+    this.value0 = 0;
+    this.onmousedown = null;
+  }
+};
 
-Neo.SizeSlider.prototype.init = function (elementID, params) {
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.element = null;
+/** @type {string} */
+Neo.SizeSlider.prototype.elementID = /** @type {unknown} */ (null);
+/** @type {Object} */
+Neo.SizeSlider.prototype.params = /** @type {unknown} */ {};
+/** @type {number} */
+Neo.SizeSlider.prototype.value = 1;
+Neo.SizeSlider.prototype.isMouseDown = false;
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.slider = null;
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.label = null;
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.hit = null;
+
+/**
+ * サイズスライダーを初期化する。
+ * @param {string} elementID - 要素のID
+ * @param {Object|null} [params] - パラメータ
+ * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
+ */
+Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
   this.isMouseDown = false;
   this.value = this.value0 = 1;
-
+  if (!this.element) {
+    console.error("SizeSlider: Element not found: " + elementID);
+    return null;
+  }
   this.element.className = "sizeSlider";
   this.element.innerHTML =
     "<div class='slider'></div><div class='label'></div>";
@@ -1249,8 +1355,31 @@ Neo.SizeSlider.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.LayerControl = function () {};
-Neo.LayerControl.prototype.init = function (elementID, params) {
+Neo.LayerControl = class {
+  constructor() {
+    this.onmousedown = null;
+    this.bg = null;
+    this.label0 = null;
+    this.label1 = null;
+    this.line0 = null;
+    this.line1 = null;
+  }
+};
+/** @type {HTMLElement|null} */
+Neo.LayerControl.prototype.element = null;
+
+/** @type {Object|null} */
+Neo.LayerControl.prototype.params = null;
+Neo.LayerControl.prototype.elementID = "";
+Neo.LayerControl.prototype.isMouseDown = false;
+
+/**
+ * レイヤーコントローラーを初期化
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.LayerControl|null}
+ */
+Neo.LayerControl.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
@@ -1258,6 +1387,10 @@ Neo.LayerControl.prototype.init = function (elementID, params) {
 
   var ref = this;
 
+  if (!this.element) {
+    console.error("LayerControl: Element not found: " + elementID);
+    return null;
+  }
   this.element.onmousedown = function (e) {
     ref._mouseDownHandler(e);
   };
@@ -1332,12 +1465,32 @@ Neo.LayerControl.prototype.update = function () {
 Neo.reserveControls = [];
 
 Neo.ReserveControl = function () {};
-Neo.ReserveControl.prototype.init = function (elementID, params) {
+/** @type {HTMLElement|null} */
+Neo.ReserveControl.prototype.element = null;
+Neo.ReserveControl.prototype.elementID = "";
+/** @type {Object|null} */
+Neo.ReserveControl.prototype.params = null;
+/** @type {Object|null} */
+Neo.ReserveControl.prototype.reserve = null;
+Neo.ReserveControl.prototype.isMouseDown = false;
+
+/**
+ * リバースコントローラーを初期化
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ReserveControl|null}
+ */
+Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
 
   var ref = this;
+
+  if (!this.element) {
+    console.error("ReserveControl: Element not found: " + elementID);
+    return null;
+  }
 
   this.element.onmousedown = function (e) {
     ref._mouseDownHandler(e);
@@ -1413,10 +1566,29 @@ Neo.scrollH;
 Neo.scrollV;
 
 Neo.ScrollBarButton = function () {};
-Neo.ScrollBarButton.prototype.init = function (elementID, params) {
+/** @type {HTMLElement|null} */
+Neo.ScrollBarButton.prototype.element = null;
+/** @type {string} */
+Neo.ScrollBarButton.prototype.elementID = /** @type {unknown} */ (null);
+/** @type {Object} */
+Neo.ScrollBarButton.prototype.params = /** @type {unknown} */ (null);
+/** @type {HTMLElement|null} */
+Neo.ScrollBarButton.prototype.barButton = null;
+
+/**
+ * @param {string} elementID
+ * @param {Object} [params]
+ * @returns {Neo.ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
+ */
+Neo.ScrollBarButton.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
+
+  if (!this.element) {
+    console.error("Element not found: " + elementID);
+    return null;
+  }
 
   this.element.innerHTML = "<div></div>";
   this.barButton = this.element.getElementsByTagName("div")[0];
@@ -1428,17 +1600,29 @@ Neo.ScrollBarButton.prototype.init = function (elementID, params) {
   return this;
 };
 
+/**
+ * @param {Neo.Painter} oe
+ * @returns {void|null} 更新成功時は void、失敗時は null
+ */
 Neo.ScrollBarButton.prototype.update = function (oe) {
   if (this.elementID == "neo-scrollH") {
     var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
     var barWidth = Math.ceil(oe.destCanvas.width * a);
     var barX = oe.scrollBarX * (oe.destCanvas.width - barWidth);
+    if (!this.barButton) {
+      console.error("Bar button element not found for " + this.elementID);
+      return null;
+    }
     this.barButton.style.width = Math.ceil(barWidth) - 4 + "px";
     this.barButton.style.left = Math.floor(barX) + "px";
   } else {
     var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
     var barHeight = Math.ceil(oe.destCanvas.height * a);
     var barY = oe.scrollBarY * (oe.destCanvas.height - barHeight);
+    if (!this.barButton) {
+      console.error("Bar button element not found for " + this.elementID);
+      return null;
+    }
     this.barButton.style.height = Math.ceil(barHeight) - 4 + "px";
     this.barButton.style.top = Math.floor(barY) + "px";
   }
@@ -1453,12 +1637,22 @@ Neo.ScrollBarButton.prototype.update = function (oe) {
 Neo.ViewerButton = class extends Neo.Button {
   constructor() {
     super();
+    /** @type {HTMLElement|null} */
+    this.element = null;
+    /** @type {HTMLCanvasElement|null} */
+    this.canvas = null;
   }
 };
 
 Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 
-Neo.ViewerButton.prototype.init = function (elementID, params) {
+/**
+ *
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns
+ */
+Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
 
   if (elementID != "neo-viewerSpeed") {
@@ -1528,8 +1722,14 @@ Neo.ViewerBar.prototype.width = 0;
 Neo.ViewerBar.prototype.length = 0;
 Neo.ViewerBar.prototype.mark = 0;
 Neo.ViewerBar.prototype.seek = 0;
+/**
+ *
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns
+ */
 
-Neo.ViewerBar.prototype.init = function (elementID, params) {
+Neo.ViewerBar.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
