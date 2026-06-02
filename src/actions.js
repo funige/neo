@@ -378,8 +378,8 @@ Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
  * 直線描画
  * @param {number|Array<*>} x0 - 始点X座標、または描画データ配列
  * @param {number|function(boolean):void} [y0] - 始点Y座標、またはコールバック関数
- * @param {number} [x1] - 終点X座標
- * @param {number} [y1] - 終点Y座標
+ * @param {number|null} [x1] - 終点X座標
+ * @param {number|null} [y1] - 終点Y座標
  * @param {string} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {

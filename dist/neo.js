@@ -1880,7 +1880,7 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.dictionary = {
@@ -2091,7 +2091,7 @@ Neo.translate = (function () {
   };
 })();
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.Painter = class {
@@ -5991,7 +5991,7 @@ Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
 };
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.ToolBase = class {
@@ -7605,10 +7605,12 @@ Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
-"use strict";
+("use strict");
 //@ts-check
 Neo.CommandBase = class {
-  constructor() {}
+  constructor() {
+    this.data = null;
+  }
 };
 Neo.CommandBase.prototype.data;
 Neo.CommandBase.prototype.execute = function () {};
@@ -7619,6 +7621,7 @@ Neo.CommandBase.prototype.execute = function () {};
   ---------------------------------------------------
 */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
+  /**@param {Object} data */
   constructor(data) {
     super();
     this.data = data;
@@ -7636,6 +7639,7 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
 };
 
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
+  /**@param {Object} data */
   constructor(data) {
     super();
     this.data = data;
@@ -7728,7 +7732,7 @@ Neo.CopyrightCommand.prototype.execute = function () {
   }
 };
 
-"use strict";
+("use strict");
 //@ts-check
 /*
   -----------------------------------------------------------------------
@@ -8108,8 +8112,8 @@ Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
  * 直線描画
  * @param {number|Array<*>} x0 - 始点X座標、または描画データ配列
  * @param {number|function(boolean):void} [y0] - 始点Y座標、またはコールバック関数
- * @param {number} [x1] - 終点X座標
- * @param {number} [y1] - 終点Y座標
+ * @param {number|null} [x1] - 終点X座標
+ * @param {number|null} [y1] - 終点Y座標
  * @param {string} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
@@ -9031,7 +9035,7 @@ Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.getModifier = function (e) {
@@ -9407,6 +9411,9 @@ Neo.ToolTip = class {
     this.onmouseup = null;
     this.onmouseout = null;
     this.onmouseover = null;
+    this.selected = false;
+    this.isTool = false;
+    this.fixed = false;
   }
 };
 
@@ -9536,7 +9543,10 @@ Neo.ToolTip.prototype.draw = function (c) {
     var ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
-
+    if (!ctx) {
+      console.error("Failed to get 2D context for ToolTip canvas.");
+      return;
+    }
     if (this.prevMode != this.mode) {
       this.prevMode = this.mode;
 
@@ -9606,6 +9616,8 @@ Neo.ToolTip.tone =
 Neo.PenTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.isTool = true;
+    this.toolStrings = [];
   }
 };
 Neo.PenTip.prototype.tools = [
@@ -9932,6 +9944,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     this.isMouseDown = false;
     this.onmousedown = null;
     this.canvas = null;
+    this.toolStrings = [];
   }
 };
 
@@ -9990,6 +10003,7 @@ Neo.MaskTip.prototype.draw = function (c) {
 Neo.DrawTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
   }
 };
 
@@ -10052,24 +10066,23 @@ Neo.ColorSlider = class {
     this.prefix = "";
     this.value0 = 0;
     this.x0 = 0;
+    /** @type {Element|null} */
+    this.element = null;
+    /** @type {string} */
+    this.elementID = "";
+    /** @type {Object} */
+    this.params = /** @type {unknown} */ {};
+    /** @type {number} */
+    this.value = 0;
+    this.isMouseDown = false;
+    /** @type {Element|null} */
+    this.slider = null;
+    /** @type {Element|null} */
+    this.label = null;
+    /** @type {Element|null} */
+    this.hit = null;
   }
 };
-
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.element = null;
-/** @type {string} */
-Neo.ColorSlider.prototype.elementID = /** @type {unknown} */ (null);
-/** @type {Object} */
-Neo.ColorSlider.prototype.params = /** @type {unknown} */ {};
-/** @type {number} */
-Neo.ColorSlider.prototype.value = 0;
-Neo.ColorSlider.prototype.isMouseDown = false;
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.slider = null;
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.label = null;
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.hit = null;
 
 /**
  * カラースライダーを初期化
@@ -10249,7 +10262,7 @@ Neo.SizeSlider = class {
 /** @type {Element|null} */
 Neo.SizeSlider.prototype.element = null;
 /** @type {string} */
-Neo.SizeSlider.prototype.elementID = /** @type {unknown} */ (null);
+Neo.SizeSlider.prototype.elementID = "";
 /** @type {Object} */
 Neo.SizeSlider.prototype.params = /** @type {unknown} */ {};
 /** @type {number} */
@@ -10602,7 +10615,7 @@ Neo.ScrollBarButton = function () {};
 /** @type {HTMLElement|null} */
 Neo.ScrollBarButton.prototype.element = null;
 /** @type {string} */
-Neo.ScrollBarButton.prototype.elementID = /** @type {unknown} */ (null);
+Neo.ScrollBarButton.prototype.elementID = "";
 /** @type {Object} */
 Neo.ScrollBarButton.prototype.params = /** @type {unknown} */ (null);
 /** @type {HTMLElement|null} */
@@ -10746,7 +10759,7 @@ Neo.ViewerBar = function () {};
 Neo.ViewerBar.prototype.element = null;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.params = null;
-Neo.ViewerBar.prototype.elementID = null;
+Neo.ViewerBar.prototype.elementID = "";
 Neo.ViewerBar.prototype.isMouseDown = false;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.markElement = null;

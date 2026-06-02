@@ -374,6 +374,9 @@ Neo.ToolTip = class {
     this.onmouseup = null;
     this.onmouseout = null;
     this.onmouseover = null;
+    this.selected = false;
+    this.isTool = false;
+    this.fixed = false;
   }
 };
 
@@ -503,7 +506,10 @@ Neo.ToolTip.prototype.draw = function (c) {
     var ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
-
+    if (!ctx) {
+      console.error("Failed to get 2D context for ToolTip canvas.");
+      return;
+    }
     if (this.prevMode != this.mode) {
       this.prevMode = this.mode;
 
@@ -573,6 +579,8 @@ Neo.ToolTip.tone =
 Neo.PenTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.isTool = true;
+    this.toolStrings = [];
   }
 };
 Neo.PenTip.prototype.tools = [
@@ -899,6 +907,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     this.isMouseDown = false;
     this.onmousedown = null;
     this.canvas = null;
+    this.toolStrings = [];
   }
 };
 
@@ -957,6 +966,7 @@ Neo.MaskTip.prototype.draw = function (c) {
 Neo.DrawTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
   }
 };
 
@@ -1019,24 +1029,23 @@ Neo.ColorSlider = class {
     this.prefix = "";
     this.value0 = 0;
     this.x0 = 0;
+    /** @type {Element|null} */
+    this.element = null;
+    /** @type {string} */
+    this.elementID = "";
+    /** @type {Object} */
+    this.params = /** @type {unknown} */ {};
+    /** @type {number} */
+    this.value = 0;
+    this.isMouseDown = false;
+    /** @type {Element|null} */
+    this.slider = null;
+    /** @type {Element|null} */
+    this.label = null;
+    /** @type {Element|null} */
+    this.hit = null;
   }
 };
-
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.element = null;
-/** @type {string} */
-Neo.ColorSlider.prototype.elementID = /** @type {unknown} */ (null);
-/** @type {Object} */
-Neo.ColorSlider.prototype.params = /** @type {unknown} */ {};
-/** @type {number} */
-Neo.ColorSlider.prototype.value = 0;
-Neo.ColorSlider.prototype.isMouseDown = false;
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.slider = null;
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.label = null;
-/** @type {Element|null} */
-Neo.ColorSlider.prototype.hit = null;
 
 /**
  * カラースライダーを初期化
@@ -1216,7 +1225,7 @@ Neo.SizeSlider = class {
 /** @type {Element|null} */
 Neo.SizeSlider.prototype.element = null;
 /** @type {string} */
-Neo.SizeSlider.prototype.elementID = /** @type {unknown} */ (null);
+Neo.SizeSlider.prototype.elementID = "";
 /** @type {Object} */
 Neo.SizeSlider.prototype.params = /** @type {unknown} */ {};
 /** @type {number} */
@@ -1569,7 +1578,7 @@ Neo.ScrollBarButton = function () {};
 /** @type {HTMLElement|null} */
 Neo.ScrollBarButton.prototype.element = null;
 /** @type {string} */
-Neo.ScrollBarButton.prototype.elementID = /** @type {unknown} */ (null);
+Neo.ScrollBarButton.prototype.elementID = "";
 /** @type {Object} */
 Neo.ScrollBarButton.prototype.params = /** @type {unknown} */ (null);
 /** @type {HTMLElement|null} */
@@ -1713,7 +1722,7 @@ Neo.ViewerBar = function () {};
 Neo.ViewerBar.prototype.element = null;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.params = null;
-Neo.ViewerBar.prototype.elementID = null;
+Neo.ViewerBar.prototype.elementID = "";
 Neo.ViewerBar.prototype.isMouseDown = false;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.markElement = null;
