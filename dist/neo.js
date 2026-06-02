@@ -1880,7 +1880,7 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
-("use strict");
+"use strict";
 //@ts-check
 
 Neo.dictionary = {
@@ -2091,7 +2091,7 @@ Neo.translate = (function () {
   };
 })();
 
-("use strict");
+"use strict";
 //@ts-check
 
 Neo.Painter = class {
@@ -2317,6 +2317,9 @@ Neo.Painter.prototype.setTool = function (tool) {
   //テキストツール以外のツールに切り替えるときは、テキストツールを終了する
   if (tool !== this.textTool) {
     this.textTool.kill();
+  }
+  if (this.tool && this.tool.cancelBezier) {
+    this.tool.cancelBezier();
   }
   if (tool !== this.pasteTool) {
     this.pasteTool.kill();
@@ -2929,7 +2932,15 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     this.isMouseDownRight
   ) {
     this.isMouseDownRight = false;
-    this.tool.cancelBezier();
+    if (this.tool.cancelBezier) {
+      this.tool.cancelBezier();
+    }
+    return;
+  }
+  if (this.drawType != Neo.Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
+    if (this.tool.cancelBezier) {
+      this.tool.cancelBezier();
+    }
     return;
   }
 
@@ -5991,7 +6002,7 @@ Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
 };
 
-("use strict");
+"use strict";
 //@ts-check
 
 Neo.ToolBase = class {
@@ -7605,7 +7616,7 @@ Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
-("use strict");
+"use strict";
 //@ts-check
 Neo.CommandBase = class {
   constructor() {
@@ -7732,7 +7743,7 @@ Neo.CopyrightCommand.prototype.execute = function () {
   }
 };
 
-("use strict");
+"use strict";
 //@ts-check
 /*
   -----------------------------------------------------------------------
@@ -9035,7 +9046,7 @@ Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };
 
-("use strict");
+"use strict";
 //@ts-check
 
 Neo.getModifier = function (e) {

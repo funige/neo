@@ -225,6 +225,9 @@ Neo.Painter.prototype.setTool = function (tool) {
   if (tool !== this.textTool) {
     this.textTool.kill();
   }
+  if (this.tool && this.tool.cancelBezier) {
+    this.tool.cancelBezier();
+  }
   if (tool !== this.pasteTool) {
     this.pasteTool.kill();
   }
@@ -836,7 +839,15 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     this.isMouseDownRight
   ) {
     this.isMouseDownRight = false;
-    this.tool.cancelBezier();
+    if (this.tool.cancelBezier) {
+      this.tool.cancelBezier();
+    }
+    return;
+  }
+  if (this.drawType != Neo.Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
+    if (this.tool.cancelBezier) {
+      this.tool.cancelBezier();
+    }
     return;
   }
 
