@@ -3474,8 +3474,12 @@ Neo.Painter.prototype.submit = function (board) {
      thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
      }
      }*/
-
-  Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
+  const png = this.getPNG();
+  if (!(png instanceof Blob)) {
+    console.error("Failed to get PNG data. Submission aborted.");
+    return;
+  }
+  Neo.submit(board, png, thumbnail2, thumbnail);
 };
 
 Neo.Painter.prototype.useThumbnail = function () {
@@ -3523,8 +3527,8 @@ Neo.Painter.prototype.dataURLtoBlob = function (dataURL) {
  * 内部で保持している複数のレイヤー（this.canvas[0], [1]）を、
  * 指定されたサイズにリサイズまたは調整して一つのキャンバスへ描画する。
  * 背景色（白）を塗りつぶした後に重ね合わせることで、合成画像を作成する。
- * @param {number} [imageWidth] - 出力画像の幅（省略時はキャンバス幅）
- * @param {number} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
+ * @param {number|null} [imageWidth] - 出力画像の幅（省略時はキャンバス幅）
+ * @param {number|null} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
  * @returns {HTMLCanvasElement|null} 合成された画像データを持つCanvas要素
  */
 Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
@@ -3606,15 +3610,17 @@ Neo.Painter.prototype.getPNG = function () {
  */
 Neo.Painter.prototype.getThumbnail = function (type) {
   if (type != "animation") {
-    var thumbnailWidth = this.getThumbnailWidth();
-    var thumbnailHeight = this.getThumbnailHeight();
+    /** @type {number|null} */
+    let thumbnailWidth = this.getThumbnailWidth();
+    /** @type {number|null} */
+    let thumbnailHeight = this.getThumbnailHeight();
     if (thumbnailWidth || thumbnailHeight) {
-      var width = this.canvasWidth;
-      var height = this.canvasHeight;
-      if (thumbnailWidth == 0) {
+      const width = this.canvasWidth;
+      const height = this.canvasHeight;
+      if (thumbnailHeight && thumbnailWidth == 0) {
         thumbnailWidth = (thumbnailHeight * width) / height;
       }
-      if (thumbnailHeight == 0) {
+      if (thumbnailWidth && thumbnailHeight == 0) {
         thumbnailHeight = (thumbnailWidth * height) / width;
       }
     } else {
@@ -7036,11 +7042,16 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
 };
 Neo.EffectToolBase.prototype.isUpMove = false;
 Neo.EffectToolBase.prototype.isEllipse = false;
+Neo.EffectToolBase.prototype.isFill = false;
 Neo.EffectToolBase.prototype.endX = 0;
 Neo.EffectToolBase.prototype.endY = 0;
 Neo.EffectToolBase.prototype.startX = 0;
 Neo.EffectToolBase.prototype.startY = 0;
 Neo.EffectToolBase.prototype.ticking = false;
+Neo.EffectToolBase.prototype.latestX = 0;
+Neo.EffectToolBase.prototype.latestY = 0;
+Neo.EffectToolBase.prototype.defaultAlpha = 0;
+Neo.EffectToolBase.prototype.doEffect = function (oe, x, y, width, height) {};
 
 Neo.EffectToolBase.prototype.downHandler = function (oe) {
   this.isUpMove = false;
@@ -8094,6 +8105,8 @@ Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
 
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
   } else {
+    let x0, y0, x1, y1, lineType;
+
     var item = arguments[0];
     var length = item.length;
 
@@ -8103,7 +8116,6 @@ Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
     lineType = item[11];
     x0 = item[12];
     y0 = item[13];
-    var x1, y1;
 
     for (var i = 14; i + 1 < length; i += 2) {
       x1 = x0;
@@ -8300,7 +8312,7 @@ Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
     y = Number(y);
     width = Number(width);
     height = Number(height);
-    // type = Number(type);
+    type = Number(type);
 
     this.push("fill", layer);
     this.pushCurrent();
@@ -8670,6 +8682,10 @@ Neo.ActionManager.prototype.text = function (
   size,
   family,
 ) {
+  string = String(string);
+  size = String(size);
+  family = String(family);
+
   var oe = Neo.painter;
   var layer = oe.current;
 
@@ -8896,7 +8912,7 @@ Neo.initViewer = function (pch) {
     false,
   );
 
-  if (pch) {
+  if (pch && pch.data && pch.data.length > 0) {
     //Neo.config.pch_file) {
     Neo.painter._actionMgr._items = pch.data;
     Neo.startViewer();
@@ -9271,7 +9287,6 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
 
   this.element.className = "buttonOff";
 
-  /**@param {Number} wait */
   this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
     this.element.style.opacity = "0.5";
@@ -9578,6 +9593,10 @@ Neo.ToolTip = class {
 };
 
 Neo.ToolTip.prototype.prevMode = -1;
+Neo.ToolTip.prototype.toolStrings = [];
+Neo.ToolTip.prototype.tools = [];
+Neo.ToolTip.prototype.toolIcons = [];
+Neo.ToolTip.prototype.hasTintImage = false;
 
 /** @type {HTMLCanvasElement|null} */
 Neo.ToolTip.prototype.canvas = null;
@@ -10537,8 +10556,9 @@ Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   this.label = this.element.getElementsByClassName("label")[0];
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
-
-  this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  }
   this.update();
   return this;
 };
@@ -10626,12 +10646,13 @@ Neo.SizeSlider.prototype.update = function () {
 
   var height = (this.value * 33.0) / 30.0;
   height = Math.max(Math.min(34, height), 1);
-
-  this.slider.style.height = height.toFixed(2) + "px";
-  if (this.label instanceof HTMLElement) {
-    this.label.innerHTML = this.value + "px";
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.height = height.toFixed(2) + "px";
+    if (this.label instanceof HTMLElement) {
+      this.label.innerHTML = this.value + "px";
+    }
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
   }
-  this.slider.style.backgroundColor = Neo.painter.foregroundColor;
 };
 
 /*
@@ -10832,6 +10853,10 @@ Neo.ReserveControl.prototype.save = function () {
   this.reserve.drawType = Neo.painter.drawType;
   this.reserve.alpha = Neo.painter.alpha;
   this.reserve.tool = Neo.painter.tool.getType();
+  if (!(this.element instanceof HTMLElement)) {
+    console.error("Element not found for ReserveControl save.");
+    return;
+  }
   this.element.style.backgroundColor = this.reserve.color;
   this.update();
   Neo.updateUI();

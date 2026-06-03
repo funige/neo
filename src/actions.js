@@ -327,6 +327,8 @@ Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
 
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
   } else {
+    let x0, y0, x1, y1, lineType;
+
     var item = arguments[0];
     var length = item.length;
 
@@ -336,7 +338,6 @@ Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
     lineType = item[11];
     x0 = item[12];
     y0 = item[13];
-    var x1, y1;
 
     for (var i = 14; i + 1 < length; i += 2) {
       x1 = x0;
@@ -533,7 +534,7 @@ Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
     y = Number(y);
     width = Number(width);
     height = Number(height);
-    // type = Number(type);
+    type = Number(type);
 
     this.push("fill", layer);
     this.pushCurrent();
@@ -903,6 +904,10 @@ Neo.ActionManager.prototype.text = function (
   size,
   family,
 ) {
+  string = String(string);
+  size = String(size);
+  family = String(family);
+
   var oe = Neo.painter;
   var layer = oe.current;
 
@@ -1129,7 +1134,7 @@ Neo.initViewer = function (pch) {
     false,
   );
 
-  if (pch) {
+  if (pch && pch.data && pch.data.length > 0) {
     //Neo.config.pch_file) {
     Neo.painter._actionMgr._items = pch.data;
     Neo.startViewer();

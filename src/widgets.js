@@ -84,7 +84,6 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
 
   this.element.className = "buttonOff";
 
-  /**@param {Number} wait */
   this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
     this.element.style.opacity = "0.5";
@@ -391,6 +390,10 @@ Neo.ToolTip = class {
 };
 
 Neo.ToolTip.prototype.prevMode = -1;
+Neo.ToolTip.prototype.toolStrings = [];
+Neo.ToolTip.prototype.tools = [];
+Neo.ToolTip.prototype.toolIcons = [];
+Neo.ToolTip.prototype.hasTintImage = false;
 
 /** @type {HTMLCanvasElement|null} */
 Neo.ToolTip.prototype.canvas = null;
@@ -1350,8 +1353,9 @@ Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   this.label = this.element.getElementsByClassName("label")[0];
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
-
-  this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  }
   this.update();
   return this;
 };
@@ -1439,12 +1443,13 @@ Neo.SizeSlider.prototype.update = function () {
 
   var height = (this.value * 33.0) / 30.0;
   height = Math.max(Math.min(34, height), 1);
-
-  this.slider.style.height = height.toFixed(2) + "px";
-  if (this.label instanceof HTMLElement) {
-    this.label.innerHTML = this.value + "px";
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.height = height.toFixed(2) + "px";
+    if (this.label instanceof HTMLElement) {
+      this.label.innerHTML = this.value + "px";
+    }
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
   }
-  this.slider.style.backgroundColor = Neo.painter.foregroundColor;
 };
 
 /*
@@ -1645,6 +1650,10 @@ Neo.ReserveControl.prototype.save = function () {
   this.reserve.drawType = Neo.painter.drawType;
   this.reserve.alpha = Neo.painter.alpha;
   this.reserve.tool = Neo.painter.tool.getType();
+  if (!(this.element instanceof HTMLElement)) {
+    console.error("Element not found for ReserveControl save.");
+    return;
+  }
   this.element.style.backgroundColor = this.reserve.color;
   this.update();
   Neo.updateUI();

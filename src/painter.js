@@ -1363,8 +1363,12 @@ Neo.Painter.prototype.submit = function (board) {
      thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
      }
      }*/
-
-  Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
+  const png = this.getPNG();
+  if (!(png instanceof Blob)) {
+    console.error("Failed to get PNG data. Submission aborted.");
+    return;
+  }
+  Neo.submit(board, png, thumbnail2, thumbnail);
 };
 
 Neo.Painter.prototype.useThumbnail = function () {
@@ -1412,8 +1416,8 @@ Neo.Painter.prototype.dataURLtoBlob = function (dataURL) {
  * 内部で保持している複数のレイヤー（this.canvas[0], [1]）を、
  * 指定されたサイズにリサイズまたは調整して一つのキャンバスへ描画する。
  * 背景色（白）を塗りつぶした後に重ね合わせることで、合成画像を作成する。
- * @param {number} [imageWidth] - 出力画像の幅（省略時はキャンバス幅）
- * @param {number} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
+ * @param {number|null} [imageWidth] - 出力画像の幅（省略時はキャンバス幅）
+ * @param {number|null} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
  * @returns {HTMLCanvasElement|null} 合成された画像データを持つCanvas要素
  */
 Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
@@ -1495,15 +1499,17 @@ Neo.Painter.prototype.getPNG = function () {
  */
 Neo.Painter.prototype.getThumbnail = function (type) {
   if (type != "animation") {
-    var thumbnailWidth = this.getThumbnailWidth();
-    var thumbnailHeight = this.getThumbnailHeight();
+    /** @type {number|null} */
+    let thumbnailWidth = this.getThumbnailWidth();
+    /** @type {number|null} */
+    let thumbnailHeight = this.getThumbnailHeight();
     if (thumbnailWidth || thumbnailHeight) {
-      var width = this.canvasWidth;
-      var height = this.canvasHeight;
-      if (thumbnailWidth == 0) {
+      const width = this.canvasWidth;
+      const height = this.canvasHeight;
+      if (thumbnailHeight && thumbnailWidth == 0) {
         thumbnailWidth = (thumbnailHeight * width) / height;
       }
-      if (thumbnailHeight == 0) {
+      if (thumbnailWidth && thumbnailHeight == 0) {
         thumbnailHeight = (thumbnailWidth * height) / width;
       }
     } else {

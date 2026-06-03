@@ -1022,6 +1022,8 @@ Neo.EffectToolBase.prototype.startY = 0;
 Neo.EffectToolBase.prototype.ticking = false;
 Neo.EffectToolBase.prototype.latestX = 0;
 Neo.EffectToolBase.prototype.latestY = 0;
+Neo.EffectToolBase.prototype.defaultAlpha = 0;
+Neo.EffectToolBase.prototype.doEffect = function (oe, x, y, width, height) {};
 
 Neo.EffectToolBase.prototype.downHandler = function (oe) {
   this.isUpMove = false;
