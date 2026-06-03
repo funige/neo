@@ -419,13 +419,14 @@ document.addEventListener("DOMContentLoaded", () => {
  *
  * @param {string} value
  * @returns {string}
+ * @note 小文字が返る
  */
 Neo.fixConfig = function (value) {
   // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
   if (value.match(/^#[0-9a-fA-F]{5}$/)) {
     value = "#0" + value.slice(1);
   }
-  return value;
+  return value.toLocaleLowerCase();
 };
 
 Neo.getStyleSheet = function () {
