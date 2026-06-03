@@ -522,7 +522,7 @@ Neo.ActionManager.prototype.bezier = function (
  * @param {number|null} [y] - 始点Y座標、またはコールバック関数
  * @param {number|null} [width] - 矩形の幅
  * @param {number|null} [height] - 矩形の高さ
- * @param {string|number} [type] - 塗りつぶしの種類(四角楕円など)
+ * @param {number|null} [type] - 塗りつぶしの種類(四角楕円など)
  */
 Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
   var oe = Neo.painter;
@@ -533,6 +533,7 @@ Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
     y = Number(y);
     width = Number(width);
     height = Number(height);
+    // type = Number(type);
 
     this.push("fill", layer);
     this.pushCurrent();
@@ -1253,16 +1254,24 @@ Neo.startViewer = function () {
       Neo.painter.onspeed();
       this.update();
     };
-
-    new Neo.ViewerButton().init("neo-viewerRewind").onmouseup = function () {
-      Neo.painter.onrewind();
-    };
-    new Neo.ViewerButton().init("neo-viewerPlus").onmouseup = function () {
-      new Neo.ZoomPlusCommand(Neo.painter).execute();
-    };
-    new Neo.ViewerButton().init("neo-viewerMinus").onmouseup = function () {
-      new Neo.ZoomMinusCommand(Neo.painter).execute();
-    };
+    const neo_viewerRewind = new Neo.ViewerButton().init("neo-viewerRewind");
+    if (neo_viewerRewind) {
+      neo_viewerRewind.onmouseup = function () {
+        Neo.painter.onrewind();
+      };
+    }
+    const neo_viewerPlus = new Neo.ViewerButton().init("neo-viewerPlus");
+    if (neo_viewerPlus) {
+      neo_viewerPlus.onmouseup = function () {
+        new Neo.ZoomPlusCommand(Neo.painter).execute();
+      };
+    }
+    const neo_viewerMinus = new Neo.ViewerButton().init("neo-viewerMinus");
+    if (neo_viewerMinus) {
+      neo_viewerMinus.onmouseup = function () {
+        new Neo.ZoomMinusCommand(Neo.painter).execute();
+      };
+    }
 
     var length = Neo.painter._actionMgr._items.length;
     Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {

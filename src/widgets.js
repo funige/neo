@@ -536,6 +536,10 @@ Neo.ToolTip.prototype.draw = function (c) {
       var img = new Image();
       var ref = this;
       img.onload = function () {
+        if (!ref.canvas) {
+          console.error("Canvas not found for ToolTip on image load.");
+          return;
+        }
         ctx.clearRect(0, 0, ref.canvas.width, ref.canvas.height);
         ref.drawTintImage(ctx, img, c, 0, 0);
       };
@@ -712,7 +716,9 @@ Neo.Pen2Tip.prototype.update = function () {
       this.draw(Neo.painter.foregroundColor);
       break;
   }
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
@@ -806,7 +812,9 @@ Neo.EraserTip.prototype.update = function () {
     this.draw();
     this.drawOnce = true;
   }
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.EraserTip.prototype.draw = function () {
@@ -876,7 +884,9 @@ Neo.EffectTip.prototype.update = function () {
   }
 
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -945,7 +955,9 @@ Neo.Effect2Tip.prototype.update = function () {
   }
 
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -1001,7 +1013,9 @@ Neo.MaskTip.prototype._mouseDownHandler = function (e) {
 
 Neo.MaskTip.prototype.update = function () {
   this.draw(Neo.painter.maskColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.MaskTip.prototype.draw = function (c) {
@@ -1073,7 +1087,9 @@ Neo.DrawTip.prototype._mouseDownHandler = function (e) {
 Neo.DrawTip.prototype.update = function () {
   this.mode = Neo.painter.drawType;
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -1137,8 +1153,8 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
 
-  if (!this.slider) {
-    console.error("Slider not found: " + elementID);
+  if (!(this.slider instanceof HTMLElement)) {
+    console.error("One or more required elements not found: " + elementID);
     return null;
   }
 
@@ -1269,9 +1285,12 @@ Neo.ColorSlider.prototype.update = function () {
 
   var width = (this.value * 49.0) / 255.0;
   width = Math.max(Math.min(48, width), 1);
-
-  this.slider.style.width = width.toFixed(2) + "px";
-  this.label.innerHTML = this.prefix + this.value.toFixed(0);
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.width = width.toFixed(2) + "px";
+  }
+  if (this.label instanceof HTMLElement) {
+    this.label.innerHTML = this.prefix + this.value.toFixed(0);
+  }
 };
 
 /*
@@ -1422,7 +1441,9 @@ Neo.SizeSlider.prototype.update = function () {
   height = Math.max(Math.min(34, height), 1);
 
   this.slider.style.height = height.toFixed(2) + "px";
-  this.label.innerHTML = this.value + "px";
+  if (this.label instanceof HTMLElement) {
+    this.label.innerHTML = this.value + "px";
+  }
   this.slider.style.backgroundColor = Neo.painter.foregroundColor;
 };
 
@@ -1630,6 +1651,10 @@ Neo.ReserveControl.prototype.save = function () {
 };
 
 Neo.ReserveControl.prototype.update = function () {
+  if (!this.element) {
+    console.error("Element not found for ReserveControl update.");
+    return;
+  }
   this.element.style.backgroundColor = this.reserve.color;
 };
 

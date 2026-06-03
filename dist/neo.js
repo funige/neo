@@ -1898,7 +1898,7 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.dictionary = {
@@ -2109,7 +2109,7 @@ Neo.translate = (function () {
   };
 })();
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.Painter = class {
@@ -6020,7 +6020,7 @@ Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
 };
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.ToolBase = class {
@@ -7032,15 +7032,18 @@ Neo.EraseAllTool.prototype.rollOverHandler = function (oe) {};
 Neo.EffectToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
-    this.isEllipse = false;
-    this.endX = 0;
-    this.endY = 0;
-    this.latestX = 0;
-    this.latestY = 0;
-    this.defaultAlpha = null;
   }
 };
 Neo.EffectToolBase.prototype.isUpMove = false;
+Neo.EffectToolBase.prototype.isEllipse = false;
+Neo.EffectToolBase.prototype.isFill = false;
+Neo.EffectToolBase.prototype.endX = 0;
+Neo.EffectToolBase.prototype.endY = 0;
+Neo.EffectToolBase.prototype.startX = 0;
+Neo.EffectToolBase.prototype.startY = 0;
+Neo.EffectToolBase.prototype.ticking = false;
+Neo.EffectToolBase.prototype.latestX = 0;
+Neo.EffectToolBase.prototype.latestY = 0;
 
 Neo.EffectToolBase.prototype.downHandler = function (oe) {
   this.isUpMove = false;
@@ -7638,7 +7641,7 @@ Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
-"use strict";
+("use strict");
 //@ts-check
 Neo.CommandBase = class {
   constructor() {
@@ -7765,7 +7768,7 @@ Neo.CopyrightCommand.prototype.execute = function () {
   }
 };
 
-"use strict";
+("use strict");
 //@ts-check
 /*
   -----------------------------------------------------------------------
@@ -8289,7 +8292,7 @@ Neo.ActionManager.prototype.bezier = function (
  * @param {number|null} [y] - 始点Y座標、またはコールバック関数
  * @param {number|null} [width] - 矩形の幅
  * @param {number|null} [height] - 矩形の高さ
- * @param {string|number} [type] - 塗りつぶしの種類(四角楕円など)
+ * @param {number|null} [type] - 塗りつぶしの種類(四角楕円など)
  */
 Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
   var oe = Neo.painter;
@@ -8300,6 +8303,7 @@ Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
     y = Number(y);
     width = Number(width);
     height = Number(height);
+    // type = Number(type);
 
     this.push("fill", layer);
     this.pushCurrent();
@@ -9020,16 +9024,24 @@ Neo.startViewer = function () {
       Neo.painter.onspeed();
       this.update();
     };
-
-    new Neo.ViewerButton().init("neo-viewerRewind").onmouseup = function () {
-      Neo.painter.onrewind();
-    };
-    new Neo.ViewerButton().init("neo-viewerPlus").onmouseup = function () {
-      new Neo.ZoomPlusCommand(Neo.painter).execute();
-    };
-    new Neo.ViewerButton().init("neo-viewerMinus").onmouseup = function () {
-      new Neo.ZoomMinusCommand(Neo.painter).execute();
-    };
+    const neo_viewerRewind = new Neo.ViewerButton().init("neo-viewerRewind");
+    if (neo_viewerRewind) {
+      neo_viewerRewind.onmouseup = function () {
+        Neo.painter.onrewind();
+      };
+    }
+    const neo_viewerPlus = new Neo.ViewerButton().init("neo-viewerPlus");
+    if (neo_viewerPlus) {
+      neo_viewerPlus.onmouseup = function () {
+        new Neo.ZoomPlusCommand(Neo.painter).execute();
+      };
+    }
+    const neo_viewerMinus = new Neo.ViewerButton().init("neo-viewerMinus");
+    if (neo_viewerMinus) {
+      neo_viewerMinus.onmouseup = function () {
+        new Neo.ZoomMinusCommand(Neo.painter).execute();
+      };
+    }
 
     var length = Neo.painter._actionMgr._items.length;
     Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {
@@ -9176,7 +9188,7 @@ Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.getModifier = function (e) {
@@ -9714,6 +9726,10 @@ Neo.ToolTip.prototype.draw = function (c) {
       var img = new Image();
       var ref = this;
       img.onload = function () {
+        if (!ref.canvas) {
+          console.error("Canvas not found for ToolTip on image load.");
+          return;
+        }
         ctx.clearRect(0, 0, ref.canvas.width, ref.canvas.height);
         ref.drawTintImage(ctx, img, c, 0, 0);
       };
@@ -9890,7 +9906,9 @@ Neo.Pen2Tip.prototype.update = function () {
       this.draw(Neo.painter.foregroundColor);
       break;
   }
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
@@ -9984,7 +10002,9 @@ Neo.EraserTip.prototype.update = function () {
     this.draw();
     this.drawOnce = true;
   }
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.EraserTip.prototype.draw = function () {
@@ -10054,7 +10074,9 @@ Neo.EffectTip.prototype.update = function () {
   }
 
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -10123,7 +10145,9 @@ Neo.Effect2Tip.prototype.update = function () {
   }
 
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -10179,7 +10203,9 @@ Neo.MaskTip.prototype._mouseDownHandler = function (e) {
 
 Neo.MaskTip.prototype.update = function () {
   this.draw(Neo.painter.maskColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.MaskTip.prototype.draw = function (c) {
@@ -10251,7 +10277,9 @@ Neo.DrawTip.prototype._mouseDownHandler = function (e) {
 Neo.DrawTip.prototype.update = function () {
   this.mode = Neo.painter.drawType;
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -10315,8 +10343,8 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
 
-  if (!this.slider) {
-    console.error("Slider not found: " + elementID);
+  if (!(this.slider instanceof HTMLElement)) {
+    console.error("One or more required elements not found: " + elementID);
     return null;
   }
 
@@ -10447,9 +10475,12 @@ Neo.ColorSlider.prototype.update = function () {
 
   var width = (this.value * 49.0) / 255.0;
   width = Math.max(Math.min(48, width), 1);
-
-  this.slider.style.width = width.toFixed(2) + "px";
-  this.label.innerHTML = this.prefix + this.value.toFixed(0);
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.width = width.toFixed(2) + "px";
+  }
+  if (this.label instanceof HTMLElement) {
+    this.label.innerHTML = this.prefix + this.value.toFixed(0);
+  }
 };
 
 /*
@@ -10600,7 +10631,9 @@ Neo.SizeSlider.prototype.update = function () {
   height = Math.max(Math.min(34, height), 1);
 
   this.slider.style.height = height.toFixed(2) + "px";
-  this.label.innerHTML = this.value + "px";
+  if (this.label instanceof HTMLElement) {
+    this.label.innerHTML = this.value + "px";
+  }
   this.slider.style.backgroundColor = Neo.painter.foregroundColor;
 };
 
@@ -10808,6 +10841,10 @@ Neo.ReserveControl.prototype.save = function () {
 };
 
 Neo.ReserveControl.prototype.update = function () {
+  if (!this.element) {
+    console.error("Element not found for ReserveControl update.");
+    return;
+  }
   this.element.style.backgroundColor = this.reserve.color;
 };
 

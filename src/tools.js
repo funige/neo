@@ -1010,15 +1010,18 @@ Neo.EraseAllTool.prototype.rollOverHandler = function (oe) {};
 Neo.EffectToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
-    this.isEllipse = false;
-    this.endX = 0;
-    this.endY = 0;
-    this.latestX = 0;
-    this.latestY = 0;
-    this.defaultAlpha = null;
   }
 };
 Neo.EffectToolBase.prototype.isUpMove = false;
+Neo.EffectToolBase.prototype.isEllipse = false;
+Neo.EffectToolBase.prototype.isFill = false;
+Neo.EffectToolBase.prototype.endX = 0;
+Neo.EffectToolBase.prototype.endY = 0;
+Neo.EffectToolBase.prototype.startX = 0;
+Neo.EffectToolBase.prototype.startY = 0;
+Neo.EffectToolBase.prototype.ticking = false;
+Neo.EffectToolBase.prototype.latestX = 0;
+Neo.EffectToolBase.prototype.latestY = 0;
 
 Neo.EffectToolBase.prototype.downHandler = function (oe) {
   this.isUpMove = false;
