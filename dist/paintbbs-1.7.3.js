@@ -1035,24 +1035,42 @@ Neo.initComponents = function () {
 };
 
 Neo.initButtons = function () {
-  new Neo.Button().init("neo-undo").onmouseup = function () {
-    new Neo.UndoCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-redo").onmouseup = function () {
-    new Neo.RedoCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-window").onmouseup = function () {
-    new Neo.WindowCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-copyright").onmouseup = function () {
-    new Neo.CopyrightCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-zoomPlus").onmouseup = function () {
-    new Neo.ZoomPlusCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-zoomMinus").onmouseup = function () {
-    new Neo.ZoomMinusCommand(Neo.painter).execute();
-  };
+  const neo_undo = new Neo.Button().init("neo-undo");
+  if (neo_undo) {
+    neo_undo.onmouseup = function () {
+      new Neo.UndoCommand(Neo.painter).execute();
+    };
+  }
+  const neo_redo = new Neo.Button().init("neo-redo");
+  if (neo_redo) {
+    neo_redo.onmouseup = function () {
+      new Neo.RedoCommand(Neo.painter).execute();
+    };
+  }
+  const neo_window = new Neo.Button().init("neo-window");
+  if (neo_window) {
+    neo_window.onmouseup = function () {
+      new Neo.WindowCommand(Neo.painter).execute();
+    };
+  }
+  const neo_copyright = new Neo.Button().init("neo-copyright");
+  if (neo_copyright) {
+    neo_copyright.onmouseup = function () {
+      new Neo.CopyrightCommand(Neo.painter).execute();
+    };
+  }
+  const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
+  if (neo_zoomPlus) {
+    neo_zoomPlus.onmouseup = function () {
+      new Neo.ZoomPlusCommand(Neo.painter).execute();
+    };
+  }
+  const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
+  if (neo_zoomMinus) {
+    neo_zoomMinus.onmouseup = function () {
+      new Neo.ZoomMinusCommand(Neo.painter).execute();
+    };
+  }
   Neo.submitButton = new Neo.Button().init("neo-submit");
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton.disable(5000);
@@ -7015,7 +7033,6 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
     this.isEllipse = false;
-    this.isFill = false;
     this.endX = 0;
     this.endY = 0;
     this.latestX = 0;
@@ -7527,22 +7544,27 @@ Neo.TextTool.prototype.keyDownHandler = function (e) {
     // Returnで確定
     e.preventDefault();
 
-    var oe = Neo.painter;
-    var text = oe.inputText;
+    const oe = Neo.painter;
+    /** @type {HTMLTextAreaElement} **/
+    const text = oe.inputText;
 
     if (text) {
       oe._pushUndo();
       //this.drawText(oe);
       //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-
-      var string = text.textContent || text.innerText;
-      var size = text.style.fontSize;
-      var family = text.style.fontFamily || "Arial";
-      var layer = oe.current;
-      var color = oe.getColor();
-      var alpha = oe.alpha;
-      var x = this.startX;
-      var y = this.startY;
+      /** @type {string} **/
+      const string = text.textContent || text.innerText;
+      /** @type {string} **/
+      const size = text.style.fontSize;
+      /** @type {string} **/
+      const family = text.style.fontFamily || "Arial";
+      /** @type {number} **/
+      const color = oe.getColor();
+      /** @type {number} **/
+      const alpha = oe.alpha;
+      // const layer = oe.current;
+      // const x = this.startX;
+      // const y = this.startY;
       //oe.doText(layer, this.startX, this.startY, color, string, size, family);
       oe._actionMgr.text(
         this.startX,
@@ -7995,15 +8017,19 @@ Neo.ActionManager.prototype.eraseAll = function () {
 };
 /**
  * 手書き線の描画アクション 等速
- * @param {*} x0
- * @param {*} [y0]
- * @param {*} [lineType]
+ * @param {number|Array<*>} x0 - 開始X座標、または一括描画するアクションデータ配列(item)
+ * @param {number|null} [y0] - 開始Y座標
+ * @param {number|null} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.freeHand = function (x0, y0, lineType) {
   var oe = Neo.painter;
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x0 = Number(x0);
+    y0 = Number(y0);
+    lineType = Number(lineType);
+
     this.push("freeHand", layer);
     this.pushCurrent();
     this.push(lineType, x0, y0, x0, y0);
@@ -8014,8 +8040,8 @@ Neo.ActionManager.prototype.freeHand = function (x0, y0, lineType) {
   } else {
     var item = arguments[0];
 
-    layer = item[1];
-    lineType = item[11];
+    const layer = item[1];
+    const lineType = item[11];
     this.getCurrent(item);
 
     var i = this._index;
@@ -8025,16 +8051,16 @@ Neo.ActionManager.prototype.freeHand = function (x0, y0, lineType) {
       i += 2;
     }
 
-    var x1 = item[i + 0];
-    var y1 = item[i + 1];
-    x0 = item[i + 2];
-    y0 = item[i + 3];
+    const x1 = item[i + 0];
+    const y1 = item[i + 1];
+    const x0 = item[i + 2];
+    const y0 = item[i + 3];
 
     oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     this._index = i;
-    var result = i + 2 + 3 >= item.length;
+    const result = i + 2 + 3 >= item.length;
 
     if (!result) {
       oe.prevLine = null;
@@ -8049,15 +8075,19 @@ Neo.ActionManager.prototype.freeHand = function (x0, y0, lineType) {
 
 /**
  * 手書き線の描画アクション 高速
- * @param {*} x0 - 開始X座標、または一括描画するアクションデータ配列(item)
- * @param {*} [y0] - 開始Y座標、または一括描画完了後のコールバック関数
- * @param {*} [lineType] - 線の種類
+ * @param {number|Array<*>} x0 - 開始X座標、または一括描画するアクションデータ配列(item)
+ * @param {number|null} [y0] - 開始Y座標
+ * @param {number|null} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
   var oe = Neo.painter;
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x0 = Number(x0);
+    y0 = Number(y0);
+    lineType = Number(lineType);
+
     this.push("freeHand", layer);
     this.pushCurrent();
     this.push(lineType, x0, y0, x0, y0);
@@ -8122,35 +8152,43 @@ Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
 /**
  * 直線描画
  * @param {number|Array<*>} x0 - 始点X座標、または描画データ配列
- * @param {number|function(boolean):void} [y0] - 始点Y座標、またはコールバック関数
+ * @param {number|null} [y0] - 始点Y座標、またはコールバック関数
  * @param {number|null} [x1] - 終点X座標
  * @param {number|null} [y1] - 終点Y座標
- * @param {string} [lineType] - 線の種類
+ * @param {number|null} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
   var oe = Neo.painter;
   var layer = oe.current;
-
   if (typeof arguments[0] != "object") {
+    x0 = Number(x0);
+    y0 = Number(y0);
+    x1 = Number(x1);
+    y1 = Number(y1);
+    lineType = Number(lineType);
+
     this.push("line", layer);
     this.pushCurrent();
     this.push(lineType, x0, y0, x1, y1);
-  } else {
-    var item = arguments[0];
 
-    layer = item[1];
+    oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+  } else {
+    //描き手順のObjectが渡された場合は、描画データを展開する
+    const item = arguments[0];
+
+    const layer = item[1];
     this.getCurrent(item);
 
-    lineType = item[11];
-    x0 = item[12];
-    y0 = item[13];
-    x1 = item[14];
-    y1 = item[15];
-  }
-  if (x1 === null) x1 = x0;
-  if (y1 === null) y1 = y0;
+    const lineType = item[11];
+    const x0 = item[12];
+    const y0 = item[13];
+    let x1 = item[14];
+    let y1 = item[15];
+    if (x1 === null) x1 = x0;
+    if (y1 === null) y1 = y0;
 
-  oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+    oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
+  }
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8160,14 +8198,14 @@ Neo.ActionManager.prototype.line = function (x0, y0, x1, y1, lineType) {
 /**
  * ベジェ曲線描画
  * @param {number|Array<*>} x0 - 始点X座標、または描画データ配列
- * @param {number|function(boolean):void} [y0] - 始点Y座標、またはコールバック関数
- * @param {number} [x1] - 制御点1 X座標
- * @param {number} [y1] - 制御点1 Y座標
- * @param {number} [x2] - 制御点2 X座標
- * @param {number} [y2] - 制御点2 Y座標
- * @param {number} [x3] - 終点X座標
- * @param {number} [y3] - 終点Y座標
- * @param {string} [lineType] - 線の種類
+ * @param {number|null} [y0] - 始点Y座標、またはコールバック関数
+ * @param {number|null} [x1] - 制御点1 X座標
+ * @param {number|null} [y1] - 制御点1 Y座標
+ * @param {number|null} [x2] - 制御点2 X座標
+ * @param {number|null} [y2] - 制御点2 Y座標
+ * @param {number|null} [x3] - 終点X座標
+ * @param {number|null} [y3] - 終点Y座標
+ * @param {number} [lineType] - 線の種類
  */
 Neo.ActionManager.prototype.bezier = function (
   x0,
@@ -8185,38 +8223,60 @@ Neo.ActionManager.prototype.bezier = function (
   var isReplay = true;
 
   if (typeof arguments[0] != "object") {
+    x0 = Number(x0);
+    y0 = Number(y0);
+    x1 = Number(x1);
+    y1 = Number(y1);
+    x2 = Number(x2);
+    y2 = Number(y2);
+    x3 = Number(x3);
+    y3 = Number(y3);
+    lineType = Number(lineType);
     this.push("bezier", layer);
     this.pushCurrent();
     this.push(lineType, x0, y0, x1, y1, x2, y2, x3, y3);
     isReplay = false;
+    oe.drawBezier(
+      oe.canvasCtx[layer],
+      x0,
+      y0,
+      x1,
+      y1,
+      x2,
+      y2,
+      x3,
+      y3,
+      lineType,
+      isReplay,
+    );
   } else {
-    var item = arguments[0];
-    layer = item[1];
+    const item = arguments[0];
+    const layer = item[1];
     this.getCurrent(item);
 
-    lineType = item[11];
-    x0 = item[12];
-    y0 = item[13];
-    x1 = item[14];
-    y1 = item[15];
-    x2 = item[16];
-    y2 = item[17];
-    x3 = item[18];
-    y3 = item[19];
+    const lineType = item[11];
+    const x0 = item[12];
+    const y0 = item[13];
+    const x1 = item[14];
+    const y1 = item[15];
+    const x2 = item[16];
+    const y2 = item[17];
+    const x3 = item[18];
+    const y3 = item[19];
+    oe.drawBezier(
+      oe.canvasCtx[layer],
+      x0,
+      y0,
+      x1,
+      y1,
+      x2,
+      y2,
+      x3,
+      y3,
+      lineType,
+      isReplay,
+    );
   }
-  oe.drawBezier(
-    oe.canvasCtx[layer],
-    x0,
-    y0,
-    x1,
-    y1,
-    x2,
-    y2,
-    x3,
-    y3,
-    lineType,
-    isReplay,
-  );
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8226,9 +8286,9 @@ Neo.ActionManager.prototype.bezier = function (
 /**
  * 塗り潰し
  * @param {number|Array<*>} x - 始点X座標、またはアクションデータ配列
- * @param {number|function(boolean):void} [y] - 始点Y座標、またはコールバック関数
- * @param {number} [width] - 矩形の幅
- * @param {number} [height] - 矩形の高さ
+ * @param {number|null} [y] - 始点Y座標、またはコールバック関数
+ * @param {number|null} [width] - 矩形の幅
+ * @param {number|null} [height] - 矩形の高さ
  * @param {string|number} [type] - 塗りつぶしの種類(四角楕円など)
  */
 Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
@@ -8236,22 +8296,29 @@ Neo.ActionManager.prototype.fill = function (x, y, width, height, type) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("fill", layer);
     this.pushCurrent();
     this.push(x, y, width, height, type);
+    oe.doFill(layer, x, y, width, height, type);
   } else {
-    var item = arguments[0];
-    layer = item[1];
+    const item = arguments[0];
+    const layer = item[1];
     this.getCurrent(item);
 
-    x = item[11];
-    y = item[12];
-    width = item[13];
-    height = item[14];
-    type = item[15];
+    const x = item[11];
+    const y = item[12];
+    const width = item[13];
+    const height = item[14];
+    const type = item[15];
+
+    oe.doFill(layer, x, y, width, height, type);
   }
 
-  oe.doFill(layer, x, y, width, height, type);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8270,16 +8337,22 @@ Neo.ActionManager.prototype.flipH = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("flipH", layer, x, y, width, height);
+    oe.flipH(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.flipH(layer, x, y, width, height);
   }
-  oe.flipH(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8298,16 +8371,22 @@ Neo.ActionManager.prototype.flipV = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("flipV", layer, x, y, width, height);
+    oe.flipV(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.flipV(layer, x, y, width, height);
   }
-  oe.flipV(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8326,16 +8405,22 @@ Neo.ActionManager.prototype.merge = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("merge", layer, x, y, width, height);
+    oe.merge(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.merge(layer, x, y, width, height);
   }
-  oe.merge(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8354,16 +8439,22 @@ Neo.ActionManager.prototype.blurRect = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("blurRect", layer, x, y, width, height);
+    oe.blurRect(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.blurRect(layer, x, y, width, height);
   }
-  oe.blurRect(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8382,20 +8473,26 @@ Neo.ActionManager.prototype.eraseRect2 = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("eraseRect2", layer);
     this.pushCurrent();
     this.push(x, y, width, height);
+    oe.eraseRect(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
+    const item = arguments[0];
+    const layer = item[1];
     this.getCurrent(item);
 
-    x = item[11];
-    y = item[12];
-    width = item[13];
-    height = item[14];
+    const x = item[11];
+    const y = item[12];
+    const width = item[13];
+    const height = item[14];
+    oe.eraseRect(layer, x, y, width, height);
   }
-  oe.eraseRect(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8415,16 +8512,22 @@ Neo.ActionManager.prototype.eraseRect = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("eraseRect", layer, x, y, width, height);
+    oe.eraseRect(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.eraseRect(layer, x, y, width, height);
   }
-  oe.eraseRect(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8444,17 +8547,23 @@ Neo.ActionManager.prototype.copy = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("copy", layer, x, y, width, height);
+    oe.copy(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.copy(layer, x, y, width, height);
   }
 
-  oe.copy(layer, x, y, width, height);
   oe.tool.x = x;
   oe.tool.y = y;
   oe.tool.width = width;
@@ -8479,19 +8588,27 @@ Neo.ActionManager.prototype.paste = function (x, y, width, height, dx, dy) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+    dx = Number(dx);
+    dy = Number(dy);
+
     this.push("paste", layer, x, y, width, height, dx, dy);
+    oe.paste(layer, x, y, width, height, dx, dy);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
-    dx = item[6];
-    dy = item[7];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    const dx = item[6];
+    const dy = item[7];
+    oe.paste(layer, x, y, width, height, dx, dy);
   }
 
-  oe.paste(layer, x, y, width, height, dx, dy);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8511,16 +8628,22 @@ Neo.ActionManager.prototype.turn = function (x, y, width, height) {
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
+    x = Number(x);
+    y = Number(y);
+    width = Number(width);
+    height = Number(height);
+
     this.push("turn", layer, x, y, width, height);
+    oe.turn(layer, x, y, width, height);
   } else {
-    var item = arguments[0];
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    width = item[4];
-    height = item[5];
+    const item = arguments[0];
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const width = item[4];
+    const height = item[5];
+    oe.turn(layer, x, y, width, height);
   }
-  oe.turn(layer, x, y, width, height);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -8534,7 +8657,7 @@ Neo.ActionManager.prototype.turn = function (x, y, width, height) {
  * @param {number} [color] - 色ID
  * @param {number} [alpha] - 不透明度
  * @param {string} [string] - 入力された文字列
- * @param {number} [size] - フォントサイズ
+ * @param {string} [size] - フォントサイズ 16pxのように単位まで指定する
  * @param {string} [family] - フォントファミリー
  */
 Neo.ActionManager.prototype.text = function (
@@ -8550,20 +8673,27 @@ Neo.ActionManager.prototype.text = function (
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
-    this.push("text", layer, x, y, color, alpha, string, size, family);
-  } else {
-    var item = arguments[0];
+    x = Number(x);
+    y = Number(y);
+    color = Number(color);
+    alpha = Number(alpha);
 
-    layer = item[1];
-    x = item[2];
-    y = item[3];
-    color = item[4];
-    alpha = item[5];
-    string = item[6];
-    size = item[7];
-    family = item[8];
+    this.push("text", layer, x, y, color, alpha, string, size, family);
+    oe.doText(layer, x, y, color, alpha, string, size, family);
+  } else {
+    const item = arguments[0];
+
+    const layer = item[1];
+    const x = item[2];
+    const y = item[3];
+    const color = item[4];
+    const alpha = item[5];
+    const string = item[6];
+    const size = item[7];
+    const family = item[8];
+
+    oe.doText(layer, x, y, color, alpha, string, size, family);
   }
-  oe.doText(layer, x, y, color, alpha, string, size, family);
   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
   var callback = arguments[1];
@@ -9092,7 +9222,7 @@ Neo.Button = class {
 /**
  * @param {string} elementID
  * @param {Object|null} [params]
- * @returns
+ * @returns {Neo.Button|null}
  */
 Neo.Button.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
@@ -9207,6 +9337,11 @@ Neo.RightButton = class extends Neo.Button {
     this.selected = false;
   }
 };
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @return {Neo.RightButton|null}
+ */
 Neo.RightButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
@@ -9249,6 +9384,11 @@ Neo.FillButton = class extends Neo.Button {
   }
 };
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.FillButton|null}
+ */
 Neo.FillButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "fill";
@@ -9438,7 +9578,7 @@ Neo.ToolTip.prototype.label = null;
 /**
  * @param {string} elementID
  * @param {Object|null} [params]
- * @returns {Neo.ToolTip}
+ * @returns {Neo.ToolTip|null}
  */
 Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
@@ -9484,6 +9624,11 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element.innerHTML =
     "<canvas width=46 height=18></canvas><div class='label'></div>";
   this.canvas = this.element.getElementsByTagName("canvas")[0];
+  if (!this.canvas) {
+    console.error("Canvas element not found for " + elementID);
+    return null;
+  }
+
   this.label = this.element.getElementsByTagName("div")[0];
 
   this.update();
@@ -9551,7 +9696,12 @@ Neo.ToolTip.prototype.update = function () {};
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d", {
+    if (!this.canvas) {
+      console.error("Canvas not found for ToolTip.");
+      return;
+    }
+    /** @type {CanvasRenderingContext2D|null} */
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
     if (!ctx) {
@@ -9644,6 +9794,11 @@ Neo.PenTip.prototype.toolIcons = [
   Neo.ToolTip.text,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.PenTip|null}
+ */
 Neo.PenTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("鉛筆"),
@@ -9694,6 +9849,11 @@ Neo.Pen2Tip.prototype.toolIcons = [
   Neo.ToolTip.burn,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Pen2Tip|null}
+ */
 Neo.Pen2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("トーン"),
@@ -9734,9 +9894,17 @@ Neo.Pen2Tip.prototype.update = function () {
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
-  var ctx = this.canvas.getContext("2d", {
+  if (!this.canvas) {
+    console.error("Canvas not found for Pen2Tip.");
+    return;
+  }
+  const ctx = this.canvas.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!ctx) {
+    console.error("Failed to get 2D context for Pen2Tip canvas.");
+    return;
+  }
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
   var buf32 = new Uint32Array(imageData.data.buffer);
@@ -9789,6 +9957,11 @@ Neo.EraserTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_ERASEALL,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.EraserTip|null}
+ */
 Neo.EraserTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("消しペン"),
@@ -9857,6 +10030,11 @@ Neo.EffectTip.prototype.toolIcons = [
   Neo.ToolTip.ellipse,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.EffectTip|null}
+ */
 Neo.EffectTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("四角"),
@@ -9915,6 +10093,11 @@ Neo.Effect2Tip.prototype.toolIcons = [
   Neo.ToolTip.flip,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Effect2Tip|null}
+ */
 Neo.Effect2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("コピー"),
@@ -9959,6 +10142,11 @@ Neo.MaskTip = class extends Neo.ToolTip {
   }
 };
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.MaskTip|null}
+ */
 Neo.MaskTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("通常"),
@@ -10025,6 +10213,11 @@ Neo.DrawTip.prototype.toolIcons = [
   Neo.ToolTip.bezier,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.DrawTip|null}
+ */
 Neo.DrawTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("手書き"),
@@ -10121,6 +10314,11 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.label = this.element.getElementsByClassName("label")[0];
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
+
+  if (!this.slider) {
+    console.error("Slider not found: " + elementID);
+    return null;
+  }
 
   switch (this.type) {
     case Neo.SLIDERTYPE_RED:
@@ -10707,7 +10905,7 @@ Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
  *
  * @param {string} elementID
  * @param {Object|null} [params]
- * @returns
+ * @returns {Neo.ViewerButton|null}
  */
 Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
@@ -10715,11 +10913,23 @@ Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   if (elementID != "neo-viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
-    var ctx = this.canvas.getContext("2d", {
+
+    if (!this.canvas) {
+      console.error("Canvas element not found for " + elementID);
+      return null;
+    }
+
+    /** @type {CanvasRenderingContext2D|null} */
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
 
-    var img = new Image();
+    if (!ctx) {
+      console.error("Canvas context not found for " + elementID);
+      return null;
+    }
+
+    const img = new Image();
     img.onload = function () {
       ctx.clearRect(0, 0, 24, 24);
       ctx.drawImage(img, 0, 0);

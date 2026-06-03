@@ -44,7 +44,7 @@ Neo.Button = class {
 /**
  * @param {string} elementID
  * @param {Object|null} [params]
- * @returns
+ * @returns {Neo.Button|null}
  */
 Neo.Button.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
@@ -159,6 +159,11 @@ Neo.RightButton = class extends Neo.Button {
     this.selected = false;
   }
 };
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @return {Neo.RightButton|null}
+ */
 Neo.RightButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
@@ -201,6 +206,11 @@ Neo.FillButton = class extends Neo.Button {
   }
 };
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.FillButton|null}
+ */
 Neo.FillButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "fill";
@@ -390,7 +400,7 @@ Neo.ToolTip.prototype.label = null;
 /**
  * @param {string} elementID
  * @param {Object|null} [params]
- * @returns {Neo.ToolTip}
+ * @returns {Neo.ToolTip|null}
  */
 Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
@@ -436,6 +446,11 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element.innerHTML =
     "<canvas width=46 height=18></canvas><div class='label'></div>";
   this.canvas = this.element.getElementsByTagName("canvas")[0];
+  if (!this.canvas) {
+    console.error("Canvas element not found for " + elementID);
+    return null;
+  }
+
   this.label = this.element.getElementsByTagName("div")[0];
 
   this.update();
@@ -503,7 +518,12 @@ Neo.ToolTip.prototype.update = function () {};
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d", {
+    if (!this.canvas) {
+      console.error("Canvas not found for ToolTip.");
+      return;
+    }
+    /** @type {CanvasRenderingContext2D|null} */
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
     if (!ctx) {
@@ -596,6 +616,11 @@ Neo.PenTip.prototype.toolIcons = [
   Neo.ToolTip.text,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.PenTip|null}
+ */
 Neo.PenTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("鉛筆"),
@@ -646,6 +671,11 @@ Neo.Pen2Tip.prototype.toolIcons = [
   Neo.ToolTip.burn,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Pen2Tip|null}
+ */
 Neo.Pen2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("トーン"),
@@ -686,9 +716,17 @@ Neo.Pen2Tip.prototype.update = function () {
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
-  var ctx = this.canvas.getContext("2d", {
+  if (!this.canvas) {
+    console.error("Canvas not found for Pen2Tip.");
+    return;
+  }
+  const ctx = this.canvas.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!ctx) {
+    console.error("Failed to get 2D context for Pen2Tip canvas.");
+    return;
+  }
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
   var buf32 = new Uint32Array(imageData.data.buffer);
@@ -741,6 +779,11 @@ Neo.EraserTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_ERASEALL,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.EraserTip|null}
+ */
 Neo.EraserTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("消しペン"),
@@ -809,6 +852,11 @@ Neo.EffectTip.prototype.toolIcons = [
   Neo.ToolTip.ellipse,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.EffectTip|null}
+ */
 Neo.EffectTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("四角"),
@@ -867,6 +915,11 @@ Neo.Effect2Tip.prototype.toolIcons = [
   Neo.ToolTip.flip,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Effect2Tip|null}
+ */
 Neo.Effect2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("コピー"),
@@ -911,6 +964,11 @@ Neo.MaskTip = class extends Neo.ToolTip {
   }
 };
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.MaskTip|null}
+ */
 Neo.MaskTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("通常"),
@@ -977,6 +1035,11 @@ Neo.DrawTip.prototype.toolIcons = [
   Neo.ToolTip.bezier,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.DrawTip|null}
+ */
 Neo.DrawTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("手書き"),
@@ -1073,6 +1136,11 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.label = this.element.getElementsByClassName("label")[0];
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
+
+  if (!this.slider) {
+    console.error("Slider not found: " + elementID);
+    return null;
+  }
 
   switch (this.type) {
     case Neo.SLIDERTYPE_RED:
@@ -1659,7 +1727,7 @@ Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
  *
  * @param {string} elementID
  * @param {Object|null} [params]
- * @returns
+ * @returns {Neo.ViewerButton|null}
  */
 Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
@@ -1667,11 +1735,23 @@ Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   if (elementID != "neo-viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
-    var ctx = this.canvas.getContext("2d", {
+
+    if (!this.canvas) {
+      console.error("Canvas element not found for " + elementID);
+      return null;
+    }
+
+    /** @type {CanvasRenderingContext2D|null} */
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
 
-    var img = new Image();
+    if (!ctx) {
+      console.error("Canvas context not found for " + elementID);
+      return null;
+    }
+
+    const img = new Image();
     img.onload = function () {
       ctx.clearRect(0, 0, 24, 24);
       ctx.drawImage(img, 0, 0);

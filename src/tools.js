@@ -1011,7 +1011,6 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
     this.isEllipse = false;
-    this.isFill = false;
     this.endX = 0;
     this.endY = 0;
     this.latestX = 0;
@@ -1523,22 +1522,27 @@ Neo.TextTool.prototype.keyDownHandler = function (e) {
     // Returnで確定
     e.preventDefault();
 
-    var oe = Neo.painter;
-    var text = oe.inputText;
+    const oe = Neo.painter;
+    /** @type {HTMLTextAreaElement} **/
+    const text = oe.inputText;
 
     if (text) {
       oe._pushUndo();
       //this.drawText(oe);
       //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-
-      var string = text.textContent || text.innerText;
-      var size = text.style.fontSize;
-      var family = text.style.fontFamily || "Arial";
-      var layer = oe.current;
-      var color = oe.getColor();
-      var alpha = oe.alpha;
-      var x = this.startX;
-      var y = this.startY;
+      /** @type {string} **/
+      const string = text.textContent || text.innerText;
+      /** @type {string} **/
+      const size = text.style.fontSize;
+      /** @type {string} **/
+      const family = text.style.fontFamily || "Arial";
+      /** @type {number} **/
+      const color = oe.getColor();
+      /** @type {number} **/
+      const alpha = oe.alpha;
+      // const layer = oe.current;
+      // const x = this.startX;
+      // const y = this.startY;
       //oe.doText(layer, this.startX, this.startY, color, string, size, family);
       oe._actionMgr.text(
         this.startX,

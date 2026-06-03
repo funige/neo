@@ -1035,24 +1035,42 @@ Neo.initComponents = function () {
 };
 
 Neo.initButtons = function () {
-  new Neo.Button().init("neo-undo").onmouseup = function () {
-    new Neo.UndoCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-redo").onmouseup = function () {
-    new Neo.RedoCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-window").onmouseup = function () {
-    new Neo.WindowCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-copyright").onmouseup = function () {
-    new Neo.CopyrightCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-zoomPlus").onmouseup = function () {
-    new Neo.ZoomPlusCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-zoomMinus").onmouseup = function () {
-    new Neo.ZoomMinusCommand(Neo.painter).execute();
-  };
+  const neo_undo = new Neo.Button().init("neo-undo");
+  if (neo_undo) {
+    neo_undo.onmouseup = function () {
+      new Neo.UndoCommand(Neo.painter).execute();
+    };
+  }
+  const neo_redo = new Neo.Button().init("neo-redo");
+  if (neo_redo) {
+    neo_redo.onmouseup = function () {
+      new Neo.RedoCommand(Neo.painter).execute();
+    };
+  }
+  const neo_window = new Neo.Button().init("neo-window");
+  if (neo_window) {
+    neo_window.onmouseup = function () {
+      new Neo.WindowCommand(Neo.painter).execute();
+    };
+  }
+  const neo_copyright = new Neo.Button().init("neo-copyright");
+  if (neo_copyright) {
+    neo_copyright.onmouseup = function () {
+      new Neo.CopyrightCommand(Neo.painter).execute();
+    };
+  }
+  const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
+  if (neo_zoomPlus) {
+    neo_zoomPlus.onmouseup = function () {
+      new Neo.ZoomPlusCommand(Neo.painter).execute();
+    };
+  }
+  const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
+  if (neo_zoomMinus) {
+    neo_zoomMinus.onmouseup = function () {
+      new Neo.ZoomMinusCommand(Neo.painter).execute();
+    };
+  }
   Neo.submitButton = new Neo.Button().init("neo-submit");
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton.disable(5000);
