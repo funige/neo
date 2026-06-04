@@ -24,6 +24,7 @@ var Neo = {};
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore
 Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
+
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
@@ -67,6 +68,18 @@ Neo.config = {
 Neo.reservePen = {};
 Neo.reserveEraser = {};
 
+Neo.submitButton = null;
+Neo.fillButton = null;
+Neo.rightButton = null;
+// toolTip
+Neo.penTip = null;
+Neo.pen2Tip = null;
+Neo.effectTip = null;
+Neo.effect2Tip = null;
+Neo.eraserTip = null;
+Neo.drawTip = null;
+Neo.maskTip = null;
+
 Neo.SLIDERTYPE_RED = 0;
 Neo.SLIDERTYPE_GREEN = 1;
 Neo.SLIDERTYPE_BLUE = 2;
@@ -102,6 +115,8 @@ Neo.extractBootConfig = function (targetName) {
   if (!node) return {};
 
   // 3. paramタグの中身だけを抽出
+
+  /** @type {Record<string, string>} */
   const config = {};
   const params = node.querySelectorAll("param");
   for (const param of params) {
@@ -840,7 +855,8 @@ Neo.multColor = function (c, scale) {
  * @returns {string|boolean} 変換後のカラーコード（失敗時は false）
  */
 Neo.colorNameToHex = function (name) {
-  var colors = {
+  /** @type {Record<string, string>} */
+  const colors = {
     aliceblue: "#f0f8ff",
     antiquewhite: "#faebd7",
     aqua: "#00ffff",
@@ -1426,6 +1442,9 @@ Neo.getSizeString = function (len) {
   return result;
 };
 
+/**
+ * @param {string} url
+ */
 Neo.openURL = function (url) {
   if (Neo.isApp) {
     // @ts-ignore
@@ -1435,6 +1454,10 @@ Neo.openURL = function (url) {
   }
 };
 
+/**
+ * @param {string}  board
+ * @param {string}  url
+ */
 Neo.getAbsoluteURL = function (board, url) {
   if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
     return url;
@@ -1577,6 +1600,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   const postData = (path, data) => {
     var errorMessage = path + "\n";
 
+    /** @type {RequestInit} */
     const requestOptions = {
       method: "post",
       body: data,
@@ -1736,12 +1760,15 @@ Neo.str_header = "";
   -----------------------------------------------------------------------
 */
 
+/**
+ * @param {HTMLElement} applet
+ */
 Neo.createContainer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
 
-  var html =
+  const html =
     '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;">' +
     '<div id="neo-container" style="visibility:hidden;" class="o">' +
     '<div id="neo-center" class="o">' +
@@ -1820,7 +1847,12 @@ Neo.createContainer = function (applet) {
     return Neo.translate(str);
   });
 
-  var parent = applet.parentNode;
+  const parent = applet.parentNode;
+  if (!parent) {
+    console.error("Failed to create container.");
+    return;
+  }
+
   parent.appendChild(neo);
   parent.insertBefore(neo, applet);
 

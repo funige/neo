@@ -13,8 +13,13 @@ Neo.CommandBase.prototype.execute = function () {};
     ZOOM
   ---------------------------------------------------
 */
+/**
+ * @typedef {Object} ZoomPlusData
+ * @property {number} zoom - 現在のズーム値
+ * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
+ */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
-  /**@param {Object} data */
+  /** @param {ZoomPlusData} data */
   constructor(data) {
     super();
     this.data = data;
@@ -31,8 +36,13 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
   // Neo.painter.updateDestCanvas();
 };
 
+/**
+ * @typedef {Object} ZoomMinusData
+ * @property {number} zoom - 現在のズーム値
+ * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
+ */
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
-  /**@param {Object} data */
+  /** @param {ZoomMinusData} data */
   constructor(data) {
     super();
     this.data = data;

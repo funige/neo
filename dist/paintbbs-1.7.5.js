@@ -24,6 +24,7 @@ var Neo = {};
 Neo.version = "1.7.5";
 // @ts-ignore
 Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
+
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
@@ -67,6 +68,18 @@ Neo.config = {
 Neo.reservePen = {};
 Neo.reserveEraser = {};
 
+Neo.submitButton = null;
+Neo.fillButton = null;
+Neo.rightButton = null;
+// toolTip
+Neo.penTip = null;
+Neo.pen2Tip = null;
+Neo.effectTip = null;
+Neo.effect2Tip = null;
+Neo.eraserTip = null;
+Neo.drawTip = null;
+Neo.maskTip = null;
+
 Neo.SLIDERTYPE_RED = 0;
 Neo.SLIDERTYPE_GREEN = 1;
 Neo.SLIDERTYPE_BLUE = 2;
@@ -102,6 +115,8 @@ Neo.extractBootConfig = function (targetName) {
   if (!node) return {};
 
   // 3. paramタグの中身だけを抽出
+
+  /** @type {Record<string, string>} */
   const config = {};
   const params = node.querySelectorAll("param");
   for (const param of params) {
@@ -840,7 +855,8 @@ Neo.multColor = function (c, scale) {
  * @returns {string|boolean} 変換後のカラーコード（失敗時は false）
  */
 Neo.colorNameToHex = function (name) {
-  var colors = {
+  /** @type {Record<string, string>} */
+  const colors = {
     aliceblue: "#f0f8ff",
     antiquewhite: "#faebd7",
     aqua: "#00ffff",
@@ -1426,6 +1442,9 @@ Neo.getSizeString = function (len) {
   return result;
 };
 
+/**
+ * @param {string} url
+ */
 Neo.openURL = function (url) {
   if (Neo.isApp) {
     // @ts-ignore
@@ -1435,6 +1454,10 @@ Neo.openURL = function (url) {
   }
 };
 
+/**
+ * @param {string}  board
+ * @param {string}  url
+ */
 Neo.getAbsoluteURL = function (board, url) {
   if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
     return url;
@@ -1577,6 +1600,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
   const postData = (path, data) => {
     var errorMessage = path + "\n";
 
+    /** @type {RequestInit} */
     const requestOptions = {
       method: "post",
       body: data,
@@ -1736,12 +1760,15 @@ Neo.str_header = "";
   -----------------------------------------------------------------------
 */
 
+/**
+ * @param {HTMLElement} applet
+ */
 Neo.createContainer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
 
-  var html =
+  const html =
     '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;">' +
     '<div id="neo-container" style="visibility:hidden;" class="o">' +
     '<div id="neo-center" class="o">' +
@@ -1820,7 +1847,12 @@ Neo.createContainer = function (applet) {
     return Neo.translate(str);
   });
 
-  var parent = applet.parentNode;
+  const parent = applet.parentNode;
+  if (!parent) {
+    console.error("Failed to create container.");
+    return;
+  }
+
   parent.appendChild(neo);
   parent.insertBefore(neo, applet);
 
@@ -2112,7 +2144,7 @@ Neo.translate = (function () {
       break;
     }
   }
-
+  /** @param {string} string */
   return function (string) {
     if (Neo.config.neo_alt_translation) {
       if (lang == "en") lang = "enx";
@@ -5413,6 +5445,18 @@ Neo.Painter.prototype.copy = function (layer, x, y, width, height) {
   this.tempCanvasCtx.putImageData(imageData, x, y);
 };
 
+/**
+ * ペースト
+ * @description 指定されたレイヤーの矩形領域に、一時バッファの内容を貼り付ける。
+ * * @param {number} layer - 操作対象のレイヤーインデックス。
+ * @param {number} x - 貼り付け開始の基準X座標。
+ * @param {number} y - 貼り付け開始の基準Y座標。
+ * @param {number} width - 貼り付け対象の横幅。
+ * @param {number} height - 貼り付け対象の縦幅。
+ * @param {number} dx - 貼り付け位置のオフセットX。
+ * @param {number} dy - 貼り付け位置のオフセットY。
+ * @returns {void}
+ */
 Neo.Painter.prototype.paste = function (layer, x, y, width, height, dx, dy) {
   var ctx = this.canvasCtx[layer];
   //  console.log(this.tempX, this.tempY);
@@ -5590,6 +5634,13 @@ Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
   ctx.putImageData(imageData, x, y);
 };
 
+/**
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ * @returns
+ */
 Neo.Painter.prototype.rectFillMask = function (x, y, width, height) {
   return true;
 };
@@ -7275,7 +7326,7 @@ Neo.EraseRectTool.prototype.type = Neo.Painter.TOOLTYPE_ERASERECT;
 /**
  * 矩形消去ツールの実行
  * @description
- * @param {object} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
+ * @param {Neo.Painter} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
  * @param {number} x - 開始X座標
  * @param {number} y - 開始Y座標
  * @param {number} width - 消去する幅
@@ -7301,6 +7352,14 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
 };
 Neo.FlipHTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_H;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.FlipHTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.flipH(ctx, x, y, width, height);
@@ -7321,6 +7380,14 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
 };
 Neo.FlipVTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_V;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.FlipVTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.flipV(ctx, x, y, width, height);
@@ -7341,6 +7408,14 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
 };
 Neo.BlurRectTool.prototype.type = Neo.Painter.TOOLTYPE_BLURRECT;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.BlurRectTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.blurRect(ctx, x, y, width, height);
@@ -7411,6 +7486,14 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
 
 Neo.MergeTool.prototype.type = Neo.Painter.TOOLTYPE_MERGE;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.MergeTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.merge(ctx, x, y, width, height);
@@ -7431,6 +7514,14 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
 };
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
   oe.isCopyActive = true;
   //  oe.copy(oe.current, x, y, width, height);
@@ -7560,6 +7651,14 @@ Neo.RectTool = class extends Neo.EffectToolBase {
 };
 Neo.RectTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.RectTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectMask);
@@ -7581,6 +7680,14 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
 Neo.RectFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECTFILL;
 
 Neo.RectFillTool.prototype.isFill = true;
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.RectFillTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectFillMask);
@@ -7601,6 +7708,15 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
 };
 Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSE;
 Neo.EllipseTool.prototype.isEllipse = true;
+
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.EllipseTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseMask);
@@ -7622,6 +7738,15 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
 Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
 Neo.EllipseFillTool.prototype.isEllipse = true;
 Neo.EllipseFillTool.prototype.isFill = true;
+
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.EllipseFillTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseFillMask);
@@ -7793,8 +7918,13 @@ Neo.CommandBase.prototype.execute = function () {};
     ZOOM
   ---------------------------------------------------
 */
+/**
+ * @typedef {Object} ZoomPlusData
+ * @property {number} zoom - 現在のズーム値
+ * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
+ */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
-  /**@param {Object} data */
+  /** @param {ZoomPlusData} data */
   constructor(data) {
     super();
     this.data = data;
@@ -7811,8 +7941,13 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
   // Neo.painter.updateDestCanvas();
 };
 
+/**
+ * @typedef {Object} ZoomMinusData
+ * @property {number} zoom - 現在のズーム値
+ * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
+ */
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
-  /**@param {Object} data */
+  /** @param {ZoomMinusData} data */
   constructor(data) {
     super();
     this.data = data;
