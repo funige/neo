@@ -22,8 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 var Neo = {};
 
 Neo.version = "1.7.2";
-/** @type {Neo.Painter} */
-Neo.painter = null;
+Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
@@ -9076,6 +9075,7 @@ Neo.Button.prototype.init = function (elementID, params) {
 
   this.element.className = "buttonOff";
 
+  /**@param {Number} wait */
   this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
     this.element.style.opacity = "0.5";

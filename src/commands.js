@@ -1,7 +1,9 @@
 "use strict";
 //@ts-check
 Neo.CommandBase = class {
-  constructor() {}
+  constructor() {
+    this.data = null;
+  }
 };
 Neo.CommandBase.prototype.data;
 Neo.CommandBase.prototype.execute = function () {};
@@ -12,6 +14,7 @@ Neo.CommandBase.prototype.execute = function () {};
   ---------------------------------------------------
 */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
+  /**@param {Object} data */
   constructor(data) {
     super();
     this.data = data;
@@ -29,6 +32,7 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
 };
 
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
+  /**@param {Object} data */
   constructor(data) {
     super();
     this.data = data;

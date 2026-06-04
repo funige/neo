@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
 var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
-/** @type {Neo.Painter} */
-Neo.painter = null;
+// @ts-ignore
+Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
@@ -85,8 +85,13 @@ Neo.SLIDERTYPE_SIZE = 4;
  */
 Neo.extractBootConfig = function (targetName) {
   // 1. 外部で設定されたObjectの場合
-  if (Neo.param && typeof Neo.param === "object") {
-    return Neo.param[targetName] ? { ...Neo.param[targetName] } : {};
+  Neo.params = Neo.params || Neo.param; //エイリアス。`Neo.params`でも、単数形の`Neo.param`でも設定できる。
+  if (
+    Neo.params &&
+    typeof Neo.params === "object" &&
+    Object.keys(Neo.params).length > 0
+  ) {
+    return Neo.params[targetName] ? { ...Neo.params[targetName] } : {};
   }
 
   // 2. DOMの探索（指定された名前を持つ要素を最初に1つ見つける）
@@ -420,11 +425,19 @@ document.addEventListener("DOMContentLoaded", () => {
  *
  * @param {string} value
  * @returns {string}
+ * @note true|falseのときは小文字が返る
  */
 Neo.fixConfig = function (value) {
   // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
   if (value.match(/^#[0-9a-fA-F]{5}$/)) {
     value = "#0" + value.slice(1);
+  }
+  //true|falseの時は小文字に統一
+  if (
+    value.toLocaleLowerCase() === "true" ||
+    value.toLocaleLowerCase() === "false"
+  ) {
+    return value.toLocaleLowerCase();
   }
   return value;
 };
@@ -1014,7 +1027,11 @@ Neo.initComponents = function () {
   document.addEventListener(
     "mouseup",
     function (e) {
-      if (Neo.painter && !Neo.painter.isContainer(e.target)) {
+      if (
+        Neo.painter &&
+        e.target instanceof Element &&
+        !Neo.painter.isContainer(e.target)
+      ) {
         Neo.painter.cancelTool(e.target);
       }
     },
@@ -1032,24 +1049,42 @@ Neo.initComponents = function () {
 };
 
 Neo.initButtons = function () {
-  new Neo.Button().init("neo-undo").onmouseup = function () {
-    new Neo.UndoCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-redo").onmouseup = function () {
-    new Neo.RedoCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-window").onmouseup = function () {
-    new Neo.WindowCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-copyright").onmouseup = function () {
-    new Neo.CopyrightCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-zoomPlus").onmouseup = function () {
-    new Neo.ZoomPlusCommand(Neo.painter).execute();
-  };
-  new Neo.Button().init("neo-zoomMinus").onmouseup = function () {
-    new Neo.ZoomMinusCommand(Neo.painter).execute();
-  };
+  const neo_undo = new Neo.Button().init("neo-undo");
+  if (neo_undo) {
+    neo_undo.onmouseup = function () {
+      new Neo.UndoCommand(Neo.painter).execute();
+    };
+  }
+  const neo_redo = new Neo.Button().init("neo-redo");
+  if (neo_redo) {
+    neo_redo.onmouseup = function () {
+      new Neo.RedoCommand(Neo.painter).execute();
+    };
+  }
+  const neo_window = new Neo.Button().init("neo-window");
+  if (neo_window) {
+    neo_window.onmouseup = function () {
+      new Neo.WindowCommand(Neo.painter).execute();
+    };
+  }
+  const neo_copyright = new Neo.Button().init("neo-copyright");
+  if (neo_copyright) {
+    neo_copyright.onmouseup = function () {
+      new Neo.CopyrightCommand(Neo.painter).execute();
+    };
+  }
+  const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
+  if (neo_zoomPlus) {
+    neo_zoomPlus.onmouseup = function () {
+      new Neo.ZoomPlusCommand(Neo.painter).execute();
+    };
+  }
+  const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
+  if (neo_zoomMinus) {
+    neo_zoomMinus.onmouseup = function () {
+      new Neo.ZoomMinusCommand(Neo.painter).execute();
+    };
+  }
   Neo.submitButton = new Neo.Button().init("neo-submit");
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton.disable(5000);

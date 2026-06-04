@@ -41,7 +41,12 @@ Neo.Button = class {
     this.onmouseout = null;
   }
 };
-Neo.Button.prototype.init = function (elementID, params) {
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Button|null}
+ */
+Neo.Button.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
@@ -153,6 +158,11 @@ Neo.RightButton = class extends Neo.Button {
     this.selected = false;
   }
 };
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @return {Neo.RightButton|null}
+ */
 Neo.RightButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
@@ -195,6 +205,11 @@ Neo.FillButton = class extends Neo.Button {
   }
 };
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.FillButton|null}
+ */
 Neo.FillButton.prototype.init = function (elementID, params) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "fill";
@@ -209,15 +224,25 @@ Neo.FillButton.prototype.init = function (elementID, params) {
 
 Neo.colorTips = [];
 
-Neo.ColorTip = function () {
-  this.element = null;
-  this.params = null;
-  this.elementID = "";
-  this.selected = false;
-  this.isMouseDown = false;
-  this.color = null;
+Neo.ColorTip = class {
+  constructor() {
+    this.element = null;
+    this.params = null;
+    this.elementID = "";
+    this.selected = false;
+    this.isMouseDown = false;
+    this.color = null;
+    this.onmousedown = null;
+    this.onmouseup = null;
+    this.onmouseover = null;
+    this.onmouseout = null;
+  }
 };
-Neo.ColorTip.prototype.init = function (elementID, params) {
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ */
+Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
@@ -358,12 +383,29 @@ Neo.ToolTip = class {
     this.onmouseup = null;
     this.onmouseout = null;
     this.onmouseover = null;
+    this.selected = false;
+    this.isTool = false;
+    this.fixed = false;
   }
 };
 
 Neo.ToolTip.prototype.prevMode = -1;
+Neo.ToolTip.prototype.toolStrings = [];
+Neo.ToolTip.prototype.tools = [];
+Neo.ToolTip.prototype.toolIcons = [];
+Neo.ToolTip.prototype.hasTintImage = false;
 
-Neo.ToolTip.prototype.init = function (elementID, params) {
+/** @type {HTMLCanvasElement|null} */
+Neo.ToolTip.prototype.canvas = null;
+/** @type {HTMLElement|null} */
+Neo.ToolTip.prototype.label = null;
+
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ToolTip|null}
+ */
+Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.params.type = this.element.id;
@@ -407,6 +449,11 @@ Neo.ToolTip.prototype.init = function (elementID, params) {
   this.element.innerHTML =
     "<canvas width=46 height=18></canvas><div class='label'></div>";
   this.canvas = this.element.getElementsByTagName("canvas")[0];
+  if (!this.canvas) {
+    console.error("Canvas element not found for " + elementID);
+    return null;
+  }
+
   this.label = this.element.getElementsByTagName("div")[0];
 
   this.update();
@@ -474,16 +521,28 @@ Neo.ToolTip.prototype.update = function () {};
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
-    var ctx = this.canvas.getContext("2d", {
+    if (!this.canvas) {
+      console.error("Canvas not found for ToolTip.");
+      return;
+    }
+    /** @type {CanvasRenderingContext2D|null} */
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
-
+    if (!ctx) {
+      console.error("Failed to get 2D context for ToolTip canvas.");
+      return;
+    }
     if (this.prevMode != this.mode) {
       this.prevMode = this.mode;
 
       var img = new Image();
       var ref = this;
       img.onload = function () {
+        if (!ref.canvas) {
+          console.error("Canvas not found for ToolTip on image load.");
+          return;
+        }
         ctx.clearRect(0, 0, ref.canvas.width, ref.canvas.height);
         ref.drawTintImage(ctx, img, c, 0, 0);
       };
@@ -547,6 +606,8 @@ Neo.ToolTip.tone =
 Neo.PenTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.isTool = true;
+    this.toolStrings = [];
   }
 };
 Neo.PenTip.prototype.tools = [
@@ -562,6 +623,11 @@ Neo.PenTip.prototype.toolIcons = [
   Neo.ToolTip.text,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.PenTip|null}
+ */
 Neo.PenTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("鉛筆"),
@@ -593,6 +659,7 @@ Neo.PenTip.prototype.update = function () {
 Neo.Pen2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
   }
 };
 
@@ -611,6 +678,11 @@ Neo.Pen2Tip.prototype.toolIcons = [
   Neo.ToolTip.burn,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Pen2Tip|null}
+ */
 Neo.Pen2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("トーン"),
@@ -647,13 +719,23 @@ Neo.Pen2Tip.prototype.update = function () {
       this.draw(Neo.painter.foregroundColor);
       break;
   }
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.Pen2Tip.prototype.drawTone = function () {
-  var ctx = this.canvas.getContext("2d", {
+  if (!this.canvas) {
+    console.error("Canvas not found for Pen2Tip.");
+    return;
+  }
+  const ctx = this.canvas.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!ctx) {
+    console.error("Failed to get 2D context for Pen2Tip canvas.");
+    return;
+  }
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
   var buf32 = new Uint32Array(imageData.data.buffer);
@@ -692,6 +774,11 @@ Neo.Pen2Tip.prototype.drawTone = function () {
 Neo.EraserTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
+    this.drawOnce = false;
+    this.isTool = true;
+    this.label = null;
+    this.canvas = null;
   }
 };
 
@@ -701,6 +788,11 @@ Neo.EraserTip.prototype.tools = [
   Neo.Painter.TOOLTYPE_ERASEALL,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.EraserTip|null}
+ */
 Neo.EraserTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("消しペン"),
@@ -723,7 +815,9 @@ Neo.EraserTip.prototype.update = function () {
     this.draw();
     this.drawOnce = true;
   }
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.EraserTip.prototype.draw = function () {
@@ -748,6 +842,9 @@ Neo.EraserTip.prototype.draw = function () {
 Neo.EffectTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
+    this.label = null;
+    this.isTool = false;
   }
 };
 
@@ -766,6 +863,11 @@ Neo.EffectTip.prototype.toolIcons = [
   Neo.ToolTip.ellipse,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.EffectTip|null}
+ */
 Neo.EffectTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("四角"),
@@ -785,7 +887,9 @@ Neo.EffectTip.prototype.update = function () {
   }
 
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -797,6 +901,11 @@ Neo.EffectTip.prototype.update = function () {
 Neo.Effect2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
+    this.isTool = true;
+    this.img = null;
+    /**@type {HTMLElement|null} */
+    this.element = null;
   }
 };
 
@@ -819,6 +928,11 @@ Neo.Effect2Tip.prototype.toolIcons = [
   Neo.ToolTip.flip,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.Effect2Tip|null}
+ */
 Neo.Effect2Tip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("コピー"),
@@ -844,7 +958,9 @@ Neo.Effect2Tip.prototype.update = function () {
   }
 
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -859,9 +975,15 @@ Neo.MaskTip = class extends Neo.ToolTip {
     this.isMouseDown = false;
     this.onmousedown = null;
     this.canvas = null;
+    this.toolStrings = [];
   }
 };
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.MaskTip|null}
+ */
 Neo.MaskTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("通常"),
@@ -894,7 +1016,9 @@ Neo.MaskTip.prototype._mouseDownHandler = function (e) {
 
 Neo.MaskTip.prototype.update = function () {
   this.draw(Neo.painter.maskColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 Neo.MaskTip.prototype.draw = function (c) {
@@ -917,6 +1041,7 @@ Neo.MaskTip.prototype.draw = function (c) {
 Neo.DrawTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    this.toolStrings = [];
   }
 };
 
@@ -927,6 +1052,11 @@ Neo.DrawTip.prototype.toolIcons = [
   Neo.ToolTip.bezier,
 ];
 
+/**
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.DrawTip|null}
+ */
 Neo.DrawTip.prototype.init = function (elementID, params) {
   this.toolStrings = [
     Neo.translate("手書き"),
@@ -960,7 +1090,9 @@ Neo.DrawTip.prototype._mouseDownHandler = function (e) {
 Neo.DrawTip.prototype.update = function () {
   this.mode = Neo.painter.drawType;
   this.draw(Neo.painter.foregroundColor);
-  this.label.innerHTML = this.toolStrings[this.mode];
+  if (this.label) {
+    this.label.innerHTML = this.toolStrings[this.mode];
+  }
 };
 
 /*
@@ -971,16 +1103,49 @@ Neo.DrawTip.prototype.update = function () {
 
 Neo.sliders = [];
 
-Neo.ColorSlider = function () {};
+Neo.ColorSlider = class {
+  constructor() {
+    this.selected = false;
+    this.toolStrings = [];
+    this.type = 0;
+    this.prefix = "";
+    this.value0 = 0;
+    this.x0 = 0;
+    /** @type {Element|null} */
+    this.element = null;
+    /** @type {string} */
+    this.elementID = "";
+    /** @type {Object} */
+    this.params = /** @type {unknown} */ {};
+    /** @type {number} */
+    this.value = 0;
+    this.isMouseDown = false;
+    /** @type {Element|null} */
+    this.slider = null;
+    /** @type {Element|null} */
+    this.label = null;
+    /** @type {Element|null} */
+    this.hit = null;
+  }
+};
 
-Neo.ColorSlider.prototype.init = function (elementID, params) {
+/**
+ * カラースライダーを初期化
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ColorSlider|null}
+ */
+Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
   this.isMouseDown = false;
   this.value = 0;
   this.type = this.params.type;
-
+  if (!this.element) {
+    console.error("Element not found: " + elementID);
+    return null;
+  }
   this.element.className = "colorSlider";
   this.element.innerHTML =
     "<div class='slider'></div><div class='label'></div>";
@@ -990,6 +1155,11 @@ Neo.ColorSlider.prototype.init = function (elementID, params) {
   this.label = this.element.getElementsByClassName("label")[0];
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
+
+  if (!(this.slider instanceof HTMLElement)) {
+    console.error("One or more required elements not found: " + elementID);
+    return null;
+  }
 
   switch (this.type) {
     case Neo.SLIDERTYPE_RED:
@@ -1118,9 +1288,12 @@ Neo.ColorSlider.prototype.update = function () {
 
   var width = (this.value * 49.0) / 255.0;
   width = Math.max(Math.min(48, width), 1);
-
-  this.slider.style.width = width.toFixed(2) + "px";
-  this.label.innerHTML = this.prefix + this.value.toFixed(0);
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.width = width.toFixed(2) + "px";
+  }
+  if (this.label instanceof HTMLElement) {
+    this.label.innerHTML = this.prefix + this.value.toFixed(0);
+  }
 };
 
 /*
@@ -1129,15 +1302,48 @@ Neo.ColorSlider.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.SizeSlider = function () {};
+Neo.SizeSlider = class {
+  constructor() {
+    this.selected = false;
+    this.toolStrings = [];
+    this.y0 = 0;
+    this.value0 = 0;
+    this.onmousedown = null;
+  }
+};
 
-Neo.SizeSlider.prototype.init = function (elementID, params) {
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.element = null;
+/** @type {string} */
+Neo.SizeSlider.prototype.elementID = "";
+/** @type {Object} */
+Neo.SizeSlider.prototype.params = /** @type {unknown} */ {};
+/** @type {number} */
+Neo.SizeSlider.prototype.value = 1;
+Neo.SizeSlider.prototype.isMouseDown = false;
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.slider = null;
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.label = null;
+/** @type {Element|null} */
+Neo.SizeSlider.prototype.hit = null;
+
+/**
+ * サイズスライダーを初期化する。
+ * @param {string} elementID - 要素のID
+ * @param {Object|null} [params] - パラメータ
+ * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
+ */
+Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
   this.isMouseDown = false;
   this.value = this.value0 = 1;
-
+  if (!this.element) {
+    console.error("SizeSlider: Element not found: " + elementID);
+    return null;
+  }
   this.element.className = "sizeSlider";
   this.element.innerHTML =
     "<div class='slider'></div><div class='label'></div>";
@@ -1147,8 +1353,9 @@ Neo.SizeSlider.prototype.init = function (elementID, params) {
   this.label = this.element.getElementsByClassName("label")[0];
   this.hit = this.element.getElementsByClassName("hit")[0];
   this.hit["data-slider"] = params.type;
-
-  this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  }
   this.update();
   return this;
 };
@@ -1236,10 +1443,13 @@ Neo.SizeSlider.prototype.update = function () {
 
   var height = (this.value * 33.0) / 30.0;
   height = Math.max(Math.min(34, height), 1);
-
-  this.slider.style.height = height.toFixed(2) + "px";
-  this.label.innerHTML = this.value + "px";
-  this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  if (this.slider instanceof HTMLElement) {
+    this.slider.style.height = height.toFixed(2) + "px";
+    if (this.label instanceof HTMLElement) {
+      this.label.innerHTML = this.value + "px";
+    }
+    this.slider.style.backgroundColor = Neo.painter.foregroundColor;
+  }
 };
 
 /*
@@ -1248,8 +1458,31 @@ Neo.SizeSlider.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.LayerControl = function () {};
-Neo.LayerControl.prototype.init = function (elementID, params) {
+Neo.LayerControl = class {
+  constructor() {
+    this.onmousedown = null;
+    this.bg = null;
+    this.label0 = null;
+    this.label1 = null;
+    this.line0 = null;
+    this.line1 = null;
+  }
+};
+/** @type {HTMLElement|null} */
+Neo.LayerControl.prototype.element = null;
+
+/** @type {Object|null} */
+Neo.LayerControl.prototype.params = null;
+Neo.LayerControl.prototype.elementID = "";
+Neo.LayerControl.prototype.isMouseDown = false;
+
+/**
+ * レイヤーコントローラーを初期化
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.LayerControl|null}
+ */
+Neo.LayerControl.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
@@ -1257,6 +1490,10 @@ Neo.LayerControl.prototype.init = function (elementID, params) {
 
   var ref = this;
 
+  if (!this.element) {
+    console.error("LayerControl: Element not found: " + elementID);
+    return null;
+  }
   this.element.onmousedown = function (e) {
     ref._mouseDownHandler(e);
   };
@@ -1331,12 +1568,32 @@ Neo.LayerControl.prototype.update = function () {
 Neo.reserveControls = [];
 
 Neo.ReserveControl = function () {};
-Neo.ReserveControl.prototype.init = function (elementID, params) {
+/** @type {HTMLElement|null} */
+Neo.ReserveControl.prototype.element = null;
+Neo.ReserveControl.prototype.elementID = "";
+/** @type {Object|null} */
+Neo.ReserveControl.prototype.params = null;
+/** @type {Object|null} */
+Neo.ReserveControl.prototype.reserve = null;
+Neo.ReserveControl.prototype.isMouseDown = false;
+
+/**
+ * リバースコントローラーを初期化
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ReserveControl|null}
+ */
+Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
 
   var ref = this;
+
+  if (!this.element) {
+    console.error("ReserveControl: Element not found: " + elementID);
+    return null;
+  }
 
   this.element.onmousedown = function (e) {
     ref._mouseDownHandler(e);
@@ -1393,12 +1650,20 @@ Neo.ReserveControl.prototype.save = function () {
   this.reserve.drawType = Neo.painter.drawType;
   this.reserve.alpha = Neo.painter.alpha;
   this.reserve.tool = Neo.painter.tool.getType();
+  if (!(this.element instanceof HTMLElement)) {
+    console.error("Element not found for ReserveControl save.");
+    return;
+  }
   this.element.style.backgroundColor = this.reserve.color;
   this.update();
   Neo.updateUI();
 };
 
 Neo.ReserveControl.prototype.update = function () {
+  if (!this.element) {
+    console.error("Element not found for ReserveControl update.");
+    return;
+  }
   this.element.style.backgroundColor = this.reserve.color;
 };
 
@@ -1412,10 +1677,29 @@ Neo.scrollH;
 Neo.scrollV;
 
 Neo.ScrollBarButton = function () {};
-Neo.ScrollBarButton.prototype.init = function (elementID, params) {
+/** @type {HTMLElement|null} */
+Neo.ScrollBarButton.prototype.element = null;
+/** @type {string} */
+Neo.ScrollBarButton.prototype.elementID = "";
+/** @type {Object} */
+Neo.ScrollBarButton.prototype.params = /** @type {unknown} */ (null);
+/** @type {HTMLElement|null} */
+Neo.ScrollBarButton.prototype.barButton = null;
+
+/**
+ * @param {string} elementID
+ * @param {Object} [params]
+ * @returns {Neo.ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
+ */
+Neo.ScrollBarButton.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
+
+  if (!this.element) {
+    console.error("Element not found: " + elementID);
+    return null;
+  }
 
   this.element.innerHTML = "<div></div>";
   this.barButton = this.element.getElementsByTagName("div")[0];
@@ -1427,17 +1711,29 @@ Neo.ScrollBarButton.prototype.init = function (elementID, params) {
   return this;
 };
 
+/**
+ * @param {Neo.Painter} oe
+ * @returns {void|null} 更新成功時は void、失敗時は null
+ */
 Neo.ScrollBarButton.prototype.update = function (oe) {
   if (this.elementID == "neo-scrollH") {
     var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
     var barWidth = Math.ceil(oe.destCanvas.width * a);
     var barX = oe.scrollBarX * (oe.destCanvas.width - barWidth);
+    if (!this.barButton) {
+      console.error("Bar button element not found for " + this.elementID);
+      return null;
+    }
     this.barButton.style.width = Math.ceil(barWidth) - 4 + "px";
     this.barButton.style.left = Math.floor(barX) + "px";
   } else {
     var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
     var barHeight = Math.ceil(oe.destCanvas.height * a);
     var barY = oe.scrollBarY * (oe.destCanvas.height - barHeight);
+    if (!this.barButton) {
+      console.error("Bar button element not found for " + this.elementID);
+      return null;
+    }
     this.barButton.style.height = Math.ceil(barHeight) - 4 + "px";
     this.barButton.style.top = Math.floor(barY) + "px";
   }
@@ -1452,22 +1748,44 @@ Neo.ScrollBarButton.prototype.update = function (oe) {
 Neo.ViewerButton = class extends Neo.Button {
   constructor() {
     super();
+    /** @type {HTMLElement|null} */
+    this.element = null;
+    /** @type {HTMLCanvasElement|null} */
+    this.canvas = null;
   }
 };
 
 Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 
-Neo.ViewerButton.prototype.init = function (elementID, params) {
+/**
+ *
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns {Neo.ViewerButton|null}
+ */
+Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
 
   if (elementID != "neo-viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
     this.canvas = this.element.getElementsByTagName("canvas")[0];
-    var ctx = this.canvas.getContext("2d", {
+
+    if (!this.canvas) {
+      console.error("Canvas element not found for " + elementID);
+      return null;
+    }
+
+    /** @type {CanvasRenderingContext2D|null} */
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
 
-    var img = new Image();
+    if (!ctx) {
+      console.error("Canvas context not found for " + elementID);
+      return null;
+    }
+
+    const img = new Image();
     img.onload = function () {
       ctx.clearRect(0, 0, 24, 24);
       ctx.drawImage(img, 0, 0);
@@ -1518,7 +1836,7 @@ Neo.ViewerBar = function () {};
 Neo.ViewerBar.prototype.element = null;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.params = null;
-Neo.ViewerBar.prototype.elementID = null;
+Neo.ViewerBar.prototype.elementID = "";
 Neo.ViewerBar.prototype.isMouseDown = false;
 Neo.ViewerBar.prototype.seekElement = null;
 Neo.ViewerBar.prototype.markElement = null;
@@ -1527,8 +1845,14 @@ Neo.ViewerBar.prototype.width = 0;
 Neo.ViewerBar.prototype.length = 0;
 Neo.ViewerBar.prototype.mark = 0;
 Neo.ViewerBar.prototype.seek = 0;
+/**
+ *
+ * @param {string} elementID
+ * @param {Object|null} [params]
+ * @returns
+ */
 
-Neo.ViewerBar.prototype.init = function (elementID, params) {
+Neo.ViewerBar.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;

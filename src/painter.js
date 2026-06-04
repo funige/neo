@@ -6,6 +6,12 @@ Neo.Painter = class {
     this._undoMgr = new Neo.UndoManager(50);
     /** @type {Neo.ActionManager} */
     this._actionMgr = new Neo.ActionManager();
+    this.clipMouseX = 0;
+    this.clipMouseY = 0;
+    this.scrollBarX = 0;
+    this.scrollBarY = 0;
+    this.scrollWidth = 0;
+    this.scrollHeight = 0;
   }
 };
 
@@ -14,6 +20,7 @@ Neo.Painter.prototype._undoMgr;
 Neo.Painter.prototype._actionMgr;
 Neo.Painter.prototype.tool = null;
 Neo.Painter.prototype.inputText = null;
+Neo.Painter.prototype.cursorRect = null;
 
 //Canvas Info
 Neo.Painter.prototype.canvas = [];
@@ -218,6 +225,9 @@ Neo.Painter.prototype.setTool = function (tool) {
   //テキストツール以外のツールに切り替えるときは、テキストツールを終了する
   if (tool !== this.textTool) {
     this.textTool.kill();
+  }
+  if (this.tool && this.tool.cancelBezier) {
+    this.tool.cancelBezier();
   }
   if (tool !== this.pasteTool) {
     this.pasteTool.kill();
@@ -830,7 +840,15 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
     this.isMouseDownRight
   ) {
     this.isMouseDownRight = false;
-    this.tool.cancelBezier();
+    if (this.tool.cancelBezier) {
+      this.tool.cancelBezier();
+    }
+    return;
+  }
+  if (this.drawType != Neo.Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
+    if (this.tool.cancelBezier) {
+      this.tool.cancelBezier();
+    }
     return;
   }
 
@@ -1122,7 +1140,7 @@ Neo.Painter.prototype.redo = function () {
  * @param {number} [h=canvasHeight] - 取得範囲の高さ
  * @param {boolean} [holdRedo=false] - リドゥ履歴を保持するかどうか
  */
-Neo.Painter.prototype._pushUndo = function (x, y, w, h, holdRedo) {
+Neo.Painter.prototype._pushUndo = function (x, y, w, h, holdRedo = false) {
   x = x === undefined ? 0 : x;
   y = y === undefined ? 0 : y;
   w = w === undefined ? this.canvasWidth : w;
@@ -1346,8 +1364,12 @@ Neo.Painter.prototype.submit = function (board) {
      thumbnail2 = this.getThumbnail(Neo.config.thumbnail_type2);
      }
      }*/
-
-  Neo.submit(board, this.getPNG(), thumbnail2, thumbnail);
+  const png = this.getPNG();
+  if (!(png instanceof Blob)) {
+    console.error("Failed to get PNG data. Submission aborted.");
+    return;
+  }
+  Neo.submit(board, png, thumbnail2, thumbnail);
 };
 
 Neo.Painter.prototype.useThumbnail = function () {
@@ -1395,8 +1417,8 @@ Neo.Painter.prototype.dataURLtoBlob = function (dataURL) {
  * 内部で保持している複数のレイヤー（this.canvas[0], [1]）を、
  * 指定されたサイズにリサイズまたは調整して一つのキャンバスへ描画する。
  * 背景色（白）を塗りつぶした後に重ね合わせることで、合成画像を作成する。
- * @param {number} [imageWidth] - 出力画像の幅（省略時はキャンバス幅）
- * @param {number} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
+ * @param {number|null} [imageWidth] - 出力画像の幅（省略時はキャンバス幅）
+ * @param {number|null} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
  * @returns {HTMLCanvasElement|null} 合成された画像データを持つCanvas要素
  */
 Neo.Painter.prototype.getImage = function (imageWidth, imageHeight) {
@@ -1478,15 +1500,17 @@ Neo.Painter.prototype.getPNG = function () {
  */
 Neo.Painter.prototype.getThumbnail = function (type) {
   if (type != "animation") {
-    var thumbnailWidth = this.getThumbnailWidth();
-    var thumbnailHeight = this.getThumbnailHeight();
+    /** @type {number|null} */
+    let thumbnailWidth = this.getThumbnailWidth();
+    /** @type {number|null} */
+    let thumbnailHeight = this.getThumbnailHeight();
     if (thumbnailWidth || thumbnailHeight) {
-      var width = this.canvasWidth;
-      var height = this.canvasHeight;
-      if (thumbnailWidth == 0) {
+      const width = this.canvasWidth;
+      const height = this.canvasHeight;
+      if (thumbnailHeight && thumbnailWidth == 0) {
         thumbnailWidth = (thumbnailHeight * width) / height;
       }
-      if (thumbnailHeight == 0) {
+      if (thumbnailWidth && thumbnailHeight == 0) {
         thumbnailHeight = (thumbnailWidth * height) / width;
       }
     } else {
@@ -2372,7 +2396,7 @@ Neo.Painter.prototype.getBezierPoint = function (
  * @param {number} y3 - 終点のY座標。
  * @param {number} type - 使用するブラシやツールのタイプ。
  * @param {boolean} isReplay - リプレイ再生中かどうか。
- * @param {boolean} isPreview - プレビュー描画中かどうか（不透明度やマスクを一時解除）。
+ * @param {boolean} [isPreview=false] - プレビュー描画中かどうか（不透明度やマスクを一時解除）。
  * @returns {void}
  */
 Neo.Painter.prototype.drawBezier = function (
@@ -2387,7 +2411,7 @@ Neo.Painter.prototype.drawBezier = function (
   y3,
   type,
   isReplay,
-  isPreview,
+  isPreview = false,
 ) {
   var points = [
     [x0, y0],
@@ -2616,7 +2640,7 @@ Neo.Painter.prototype.xorRect = function (
  * @param {number} y - 矩形の開始Y座標。
  * @param {number} width - 矩形の横幅。
  * @param {number} height - 矩形の高さ。
- * @param {boolean} isFill - trueなら矩形内部を塗りつぶし、falseなら外周のみを描画する。
+ * @param {boolean} [isFill=false] - trueなら矩形内部を塗りつぶし、falseなら外周のみを描画する。
  * @param {number} [c=0xffffff] - XORに使用する32bitマスク値。
  * @returns {void}
  */
@@ -2626,8 +2650,8 @@ Neo.Painter.prototype.drawXORRect = function (
   y,
   width,
   height,
-  isFill,
-  c,
+  isFill = false,
+  c = 0xffffff,
 ) {
   x = Math.round(x);
   y = Math.round(y);
@@ -2683,7 +2707,7 @@ Neo.Painter.prototype.drawXORRect = function (
  * @param {number} y - バウンディングボックスの左上Y。
  * @param {number} width - 幅。
  * @param {number} height - 高さ。
- * @param {boolean} isFill - trueで塗りつぶし、falseで輪郭のみ。
+ * @param {boolean} [isFill] - trueで塗りつぶし、falseで輪郭のみ。
  * @param {number} [c=0xFFFFFF] - XOR用マスク値。
  */
 Neo.Painter.prototype.drawXOREllipse = function (
@@ -3379,7 +3403,7 @@ Neo.Painter.prototype.getMaskFunc = function (type) {
  * @param {number} layer - 対象レイヤーインデックス。
  * @param {number} x, y - 描画開始X/Y座標。
  * @param {number} width, height - 描画対象領域のサイズ。
- * @param {string|number} [type] - マスク形状タイプ(例: TOOLTYPE_RECT, TOOLTYPE_RECTFILLなど)。
+ * @param {string|number} type - マスク形状タイプ(例: TOOLTYPE_RECT, TOOLTYPE_RECTFILLなど)。
  */
 Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
   var ctx = this.canvasCtx[layer];
@@ -3518,14 +3542,14 @@ Neo.Painter.prototype.ellipseMask = function (x, y, width, height) {
  * @param {number} _mx - マウスのX座標
  * @param {number} _my - マウスのY座標
  * @param {boolean} isClip - キャンバス範囲外をカットするかどうか
- * @param {boolean} isCenter - 座標をピクセル中心（0.5）に合わせるかどうか
+ * @param {boolean} [isCenter=false] - 座標をピクセル中心（0.5）に合わせるかどうか
  * @returns {{x: number, y: number}} 変換後の座標オブジェクト
  */
 Neo.Painter.prototype.getDestCanvasPosition = function (
   _mx,
   _my,
   isClip,
-  isCenter,
+  isCenter = false,
 ) {
   var mx = Math.floor(_mx); //Math.round(mx);
   var my = Math.floor(_my); //Math.round(my);
