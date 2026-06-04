@@ -198,7 +198,7 @@ Neo.translate = (function () {
       break;
     }
   }
-
+  /** @param {string} string */
   return function (string) {
     if (Neo.config.neo_alt_translation) {
       if (lang == "en") lang = "enx";

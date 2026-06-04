@@ -1232,7 +1232,7 @@ Neo.EraseRectTool.prototype.type = Neo.Painter.TOOLTYPE_ERASERECT;
 /**
  * 矩形消去ツールの実行
  * @description
- * @param {object} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
+ * @param {Neo.Painter} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
  * @param {number} x - 開始X座標
  * @param {number} y - 開始Y座標
  * @param {number} width - 消去する幅
@@ -1258,6 +1258,14 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
 };
 Neo.FlipHTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_H;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.FlipHTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.flipH(ctx, x, y, width, height);
@@ -1278,6 +1286,14 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
 };
 Neo.FlipVTool.prototype.type = Neo.Painter.TOOLTYPE_FLIP_V;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.FlipVTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.flipV(ctx, x, y, width, height);
@@ -1298,6 +1314,14 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
 };
 Neo.BlurRectTool.prototype.type = Neo.Painter.TOOLTYPE_BLURRECT;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.BlurRectTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.blurRect(ctx, x, y, width, height);
@@ -1368,6 +1392,14 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
 
 Neo.MergeTool.prototype.type = Neo.Painter.TOOLTYPE_MERGE;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.MergeTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.merge(ctx, x, y, width, height);
@@ -1388,6 +1420,14 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
 };
 Neo.CopyTool.prototype.type = Neo.Painter.TOOLTYPE_COPY;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.CopyTool.prototype.doEffect = function (oe, x, y, width, height) {
   oe.isCopyActive = true;
   //  oe.copy(oe.current, x, y, width, height);
@@ -1517,6 +1557,14 @@ Neo.RectTool = class extends Neo.EffectToolBase {
 };
 Neo.RectTool.prototype.type = Neo.Painter.TOOLTYPE_RECT;
 
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.RectTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectMask);
@@ -1538,6 +1586,14 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
 Neo.RectFillTool.prototype.type = Neo.Painter.TOOLTYPE_RECTFILL;
 
 Neo.RectFillTool.prototype.isFill = true;
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.RectFillTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.rectFillMask);
@@ -1558,6 +1614,15 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
 };
 Neo.EllipseTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSE;
 Neo.EllipseTool.prototype.isEllipse = true;
+
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.EllipseTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseMask);
@@ -1579,6 +1644,15 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
 Neo.EllipseFillTool.prototype.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
 Neo.EllipseFillTool.prototype.isEllipse = true;
 Neo.EllipseFillTool.prototype.isFill = true;
+
+/**
+ * @param {Neo.Painter} oe
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ *
+ */
 Neo.EllipseFillTool.prototype.doEffect = function (oe, x, y, width, height) {
   //  var ctx = oe.canvasCtx[oe.current];
   //  oe.doFill(ctx, x, y, width, height, this.type); //oe.ellipseFillMask);

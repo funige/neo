@@ -3288,6 +3288,18 @@ Neo.Painter.prototype.copy = function (layer, x, y, width, height) {
   this.tempCanvasCtx.putImageData(imageData, x, y);
 };
 
+/**
+ * ペースト
+ * @description 指定されたレイヤーの矩形領域に、一時バッファの内容を貼り付ける。
+ * * @param {number} layer - 操作対象のレイヤーインデックス。
+ * @param {number} x - 貼り付け開始の基準X座標。
+ * @param {number} y - 貼り付け開始の基準Y座標。
+ * @param {number} width - 貼り付け対象の横幅。
+ * @param {number} height - 貼り付け対象の縦幅。
+ * @param {number} dx - 貼り付け位置のオフセットX。
+ * @param {number} dy - 貼り付け位置のオフセットY。
+ * @returns {void}
+ */
 Neo.Painter.prototype.paste = function (layer, x, y, width, height, dx, dy) {
   var ctx = this.canvasCtx[layer];
   //  console.log(this.tempX, this.tempY);
@@ -3465,6 +3477,13 @@ Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
   ctx.putImageData(imageData, x, y);
 };
 
+/**
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ * @returns
+ */
 Neo.Painter.prototype.rectFillMask = function (x, y, width, height) {
   return true;
 };
