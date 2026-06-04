@@ -86,7 +86,11 @@ Neo.SLIDERTYPE_SIZE = 4;
 Neo.extractBootConfig = function (targetName) {
   // 1. 外部で設定されたObjectの場合
   Neo.params = Neo.params || Neo.param; //エイリアス。`Neo.params`でも、単数形の`Neo.param`でも設定できる。
-  if (Neo.params && typeof Neo.params === "object") {
+  if (
+    Neo.params &&
+    typeof Neo.params === "object" &&
+    Object.keys(Neo.params).length > 0
+  ) {
     return Neo.params[targetName] ? { ...Neo.params[targetName] } : {};
   }
 
@@ -421,14 +425,21 @@ document.addEventListener("DOMContentLoaded", () => {
  *
  * @param {string} value
  * @returns {string}
- * @note 小文字が返る
+ * @note true|falseのときは小文字が返る
  */
 Neo.fixConfig = function (value) {
   // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
   if (value.match(/^#[0-9a-fA-F]{5}$/)) {
     value = "#0" + value.slice(1);
   }
-  return value.toLocaleLowerCase();
+  //true|falseの時は小文字に統一
+  if (
+    value.toLocaleLowerCase() === "true" ||
+    value.toLocaleLowerCase() === "false"
+  ) {
+    return value.toLocaleLowerCase();
+  }
+  return value;
 };
 
 Neo.getStyleSheet = function () {
