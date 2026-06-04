@@ -82,7 +82,7 @@ APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効
 ```
 <div class="neo-applet-paintbbs" data-width="400" data-height="460" ></div>
 <script>
- Neo.param = {
+ Neo.params = {
     paintbbs:{
     image_width:300,
     image_height:300,
@@ -104,7 +104,7 @@ APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効
 ```
 <div class="neo-applet-pch" data-width="400" data-height="450" ></div>
 <script>
-  Neo.param = {
+  Neo.params = {
     pch:{
     neo_enable_zoom_out:true,
     }
@@ -114,7 +114,7 @@ APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効
 `class="neo-applet-pch"`と`pch:{`で動画画面判定をしています。  
 ```
 <script>
-Neo.param = {
+Neo.params = {
   paintbbs:{},
   pch:{}
 }

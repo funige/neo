@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
+// @ts-ignore
 Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -84,8 +85,9 @@ Neo.SLIDERTYPE_SIZE = 4;
  */
 Neo.extractBootConfig = function (targetName) {
   // 1. 外部で設定されたObjectの場合
-  if (Neo.param && typeof Neo.param === "object") {
-    return Neo.param[targetName] ? { ...Neo.param[targetName] } : {};
+  Neo.params = Neo.params || Neo.param; //エイリアス。`Neo.params`でも、単数形の`Neo.param`でも設定できる。
+  if (Neo.params && typeof Neo.params === "object") {
+    return Neo.params[targetName] ? { ...Neo.params[targetName] } : {};
   }
 
   // 2. DOMの探索（指定された名前を持つ要素を最初に1つ見つける）

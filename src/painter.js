@@ -20,6 +20,7 @@ Neo.Painter.prototype._undoMgr;
 Neo.Painter.prototype._actionMgr;
 Neo.Painter.prototype.tool = null;
 Neo.Painter.prototype.inputText = null;
+Neo.Painter.prototype.cursorRect = null;
 
 //Canvas Info
 Neo.Painter.prototype.canvas = [];
@@ -2639,7 +2640,7 @@ Neo.Painter.prototype.xorRect = function (
  * @param {number} y - 矩形の開始Y座標。
  * @param {number} width - 矩形の横幅。
  * @param {number} height - 矩形の高さ。
- * @param {boolean} isFill - trueなら矩形内部を塗りつぶし、falseなら外周のみを描画する。
+ * @param {boolean} [isFill=false] - trueなら矩形内部を塗りつぶし、falseなら外周のみを描画する。
  * @param {number} [c=0xffffff] - XORに使用する32bitマスク値。
  * @returns {void}
  */
@@ -2649,8 +2650,8 @@ Neo.Painter.prototype.drawXORRect = function (
   y,
   width,
   height,
-  isFill,
-  c,
+  isFill = false,
+  c = 0xffffff,
 ) {
   x = Math.round(x);
   y = Math.round(y);
@@ -2706,7 +2707,7 @@ Neo.Painter.prototype.drawXORRect = function (
  * @param {number} y - バウンディングボックスの左上Y。
  * @param {number} width - 幅。
  * @param {number} height - 高さ。
- * @param {boolean} isFill - trueで塗りつぶし、falseで輪郭のみ。
+ * @param {boolean} [isFill] - trueで塗りつぶし、falseで輪郭のみ。
  * @param {number} [c=0xFFFFFF] - XOR用マスク値。
  */
 Neo.Painter.prototype.drawXOREllipse = function (
@@ -3541,14 +3542,14 @@ Neo.Painter.prototype.ellipseMask = function (x, y, width, height) {
  * @param {number} _mx - マウスのX座標
  * @param {number} _my - マウスのY座標
  * @param {boolean} isClip - キャンバス範囲外をカットするかどうか
- * @param {boolean} isCenter - 座標をピクセル中心（0.5）に合わせるかどうか
+ * @param {boolean} [isCenter=false] - 座標をピクセル中心（0.5）に合わせるかどうか
  * @returns {{x: number, y: number}} 変換後の座標オブジェクト
  */
 Neo.Painter.prototype.getDestCanvasPosition = function (
   _mx,
   _my,
   isClip,
-  isCenter,
+  isCenter = false,
 ) {
   var mx = Math.floor(_mx); //Math.round(mx);
   var my = Math.floor(_my); //Math.round(my);
