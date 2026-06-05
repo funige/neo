@@ -66,12 +66,11 @@ PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/
 ### 起動オプション
 - PaintBBS オリジナルの起動オプションについては[オリジナルの README](https://web.archive.org/web/20070822002857/https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)
 - NEO 独自のオプションについては、[NEO の独自拡張について](README-params.md)を参照してください。
-- また、Java形式に依存しない新しい起動オプションの設定方向もありますので、ご確認ください。  
-paramタグは2022年にHTML Living Standardから削除されています。新しい起動オプションへの移行をご検討ください。
-  
+- paramタグは2022年にHTML Living Standardから削除されました。
+新しい起動オプションへの移行をご検討ください。
+    
 [具体的な設定例](./README-params.md#applet-dummy%E3%82%BF%E3%82%B0%E3%81%A8param%E3%82%BF%E3%82%B0%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E6%96%B0%E3%81%97%E3%81%84%E8%A8%AD%E5%AE%9A) 。
-
-
+  
 
 ### iPadで意図せず画面が拡大する場合
 - NEOが起動するHTMLファイルの<head></head>内に以下のJavascriptを記述する事で、意図しないiPadの画面拡大を防止できる場合があります。  
