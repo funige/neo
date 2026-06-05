@@ -1,6 +1,8 @@
 "use strict";
 //@ts-check
-
+/**
+ * @param {PointerEvent} e
+ */
 Neo.getModifier = function (e) {
   if (e.shiftKey) {
     return "shift";
@@ -43,7 +45,7 @@ Neo.Button = class {
 };
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.Button|null}
  */
 Neo.Button.prototype.init = function (elementID, params = {}) {
@@ -160,10 +162,10 @@ Neo.RightButton = class extends Neo.Button {
 };
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @return {Neo.RightButton|null}
  */
-Neo.RightButton.prototype.init = function (elementID, params) {
+Neo.RightButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
   return this;
@@ -207,10 +209,10 @@ Neo.FillButton = class extends Neo.Button {
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.FillButton|null}
  */
-Neo.FillButton.prototype.init = function (elementID, params) {
+Neo.FillButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "fill";
   return this;
@@ -240,7 +242,7 @@ Neo.ColorTip = class {
 };
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  */
 Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
@@ -402,7 +404,7 @@ Neo.ToolTip.prototype.label = null;
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ToolTip|null}
  */
 Neo.ToolTip.prototype.init = function (elementID, params = {}) {
@@ -625,10 +627,10 @@ Neo.PenTip.prototype.toolIcons = [
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.PenTip|null}
  */
-Neo.PenTip.prototype.init = function (elementID, params) {
+Neo.PenTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("鉛筆"),
     Neo.translate("水彩"),
@@ -680,10 +682,10 @@ Neo.Pen2Tip.prototype.toolIcons = [
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.Pen2Tip|null}
  */
-Neo.Pen2Tip.prototype.init = function (elementID, params) {
+Neo.Pen2Tip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("トーン"),
     Neo.translate("ぼかし"),
@@ -790,10 +792,10 @@ Neo.EraserTip.prototype.tools = [
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.EraserTip|null}
  */
-Neo.EraserTip.prototype.init = function (elementID, params) {
+Neo.EraserTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("消しペン"),
     Neo.translate("消し四角"),
@@ -865,10 +867,10 @@ Neo.EffectTip.prototype.toolIcons = [
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.EffectTip|null}
  */
-Neo.EffectTip.prototype.init = function (elementID, params) {
+Neo.EffectTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("四角"),
     Neo.translate("線四角"),
@@ -930,10 +932,10 @@ Neo.Effect2Tip.prototype.toolIcons = [
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.Effect2Tip|null}
  */
-Neo.Effect2Tip.prototype.init = function (elementID, params) {
+Neo.Effect2Tip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("コピー"),
     Neo.translate("ﾚｲﾔ結合"),
@@ -981,10 +983,10 @@ Neo.MaskTip = class extends Neo.ToolTip {
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.MaskTip|null}
  */
-Neo.MaskTip.prototype.init = function (elementID, params) {
+Neo.MaskTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("通常"),
     Neo.translate("マスク"),
@@ -1054,10 +1056,10 @@ Neo.DrawTip.prototype.toolIcons = [
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.DrawTip|null}
  */
-Neo.DrawTip.prototype.init = function (elementID, params) {
+Neo.DrawTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("手書き"),
     Neo.translate("直線"),
@@ -1132,7 +1134,7 @@ Neo.ColorSlider = class {
 /**
  * カラースライダーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ColorSlider|null}
  */
 Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
@@ -1331,7 +1333,7 @@ Neo.SizeSlider.prototype.hit = null;
 /**
  * サイズスライダーを初期化する。
  * @param {string} elementID - 要素のID
- * @param {Object|null} [params] - パラメータ
+ * @param {Object} [params] - パラメータ
  * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
  */
 Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
@@ -1479,7 +1481,7 @@ Neo.LayerControl.prototype.isMouseDown = false;
 /**
  * レイヤーコントローラーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.LayerControl|null}
  */
 Neo.LayerControl.prototype.init = function (elementID, params = {}) {
@@ -1580,7 +1582,7 @@ Neo.ReserveControl.prototype.isMouseDown = false;
 /**
  * リバースコントローラーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ReserveControl|null}
  */
 Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
@@ -1615,11 +1617,14 @@ Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
 
   this.reserve = Neo.clone(Neo.config.reserves[index]);
   this.update();
-
+  //どこからも参照されていない?
   Neo.reserveControls.push(this);
   return this;
 };
-
+/**
+ * 保管ペンに保存
+ * @param {} e
+ */
 Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
   if (Neo.getModifier(e) == "right") {
     this.save();
@@ -1673,8 +1678,10 @@ Neo.ReserveControl.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.scrollH;
-Neo.scrollV;
+/** @type {Neo.ScrollBarButton|null} */
+Neo.scrollH = null;
+/** @type {Neo.ScrollBarButton|null} */
+Neo.scrollV = null;
 
 Neo.ScrollBarButton = function () {};
 /** @type {HTMLElement|null} */
@@ -1760,7 +1767,7 @@ Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 /**
  *
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ViewerButton|null}
  */
 Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
@@ -1848,7 +1855,7 @@ Neo.ViewerBar.prototype.seek = 0;
 /**
  *
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns
  */
 

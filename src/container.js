@@ -43,6 +43,7 @@ Neo.updateUI = function () {};
 Neo.stabilize_level = 1;
 Neo.styleSheet = null;
 Neo.rules = null;
+/** @type {any} **/
 Neo.config = {
   width: 300,
   height: 300,
@@ -64,7 +65,6 @@ Neo.config = {
     "#F9DDCF",
   ],
 };
-
 Neo.reservePen = {};
 Neo.reserveEraser = {};
 
@@ -80,11 +80,25 @@ Neo.eraserTip = null;
 Neo.drawTip = null;
 Neo.maskTip = null;
 
+Neo.isApp = false;
+
+Neo.viewerBar = null;
+Neo.viewerPlay = null;
+Neo.viewerStop = null;
+Neo.viewerSpeed = null;
+Neo.speed = null;
+
+Neo.params = null;
+Neo.param = null;
+
 Neo.SLIDERTYPE_RED = 0;
 Neo.SLIDERTYPE_GREEN = 1;
 Neo.SLIDERTYPE_BLUE = 2;
 Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
+
+Neo.touch_move_grid_control = function (e) {};
+Neo.add_touch_move_grid_control = function () {};
 
 /**
  *  @type {any} *
@@ -1647,7 +1661,9 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
             }
             Neo.uploaded = true;
             //画面移動の関数が定義されている時はユーザーが定義した関数で画面移動
+            //@ts-ignore
             if (typeof Neo.handleExit === "function") {
+              //@ts-ignore
               return Neo.handleExit();
             }
             return (location.href = exitURL);

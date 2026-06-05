@@ -79,6 +79,9 @@ Neo.ToolBase.prototype.getToolButton = function () {
   return null;
 };
 
+/**
+ * 保管ペンから情報を取り出す
+ */
 Neo.ToolBase.prototype.getReserve = function () {
   switch (this.type) {
     case Neo.Painter.TOOLTYPE_ERASER:

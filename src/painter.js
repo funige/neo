@@ -592,7 +592,7 @@ Neo.Painter.prototype._initToneData = function () {
  * 定義済みの閾値テーブル(alphaTable)に基づき、指定されたアルファ値に最も近い
  * ハーフトーンのパターンを選択して返す。
  * @param {number} alpha - 0〜255の範囲のアルファ値（透明度）
- * @returns {Array} 対応するハーフトーンパターン
+ * @returns {Array<number>} 対応するハーフトーンパターン
  */
 Neo.Painter.prototype.getToneData = function (alpha) {
   var alphaTable = [
@@ -3430,7 +3430,7 @@ Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
   var r1 = this._currentColor[0];
   var g1 = this._currentColor[1];
   var b1 = this._currentColor[2];
-  var a1 = this.getAlpha(Neo.ALPHATYPE_FILL);
+  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_FILL);
 
   for (var j = 0; j < height; j++) {
     for (var i = 0; i < width; i++) {
