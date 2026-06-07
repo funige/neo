@@ -694,6 +694,9 @@ Neo.Painter.prototype.cancelCopy = function () {
    -----------------------------------------------------------------------
  */
 
+/**
+ * @param {KeyboardEvent} e
+ */
 Neo.Painter.prototype._keyDownHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
@@ -724,6 +727,7 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
     //全消し
     if (
       document.activeElement != this.inputText &&
+      key &&
       ["delete", "backspace"].includes(key)
     ) {
       this._pushUndo();
@@ -757,6 +761,9 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
     }
   }
 };
+/**
+ * @param {KeyboardEvent} e
+ */
 Neo.Painter.prototype._keyUpHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
@@ -1715,21 +1722,34 @@ Neo.Painter.prototype.getBound = function (x0, y0, x1, y1, r) {
   }
   return [left, top, width, height];
 };
-
-Neo.Painter.prototype.getColor = function (c) {
-  if (!c) c = this.foregroundColor;
-  var r = parseInt(c.slice(1, 3), 16);
-  var g = parseInt(c.slice(3, 5), 16);
-  var b = parseInt(c.slice(5, 7), 16);
-  var a = Math.floor(this.alpha * 255);
+/**
+ * 色を取得
+ * @param {string} [color]
+ */
+Neo.Painter.prototype.getColor = function (color = "") {
+  const c = color ? color : this.foregroundColor;
+  const r = parseInt(c.slice(1, 3), 16);
+  const g = parseInt(c.slice(3, 5), 16);
+  const b = parseInt(c.slice(5, 7), 16);
+  const a = Math.floor(this.alpha * 255);
   return (a << 24) | (b << 16) | (g << 8) | r;
 };
 
+/**
+ * 数値形式の色情報を、CSS等で利用可能な文字列（#RRGGBB）へ変換する。
+ * 下位24ビットのRGB成分を抽出し、6桁の16進数文字列を生成する。
+ * アルファチャンネル（透明度）は破棄される。
+ * * @param {number} c - 変換対象の色数値
+ * @returns {string} CSS形式のカラー文字列
+ */
 Neo.Painter.prototype.getColorString = function (c) {
-  var rgb = ("000000" + (c & 0xffffff).toString(16)).slice(-6);
+  const rgb = ("000000" + (c & 0xffffff).toString(16)).slice(-6);
   return "#" + rgb;
 };
-
+/**
+ * 色をセット
+ * @param {string|number} c
+ */
 Neo.Painter.prototype.setColor = function (c) {
   if (typeof c != "string") c = this.getColorString(c);
   this.foregroundColor = c;

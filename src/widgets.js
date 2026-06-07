@@ -371,7 +371,6 @@ Neo.ColorTip.getCurrent = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.toolTips = [];
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
@@ -504,7 +503,9 @@ Neo.ToolTip.prototype._mouseOutHandler = function (e) {
 Neo.ToolTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
-
+/**
+ * @param {boolean} selected
+ */
 Neo.ToolTip.prototype.setSelected = function (selected) {
   if (this.fixed) {
     this.element.className = "toolTipFixed";
@@ -520,6 +521,9 @@ Neo.ToolTip.prototype.setSelected = function (selected) {
 
 Neo.ToolTip.prototype.update = function () {};
 
+/**
+ * @param {string|number} c
+ */
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
@@ -554,7 +558,13 @@ Neo.ToolTip.prototype.draw = function (c) {
     }
   }
 };
-
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {HTMLImageElement} img
+ * @param {string} c
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ToolTip.prototype.drawTintImage = function (ctx, img, c, x, y) {
   ctx.drawImage(img, x, y);
   Neo.tintImage(ctx, c);
@@ -1635,6 +1645,10 @@ Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
 };
 
 Neo.ReserveControl.prototype.load = function () {
+  if (!this.reserve) {
+    console.error("Reserve not found for ReserveControl load.");
+    return;
+  }
   Neo.painter.setToolByType(this.reserve.tool);
   Neo.painter.foregroundColor = this.reserve.color;
   Neo.painter.lineWidth = this.reserve.size;
@@ -1650,6 +1664,10 @@ Neo.ReserveControl.prototype.load = function () {
 };
 
 Neo.ReserveControl.prototype.save = function () {
+  if (!this.reserve) {
+    console.error("reserve not found for ReserveControl save");
+    return;
+  }
   this.reserve.color = Neo.painter.foregroundColor;
   this.reserve.size = Neo.painter.lineWidth;
   this.reserve.drawType = Neo.painter.drawType;

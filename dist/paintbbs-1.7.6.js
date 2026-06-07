@@ -29,20 +29,26 @@ Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
 Neo.container = null;
+/**@type {HTMLElement|null} */
 Neo.center = null;
 Neo.canvas = null;
+/**@type {HTMLElement|null} */
 Neo.toolsWrapper = null;
+/**@type {HTMLElement|null} */
 Neo.tools = null;
 Neo.toolSide = false;
+/**@type {HTMLElement|null} */
 Neo.applet = null;
 Neo.isAnimation = false;
 Neo.storage = null;
+/**@type {HTMLElement|null} */
 Neo.elementNeo = null;
 Neo.isPinchZooming = null;
 Neo.updateUI = function () {};
 Neo.stabilize_level = 1;
+/** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
-Neo.rules = null;
+Neo.rules = {};
 /** @type {any} **/
 Neo.config = {
   width: 300,
@@ -207,6 +213,7 @@ Neo.init2 = function () {
   Neo.center = document.getElementById("neo-center");
   if (
     Neo.center &&
+    Neo.container &&
     Neo.container.clientWidth &&
     Neo.container.clientWidth >= 400 &&
     Neo.config.neo_disable_neo_center_min_width != "true"
@@ -385,7 +392,9 @@ Neo.initConfig = function (applet) {
     },
   ];
 
+  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
   Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
+  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
   Neo.reserveEraser = Neo.clone(Neo.config.reserves[1]);
 };
 
@@ -417,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
   Neo.add_touch_move_grid_control = function () {
     if (Neo.elementNeo && Neo.config.neo_disable_grid_touch_move) {
       // すでにリスナーが追加されていない場合のみ追加
-      if (!Neo.elementNeo?._touchMoveListenerAdded) {
+      if (!Neo.elementNeo_touchMoveListenerAdded) {
         Neo.elementNeo?.addEventListener(
           "touchmove",
           Neo.touch_move_grid_control,
@@ -425,7 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
             passive: false,
           },
         );
-        Neo.elementNeo._touchMoveListenerAdded = true; // リスナーが追加されたことを記録
+        Neo.elementNeo_touchMoveListenerAdded = true; // リスナーが追加されたことを記録
       }
     }
   };
@@ -438,11 +447,8 @@ document.addEventListener("DOMContentLoaded", () => {
         Neo.elementNeo.removeEventListener(
           "touchmove",
           Neo.touch_move_grid_control,
-          {
-            passive: false,
-          },
         );
-        Neo.elementNeo._touchMoveListenerAdded = false; // リスナーが削除されたことを記録
+        Neo.elementNeo_touchMoveListenerAdded = false; // リスナーが削除されたことを記録
       }
     }
   });
@@ -727,9 +733,9 @@ Neo.initSkin = function () {
  * @param {string} selector - CSSセレクタ (例: "body", ".paint-canvas")
  * @param {string} styleName - CSSプロパティ名 (例: "letter-spacing")
  * @param {string|number} value - 設定する値 (例: "0px !important")
- * @param {CSSStyleSheet} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
+ * @param {CSSStyleSheet|null} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
  */
-Neo.addRule = function (selector, styleName, value, sheet) {
+Neo.addRule = function (selector, styleName, value, sheet = null) {
   // 1. 省略時はデフォルトの stylesheet を適用
   if (!sheet) {
     sheet = Neo.styleSheet;
@@ -2867,6 +2873,9 @@ Neo.Painter.prototype.cancelCopy = function () {
    -----------------------------------------------------------------------
  */
 
+/**
+ * @param {KeyboardEvent} e
+ */
 Neo.Painter.prototype._keyDownHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
@@ -2897,6 +2906,7 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
     //全消し
     if (
       document.activeElement != this.inputText &&
+      key &&
       ["delete", "backspace"].includes(key)
     ) {
       this._pushUndo();
@@ -2930,6 +2940,9 @@ Neo.Painter.prototype._keyDownHandler = function (e) {
     }
   }
 };
+/**
+ * @param {KeyboardEvent} e
+ */
 Neo.Painter.prototype._keyUpHandler = function (e) {
   this.isShiftDown = e.shiftKey;
   this.isCtrlDown = e.ctrlKey;
@@ -3888,21 +3901,34 @@ Neo.Painter.prototype.getBound = function (x0, y0, x1, y1, r) {
   }
   return [left, top, width, height];
 };
-
-Neo.Painter.prototype.getColor = function (c) {
-  if (!c) c = this.foregroundColor;
-  var r = parseInt(c.slice(1, 3), 16);
-  var g = parseInt(c.slice(3, 5), 16);
-  var b = parseInt(c.slice(5, 7), 16);
-  var a = Math.floor(this.alpha * 255);
+/**
+ * 色を取得
+ * @param {string} [color]
+ */
+Neo.Painter.prototype.getColor = function (color = "") {
+  const c = color ? color : this.foregroundColor;
+  const r = parseInt(c.slice(1, 3), 16);
+  const g = parseInt(c.slice(3, 5), 16);
+  const b = parseInt(c.slice(5, 7), 16);
+  const a = Math.floor(this.alpha * 255);
   return (a << 24) | (b << 16) | (g << 8) | r;
 };
 
+/**
+ * 数値形式の色情報を、CSS等で利用可能な文字列（#RRGGBB）へ変換する。
+ * 下位24ビットのRGB成分を抽出し、6桁の16進数文字列を生成する。
+ * アルファチャンネル（透明度）は破棄される。
+ * * @param {number} c - 変換対象の色数値
+ * @returns {string} CSS形式のカラー文字列
+ */
 Neo.Painter.prototype.getColorString = function (c) {
-  var rgb = ("000000" + (c & 0xffffff).toString(16)).slice(-6);
+  const rgb = ("000000" + (c & 0xffffff).toString(16)).slice(-6);
   return "#" + rgb;
 };
-
+/**
+ * 色をセット
+ * @param {string|number} c
+ */
 Neo.Painter.prototype.setColor = function (c) {
   if (typeof c != "string") c = this.getColorString(c);
   this.foregroundColor = c;
@@ -9857,7 +9883,6 @@ Neo.ColorTip.getCurrent = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.toolTips = [];
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
@@ -9990,7 +10015,9 @@ Neo.ToolTip.prototype._mouseOutHandler = function (e) {
 Neo.ToolTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
-
+/**
+ * @param {boolean} selected
+ */
 Neo.ToolTip.prototype.setSelected = function (selected) {
   if (this.fixed) {
     this.element.className = "toolTipFixed";
@@ -10006,6 +10033,9 @@ Neo.ToolTip.prototype.setSelected = function (selected) {
 
 Neo.ToolTip.prototype.update = function () {};
 
+/**
+ * @param {string|number} c
+ */
 Neo.ToolTip.prototype.draw = function (c) {
   if (this.hasTintImage) {
     if (typeof c != "string") c = Neo.painter.getColorString(c);
@@ -10040,7 +10070,13 @@ Neo.ToolTip.prototype.draw = function (c) {
     }
   }
 };
-
+/**
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {HTMLImageElement} img
+ * @param {string} c
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ToolTip.prototype.drawTintImage = function (ctx, img, c, x, y) {
   ctx.drawImage(img, x, y);
   Neo.tintImage(ctx, c);
@@ -11121,6 +11157,10 @@ Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
 };
 
 Neo.ReserveControl.prototype.load = function () {
+  if (!this.reserve) {
+    console.error("Reserve not found for ReserveControl load.");
+    return;
+  }
   Neo.painter.setToolByType(this.reserve.tool);
   Neo.painter.foregroundColor = this.reserve.color;
   Neo.painter.lineWidth = this.reserve.size;
@@ -11136,6 +11176,10 @@ Neo.ReserveControl.prototype.load = function () {
 };
 
 Neo.ReserveControl.prototype.save = function () {
+  if (!this.reserve) {
+    console.error("reserve not found for ReserveControl save");
+    return;
+  }
   this.reserve.color = Neo.painter.foregroundColor;
   this.reserve.size = Neo.painter.lineWidth;
   this.reserve.drawType = Neo.painter.drawType;

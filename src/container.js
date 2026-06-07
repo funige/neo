@@ -29,20 +29,26 @@ Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
 Neo.container = null;
+/**@type {HTMLElement|null} */
 Neo.center = null;
 Neo.canvas = null;
+/**@type {HTMLElement|null} */
 Neo.toolsWrapper = null;
+/**@type {HTMLElement|null} */
 Neo.tools = null;
 Neo.toolSide = false;
+/**@type {HTMLElement|null} */
 Neo.applet = null;
 Neo.isAnimation = false;
 Neo.storage = null;
+/**@type {HTMLElement|null} */
 Neo.elementNeo = null;
 Neo.isPinchZooming = null;
 Neo.updateUI = function () {};
 Neo.stabilize_level = 1;
+/** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
-Neo.rules = null;
+Neo.rules = {};
 /** @type {any} **/
 Neo.config = {
   width: 300,
@@ -207,6 +213,7 @@ Neo.init2 = function () {
   Neo.center = document.getElementById("neo-center");
   if (
     Neo.center &&
+    Neo.container &&
     Neo.container.clientWidth &&
     Neo.container.clientWidth >= 400 &&
     Neo.config.neo_disable_neo_center_min_width != "true"
@@ -385,7 +392,9 @@ Neo.initConfig = function (applet) {
     },
   ];
 
+  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
   Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
+  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
   Neo.reserveEraser = Neo.clone(Neo.config.reserves[1]);
 };
 
@@ -417,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
   Neo.add_touch_move_grid_control = function () {
     if (Neo.elementNeo && Neo.config.neo_disable_grid_touch_move) {
       // すでにリスナーが追加されていない場合のみ追加
-      if (!Neo.elementNeo?._touchMoveListenerAdded) {
+      if (!Neo.elementNeo_touchMoveListenerAdded) {
         Neo.elementNeo?.addEventListener(
           "touchmove",
           Neo.touch_move_grid_control,
@@ -425,7 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
             passive: false,
           },
         );
-        Neo.elementNeo._touchMoveListenerAdded = true; // リスナーが追加されたことを記録
+        Neo.elementNeo_touchMoveListenerAdded = true; // リスナーが追加されたことを記録
       }
     }
   };
@@ -438,11 +447,8 @@ document.addEventListener("DOMContentLoaded", () => {
         Neo.elementNeo.removeEventListener(
           "touchmove",
           Neo.touch_move_grid_control,
-          {
-            passive: false,
-          },
         );
-        Neo.elementNeo._touchMoveListenerAdded = false; // リスナーが削除されたことを記録
+        Neo.elementNeo_touchMoveListenerAdded = false; // リスナーが削除されたことを記録
       }
     }
   });
@@ -727,9 +733,9 @@ Neo.initSkin = function () {
  * @param {string} selector - CSSセレクタ (例: "body", ".paint-canvas")
  * @param {string} styleName - CSSプロパティ名 (例: "letter-spacing")
  * @param {string|number} value - 設定する値 (例: "0px !important")
- * @param {CSSStyleSheet} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
+ * @param {CSSStyleSheet|null} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
  */
-Neo.addRule = function (selector, styleName, value, sheet) {
+Neo.addRule = function (selector, styleName, value, sheet = null) {
   // 1. 省略時はデフォルトの stylesheet を適用
   if (!sheet) {
     sheet = Neo.styleSheet;
