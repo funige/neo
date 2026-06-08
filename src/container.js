@@ -43,6 +43,7 @@ Neo.isAnimation = false;
 Neo.storage = null;
 /**@type {HTMLElement|null} */
 Neo.elementNeo = null;
+Neo.elementNeo_touchMoveListenerAdded = false;
 Neo.isPinchZooming = null;
 Neo.updateUI = function () {};
 Neo.stabilize_level = 1;
@@ -130,6 +131,7 @@ Neo.extractBootConfig = function (targetName) {
   // 2. DOMの探索（指定された名前を持つ要素を最初に1つ見つける）
   // targetName が "paintbbs" なら .neo-applet-paintbbs を探す
   const applet = `applet[name="${targetName}"], applet-dummy[name="${targetName}"], .neo-applet-${targetName}`;
+  /**@type {HTMLElement|null} */
   const node = document.querySelector(applet);
 
   if (!node) return {};
@@ -356,8 +358,8 @@ Neo.initConfig = function (applet) {
       Neo.applyStyle("color_bar_select", "#407675");
     }
 
-    var e = document.getElementById("neo-container");
-    Neo.config.inherit_color = Neo.getInheritColor(e);
+    const container = document.getElementById("neo-container");
+    Neo.config.inherit_color = Neo.getInheritColor(container);
     if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
 
     if (
@@ -811,19 +813,20 @@ Neo.applyStyle = function (name, defaultColor) {
     Neo.config[name] = Neo.rules[name] || defaultColor;
   }
 };
-
-Neo.getInheritColor = function (e) {
+/** @param {HTMLElement|null} element */
+Neo.getInheritColor = function (element) {
   var result = "#000000";
-  while (e && e.style) {
-    if (e.style.color != "") {
-      result = e.style.color;
+  while (element && element.style) {
+    if (element.style.color != "") {
+      result = element.style.color;
       break;
     }
-    if (e.attributes["text"]) {
-      result = e.attributes["text"].value;
+    if (element.attributes["text"]) {
+      result = element.attributes["text"].value;
       break;
     }
-    e = e.parentNode;
+    element =
+      element.parentNode instanceof HTMLElement ? element.parentNode : null;
   }
   return result;
 };
@@ -1896,10 +1899,10 @@ Neo.createContainer = function (applet) {
 /**
  * 指定されたCanvas上の画像の形（アルファチャンネル）を維持したまま、指定した単色に置き換える
  * @param {CanvasRenderingContext2D} ctx - 対象となるCanvasの2Dコンテキスト
- * @param {string|number} c - 置き換えたい新しい色（カラーコードまたは数値）
+ * @param {string} color - 置き換えたい新しい色（カラーコードまたは数値）
  */
-Neo.tintImage = function (ctx, c) {
-  c = Neo.painter.getColor(c) & 0xffffff;
+Neo.tintImage = function (ctx, color) {
+  const c = Neo.painter.getColor(color) & 0xffffff;
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
   var buf32 = new Uint32Array(imageData.data.buffer);

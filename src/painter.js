@@ -16,8 +16,6 @@ Neo.Painter = class {
 };
 
 Neo.Painter.prototype.container = null;
-Neo.Painter.prototype._undoMgr;
-Neo.Painter.prototype._actionMgr;
 Neo.Painter.prototype.tool = null;
 Neo.Painter.prototype.inputText = null;
 Neo.Painter.prototype.cursorRect = null;
@@ -791,7 +789,10 @@ Neo.Painter.prototype._rollOutHandler = function (e) {
     this.tool.rollOutHandler(this);
   }
 };
-
+/**
+ * @param {MouseEvent|TouchEvent} e
+ * @returns {void}
+ */
 Neo.Painter.prototype._mouseDownHandler = function (e) {
   if (this.busy) {
     // loadAnimation実行中は何もしない
@@ -809,7 +810,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
 
   if (this.touchlength > 1) return;
 
-  if (e.button == 2 || this.virtualRight) {
+  if ((e instanceof MouseEvent && e.button == 2) || this.virtualRight) {
     this.isMouseDownRight = true;
   } else {
     if (!e.shiftKey && e.ctrlKey && e.altKey) {
@@ -862,20 +863,20 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   // 右クリック時のカラーピッカーのガード
   if (this.isMouseDownRight) {
     this.isMouseDownRight = false;
-    if (!this.isWidget(e.target)) {
+    if (e.target instanceof HTMLElement && !this.isWidget(e.target)) {
       this.pickColor(this.mouseX, this.mouseY);
       return;
     }
   }
 
   if (!this.isUIPaused()) {
-    if (e.target["data-bar"]) {
+    if (e.target && e.target["data-bar"]) {
       this.pushTool(this.handTool);
       this.handTool.reverse = false;
     } else if (this.isSpaceDown && document.activeElement != this.inputText) {
       this.pushTool(this.handTool);
       this.handTool.reverse = true;
-    } else if (e.target["data-slider"] != undefined) {
+    } else if (e.target && e.target["data-slider"] != undefined) {
       this.pushTool(this.sliderTool);
       this.sliderTool.target = e.target;
       this.sliderTool.alt = false;
@@ -883,7 +884,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
       this.pushTool(this.sliderTool);
       this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
       this.sliderTool.alt = true;
-    } else if (this.isWidget(e.target)) {
+    } else if (e.target instanceof HTMLElement && this.isWidget(e.target)) {
       // UI操作時のツール切り替え（dummyToolへの差し替え）
       this.isMouseDown = false;
       this.pushTool(this.dummyTool);
@@ -900,13 +901,16 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   //  };
 };
 
+/**
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.Painter.prototype._mouseUpHandler = function (e) {
   this.isMouseDown = false;
   this.isMouseDownRight = false;
   this.tool.upHandler(this);
   //  document.onmouseup = undefined;
 
-  if (e.target.id != "neo-right") {
+  if (e.target instanceof HTMLElement && e.target.id != "neo-right") {
     this.virtualRight = false;
     Neo.RightButton.clear();
   }
@@ -922,7 +926,10 @@ Neo.Painter.prototype._mouseUpHandler = function (e) {
   //      }
   //  }
 };
-
+/**
+ * @param {PointerEvent|TouchEvent} e
+ * @returns
+ */
 Neo.Painter.prototype._mouseMoveHandler = function (e) {
   this._updateMousePosition(e);
 
@@ -941,7 +948,11 @@ Neo.Painter.prototype._mouseMoveHandler = function (e) {
 
   // 画面外をタップした時スクロール可能にするため
   //  console.warn("move -" + e.target.id + e.target.className)
-  if (e.cancelable && e.target.className != "o") {
+  if (
+    e.cancelable &&
+    e.target instanceof HTMLElement &&
+    e.target.className != "o"
+  ) {
     e.preventDefault();
   }
 };
@@ -2440,32 +2451,51 @@ Neo.Painter.prototype.drawBezier = function (
     [x3, y3],
   ];
   var ref = this;
+  /**
+   * @callback DrawCallback
+   * @param {number} left
+   * @param {number} top
+   * @param {number} width
+   * @param {number} height
+   * @param {Uint8ClampedArray} buf8
+   * @param {ImageData} imageData
+   */
+  this.draw(
+    ctx,
+    points,
+    /** @type {DrawCallback} */ function (
+      left,
+      top,
+      width,
+      height,
+      buf8,
+      imageData,
+    ) {
+      var n = Math.ceil((width + height) * 2.5);
+      var oType = ref._currentMaskType;
+      var oAlpha = ref._currentColor[3];
 
-  this.draw(ctx, points, function (left, top, width, height, buf8, imageData) {
-    var n = Math.ceil((width + height) * 2.5);
-    var oType = ref._currentMaskType;
-    var oAlpha = ref._currentColor[3];
+      if (isPreview) {
+        ref._currentMaskType = Neo.Painter.MASKTYPE_NONE;
+        ref._currentColor[3] = 255;
+      }
 
-    if (isPreview) {
-      ref._currentMaskType = Neo.Painter.MASKTYPE_NONE;
-      ref._currentColor[3] = 255;
-    }
+      for (var i = 0; i < n; i++) {
+        var t = (i * 1.0) / n;
+        var p = ref.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
 
-    for (var i = 0; i < n; i++) {
-      var t = (i * 1.0) / n;
-      var p = ref.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
+        p[0] = Math.round(p[0]);
+        p[1] = Math.round(p[1]);
 
-      p[0] = Math.round(p[0]);
-      p[1] = Math.round(p[1]);
-
-      ref.plot(p, function (x, y) {
-        ref.setPoint(buf8, imageData.width, x, y, left, top, type);
-      });
-    }
-    ref._currentMaskType = oType;
-    ref._currentColor[3] = oAlpha;
-    ref.prevLine = null;
-  });
+        ref.plot(p, function (x, y) {
+          ref.setPoint(buf8, imageData.width, x, y, left, top, type);
+        });
+      }
+      ref._currentMaskType = oType;
+      ref._currentColor[3] = oAlpha;
+      ref.prevLine = null;
+    },
+  );
 };
 
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
@@ -2492,12 +2522,31 @@ Neo.Painter.prototype.drawLine = function (ctx, x0, y0, x1, y1, type) {
   ];
   var ref = this;
   this.aerr = 0;
-
-  this.draw(ctx, points, function (left, top, width, height, buf8, imageData) {
-    ref.bresenham(points, function (x, y) {
-      ref.setPoint(buf8, imageData.width, x, y, left, top, type);
-    });
-  });
+  /**
+   * @callback DrawCallback
+   * @param {number} left
+   * @param {number} top
+   * @param {number} width
+   * @param {number} height
+   * @param {Uint8ClampedArray} buf8
+   * @param {ImageData} imageData
+   */
+  this.draw(
+    ctx,
+    points,
+    /** @type {DrawCallback} */ function (
+      left,
+      top,
+      width,
+      height,
+      buf8,
+      imageData,
+    ) {
+      ref.bresenham(points, function (x, y) {
+        ref.setPoint(buf8, imageData.width, x, y, left, top, type);
+      });
+    },
+  );
   this.prevLine = points;
 };
 

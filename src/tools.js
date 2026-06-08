@@ -441,9 +441,17 @@ Neo.DrawToolBase.prototype.lineMoveHandler = function (oe) {
   this.drawLineCursor(oe);
 };
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DrawToolBase.prototype.lineUpMoveHandler = function (oe) {};
 
-Neo.DrawToolBase.prototype.drawLineCursor = function (oe, mx, my) {
+/**
+ *  @param {Neo.Painter} oe
+ *  @param {number} [mx]
+ *  @param {number} [my]
+ * */
+Neo.DrawToolBase.prototype.drawLineCursor = function (oe, mx = 0, my = 0) {
   if (!mx) mx = Math.floor(oe.mouseX);
   if (!my) my = Math.floor(oe.mouseY);
   var nx = this.startX;
@@ -949,8 +957,17 @@ Neo.HandTool.prototype.moveHandler = function (oe) {
     this.ticking = false;
   });
 };
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.HandTool.prototype.upMoveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.HandTool.prototype.rollOverHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.HandTool.prototype.rollOutHandler = function (oe) {};
 
 /*
@@ -1049,12 +1066,27 @@ Neo.FillTool.prototype.downHandler = function (oe) {
   //oe.doFloodFill(layer, x, y, color);
 };
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.FillTool.prototype.upHandler = function (oe) {};
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.FillTool.prototype.moveHandler = function (oe) {};
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.FillTool.prototype.rollOutHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.FillTool.prototype.upMoveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.FillTool.prototype.rollOverHandler = function (oe) {};
 
 /*
@@ -1083,12 +1115,25 @@ Neo.EraseAllTool.prototype.downHandler = function (oe) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
 };
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.EraseAllTool.prototype.upHandler = function (oe) {};
-
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.EraseAllTool.prototype.moveHandler = function (oe) {};
-
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.EraseAllTool.prototype.rollOutHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.EraseAllTool.prototype.upMoveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.EraseAllTool.prototype.rollOverHandler = function (oe) {};
 
 /*
@@ -1699,11 +1744,25 @@ Neo.TextTool.prototype.downHandler = function (oe) {
   }
 };
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.TextTool.prototype.upHandler = function (oe) {};
-
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.TextTool.prototype.moveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.TextTool.prototype.upMoveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.TextTool.prototype.rollOverHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.TextTool.prototype.rollOutHandler = function (oe) {};
 
 /**
@@ -1801,13 +1860,29 @@ Neo.DummyTool = class extends Neo.ToolBase {
 Neo.DummyTool.prototype.type = Neo.Painter.TOOLTYPE_NONE;
 Neo.DummyTool.prototype.isUpMove = false;
 
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DummyTool.prototype.downHandler = function (oe) {};
-
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DummyTool.prototype.upHandler = function (oe) {
   oe.popTool();
 };
-
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DummyTool.prototype.moveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
+/**
+ *  @param {Neo.Painter} oe
+ * */
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};

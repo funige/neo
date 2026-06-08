@@ -912,13 +912,13 @@ Neo.ActionManager.prototype.text = function (
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
-    x = Number(x);
-    y = Number(y);
-    color = Number(color);
-    alpha = Number(alpha);
+    const _x = Number(x);
+    const _y = Number(y);
+    const _color = Number(color);
+    const _alpha = Number(alpha);
 
-    this.push("text", layer, x, y, color, alpha, string, size, family);
-    oe.doText(layer, x, y, color, alpha, string, size, family);
+    this.push("text", layer, _x, _y, _color, _alpha, string, size, family);
+    oe.doText(layer, _x, _y, _color, _alpha, string, size, family);
   } else {
     const item = arguments[0];
 
@@ -1319,7 +1319,7 @@ Neo.getPCH = function (filename, callback) {
  * * @typedef {Object} PCHData
  * @property {number} width - キャンバスの横幅
  * @property {number} height - キャンバスの高さ
- * @property {Array} data - 描画命令の配列（fixPCH適用済み）
+ * @property {Array<any>} data - 描画命令の配列（fixPCH適用済み）
  * * @param {ArrayBuffer} rawdata - fetchで取得した生のバイナリデータ
  * @returns {PCHData|null} デコード成功時はオブジェクト、失敗時はnullを返す
  * * @example

@@ -70,6 +70,9 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
   };
   this.element.addEventListener(
     "touchstart",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._mouseDownHandler(e);
       e.preventDefault();
@@ -78,6 +81,9 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
   );
   this.element.addEventListener(
     "touchend",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._mouseUpHandler(e);
     },
@@ -103,7 +109,9 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
 
   return this;
 };
-
+/**
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.Button.prototype._mouseDownHandler = function (e) {
   if (Neo.painter.isUIPaused()) return;
   this.isMouseDown = true;
@@ -118,6 +126,9 @@ Neo.Button.prototype._mouseDownHandler = function (e) {
 
   if (this.onmousedown) this.onmousedown(this);
 };
+/**
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.Button.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
@@ -430,6 +441,9 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   };
   this.element.addEventListener(
     "touchstart",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._mouseDownHandler(e);
       e.preventDefault();
@@ -438,6 +452,9 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   );
   this.element.addEventListener(
     "touchend",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._mouseUpHandler(e);
     },
@@ -522,11 +539,16 @@ Neo.ToolTip.prototype.setSelected = function (selected) {
 Neo.ToolTip.prototype.update = function () {};
 
 /**
- * @param {string|number} c
+ * ツールチップのアイコンを描画し、必要に応じて色調補正（ティント）を施す。
+ * 動作モードが変更された際には新たな画像を読み込み、
+ * 変更がない場合は既存のキャンバスに対し色調のみを再適用し効率化を図る。
+ *
+ * @param {string|number} color - アイコンに適用すべき色彩。カラー文字列、またはNeo.painterで解釈可能な数値IDを指定する。
  */
-Neo.ToolTip.prototype.draw = function (c) {
+Neo.ToolTip.prototype.draw = function (color) {
   if (this.hasTintImage) {
-    if (typeof c != "string") c = Neo.painter.getColorString(c);
+    const c =
+      typeof color === "string" ? color : Neo.painter.getColorString(color);
     if (!this.canvas) {
       console.error("Canvas not found for ToolTip.");
       return;
@@ -559,11 +581,14 @@ Neo.ToolTip.prototype.draw = function (c) {
   }
 };
 /**
- * @param {CanvasRenderingContext2D} ctx
- * @param {HTMLImageElement} img
- * @param {string} c
- * @param {number} x
- * @param {number} y
+ * 指定された座標へ画像を配置し、その上から特定の色調を合成する。
+ * 画像の描画と、それに続く色調の適用という二段階の処理を担う。
+ *
+ * @param {CanvasRenderingContext2D} ctx - 描画先となる2Dレンダリングコンテキスト。
+ * @param {HTMLImageElement} img - 描画対象のソース画像。
+ * @param {string} c - 合成すべき色彩を表すカラー文字列。
+ * @param {number} x - 描画始点のX座標。
+ * @param {number} y - 描画始点のY座標。
  */
 Neo.ToolTip.prototype.drawTintImage = function (ctx, img, c, x, y) {
   ctx.drawImage(img, x, y);
@@ -636,6 +661,7 @@ Neo.PenTip.prototype.toolIcons = [
 ];
 
 /**
+ * 鉛筆･水彩･テキスト
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.PenTip|null}
@@ -691,6 +717,7 @@ Neo.Pen2Tip.prototype.toolIcons = [
 ];
 
 /**
+ * トーン･ぼかし･覆い焼き･焼き込み
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.Pen2Tip|null}
@@ -801,6 +828,7 @@ Neo.EraserTip.prototype.tools = [
 ];
 
 /**
+ * 消しペン･消し四角･全消し
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.EraserTip|null}
@@ -876,6 +904,7 @@ Neo.EffectTip.prototype.toolIcons = [
 ];
 
 /**
+ * 四角･線四角･楕円･線楕円
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.EffectTip|null}
@@ -941,6 +970,7 @@ Neo.Effect2Tip.prototype.toolIcons = [
 ];
 
 /**
+ * コピー･レイヤー結合･角取り･左右反転･上下反転･傾け
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.Effect2Tip|null}
@@ -992,6 +1022,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
 };
 
 /**
+ * 通常･マスク･逆マスク･加算･逆加算
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.MaskTip|null}
@@ -1033,9 +1064,14 @@ Neo.MaskTip.prototype.update = function () {
   }
 };
 
-Neo.MaskTip.prototype.draw = function (c) {
-  if (typeof c != "string") c = Neo.painter.getColorString(c);
-
+/**
+ * マスクチップのアイコンを描画して色調補正（ティント）を施す。
+ *
+ * @param {string|number} color - アイコンに適用すべき色彩。カラー文字列、またはNeo.painterで解釈可能な数値IDを指定する。
+ */
+Neo.MaskTip.prototype.draw = function (color) {
+  const c =
+    typeof color === "string" ? color : Neo.painter.getColorString(color);
   var ctx = this.canvas.getContext("2d", {
     willReadFrequently: true,
   });
@@ -1065,6 +1101,7 @@ Neo.DrawTip.prototype.toolIcons = [
 ];
 
 /**
+ * 手書き･直線･BZ曲線
  * @param {string} elementID
  * @param {Object} [params]
  * @returns {Neo.DrawTip|null}
@@ -1196,7 +1233,10 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.update();
   return this;
 };
-
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.downHandler = function (x, y) {
   if (Neo.painter.isShiftDown) {
     this.shift(x, y);
@@ -1205,13 +1245,25 @@ Neo.ColorSlider.prototype.downHandler = function (x, y) {
   }
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.moveHandler = function (x, y) {
   this.slide(x, y);
   //event.preventDefault();
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.upHandler = function (x, y) {};
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.shift = function (x, y) {
   var value;
   if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
@@ -1243,6 +1295,10 @@ Neo.ColorSlider.prototype.shift = function (x, y) {
   }
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.slide = function (x, y) {
   var value;
   if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
@@ -1372,6 +1428,10 @@ Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   return this;
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.downHandler = function (x, y) {
   if (Neo.painter.isShiftDown) {
     this.shift(x, y);
@@ -1382,13 +1442,25 @@ Neo.SizeSlider.prototype.downHandler = function (x, y) {
   }
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.moveHandler = function (x, y) {
   this.slide(x, y);
   //event.preventDefault();
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.upHandler = function (x, y) {};
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.shift = function (x, y) {
   var value0 = Neo.painter.lineWidth;
   var value;
@@ -1511,6 +1583,9 @@ Neo.LayerControl.prototype.init = function (elementID, params = {}) {
   };
   this.element.addEventListener(
     "touchstart",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._mouseDownHandler(e);
       e.preventDefault();
@@ -1612,6 +1687,9 @@ Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
   };
   this.element.addEventListener(
     "touchstart",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._mouseDownHandler(e);
       e.preventDefault();
@@ -1633,7 +1711,6 @@ Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
 };
 /**
  * 保管ペンに保存
- * @param {} e
  */
 Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
   if (Neo.getModifier(e) == "right") {
@@ -1921,6 +1998,9 @@ Neo.ViewerBar.prototype.init = function (elementID, params = {}) {
   //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
   this.element.addEventListener(
     "touchstart",
+    /**
+     * @param {TouchEvent} e
+     */
     function (e) {
       ref._touchHandler(e);
       e.preventDefault();
