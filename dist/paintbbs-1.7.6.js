@@ -104,6 +104,7 @@ Neo.SLIDERTYPE_BLUE = 2;
 Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
 
+/** @param {TouchEvent} e */
 Neo.touch_move_grid_control = function (e) {};
 Neo.add_touch_move_grid_control = function () {};
 
@@ -411,6 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // グリッド部分の touchmove イベントのデフォルトの動作をキャンセル
+  /** @param {TouchEvent} e */
   Neo.touch_move_grid_control = function (e) {
     if (Neo.config.neo_disable_grid_touch_move) {
       let screenwidth = Number(screen.width);
@@ -2196,9 +2198,10 @@ Neo.Painter = class {
     this.scrollHeight = 0;
   }
 };
-
+/** @type {HTMLElement|null} */
 Neo.Painter.prototype.container = null;
 Neo.Painter.prototype.tool = null;
+/** @type {HTMLElement|null} */
 Neo.Painter.prototype.inputText = null;
 Neo.Painter.prototype.cursorRect = null;
 
@@ -2610,12 +2613,12 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   this.tempCanvas.style.position = "absolute";
   this.tempCanvas.enabled = false;
 
-  var array = this.container.getElementsByTagName("canvas");
-  if (array.length > 0) {
+  var array = this.container?.querySelectorAll("canvas");
+  if (array && array.length > 0) {
     this.destCanvas = array[0];
   } else {
     this.destCanvas = document.createElement("canvas");
-    this.container.appendChild(this.destCanvas);
+    this.container?.appendChild(this.destCanvas);
   }
 
   this.destCanvasCtx = this.destCanvas.getContext("2d", {
@@ -2804,7 +2807,7 @@ Neo.Painter.prototype._initInputText = function () {
 
   text.style.display = "none";
   //  text.style.userSelect = "none";
-  this.container.appendChild(text);
+  this.container?.appendChild(text);
   this.inputText = text;
 
   this.updateInputText();
@@ -2843,16 +2846,25 @@ Neo.Painter.prototype._initTools = function () {
 };
 
 Neo.Painter.prototype.hideInputText = function () {
-  var text = this.inputText;
+  const text = this.inputText;
+  if (!text) {
+    console.error("inputText not found for hideInputText");
+    return;
+  }
   text.blur();
   text.style.display = "none";
 };
 
 Neo.Painter.prototype.updateInputText = function () {
-  var text = this.inputText;
-  var d = this.lineWidth;
-  var fontSize = Math.round((d * 55) / 28 + 7);
-  var height = Math.round((d * 68) / 28 + 12);
+  const text = this.inputText;
+  if (!text) {
+    console.error("inputText not found for updateInputText");
+    return;
+  }
+
+  const d = this.lineWidth;
+  const fontSize = Math.round((d * 55) / 28 + 7);
+  const height = Math.round((d * 68) / 28 + 12);
 
   text.style.fontSize = fontSize + "px";
   text.style.lineHeight = fontSize + "px";
@@ -7937,7 +7949,11 @@ Neo.TextTool.prototype.downHandler = function (oe) {
   if (Neo.painter.inputText) {
     Neo.painter.updateInputText();
 
-    var rect = oe.container.getBoundingClientRect();
+    var rect = oe.container?.getBoundingClientRect();
+    if (!rect) {
+      console.error("rect not found for TextTool");
+      return;
+    }
     var text = Neo.painter.inputText;
     var x = oe.rawMouseX - rect.left - 5;
     var y = oe.rawMouseY - rect.top - 5;
@@ -7983,7 +7999,7 @@ Neo.TextTool.prototype.keyDownHandler = function (e) {
     e.preventDefault();
 
     const oe = Neo.painter;
-    /** @type {HTMLTextAreaElement} **/
+    /** @type {HTMLElement|null} **/
     const text = oe.inputText;
 
     if (text) {
@@ -9143,13 +9159,23 @@ Neo.ActionManager.prototype.text = function (
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
-    const _x = Number(x);
-    const _y = Number(y);
-    const _color = Number(color);
-    const _alpha = Number(alpha);
+    const numX = Number(x);
+    const numY = Number(y);
+    const numColor = Number(color);
+    const numAlpha = Number(alpha);
 
-    this.push("text", layer, _x, _y, _color, _alpha, string, size, family);
-    oe.doText(layer, _x, _y, _color, _alpha, string, size, family);
+    this.push(
+      "text",
+      layer,
+      numX,
+      numY,
+      numColor,
+      numAlpha,
+      string,
+      size,
+      family,
+    );
+    oe.doText(layer, numX, numY, numColor, numAlpha, string, size, family);
   } else {
     const item = arguments[0];
 

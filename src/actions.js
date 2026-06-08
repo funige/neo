@@ -912,13 +912,23 @@ Neo.ActionManager.prototype.text = function (
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
-    const _x = Number(x);
-    const _y = Number(y);
-    const _color = Number(color);
-    const _alpha = Number(alpha);
+    const numX = Number(x);
+    const numY = Number(y);
+    const numColor = Number(color);
+    const numAlpha = Number(alpha);
 
-    this.push("text", layer, _x, _y, _color, _alpha, string, size, family);
-    oe.doText(layer, _x, _y, _color, _alpha, string, size, family);
+    this.push(
+      "text",
+      layer,
+      numX,
+      numY,
+      numColor,
+      numAlpha,
+      string,
+      size,
+      family,
+    );
+    oe.doText(layer, numX, numY, numColor, numAlpha, string, size, family);
   } else {
     const item = arguments[0];
 

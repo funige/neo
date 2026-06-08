@@ -1732,7 +1732,11 @@ Neo.TextTool.prototype.downHandler = function (oe) {
   if (Neo.painter.inputText) {
     Neo.painter.updateInputText();
 
-    var rect = oe.container.getBoundingClientRect();
+    var rect = oe.container?.getBoundingClientRect();
+    if (!rect) {
+      console.error("rect not found for TextTool");
+      return;
+    }
     var text = Neo.painter.inputText;
     var x = oe.rawMouseX - rect.left - 5;
     var y = oe.rawMouseY - rect.top - 5;
@@ -1778,7 +1782,7 @@ Neo.TextTool.prototype.keyDownHandler = function (e) {
     e.preventDefault();
 
     const oe = Neo.painter;
-    /** @type {HTMLTextAreaElement} **/
+    /** @type {HTMLElement|null} **/
     const text = oe.inputText;
 
     if (text) {

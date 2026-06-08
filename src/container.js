@@ -104,6 +104,7 @@ Neo.SLIDERTYPE_BLUE = 2;
 Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
 
+/** @param {TouchEvent} e */
 Neo.touch_move_grid_control = function (e) {};
 Neo.add_touch_move_grid_control = function () {};
 
@@ -411,6 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // グリッド部分の touchmove イベントのデフォルトの動作をキャンセル
+  /** @param {TouchEvent} e */
   Neo.touch_move_grid_control = function (e) {
     if (Neo.config.neo_disable_grid_touch_move) {
       let screenwidth = Number(screen.width);

@@ -14,9 +14,10 @@ Neo.Painter = class {
     this.scrollHeight = 0;
   }
 };
-
+/** @type {HTMLElement|null} */
 Neo.Painter.prototype.container = null;
 Neo.Painter.prototype.tool = null;
+/** @type {HTMLElement|null} */
 Neo.Painter.prototype.inputText = null;
 Neo.Painter.prototype.cursorRect = null;
 
@@ -428,12 +429,12 @@ Neo.Painter.prototype._initCanvas = function (div, width, height) {
   this.tempCanvas.style.position = "absolute";
   this.tempCanvas.enabled = false;
 
-  var array = this.container.getElementsByTagName("canvas");
-  if (array.length > 0) {
+  var array = this.container?.querySelectorAll("canvas");
+  if (array && array.length > 0) {
     this.destCanvas = array[0];
   } else {
     this.destCanvas = document.createElement("canvas");
-    this.container.appendChild(this.destCanvas);
+    this.container?.appendChild(this.destCanvas);
   }
 
   this.destCanvasCtx = this.destCanvas.getContext("2d", {
@@ -622,7 +623,7 @@ Neo.Painter.prototype._initInputText = function () {
 
   text.style.display = "none";
   //  text.style.userSelect = "none";
-  this.container.appendChild(text);
+  this.container?.appendChild(text);
   this.inputText = text;
 
   this.updateInputText();
@@ -661,16 +662,25 @@ Neo.Painter.prototype._initTools = function () {
 };
 
 Neo.Painter.prototype.hideInputText = function () {
-  var text = this.inputText;
+  const text = this.inputText;
+  if (!text) {
+    console.error("inputText not found for hideInputText");
+    return;
+  }
   text.blur();
   text.style.display = "none";
 };
 
 Neo.Painter.prototype.updateInputText = function () {
-  var text = this.inputText;
-  var d = this.lineWidth;
-  var fontSize = Math.round((d * 55) / 28 + 7);
-  var height = Math.round((d * 68) / 28 + 12);
+  const text = this.inputText;
+  if (!text) {
+    console.error("inputText not found for updateInputText");
+    return;
+  }
+
+  const d = this.lineWidth;
+  const fontSize = Math.round((d * 55) / 28 + 7);
+  const height = Math.round((d * 68) / 28 + 12);
 
   text.style.fontSize = fontSize + "px";
   text.style.lineHeight = fontSize + "px";
