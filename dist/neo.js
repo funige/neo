@@ -5358,10 +5358,13 @@ Neo.Painter.prototype.addBlur = function (buffer, index, a, rgba) {
 };
 
 /**
- * 指定された座標における、全可視レイヤーの合成色を算出する。
+ * スポイト
+ * @description 指定された座標における、全可視レイヤーの合成色を算出する。
  * * 各レイヤーのRGBA値を順次アルファブレンドし、背景色（白）をベースにした
  * * 最終的な表示色を計算する。算出された色は現在のカラーとして設定され、
  * * 透明度に応じて自動的にツールをペンか消しゴムへ切り替える機能を持つ。
+ * * 下のレイヤーの色を右クリックでスポイトできる2.22_8と
+ * * 下のレイヤーに色があっても上のレイヤーが透明なら右クリックで消しゴムに切り換わるv2.04の動作をエミュレート。
  * @param {number} x - 取得対象のX座標。
  * @param {number} y - 取得対象のY座標。
  * @returns {void}
@@ -5395,10 +5398,15 @@ Neo.Painter.prototype.pickColor = function (x, y) {
   }
   this.setColor(result);
 
+  //レイヤー1が選択されている時に
   if (this.current > 0) {
+    //透明色を右クリックでスポイトした時に消しゴム化する。
+    //v2.16より古いバージョンではレイヤー1でスポイトした色が透明の時は消しゴムに切り換わる。
     if (a == 0 && (result == 0xffffff || this.getEmulationMode() < 2.16)) {
       this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
     } else {
+      // v2.16以後の新しいバージョンは下のレイヤーの色をスポイトできるようにするため
+      // レイヤー0に色がある時は消しゴム化しない。
       if (Neo.eraserTip.selected) {
         this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
       }
