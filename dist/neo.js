@@ -5370,7 +5370,7 @@ Neo.Painter.prototype.addBlur = function (buffer, index, a, rgba) {
  * @returns {void}
  */
 Neo.Painter.prototype.pickColor = function (x, y) {
-  var r = 0xff,
+  let r = 0xff,
     g = 0xff,
     b = 0xff,
     a = 0,
@@ -5380,10 +5380,10 @@ Neo.Painter.prototype.pickColor = function (x, y) {
   if (x >= 0 && x < this.canvasWidth && y >= 0 && y < this.canvasHeight) {
     for (var i = 0; i < 2; i++) {
       if (this.visible[i]) {
-        var ctx = this.canvasCtx[i];
-        var imageData = ctx.getImageData(x, y, 1, 1);
-        var buf32 = new Uint32Array(imageData.data.buffer);
-        var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+        const ctx = this.canvasCtx[i];
+        const imageData = ctx.getImageData(x, y, 1, 1);
+        const buf32 = new Uint32Array(imageData.data.buffer);
+        const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
         a = buf8[3] / 255.0;
         r = r * (1.0 - a) + buf8[2] * a;
@@ -5405,7 +5405,7 @@ Neo.Painter.prototype.pickColor = function (x, y) {
     if (a == 0 && (result == 0xffffff || this.getEmulationMode() < 2.16)) {
       this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
     } else {
-      // v2.16以後の新しいバージョンでは下のレイヤーの色をスポイトできるようにするため
+      // v2.16以後の新しいバージョンでは
       // レイヤー0に色がある時は消しゴム化しない。
       if (Neo.eraserTip.selected) {
         this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
@@ -5465,11 +5465,11 @@ Neo.Painter.prototype.doFloodFill = function (layer, x, y, fillColor) {
     return;
   }
 
-  var imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
-  var buf32 = new Uint32Array(imageData.data.buffer);
-  var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-  var width = imageData.width;
-  var stack = [{ x: x, y: y }];
+  const imageData = ctx.getImageData(0, 0, this.canvasWidth, this.canvasHeight);
+  const buf32 = new Uint32Array(imageData.data.buffer);
+  const buf8 = new Uint8ClampedArray(imageData.data.buffer);
+  const width = imageData.width;
+  const stack = [{ x: x, y: y }];
 
   var baseColor = buf32[y * width + x];
 
@@ -5482,10 +5482,10 @@ Neo.Painter.prototype.doFloodFill = function (layer, x, y, fillColor) {
       if (!point) {
         break;
       }
-      var x = point.x;
-      var y = point.y;
-      var x0 = x;
-      var x1 = x;
+      const x = point.x;
+      const y = point.y;
+      let x0 = x;
+      let x1 = x;
       if (buf32[y * width + x] == fillColor) continue;
       if (buf32[y * width + x] != baseColor) continue;
 
@@ -5524,27 +5524,27 @@ Neo.Painter.prototype.copy = function (layer, x, y, width, height) {
   this.tempY = 0;
   this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-  var imageData = this.canvasCtx[layer].getImageData(x, y, width, height);
-  var buf32 = new Uint32Array(imageData.data.buffer);
-  var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+  const imageData = this.canvasCtx[layer].getImageData(x, y, width, height);
+  const buf32 = new Uint32Array(imageData.data.buffer);
+  // let buf8 = new Uint8ClampedArray(imageData.data.buffer);
   this.temp = new Uint32Array(buf32.length);
   for (var i = 0; i < buf32.length; i++) {
     this.temp[i] = buf32[i];
   }
 
   //tempCanvasに乗せる画像を作る
-  imageData = this.tempCanvasCtx.getImageData(x, y, width, height);
-  buf32 = new Uint32Array(imageData.data.buffer);
-  buf8 = new Uint8ClampedArray(imageData.data.buffer);
-  for (var i = 0; i < buf32.length; i++) {
+  const tempImageData = this.tempCanvasCtx.getImageData(x, y, width, height);
+  const tempBuf32 = new Uint32Array(tempImageData.data.buffer);
+  let tempBuf8 = new Uint8ClampedArray(tempImageData.data.buffer);
+  for (var i = 0; i < tempBuf32.length; i++) {
     if (this.temp[i] >> 24) {
-      buf32[i] = this.temp[i] | 0xff000000;
+      tempBuf32[i] = this.temp[i] | 0xff000000;
     } else {
-      buf32[i] = 0xffffffff;
+      tempBuf32[i] = 0xffffffff;
     }
   }
-  imageData.data.set(buf8);
-  this.tempCanvasCtx.putImageData(imageData, x, y);
+  tempImageData.data.set(tempBuf8);
+  this.tempCanvasCtx.putImageData(tempImageData, x, y);
 };
 
 /**
