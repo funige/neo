@@ -5405,7 +5405,7 @@ Neo.Painter.prototype.pickColor = function (x, y) {
     if (a == 0 && (result == 0xffffff || this.getEmulationMode() < 2.16)) {
       this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
     } else {
-      // v2.16以後の新しいバージョンは下のレイヤーの色をスポイトできるようにするため
+      // v2.16以後の新しいバージョンでは下のレイヤーの色をスポイトできるようにするため
       // レイヤー0に色がある時は消しゴム化しない。
       if (Neo.eraserTip.selected) {
         this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
