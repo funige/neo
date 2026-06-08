@@ -4559,6 +4559,7 @@ Neo.Painter.prototype.xorPixel = function (buf32, bufWidth, x, y, c) {
 };
 
 /**
+ * Bz曲線
  * 3次ベジェ曲線上の指定位置（t）における座標を算出。
  * * 始点(x0, y0)から終点(x3, y3)まで、2つの制御点(x1, y1), (x2, y2)の影響を受けて
  * 滑らかに変化する曲線を補間する。
@@ -4595,6 +4596,7 @@ Neo.Painter.prototype.getBezierPoint = function (
 };
 
 /**
+ * Bz曲線
  * 4つの制御点から3次ベジェ曲線を計算し、描画バッファにストロークを描画する。
  * * 計算された曲線上の各点において `plot` を経由し、最終的に `setPoint` で
  * 実際のピクセル操作を行う。
@@ -4669,9 +4671,13 @@ Neo.Painter.prototype.drawBezier = function (
         p[0] = Math.round(p[0]);
         p[1] = Math.round(p[1]);
 
-        ref.plot(p, function (x, y) {
-          ref.setPoint(buf8, imageData.width, x, y, left, top, type);
-        });
+        ref.plot(
+          p,
+          /** @param {number} x @param {number} y **/
+          function (x, y) {
+            ref.setPoint(buf8, imageData.width, x, y, left, top, type);
+          },
+        );
       }
       ref._currentMaskType = oType;
       ref._currentColor[3] = oAlpha;
@@ -4837,6 +4843,8 @@ Neo.Painter.prototype.plot = function (point, callback) {
 };
 
 /**
+ * 直線
+ * @description
  * キャンバス上の指定された単一点に対して描画処理を適用する。
  * * 内部的には始点と終点が同一の線分として `drawLine` を呼び出すことで、
  * * 線描画ロジックの重複排除やバッファ最適化の恩恵を統合的に受ける。
@@ -5677,12 +5685,12 @@ Neo.Painter.prototype.getMaskFunc = function (type) {
  * @param {string|number} type - マスク形状タイプ(例: TOOLTYPE_RECT, TOOLTYPE_RECTFILLなど)。
  */
 Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
-  var ctx = this.canvasCtx[layer];
-  var maskFunc = this.getMaskFunc(type);
+  const ctx = this.canvasCtx[layer];
+  const maskFunc = this.getMaskFunc(type);
 
-  var imageData = ctx.getImageData(x, y, width, height);
-  var buf32 = new Uint32Array(imageData.data.buffer);
-  var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+  const imageData = ctx.getImageData(x, y, width, height);
+  // const buf32 = new Uint32Array(imageData.data.buffer);
+  const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
   var index = 0;
 
@@ -5699,14 +5707,15 @@ Neo.Painter.prototype.doFill = function (layer, x, y, width, height, type) {
           this._currentMaskType >= Neo.Painter.MASKTYPE_ADD ||
           !this.isMasked(buf8, index)
         ) {
-          var r0 = buf8[index + 0];
-          var g0 = buf8[index + 1];
-          var b0 = buf8[index + 2];
-          var a0 = buf8[index + 3] / 255.0;
+          const r0 = buf8[index + 0];
+          const g0 = buf8[index + 1];
+          const b0 = buf8[index + 2];
+          const a0 = buf8[index + 3] / 255.0;
 
           var a = a0 + a1 - a0 * a1;
 
           if (a > 0) {
+            //不透明なピクセルの場合
             var a1x = a1;
             var ax = 1 + a0 * (1 - a1x);
 
@@ -5817,20 +5826,20 @@ Neo.Painter.prototype.ellipseMask = function (x, y, width, height) {
 
 /**
  * キャンバス上のマウス座標を、ズーム・スクロール状態を反映した描画先座標に変換。
- * @param {number} _mx - マウスのX座標
- * @param {number} _my - マウスのY座標
+ * @param {number} mouseX - マウスのX座標
+ * @param {number} mouseY - マウスのY座標
  * @param {boolean} isClip - キャンバス範囲外をカットするかどうか
  * @param {boolean} [isCenter=false] - 座標をピクセル中心（0.5）に合わせるかどうか
  * @returns {{x: number, y: number}} 変換後の座標オブジェクト
  */
 Neo.Painter.prototype.getDestCanvasPosition = function (
-  _mx,
-  _my,
+  mouseX,
+  mouseY,
   isClip,
   isCenter = false,
 ) {
-  var mx = Math.floor(_mx); //Math.round(mx);
-  var my = Math.floor(_my); //Math.round(my);
+  let mx = Math.floor(mouseX); //Math.round(mouseX);
+  let my = Math.floor(mouseY); //Math.round(mouseY);
   if (isCenter) {
     mx += 0.499;
     my += 0.499;
