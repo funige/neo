@@ -1059,7 +1059,15 @@ Neo.initViewer = function (pch) {
   pageview.style.height = pageHeight + "px";
 
   Neo.canvas = document.getElementById("neo-canvas");
+  if (!Neo.canvas) {
+    console.error("initViewer: Canvas element not found");
+    return;
+  }
   Neo.container = document.getElementById("neo-container");
+  if (!Neo.container) {
+    console.error("initViewer: Container element not found");
+    return;
+  }
   Neo.container.style.backgroundColor = Neo.config.color_back;
   Neo.container.style.border = "0";
 
@@ -1139,7 +1147,9 @@ Neo.initViewer = function (pch) {
     "pointerup",
     function () {
       Neo.painter._actionMgr.isMouseDown = false;
-      Neo.viewerBar.isMouseDown = false;
+      if (Neo.viewerBar) {
+        Neo.viewerBar.isMouseDown = false;
+      }
     },
     false,
   );
@@ -1256,15 +1266,29 @@ Neo.startViewer = function () {
 
   setTimeout(function () {
     Neo.viewerPlay = new Neo.ViewerButton().init("neo-viewerPlay");
+    if (!Neo.viewerPlay) {
+      console.error("startViewer: ViewerPlay not found");
+      return;
+    }
     Neo.viewerPlay.setSelected(true);
     Neo.viewerPlay.onmouseup = function () {
       Neo.painter.onplay();
     };
     Neo.viewerStop = new Neo.ViewerButton().init("neo-viewerStop");
+    if (!Neo.viewerStop) {
+      console.error("startViewer: ViewerStop not found");
+      return;
+    }
+
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
     Neo.viewerSpeed = new Neo.ViewerButton().init("neo-viewerSpeed");
+    if (!Neo.viewerSpeed) {
+      console.error("startViewer: ViewerSpeed not found");
+      return;
+    }
+
     Neo.viewerSpeed.onmouseup = function () {
       Neo.painter.onspeed();
       this.update();

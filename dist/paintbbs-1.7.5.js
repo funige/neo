@@ -1944,7 +1944,7 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.dictionary = {
@@ -2155,7 +2155,7 @@ Neo.translate = (function () {
   };
 })();
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.Painter = class {
@@ -6092,7 +6092,7 @@ Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
 };
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.ToolBase = class {
@@ -7903,7 +7903,7 @@ Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
 Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
-"use strict";
+("use strict");
 //@ts-check
 Neo.CommandBase = class {
   constructor() {
@@ -8040,7 +8040,7 @@ Neo.CopyrightCommand.prototype.execute = function () {
   }
 };
 
-"use strict";
+("use strict");
 //@ts-check
 /*
   -----------------------------------------------------------------------
@@ -9465,7 +9465,7 @@ Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };
 
-"use strict";
+("use strict");
 //@ts-check
 
 Neo.getModifier = function (e) {
@@ -10599,7 +10599,7 @@ Neo.ColorSlider = class {
 /**
  * カラースライダーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {any} [params]
  * @returns {Neo.ColorSlider|null}
  */
 Neo.ColorSlider.prototype.init = function (elementID, params = {}) {

@@ -28,9 +28,11 @@ Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
 Neo.fullScreen = false;
 Neo.uploaded = false;
 Neo.viewer = false;
+/**@type  {HTMLElement|null} */
 Neo.container = null;
 /**@type {HTMLElement|null} */
 Neo.center = null;
+/**@type {HTMLElement|null} */
 Neo.canvas = null;
 /**@type {HTMLElement|null} */
 Neo.toolsWrapper = null;
@@ -40,11 +42,14 @@ Neo.toolSide = false;
 /**@type {HTMLElement|null} */
 Neo.applet = null;
 Neo.isAnimation = false;
-Neo.storage = null;
+Neo.storage = localStorage;
 /**@type {HTMLElement|null} */
 Neo.elementNeo = null;
 Neo.elementNeo_touchMoveListenerAdded = false;
-Neo.isPinchZooming = null;
+/** @returns {boolean} */
+Neo.isPinchZooming = function () {
+  return false;
+};
 Neo.updateUI = function () {};
 Neo.stabilize_level = 1;
 /** @type {CSSStyleSheet|null}*/
@@ -74,28 +79,55 @@ Neo.config = {
 };
 Neo.reservePen = {};
 Neo.reserveEraser = {};
-
+//@ts-ignore
+/**@type {Neo.Button|null} */
 Neo.submitButton = null;
+//@ts-ignore
+/**@type {Neo.FillButton|null} */
 Neo.fillButton = null;
+//@ts-ignore
+/**@type {Neo.RightButton|null} */
 Neo.rightButton = null;
 // toolTip
+//@ts-ignore
+/**@type {Neo.PenTip|null} */
 Neo.penTip = null;
+//@ts-ignore
+/**@type {Neo.Pen2Tip|null} */
 Neo.pen2Tip = null;
+//@ts-ignore
+/**@type {Neo.EffectTip|null} */
 Neo.effectTip = null;
+//@ts-ignore
+/**@type {Neo.Effect2Tip|null} */
 Neo.effect2Tip = null;
+//@ts-ignore
+/**@type {Neo.EraserTip|null} */
 Neo.eraserTip = null;
+//@ts-ignore
+/**@type {Neo.DrawTip|null} */
 Neo.drawTip = null;
+//@ts-ignore
+/**@type {Neo.MaskTip|null} */
 Neo.maskTip = null;
 
 Neo.isApp = false;
-
+// @ts-ignore
+/**@type {Neo.ViewerBar|null} */
 Neo.viewerBar = null;
+// @ts-ignore
+/**@type {Neo.ViewerButton|null} */
 Neo.viewerPlay = null;
+// @ts-ignore
+/**@type {Neo.ViewerButton|null} */
 Neo.viewerStop = null;
+// @ts-ignore
+/**@type {Neo.ViewerButton|null} */
 Neo.viewerSpeed = null;
-Neo.speed = null;
-
+Neo.speed = 0;
+/**@type {object|null} */
 Neo.params = null;
+/**@type {object|null} */
 Neo.param = null;
 
 Neo.SLIDERTYPE_RED = 0;
@@ -210,7 +242,16 @@ Neo.init2 = function () {
   pageview.style.height = Neo.config.applet_height + "px";
 
   Neo.canvas = document.getElementById("neo-canvas");
+  if (!Neo.canvas) {
+    console.error("initViewer: Canvas element not found");
+    return;
+  }
   Neo.container = document.getElementById("neo-container");
+  if (!Neo.container) {
+    console.error("init2: Container element not found");
+    return;
+  }
+
   Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
   Neo.tools = document.getElementById("neo-tools");
   Neo.center = document.getElementById("neo-center");
@@ -243,12 +284,13 @@ Neo.init2 = function () {
       ? "描きかけの画像があります。復元しますか？"
       : "描きかけの画像があります。動画の読み込みを中止して復元しますか？";
 
+  /**@type {string|null} */
   let storageTimestamp = Neo.storage.getItem("timestamp");
   const nowTimestamp = Date.now();
 
   if (
     Number.isInteger(Number(storageTimestamp)) &&
-    nowTimestamp - storageTimestamp > 3 * 86400 * 1000
+    nowTimestamp - Number(storageTimestamp) > 3 * 86400 * 1000
   ) {
     //3日経過した復元データは破棄
     Neo.painter.clearSession();
@@ -403,6 +445,7 @@ Neo.initConfig = function (applet) {
 
 document.addEventListener("DOMContentLoaded", () => {
   // ピンチズーム検出
+  /**@returns {boolean} */
   Neo.isPinchZooming = function () {
     if ("visualViewport" in window && window.visualViewport) {
       return window.visualViewport.scale > 1;
@@ -789,6 +832,7 @@ Neo.readStyle = function (sheet) {
       if (rule instanceof CSSStyleRule) {
         var selector = rule.selectorText;
         if (selector) {
+          // .NEOと、セレクタ名の前のドットを除去してセレクタ名を取り出す。
           selector = selector.replace(/^(.NEO\s+)?\./, "");
 
           var css = rule.cssText || rule.style.cssText;
@@ -1127,13 +1171,21 @@ Neo.initButtons = function () {
     };
   }
   Neo.submitButton = new Neo.Button().init("neo-submit");
+  if (!Neo.submitButton) {
+    console.error("initButtons: SubmitButton not found");
+    return;
+  }
   Neo.submitButton.onmouseup = function () {
-    Neo.submitButton.disable(5000);
+    Neo.submitButton?.disable(5000);
     new Neo.SubmitCommand(Neo.painter).execute();
   };
 
   Neo.fillButton = new Neo.FillButton().init("neo-fill");
   Neo.rightButton = new Neo.RightButton().init("neo-right");
+  if (!Neo.rightButton) {
+    console.error("initButtons: RightButton not found");
+    return;
+  }
 
   if (Neo.isMobile() || Neo.config.neo_show_right_button == "true") {
     Neo.rightButton.element.style.display = "block";
@@ -1148,15 +1200,24 @@ Neo.initButtons = function () {
   Neo.drawTip = new Neo.DrawTip().init("neo-draw");
   Neo.maskTip = new Neo.MaskTip().init("neo-mask");
 
-  Neo.toolButtons = [
-    Neo.fillButton,
-    Neo.penTip,
-    Neo.pen2Tip,
-    Neo.effectTip,
-    Neo.effect2Tip,
-    Neo.drawTip,
-    Neo.eraserTip,
-  ];
+  Neo.toolButtons =
+    Neo.fillButton &&
+    Neo.penTip &&
+    Neo.pen2Tip &&
+    Neo.effectTip &&
+    Neo.effect2Tip &&
+    Neo.drawTip &&
+    Neo.eraserTip
+      ? [
+          Neo.fillButton,
+          Neo.penTip,
+          Neo.pen2Tip,
+          Neo.effectTip,
+          Neo.effect2Tip,
+          Neo.drawTip,
+          Neo.eraserTip,
+        ]
+      : [];
 
   // colorTip
   for (var i = 1; i <= 14; i++) {
@@ -1222,6 +1283,12 @@ Neo.start = function (isApp = false) {
     document[name] = Neo;
 
     Neo.resizeCanvas();
+
+    if (!Neo.container) {
+      console.error("start: Container element not found");
+      return;
+    }
+
     Neo.container.style.visibility = "visible";
 
     if (Neo.isApp) {
@@ -1286,8 +1353,9 @@ Neo.showWarning = function () {
 
 Neo.updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
-  for (var i = 0; i < Neo.toolButtons.length; i++) {
-    var toolTip = Neo.toolButtons[i];
+  for (let i = 0; i < Neo.toolButtons.length; i++) {
+    /** @type {any} */
+    const toolTip = Neo.toolButtons[i];
     if (current) {
       if (current == toolTip) {
         toolTip.setSelected(true);
@@ -1309,13 +1377,15 @@ Neo.updateUI = function () {
  * @param {boolean} updateColorTip
  */
 Neo.updateUIColor = function (updateSlider, updateColorTip) {
-  for (var i = 0; i < Neo.toolButtons.length; i++) {
-    var toolTip = Neo.toolButtons[i];
+  for (let i = 0; i < Neo.toolButtons.length; i++) {
+    /** @type {any} */
+    const toolTip = Neo.toolButtons[i];
     toolTip.update();
   }
 
   if (updateSlider) {
-    for (var i = 0; i < Neo.sliders.length; i++) {
+    for (let i = 0; i < Neo.sliders.length; i++) {
+      /** @type {any} */
       var slider = Neo.sliders[i];
       slider.update();
     }
@@ -1339,6 +1409,10 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 Neo.updateWindow = function () {
   const windowView = document.getElementById("neo-windowView");
   const pageView = document.getElementById("neo-pageView");
+  if (!Neo.container) {
+    console.error("updateWindow: Container element not found");
+    return;
+  }
   if (Neo.fullScreen) {
     if (!windowView) return;
     windowView.style.display = "block";
@@ -1355,6 +1429,11 @@ Neo.updateWindow = function () {
 };
 
 Neo.resizeCanvas = function () {
+  if (!Neo.container) {
+    console.error("resizeCanvas: Container element not found");
+    return;
+  }
+
   var appletWidth = Neo.container.clientWidth;
   var appletHeight = Neo.container.clientHeight;
 
@@ -1382,9 +1461,14 @@ Neo.resizeCanvas = function () {
   const destCanvas = Neo.painter.destCanvas;
   destCanvas.width = width;
   destCanvas.height = height;
-  Neo.painter.destCanvasCtx = destCanvas.getContext("2d", {
+  const destctx = destCanvas.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!destctx) {
+    console.error("resizeCanvas: Failed to get 2d context");
+    return;
+  }
+  Neo.painter.destCanvasCtx = destctx;
 
   const ctx = Neo.painter.destCanvasCtx;
   if (Neo.painter.zoom < 1) {
@@ -1403,17 +1487,18 @@ Neo.resizeCanvas = function () {
   destCanvas.style.touchAction = "none";
   destCanvas.style.pointerEvents = "auto";
 
-  Neo.canvas.style.touchAction = "none";
-  Neo.canvas.style.pointerEvents = "auto";
+  if (Neo.canvas) {
+    Neo.canvas.style.touchAction = "none";
+    Neo.canvas.style.pointerEvents = "auto";
+    Neo.canvas.style.width = width + "px";
+    Neo.canvas.style.height = height + "px";
+  }
 
   const tools = Neo.tools ?? "";
   if (tools) {
     tools.style.touchAction = "none";
     tools.style.pointerEvents = "auto";
   }
-
-  Neo.canvas.style.width = width + "px";
-  Neo.canvas.style.height = height + "px";
 
   if (Neo.toolsWrapper) {
     const toolsWrapper = Neo.toolsWrapper;
@@ -1645,12 +1730,12 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
           response.text().then((text) => {
             console.log(text);
             if (text.match(/^error\n/m)) {
-              Neo.submitButton.enable();
+              Neo.submitButton?.enable();
               return alert(text.replace(/^error\n/m, ""));
             }
             if (Neo.config.neo_validate_exact_ok_text_in_response === "true") {
               if (text !== "ok") {
-                Neo.submitButton.enable();
+                Neo.submitButton?.enable();
                 return alert(
                   errorMessage +
                     Neo.translate(
@@ -1680,7 +1765,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
             return (location.href = exitURL);
           });
         } else {
-          Neo.submitButton.enable();
+          Neo.submitButton?.enable();
           const response_status = response.status;
           let httpErrorMessag = "";
           switch (response_status) {
@@ -1715,7 +1800,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
         }
       })
       .catch((error) => {
-        Neo.submitButton.enable();
+        Neo.submitButton?.enable();
         return alert(
           errorMessage +
             Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"),
@@ -1729,7 +1814,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
     );
 
     if (!isConfirmed) {
-      Neo.submitButton.enable();
+      Neo.submitButton?.enable();
       console.log("中止しました。");
       return; // ユーザーが続行しない場合、処理を中断
     }

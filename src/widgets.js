@@ -1,7 +1,7 @@
 "use strict";
 //@ts-check
 /**
- * @param {PointerEvent} e
+ * @param {MouseEvent} e
  */
 Neo.getModifier = function (e) {
   if (e.shiftKey) {
@@ -30,7 +30,8 @@ Neo.Button = class {
     this.elementID = "";
     this.selected = false;
     this.isMouseDown = false;
-    this.disable = function () {};
+    /** @param {number} wait */
+    this.disable = function (wait) {};
     this.enable = function () {};
 
     /** @type {((Button: Neo.Button) => void) | null} */
@@ -92,6 +93,9 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
 
   this.element.className = "buttonOff";
 
+  /**
+   * @param {number} wait
+   */
   this.disable = function (wait) {
     this.element.style.pointerEvents = "none";
     this.element.style.opacity = "0.5";
@@ -117,8 +121,9 @@ Neo.Button.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
   if (this.params.type == "fill" && this.selected == false) {
-    for (var i = 0; i < Neo.toolButtons.length; i++) {
-      var toolTip = Neo.toolButtons[i];
+    for (let i = 0; i < Neo.toolButtons.length; i++) {
+      /** @type {any} */
+      const toolTip = Neo.toolButtons[i];
       toolTip.setSelected(this.selected ? false : true);
     }
     Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -145,7 +150,9 @@ Neo.Button.prototype._mouseOutHandler = function (e) {
 Neo.Button.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
-
+/**
+ * @param {boolean} selected
+ */
 Neo.Button.prototype.setSelected = function (selected) {
   if (selected) {
     this.element.className = "buttonOn";
@@ -190,6 +197,9 @@ Neo.RightButton.prototype._mouseUpHandler = function (e) {
 
 Neo.RightButton.prototype._mouseOutHandler = function (e) {};
 
+/**
+ * @param {boolean} selected
+ */
 Neo.RightButton.prototype.setSelected = function (selected) {
   if (selected) {
     this.element.className = "buttonOn";
@@ -202,8 +212,8 @@ Neo.RightButton.prototype.setSelected = function (selected) {
 };
 
 Neo.RightButton.clear = function () {
-  var right = Neo.rightButton;
-  right.setSelected(false);
+  const right = Neo.rightButton;
+  right?.setSelected(false);
 };
 
 /*
@@ -307,7 +317,10 @@ Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.setSelected(this.selected);
   Neo.colorTips.push(this);
 };
-
+/**
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
 Neo.ColorTip.prototype._mouseDownHandler = function (e) {
   if (Neo.painter.isUIPaused()) return;
   this.isMouseDown = true;
@@ -338,6 +351,10 @@ Neo.ColorTip.prototype._mouseDownHandler = function (e) {
 
   if (this.onmousedown) this.onmousedown(this);
 };
+/**
+ * @param {MouseEvent} e
+ * @returns {void}
+ */
 Neo.ColorTip.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
@@ -354,6 +371,9 @@ Neo.ColorTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
 
+/**
+ * @param {boolean} selected
+ */
 Neo.ColorTip.prototype.setSelected = function (selected) {
   if (selected) {
     this.element.className = "colorTipOn";
@@ -382,6 +402,7 @@ Neo.ColorTip.getCurrent = function () {
   -------------------------------------------------------------------------
 */
 
+/** @type {object[]} */
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
@@ -466,13 +487,13 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
 
   this.element.innerHTML =
     "<canvas width=46 height=18></canvas><div class='label'></div>";
-  this.canvas = this.element.getElementsByTagName("canvas")[0];
+  this.canvas = this.element.querySelector("canvas");
   if (!this.canvas) {
     console.error("Canvas element not found for " + elementID);
     return null;
   }
 
-  this.label = this.element.getElementsByTagName("div")[0];
+  this.label = this.element.querySelector("div");
 
   this.update();
   return this;
@@ -483,8 +504,9 @@ Neo.ToolTip.prototype._mouseDownHandler = function (e) {
 
   if (this.isTool) {
     if (this.selected == false) {
-      for (var i = 0; i < Neo.toolButtons.length; i++) {
-        var toolTip = Neo.toolButtons[i];
+      for (let i = 0; i < Neo.toolButtons.length; i++) {
+        /** @type {any} */
+        const toolTip = Neo.toolButtons[i];
         toolTip.setSelected(this == toolTip ? true : false);
       }
     } else {
@@ -1164,8 +1186,8 @@ Neo.ColorSlider = class {
     this.element = null;
     /** @type {string} */
     this.elementID = "";
-    /** @type {Object} */
-    this.params = /** @type {unknown} */ {};
+    /** @type {any} */
+    this.params = {};
     /** @type {number} */
     this.value = 0;
     this.isMouseDown = false;
@@ -1181,7 +1203,7 @@ Neo.ColorSlider = class {
 /**
  * カラースライダーを初期化
  * @param {string} elementID
- * @param {Object} [params]
+ * @param {any} [params]
  * @returns {Neo.ColorSlider|null}
  */
 Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
@@ -1377,6 +1399,8 @@ Neo.SizeSlider = class {
     this.y0 = 0;
     this.value0 = 0;
     this.onmousedown = null;
+    /**@type {any} */
+    this.params = {};
   }
 };
 
@@ -1397,9 +1421,9 @@ Neo.SizeSlider.prototype.label = null;
 Neo.SizeSlider.prototype.hit = null;
 
 /**
- * サイズスライダーを初期化する。
+ * サイズスライダーを初期化
  * @param {string} elementID - 要素のID
- * @param {Object} [params] - パラメータ
+ * @param {any} [params] - パラメータ
  * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
  */
 Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
@@ -1658,9 +1682,9 @@ Neo.ReserveControl = function () {};
 /** @type {HTMLElement|null} */
 Neo.ReserveControl.prototype.element = null;
 Neo.ReserveControl.prototype.elementID = "";
-/** @type {Object|null} */
+/** @type {any} */
 Neo.ReserveControl.prototype.params = null;
-/** @type {Object|null} */
+/** @type {any} */
 Neo.ReserveControl.prototype.reserve = null;
 Neo.ReserveControl.prototype.isMouseDown = false;
 
@@ -1742,7 +1766,7 @@ Neo.ReserveControl.prototype.load = function () {
 
 Neo.ReserveControl.prototype.save = function () {
   if (!this.reserve) {
-    console.error("reserve not found for ReserveControl save");
+    console.error("Reserve not found for ReserveControl save");
     return;
   }
   this.reserve.color = Neo.painter.foregroundColor;
@@ -1804,7 +1828,11 @@ Neo.ScrollBarButton.prototype.init = function (elementID, params = {}) {
   }
 
   this.element.innerHTML = "<div></div>";
-  this.barButton = this.element.getElementsByTagName("div")[0];
+  this.barButton = this.element.querySelector("div");
+  if (!this.barButton) {
+    console.error("ScrollBarButton: BarButton not found");
+    return null;
+  }
   this.element["data-bar"] = true;
   this.barButton["data-bar"] = true;
 
@@ -1870,7 +1898,7 @@ Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
 
   if (elementID != "neo-viewerSpeed") {
     this.element.innerHTML = "<canvas width=24 height=24></canvas>";
-    this.canvas = this.element.getElementsByTagName("canvas")[0];
+    this.canvas = this.element.querySelector("canvas");
 
     if (!this.canvas) {
       console.error("Canvas element not found for " + elementID);
