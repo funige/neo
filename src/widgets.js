@@ -263,7 +263,7 @@ Neo.ColorTip = class {
 };
 /**
  * @param {string} elementID
- * @param {Object} [params]
+ * @param {any} [params]
  */
 Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
