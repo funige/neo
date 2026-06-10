@@ -1,13 +1,13 @@
 "use strict";
 //@ts-check
 /**
- * @param {MouseEvent} e
+ * @param {MouseEvent|TouchEvent} e
  */
 Neo.getModifier = function (e) {
   if (e.shiftKey) {
     return "shift";
   } else if (
-    e.button == 2 ||
+    (e instanceof MouseEvent && e.button == 2) ||
     e.ctrlKey ||
     e.altKey ||
     Neo.painter.virtualRight
@@ -26,6 +26,7 @@ Neo.getModifier = function (e) {
 Neo.Button = class {
   constructor() {
     this.element = null;
+    /** @type {any} */
     this.params = null;
     this.elementID = "";
     this.selected = false;
@@ -57,18 +58,23 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
   this.isMouseDown = false;
 
   var ref = this;
+  /** @param {MouseEvent} e */
   this.element.onmousedown = function (e) {
     ref._mouseDownHandler(e);
   };
+  /** @param {MouseEvent} e */
   this.element.onmouseup = function (e) {
     ref._mouseUpHandler(e);
   };
+  /** @param {MouseEvent} e */
   this.element.onmouseover = function (e) {
     ref._mouseOverHandler(e);
   };
+  /** @param {MouseEvent} e */
   this.element.onmouseout = function (e) {
     ref._mouseOutHandler(e);
   };
+  /** @param {MouseEvent} e */
   this.element.addEventListener(
     "touchstart",
     /**
@@ -131,9 +137,7 @@ Neo.Button.prototype._mouseDownHandler = function (e) {
 
   if (this.onmousedown) this.onmousedown(this);
 };
-/**
- * @param {MouseEvent|TouchEvent} e
- */
+/** @param {MouseEvent|TouchEvent} e */
 Neo.Button.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
@@ -141,12 +145,14 @@ Neo.Button.prototype._mouseUpHandler = function (e) {
     if (this.onmouseup) this.onmouseup(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.Button.prototype._mouseOutHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseout) this.onmouseout(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.Button.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
@@ -173,7 +179,9 @@ Neo.Button.prototype.update = function () {};
 Neo.RightButton = class extends Neo.Button {
   constructor() {
     super();
+    /** @type {any} */
     this.params = null;
+    /**@type {HTMLElement|null} */
     this.element = null;
     this.selected = false;
   }
@@ -189,12 +197,15 @@ Neo.RightButton.prototype.init = function (elementID, params = {}) {
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.RightButton.prototype._mouseDownHandler = function (e) {};
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.RightButton.prototype._mouseUpHandler = function (e) {
   this.setSelected(!this.selected);
 };
 
+/** @param {MouseEvent} e */
 Neo.RightButton.prototype._mouseOutHandler = function (e) {};
 
 /**
@@ -249,12 +260,14 @@ Neo.colorTips = [];
 
 Neo.ColorTip = class {
   constructor() {
+    /**@type {HTMLElement|null} */
     this.element = null;
+    /** @type {any} */
     this.params = null;
     this.elementID = "";
     this.selected = false;
     this.isMouseDown = false;
-    this.color = null;
+    this.color = "";
     this.onmousedown = null;
     this.onmouseup = null;
     this.onmouseover = null;
@@ -274,51 +287,58 @@ Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.isMouseDown = false;
 
   var ref = this;
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.onmouseup = function (e) {
-    ref._mouseUpHandler(e);
-  };
-  this.element.onmouseover = function (e) {
-    ref._mouseOverHandler(e);
-  };
-  this.element.onmouseout = function (e) {
-    ref._mouseOutHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
+  if (this.element) {
+    /** @param {MouseEvent} e */
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "touchend",
-    function (e) {
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseup = function (e) {
       ref._mouseUpHandler(e);
-    },
-    true,
-  );
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseover = function (e) {
+      ref._mouseOverHandler(e);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseout = function (e) {
+      ref._mouseOutHandler(e);
+    };
+    /** @param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchstart",
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+    /** @param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchend",
+      function (e) {
+        ref._mouseUpHandler(e);
+      },
+      true,
+    );
 
-  this.element.className = "colorTipOff";
+    this.element.className = "colorTipOff";
 
-  var index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
-  this.element.style.left = index % 2 ? "0px" : "26px";
-  this.element.style.top = Math.floor(index / 2) * 21 + "px";
+    var index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
+    this.element.style.left = index % 2 ? "0px" : "26px";
+    this.element.style.top = Math.floor(index / 2) * 21 + "px";
 
-  // base64 ColorTip.png
-  this.element.innerHTML =
-    "<img style='max-width:44px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />";
-
+    // base64 ColorTip.png
+    this.element.innerHTML =
+      "<img style='max-width:44px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />";
+  }
   this.setColor(Neo.config.colors[params.index - 1]);
 
   this.setSelected(this.selected);
   Neo.colorTips.push(this);
 };
 /**
- * @param {MouseEvent} e
+ * @param {MouseEvent|TouchEvent} e
  * @returns {void}
  */
 Neo.ColorTip.prototype._mouseDownHandler = function (e) {
@@ -352,7 +372,7 @@ Neo.ColorTip.prototype._mouseDownHandler = function (e) {
   if (this.onmousedown) this.onmousedown(this);
 };
 /**
- * @param {MouseEvent} e
+ * @param {MouseEvent|TouchEvent} e
  * @returns {void}
  */
 Neo.ColorTip.prototype._mouseUpHandler = function (e) {
@@ -361,12 +381,14 @@ Neo.ColorTip.prototype._mouseUpHandler = function (e) {
     if (this.onmouseup) this.onmouseup(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.ColorTip.prototype._mouseOutHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseout) this.onmouseout(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.ColorTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
@@ -375,6 +397,11 @@ Neo.ColorTip.prototype._mouseOverHandler = function (e) {
  * @param {boolean} selected
  */
 Neo.ColorTip.prototype.setSelected = function (selected) {
+  if (!this.element) {
+    console.error("setSelected: Element not found");
+    return null;
+  }
+
   if (selected) {
     this.element.className = "colorTipOn";
   } else {
@@ -382,8 +409,17 @@ Neo.ColorTip.prototype.setSelected = function (selected) {
   }
   this.selected = selected;
 };
-
+/**
+ * カラーチップに色をセット
+ * @param {string} color
+ * @returns
+ */
 Neo.ColorTip.prototype.setColor = function (color) {
+  if (!this.element) {
+    console.error("setColor: Element not found");
+    return null;
+  }
+
   this.color = color;
   this.element.style.backgroundColor = color;
 };
@@ -407,7 +443,10 @@ Neo.toolButtons = [];
 
 Neo.ToolTip = class {
   constructor() {
+    /** @type {string[]} */
+    this.toolStrings = [];
     this.element = null;
+    /** @type {any} */
     this.params = null;
     this.elementID = "";
     this.mode = 0;
@@ -423,8 +462,9 @@ Neo.ToolTip = class {
 };
 
 Neo.ToolTip.prototype.prevMode = -1;
-Neo.ToolTip.prototype.toolStrings = [];
+/**@type {any} */
 Neo.ToolTip.prototype.tools = [];
+/**@type {any} */
 Neo.ToolTip.prototype.toolIcons = [];
 Neo.ToolTip.prototype.hasTintImage = false;
 
@@ -441,64 +481,68 @@ Neo.ToolTip.prototype.label = null;
 Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.params.type = this.element.id;
   this.elementID = elementID;
   this.mode = 0;
 
   this.isMouseDown = false;
 
   var ref = this;
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.onmouseup = function (e) {
-    ref._mouseUpHandler(e);
-  };
-  this.element.onmouseover = function (e) {
-    ref._mouseOverHandler(e);
-  };
-  this.element.onmouseout = function (e) {
-    ref._mouseOutHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    /**
-     * @param {TouchEvent} e
-     */
-    function (e) {
+
+  if (this.element) {
+    this.params.type = this.element.id;
+    /** @param {MouseEvent} e */
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "touchend",
-    /**
-     * @param {TouchEvent} e
-     */
-    function (e) {
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseup = function (e) {
       ref._mouseUpHandler(e);
-    },
-    true,
-  );
-  // console.log("this.params.type", this.params.type);
-  this.selected = this.params.type == "neo-pen" ? true : false;
-  this.setSelected(this.selected);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseover = function (e) {
+      ref._mouseOverHandler(e);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseout = function (e) {
+      ref._mouseOutHandler(e);
+    };
+    /**@param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+    /**@param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchend",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseUpHandler(e);
+      },
+      true,
+    );
+    // console.log("this.params.type", this.params.type);
+    this.selected = this.params.type == "neo-pen" ? true : false;
+    this.setSelected(this.selected);
 
-  this.element.innerHTML =
-    "<canvas width=46 height=18></canvas><div class='label'></div>";
-  this.canvas = this.element.querySelector("canvas");
-  if (!this.canvas) {
-    console.error("Canvas element not found for " + elementID);
-    return null;
+    this.element.innerHTML =
+      "<canvas width=46 height=18></canvas><div class='label'></div>";
+    this.canvas = this.element.querySelector("canvas");
+    this.label = this.element.querySelector("div");
   }
-
-  this.label = this.element.querySelector("div");
-
   this.update();
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.ToolTip.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
@@ -526,6 +570,7 @@ Neo.ToolTip.prototype._mouseDownHandler = function (e) {
   if (this.onmousedown) this.onmousedown(this);
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.ToolTip.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
@@ -533,12 +578,14 @@ Neo.ToolTip.prototype._mouseUpHandler = function (e) {
   }
 };
 
+/** @param {MouseEvent} e */
 Neo.ToolTip.prototype._mouseOutHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseout) this.onmouseout(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.ToolTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
@@ -546,6 +593,11 @@ Neo.ToolTip.prototype._mouseOverHandler = function (e) {
  * @param {boolean} selected
  */
 Neo.ToolTip.prototype.setSelected = function (selected) {
+  if (!this.element) {
+    console.error("setSelected: Element not found");
+    return null;
+  }
+
   if (this.fixed) {
     this.element.className = "toolTipFixed";
   } else {
@@ -666,6 +718,7 @@ Neo.PenTip = class extends Neo.ToolTip {
   constructor() {
     super();
     this.isTool = true;
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -719,6 +772,7 @@ Neo.PenTip.prototype.update = function () {
 Neo.Pen2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -835,6 +889,7 @@ Neo.Pen2Tip.prototype.drawTone = function () {
 Neo.EraserTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
     this.drawOnce = false;
     this.isTool = true;
@@ -904,6 +959,7 @@ Neo.EraserTip.prototype.draw = function () {
 Neo.EffectTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
     this.label = null;
     this.isTool = false;
@@ -964,6 +1020,7 @@ Neo.EffectTip.prototype.update = function () {
 Neo.Effect2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
     this.isTool = true;
     this.img = null;
@@ -1012,7 +1069,7 @@ Neo.Effect2Tip.prototype.init = function (elementID, params = {}) {
 
   this.img = document.createElement("img");
   this.img.src = Neo.ToolTip.copy2;
-  this.element.appendChild(this.img);
+  this.element?.appendChild(this.img);
   return this;
 };
 
@@ -1039,6 +1096,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     this.isMouseDown = false;
     this.onmousedown = null;
     this.canvas = null;
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -1063,6 +1121,7 @@ Neo.MaskTip.prototype.init = function (elementID, params = {}) {
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.MaskTip.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
@@ -1111,6 +1170,7 @@ Neo.MaskTip.prototype.draw = function (color) {
 Neo.DrawTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -1140,6 +1200,7 @@ Neo.DrawTip.prototype.init = function (elementID, params = {}) {
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.DrawTip.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
@@ -1177,6 +1238,7 @@ Neo.sliders = [];
 Neo.ColorSlider = class {
   constructor() {
     this.selected = false;
+    /** @type {string[]} */
     this.toolStrings = [];
     this.type = 0;
     this.prefix = "";
@@ -1213,43 +1275,38 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.isMouseDown = false;
   this.value = 0;
   this.type = this.params.type;
-  if (!this.element) {
-    console.error("Element not found: " + elementID);
-    return null;
-  }
-  this.element.className = "colorSlider";
-  this.element.innerHTML =
-    "<div class='slider'></div><div class='label'></div>";
-  this.element.innerHTML += "<div class='hit'></div>";
+  if (this.element) {
+    this.element.className = "colorSlider";
+    this.element.innerHTML =
+      "<div class='slider'></div><div class='label'></div>";
+    this.element.innerHTML += "<div class='hit'></div>";
 
-  this.slider = this.element.getElementsByClassName("slider")[0];
-  this.label = this.element.getElementsByClassName("label")[0];
-  this.hit = this.element.getElementsByClassName("hit")[0];
-  this.hit["data-slider"] = params.type;
-
-  if (!(this.slider instanceof HTMLElement)) {
-    console.error("One or more required elements not found: " + elementID);
-    return null;
+    this.slider = this.element.getElementsByClassName("slider")[0];
+    this.label = this.element.getElementsByClassName("label")[0];
+    this.hit = this.element.getElementsByClassName("hit")[0];
+    this.hit["data-slider"] = params.type;
   }
 
-  switch (this.type) {
-    case Neo.SLIDERTYPE_RED:
-      this.prefix = "R";
-      this.slider.style.backgroundColor = "#fa9696";
-      break;
-    case Neo.SLIDERTYPE_GREEN:
-      this.prefix = "G";
-      this.slider.style.backgroundColor = "#82f238";
-      break;
-    case Neo.SLIDERTYPE_BLUE:
-      this.prefix = "B";
-      this.slider.style.backgroundColor = "#8080ff";
-      break;
-    case Neo.SLIDERTYPE_ALPHA:
-      this.prefix = "A";
-      this.slider.style.backgroundColor = "#aaaaaa";
-      this.value = 255;
-      break;
+  if (this.slider instanceof HTMLElement) {
+    switch (this.type) {
+      case Neo.SLIDERTYPE_RED:
+        this.prefix = "R";
+        this.slider.style.backgroundColor = "#fa9696";
+        break;
+      case Neo.SLIDERTYPE_GREEN:
+        this.prefix = "G";
+        this.slider.style.backgroundColor = "#82f238";
+        break;
+      case Neo.SLIDERTYPE_BLUE:
+        this.prefix = "B";
+        this.slider.style.backgroundColor = "#8080ff";
+        break;
+      case Neo.SLIDERTYPE_ALPHA:
+        this.prefix = "A";
+        this.slider.style.backgroundColor = "#aaaaaa";
+        this.value = 255;
+        break;
+    }
   }
 
   this.update();
@@ -1395,6 +1452,7 @@ Neo.ColorSlider.prototype.update = function () {
 Neo.SizeSlider = class {
   constructor() {
     this.selected = false;
+    /** @type {string[]} */
     this.toolStrings = [];
     this.y0 = 0;
     this.value0 = 0;
@@ -1432,19 +1490,17 @@ Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   this.elementID = elementID;
   this.isMouseDown = false;
   this.value = this.value0 = 1;
-  if (!this.element) {
-    console.error("SizeSlider: Element not found: " + elementID);
-    return null;
-  }
-  this.element.className = "sizeSlider";
-  this.element.innerHTML =
-    "<div class='slider'></div><div class='label'></div>";
-  this.element.innerHTML += "<div class='hit'></div>";
+  if (this.element) {
+    this.element.className = "sizeSlider";
+    this.element.innerHTML =
+      "<div class='slider'></div><div class='label'></div>";
+    this.element.innerHTML += "<div class='hit'></div>";
 
-  this.slider = this.element.getElementsByClassName("slider")[0];
-  this.label = this.element.getElementsByClassName("label")[0];
-  this.hit = this.element.getElementsByClassName("hit")[0];
-  this.hit["data-slider"] = params.type;
+    this.slider = this.element.getElementsByClassName("slider")[0];
+    this.label = this.element.getElementsByClassName("label")[0];
+    this.hit = this.element.getElementsByClassName("hit")[0];
+    this.hit["data-slider"] = params.type;
+  }
   if (this.slider instanceof HTMLElement) {
     this.slider.style.backgroundColor = Neo.painter.foregroundColor;
   }
@@ -1579,7 +1635,7 @@ Neo.LayerControl = class {
 /** @type {HTMLElement|null} */
 Neo.LayerControl.prototype.element = null;
 
-/** @type {Object|null} */
+/** @type {any} */
 Neo.LayerControl.prototype.params = null;
 Neo.LayerControl.prototype.elementID = "";
 Neo.LayerControl.prototype.isMouseDown = false;
@@ -1598,42 +1654,39 @@ Neo.LayerControl.prototype.init = function (elementID, params = {}) {
 
   var ref = this;
 
-  if (!this.element) {
-    console.error("LayerControl: Element not found: " + elementID);
-    return null;
-  }
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    /**
-     * @param {TouchEvent} e
-     */
-    function (e) {
+  if (this.element) {
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
+    };
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
 
-  this.element.className = "layerControl";
+    this.element.className = "layerControl";
 
-  var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+    var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
 
-  this.element.innerHTML =
-    "<div class='bg'></div><div class='label0'>" +
-    layerStrings[0] +
-    "</div><div class='label1'>" +
-    layerStrings[1] +
-    "</div><div class='line1'></div><div class='line0'></div>";
+    this.element.innerHTML =
+      "<div class='bg'></div><div class='label0'>" +
+      layerStrings[0] +
+      "</div><div class='label1'>" +
+      layerStrings[1] +
+      "</div><div class='line1'></div><div class='line0'></div>";
 
-  this.bg = this.element.getElementsByClassName("bg")[0];
-  this.label0 = this.element.getElementsByClassName("label0")[0];
-  this.label1 = this.element.getElementsByClassName("label1")[0];
-  this.line0 = this.element.getElementsByClassName("line0")[0];
-  this.line1 = this.element.getElementsByClassName("line1")[0];
-
+    this.bg = this.element.getElementsByClassName("bg")[0];
+    this.label0 = this.element.getElementsByClassName("label0")[0];
+    this.label1 = this.element.getElementsByClassName("label1")[0];
+    this.line0 = this.element.getElementsByClassName("line0")[0];
+    this.line1 = this.element.getElementsByClassName("line1")[0];
+  }
   this.line0.style.display = "none";
   this.line1.style.display = "none";
   this.label1.style.display = "none";
@@ -1642,6 +1695,7 @@ Neo.LayerControl.prototype.init = function (elementID, params = {}) {
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.LayerControl.prototype._mouseDownHandler = function (e) {
   if (Neo.getModifier(e) == "right") {
     var visible = Neo.painter.visible[Neo.painter.current];
@@ -1701,33 +1755,29 @@ Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
 
   var ref = this;
 
-  if (!this.element) {
-    console.error("ReserveControl: Element not found: " + elementID);
-    return null;
-  }
-
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    /**
-     * @param {TouchEvent} e
-     */
-    function (e) {
+  if (this.element) {
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
+    };
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
 
-  this.element.className = "reserve";
+    this.element.className = "reserve";
 
-  var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
-  this.element.style.top = "1px";
-  this.element.style.left = index * 15 + 2 + "px";
-
-  this.reserve = Neo.clone(Neo.config.reserves[index]);
+    var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
+    this.element.style.top = "1px";
+    this.element.style.left = index * 15 + 2 + "px";
+    this.reserve = Neo.clone(Neo.config.reserves[index]);
+  }
   this.update();
   //どこからも参照されていない?
   Neo.reserveControls.push(this);
@@ -1736,6 +1786,7 @@ Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
 /**
  * 保管ペンに保存
  */
+/** @param {MouseEvent|TouchEvent} e */
 Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
   if (Neo.getModifier(e) == "right") {
     this.save();
@@ -1822,19 +1873,14 @@ Neo.ScrollBarButton.prototype.init = function (elementID, params = {}) {
   this.params = params || {};
   this.elementID = elementID;
 
-  if (!this.element) {
-    console.error("Element not found: " + elementID);
-    return null;
+  if (this.element) {
+    this.element.innerHTML = "<div></div>";
+    this.barButton = this.element.querySelector("div");
+    this.element["data-bar"] = true;
   }
-
-  this.element.innerHTML = "<div></div>";
-  this.barButton = this.element.querySelector("div");
-  if (!this.barButton) {
-    console.error("ScrollBarButton: BarButton not found");
-    return null;
+  if (this.barButton) {
+    this.barButton["data-bar"] = true;
   }
-  this.element["data-bar"] = true;
-  this.barButton["data-bar"] = true;
 
   if (elementID == "neo-scrollH") Neo.scrollH = this;
   if (elementID == "neo-scrollV") Neo.scrollV = this;
@@ -1962,80 +2008,94 @@ Neo.ViewerButton.rewind =
 // length/mark/count
 // update
 
-Neo.ViewerBar = function () {};
-Neo.ViewerBar.prototype.element = null;
-Neo.ViewerBar.prototype.seekElement = null;
-Neo.ViewerBar.prototype.params = null;
-Neo.ViewerBar.prototype.elementID = "";
-Neo.ViewerBar.prototype.isMouseDown = false;
-Neo.ViewerBar.prototype.seekElement = null;
-Neo.ViewerBar.prototype.markElement = null;
-Neo.ViewerBar.prototype.textElement = null;
-Neo.ViewerBar.prototype.width = 0;
-Neo.ViewerBar.prototype.length = 0;
-Neo.ViewerBar.prototype.mark = 0;
-Neo.ViewerBar.prototype.seek = 0;
+Neo.ViewerBar = class {
+  constructor() {
+    /** @type {any} */
+    this.params = null;
+    this.elementID = "";
+    this.isMouseDown = false;
+    /**@type {HTMLElement|null} */
+    this.element;
+    /**@type {HTMLElement} */
+    this.seekElement;
+    /**@type {HTMLElement} */
+    this.markElement;
+    /**@type {HTMLElement} */
+    this.textElement;
+    this.width = 0;
+    this.length = 0;
+    this.mark = 0;
+    this.seek = 0;
+  }
+};
 /**
  *
  * @param {string} elementID
  * @param {Object} [params]
- * @returns
+ * @returns {Neo.ViewerBar}
  */
-
 Neo.ViewerBar.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
   this.isMouseDown = false;
+  if (this.element) {
+    this.element.style.display = "inline-block";
+    this.element.innerHTML =
+      "<div id='neo-viewerBarLeft'></div>" +
+      "<div id='neo-viewerBarMark'></div>" +
+      "<div id='neo-viewerBarText'>hoge</div>";
 
-  this.element.style.display = "inline-block";
-  this.element.innerHTML =
-    "<div id='neo-viewerBarLeft'></div>" +
-    "<div id='neo-viewerBarMark'></div>" +
-    "<div id='neo-viewerBarText'>hoge</div>";
-  this.seekElement = this.element.children[0];
-  this.markElement = this.element.children[1];
-  this.textElement = this.element.children[2];
+    if (this.element.children[0] instanceof HTMLElement) {
+      this.seekElement = this.element.children[0];
+    }
+    if (this.element.children[1] instanceof HTMLElement) {
+      this.markElement = this.element.children[1];
+    }
+    if (this.element.children[2] instanceof HTMLElement) {
+      this.textElement = this.element.children[2];
+    }
+  }
 
   this.width = this.seekElement.offsetWidth;
 
   this.length = this.params.length || 100;
   this.mark = this.length;
   this.seek = 0;
-
-  var ref = this;
-  this.element.addEventListener(
-    "pointerdown",
-    function (e) {
-      ref.isMouseDown = true;
-      ref._touchHandler(e);
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "pointermove",
-    function (e) {
-      e.preventDefault();
-      if (ref.isMouseDown) {
+  if (this.element) {
+    var ref = this;
+    this.element.addEventListener(
+      "pointerdown",
+      function (e) {
+        ref.isMouseDown = true;
         ref._touchHandler(e);
-      }
-    },
-    { passive: false, capture: true },
-  );
-  //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
-  //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
-  this.element.addEventListener(
-    "touchstart",
-    /**
-     * @param {TouchEvent} e
-     */
-    function (e) {
-      ref._touchHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-
+      },
+      { passive: false, capture: true },
+    );
+    this.element.addEventListener(
+      "pointermove",
+      function (e) {
+        e.preventDefault();
+        if (ref.isMouseDown) {
+          ref._touchHandler(e);
+        }
+      },
+      { passive: false, capture: true },
+    );
+    //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
+    //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._touchHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+  }
   this.update();
   return this;
 };

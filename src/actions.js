@@ -8,6 +8,7 @@
 
 Neo.ActionManager = class {
   constructor() {
+    /** @type {any} */
     this._items = [];
     this._head = 0;
     this._index = 0;
@@ -160,7 +161,7 @@ Neo.ActionManager.prototype.play = function () {
     func = item[0] && this[item[0]] ? item[0] : "dummy";
   }
 
-  var ref = this;
+  const ref = this;
   var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
   this[func](item, function (result) {
@@ -354,6 +355,14 @@ Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
   if (callback && typeof callback == "function") callback(true);
 };
 
+/**
+ * フリーハンド
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} lineType
+ */
 Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
   if (arguments.length > 1) {
     var oe = Neo.painter;
@@ -1357,10 +1366,6 @@ Neo.getPCH = function (filename, callback) {
  * * @param {ArrayBuffer} rawdata - fetchで取得した生のバイナリデータ
  * @returns {PCHData|null} デコード成功時はオブジェクト、失敗時はnullを返す
  * * @example
- * const pch = Neo.decodePCH(buffer);
- * if (pch) {
- * console.log(`Canvas size: ${pch.width}x${pch.height}`);
- * }
  */
 Neo.decodePCH = function (rawdata) {
   var byteArray = new Uint8Array(rawdata);
@@ -1425,6 +1430,7 @@ Neo.suspendDraw = function () {
   Neo.painter.onstop();
 };
 
+/** @param {number} value */
 Neo.setSpeed = function (value) {
   Neo.speed = value;
 };
@@ -1444,6 +1450,9 @@ Neo.setVisit = function (layer, value) {
   );
 };
 
+/**
+ * @param {number} value
+ */
 Neo.setMark = function (value) {
   Neo.painter._actionMgr._mark = value;
   Neo.painter.onmark();

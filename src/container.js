@@ -23,7 +23,8 @@ var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore
-Neo.painter = /** @type {Neo.Painter} */ (/** @type {unknown} */ (null));
+/** @type {Neo.Painter} */
+Neo.painter;
 
 Neo.fullScreen = false;
 Neo.uploaded = false;
@@ -54,6 +55,7 @@ Neo.updateUI = function () {};
 Neo.stabilize_level = 1;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
+/** @type {any} **/
 Neo.rules = {};
 /** @type {any} **/
 Neo.config = {
@@ -204,7 +206,6 @@ Neo.init = function () {
         }
       }
       if (name == "paintbbs" || name == "pch") {
-        // console.log(name);
 
         Neo.applet = applet;
 
@@ -334,11 +335,12 @@ Neo.init2 = function () {
 };
 /**
  * 初期設定
+ * @param {HTMLElement|any} applet div,applet,applet-dummy
  */
 Neo.initConfig = function (applet) {
   if (applet) {
-    var appletWidth = applet.dataset.width || applet.attributes.width.value;
-    var appletHeight = applet.dataset.height || applet.attributes.height.value;
+    var appletWidth = applet.dataset.width || applet.getAttribute("width");
+    var appletHeight = applet.dataset.height || applet.getAttribute("height");
     if (appletWidth) Neo.config.applet_width = parseInt(appletWidth);
     if (appletHeight) Neo.config.applet_height = parseInt(appletHeight);
     let targetName;
@@ -401,8 +403,8 @@ Neo.initConfig = function (applet) {
       Neo.applyStyle("color_bar_select", "#407675");
     }
 
-    const container = document.getElementById("neo-container");
-    Neo.config.inherit_color = Neo.getInheritColor(container);
+    // const container = document.getElementById("neo-container");
+    // Neo.config.inherit_color = Neo.getInheritColor(container);
     if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
 
     if (
@@ -859,23 +861,26 @@ Neo.applyStyle = function (name, defaultColor) {
     Neo.config[name] = Neo.rules[name] || defaultColor;
   }
 };
-/** @param {HTMLElement|null} element */
-Neo.getInheritColor = function (element) {
-  var result = "#000000";
-  while (element && element.style) {
-    if (element.style.color != "") {
-      result = element.style.color;
-      break;
-    }
-    if (element.attributes["text"]) {
-      result = element.attributes["text"].value;
-      break;
-    }
-    element =
-      element.parentNode instanceof HTMLElement ? element.parentNode : null;
-  }
-  return result;
-};
+// /** @param {HTMLElement|null} element */
+// Neo.getInheritColor = function (element) {
+//   var result = "#000000";
+//   while (element && element.style) {
+//     if (element.style.color != "") {
+//       result = element.style.color;
+//       break;
+//     }
+//     const textAttributes = element.attributes.getNamedItem("text");
+
+//     if (textAttributes) {
+//       result = textAttributes.value;
+//       console.log("result", result);
+//       break;
+//     }
+//     element =
+//       element.parentNode instanceof HTMLElement ? element.parentNode : null;
+//   }
+//   return result;
+// };
 
 Neo.backgroundImage = function () {
   var c1 = Neo.painter.getColor(Neo.config.color_bk) | 0xff000000;
@@ -1087,27 +1092,6 @@ Neo.initComponents = function () {
   var copyright = document.getElementById("neo-copyright");
   if (copyright) copyright.innerHTML += "v" + Neo.version;
 
-  // アプレットのborderの動作をエミュレート
-  if (navigator.userAgent.search("FireFox") > -1) {
-    const container = document.getElementById("neo-container");
-    if (!container) return;
-    container?.addEventListener(
-      "mousedown",
-      function (e) {
-        container.style.borderColor = Neo.config.inherit_color;
-        e.stopPropagation();
-      },
-      false,
-    );
-    document.addEventListener(
-      "mousedown",
-      function (e) {
-        container.style.borderColor = "transparent";
-      },
-      false,
-    );
-  }
-
   // ドラッグしたまま画面外に移動した時
   document.addEventListener(
     "mouseup",
@@ -1296,7 +1280,9 @@ Neo.start = function (isApp = false) {
       var ipc = require("electron").ipcRenderer;
       ipc.sendToHost("neo-status", "ok");
     } else {
+      //@ts-ignore
       if (document["paintBBSCallback"]) {
+        //@ts-ignore
         document["paintBBSCallback"]("start");
       }
     }
@@ -1530,8 +1516,9 @@ Neo.resizeCanvas = function () {
  * @returns {Record<string, any>} コピーされた新しいオブジェクト
  */
 Neo.clone = function (src) {
-  var dst = {};
-  for (var k in src) {
+  /** @type {Record<string, any>} */
+  const dst = {};
+  for (const k in src) {
     dst[k] = src[k];
   }
   return dst;
@@ -1565,34 +1552,36 @@ Neo.openURL = function (url) {
 };
 
 /**
- * @param {string}  board
+ * @param {string}  boardURL
  * @param {string}  url
  */
-Neo.getAbsoluteURL = function (board, url) {
+Neo.getAbsoluteURL = function (boardURL, url) {
   if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
     return url;
   } else {
-    return board + url;
+    return boardURL + url;
   }
 };
 
 /**
  * 描画されたイラストデータ（および各種サムネイル、動画データ）をサーバーに投稿する
- * @param {*} board - お絵かき掲示板の設定やコンテキストオブジェクト
+ * @param {string} boardURL - 掲示板のURL
  * @param {Blob} blob - 投稿するメインのイラスト画像データ (PNG等)
  * @param {Blob|null} thumbnail - 通常のサムネイル画像データ（無い場合は null）
  * @param {Blob|null} thumbnail2 - アニメーション動画（PCH）データ（無い場合は null）
  */
-Neo.submit = function (board, blob, thumbnail, thumbnail2) {
-  var url = Neo.getAbsoluteURL(board, Neo.config.url_save);
+Neo.submit = function (boardURL, blob, thumbnail, thumbnail2) {
+  let url = Neo.getAbsoluteURL(boardURL, Neo.config.url_save);
   var headerString = Neo.str_header || "";
-
+  //@ts-ignore
   if (document["paintBBSCallback"]) {
+    //@ts-ignore
     var result = document["paintBBSCallback"]("check");
     if (result == 0 || result == "false") {
       return;
     }
 
+    //@ts-ignore
     result = document["paintBBSCallback"]("header");
     if (result && typeof result == "string") {
       headerString = result;
@@ -1744,7 +1733,7 @@ Neo.submit = function (board, blob, thumbnail, thumbnail2) {
                 );
               }
             }
-            var exitURL = Neo.getAbsoluteURL(board, Neo.config.url_exit);
+            var exitURL = Neo.getAbsoluteURL(boardURL, Neo.config.url_exit);
             var responseURL = text.replace(/&amp;/g, "&");
 
             // ふたばではresponseの文字列をそのままURLとして解釈する

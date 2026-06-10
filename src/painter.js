@@ -16,6 +16,7 @@ Neo.Painter = class {
 };
 /** @type {HTMLElement|null} */
 Neo.Painter.prototype.container = null;
+/** @type {any} */
 Neo.Painter.prototype.tool = null;
 /** @type {HTMLElement|null} */
 Neo.Painter.prototype.inputText = null;
@@ -26,27 +27,25 @@ Neo.Painter.prototype.cursorRect = null;
 Neo.Painter.prototype.canvas = [];
 /** @type {CanvasRenderingContext2D[]} */
 Neo.Painter.prototype.canvasCtx = [];
-/** @type {boolean[]} */ Neo.Painter.prototype.visible = [];
+/** @type {boolean[]} */
+Neo.Painter.prototype.visible = [];
 Neo.Painter.prototype.current = 0;
 
 //Temp Canvas Info
-Neo.Painter.prototype.tempCanvas = /** @type {HTMLCanvasElement}*/ (
-  /** @type {unknown} */ (null)
-);
-Neo.Painter.prototype.tempCanvasCtx = /** @type {CanvasRenderingContext2D}*/ (
-  /** @type {unknown} */ (null)
-);
+/** @type {HTMLCanvasElement}*/
+Neo.Painter.prototype.tempCanvas;
+/** @type {CanvasRenderingContext2D}*/
+Neo.Painter.prototype.tempCanvasCtx;
 Neo.Painter.prototype.tempX = 0;
 Neo.Painter.prototype.tempY = 0;
+/** @type {Uint32Array|null} */
 Neo.Painter.prototype.temp = null;
 
 //Destination Canvas for display
-Neo.Painter.prototype.destCanvas = /** @type {HTMLCanvasElement}*/ (
-  /** @type {unknown} */ (null)
-);
-Neo.Painter.prototype.destCanvasCtx = /** @type {CanvasRenderingContext2D}*/ (
-  /** @type {unknown} */ (null)
-);
+/** @type {HTMLCanvasElement}*/
+Neo.Painter.prototype.destCanvas;
+/** @type {CanvasRenderingContext2D}*/
+Neo.Painter.prototype.destCanvasCtx;
 
 Neo.Painter.prototype.backgroundColor = "#ffffff";
 Neo.Painter.prototype.foregroundColor = "#000000";
@@ -111,7 +110,9 @@ Neo.Painter.prototype.toolStack = [];
 Neo.Painter.prototype.maskType = 0;
 Neo.Painter.prototype.drawType = 0;
 Neo.Painter.prototype.maskColor = "#000000";
+/** @type {number[]} */
 Neo.Painter.prototype._currentColor = [];
+/** @type {number[]} */
 Neo.Painter.prototype._currentMask = [];
 
 Neo.Painter.prototype.aerr = 0;
@@ -120,35 +121,59 @@ Neo.Painter.prototype.busy = false;
 Neo.Painter.prototype.busySkipped = false;
 
 Neo.Painter.prototype.touchlength = 0;
+/**@type {Neo.PenTool} */
+Neo.Painter.prototype.penTool;
+/**@type {Neo.EraserTool} */
+Neo.Painter.prototype.eraserTool;
+/**@type {Neo.HandTool} */
+Neo.Painter.prototype.handTool;
+/**@type {Neo.FillTool} */
+Neo.Painter.prototype.fillTool;
+/**@type {Neo.EraseAllTool} */
+Neo.Painter.prototype.eraseAllTool;
+/**@type {Neo.EraseRectTool} */
+Neo.Painter.prototype.eraseRectTool;
 
-Neo.Painter.prototype.penTool = null;
-Neo.Painter.prototype.eraserTool = null;
-Neo.Painter.prototype.handTool = null;
-Neo.Painter.prototype.fillTool = null;
-Neo.Painter.prototype.eraseAllTool = null;
-Neo.Painter.prototype.eraseRectTool = null;
+/**@type {Neo.CopyTool} */
+Neo.Painter.prototype.copyTool;
+/**@type {Neo.PasteTool} */
+Neo.Painter.prototype.pasteTool;
+/**@type {Neo.MergeTool} */
+Neo.Painter.prototype.mergeTool;
+/**@type {Neo.FlipHTool} */
+Neo.Painter.prototype.flipHTool;
+/**@type {Neo.FlipVTool} */
+Neo.Painter.prototype.flipVTool;
 
-Neo.Painter.prototype.copyTool = null;
-Neo.Painter.prototype.pasteTool = null;
-Neo.Painter.prototype.mergeTool = null;
-Neo.Painter.prototype.flipHTool = null;
-Neo.Painter.prototype.flipVTool = null;
+/**@type {Neo.BrushTool} */
+Neo.Painter.prototype.brushTool;
+/**@type {Neo.TextTool} */
+Neo.Painter.prototype.textTool;
+/**@type {Neo.ToneTool} */
+Neo.Painter.prototype.toneTool;
+/**@type {Neo.BlurTool} */
+Neo.Painter.prototype.blurTool;
+/**@type {Neo.DodgeTool} */
+Neo.Painter.prototype.dodgeTool;
+/**@type {Neo.BurnTool} */
+Neo.Painter.prototype.burnTool;
+/**@type {Neo.SliderTool} */
+Neo.Painter.prototype.sliderTool;
+/**@type {Neo.DummyTool} */
+Neo.Painter.prototype.dummyTool;
 
-Neo.Painter.prototype.brushTool = null;
-Neo.Painter.prototype.textTool = null;
-Neo.Painter.prototype.toneTool = null;
-Neo.Painter.prototype.blurTool = null;
-Neo.Painter.prototype.dodgeTool = null;
-Neo.Painter.prototype.burnTool = null;
-Neo.Painter.prototype.sliderTool = null;
-Neo.Painter.prototype.dummyTool = null;
-
-Neo.Painter.prototype.rectTool = null;
-Neo.Painter.prototype.rectFillTool = null;
-Neo.Painter.prototype.ellipseTool = null;
-Neo.Painter.prototype.ellipseFillTool = null;
-Neo.Painter.prototype.blurRectTool = null;
-Neo.Painter.prototype.turnTool = null;
+/**@type {Neo.RectTool} */
+Neo.Painter.prototype.rectTool;
+/**@type {Neo.RectFillTool} */
+Neo.Painter.prototype.rectFillTool;
+/**@type {Neo.EllipseTool} */
+Neo.Painter.prototype.ellipseTool;
+/**@type {Neo.EllipseFillTool} */
+Neo.Painter.prototype.ellipseFillTool;
+/**@type {Neo.BlurRectTool} */
+Neo.Painter.prototype.blurRectTool;
+/**@type {Neo.TurnTool} */
+Neo.Painter.prototype.turnTool;
 
 Neo.Painter.LINETYPE_NONE = 0;
 Neo.Painter.LINETYPE_PEN = 1;
@@ -909,13 +934,16 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
   }
 
   if (!this.isUIPaused()) {
-    if (e.target && e.target["data-bar"]) {
+    if (e.target instanceof HTMLElement && e.target["data-bar"]) {
       this.pushTool(this.handTool);
       this.handTool.reverse = false;
     } else if (this.isSpaceDown && document.activeElement != this.inputText) {
       this.pushTool(this.handTool);
       this.handTool.reverse = true;
-    } else if (e.target && e.target["data-slider"] != undefined) {
+    } else if (
+      e.target instanceof HTMLElement &&
+      e.target["data-slider"] != undefined
+    ) {
       this.pushTool(this.sliderTool);
       this.sliderTool.target = e.target;
       this.sliderTool.alt = false;
@@ -1152,7 +1180,7 @@ Neo.Painter.prototype._beforeUnloadHandler = function (e) {
 Neo.Painter.prototype.undo = function () {
   var undoItem = this._undoMgr.popUndo();
 
-  if (undoItem) {
+  if (undoItem && undoItem.data.length > 0) {
     this._pushRedo();
     this._actionMgr.back();
 
@@ -1170,7 +1198,7 @@ Neo.Painter.prototype.undo = function () {
 Neo.Painter.prototype.redo = function () {
   var undoItem = this._undoMgr.popRedo();
 
-  if (undoItem) {
+  if (undoItem && undoItem.data.length > 0) {
     this._actionMgr.forward();
 
     this._pushUndo(0, 0, this.canvasWidth, this.canvasHeight, true);
@@ -1265,12 +1293,11 @@ Neo.Painter.prototype._pushRedo = function (x, y, w, h) {
  */
 Neo.UndoManager = function (_maxStep) {
   this._maxStep = _maxStep;
+  /** @type {Neo.UndoItem[]} */
   this._undoItems = [];
+  /** @type {Neo.UndoItem[]} */
   this._redoItems = [];
 };
-Neo.UndoManager.prototype._maxStep;
-Neo.UndoManager.prototype._redoItems;
-Neo.UndoManager.prototype._undoItems;
 
 /**
  * 新しい操作履歴（UndoItem）を登録し、履歴を管理する。
@@ -1313,12 +1340,25 @@ Neo.UndoManager.prototype.popRedo = function () {
   return this._redoItems.pop();
 };
 
-Neo.UndoItem = function () {};
-Neo.UndoItem.prototype.data;
-Neo.UndoItem.prototype.x;
-Neo.UndoItem.prototype.y;
-Neo.UndoItem.prototype.width;
-Neo.UndoItem.prototype.height;
+/**
+ * キャンバスの状態を保持するUndo/Redo用のクラス
+ */
+Neo.UndoItem = class {
+  /**
+   * @param {ImageData[]} [data]
+   * @param {number} [x]
+   * @param {number} [y]
+   * @param {number} [width]
+   * @param {number} [height]
+   */
+  constructor(data = [], x = 0, y = 0, width = 0, height = 0) {
+    this.data = data;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
+};
 
 /*
    -------------------------------------------------------------------------
@@ -1396,7 +1436,12 @@ Neo.Painter.prototype.setZoomPosition = function (x, y) {
    -------------------------------------------------------------------------
  */
 
-Neo.Painter.prototype.submit = function (board) {
+/**
+ * データ送信
+ * @param {string} boardURL 掲示板のURL
+ * @returns
+ */
+Neo.Painter.prototype.submit = function (boardURL) {
   if (Neo.isAnimation) {
     // neo_save_layers
     var items = this._actionMgr._items;
@@ -1429,7 +1474,7 @@ Neo.Painter.prototype.submit = function (board) {
     console.error("Failed to get PNG data. Submission aborted.");
     return;
   }
-  Neo.submit(board, png, thumbnail2, thumbnail);
+  Neo.submit(boardURL, png, thumbnail2, thumbnail);
 };
 
 Neo.Painter.prototype.useThumbnail = function () {
@@ -4052,7 +4097,9 @@ Neo.Painter.prototype.onspeed = function () {
   var mode = mgr.speedMode();
   Neo.speed = mgr._speedTable[(mode + 1) % 4];
 };
-
+/**
+ * @param {number[]} item
+ */
 Neo.Painter.prototype.setCurrent = function (item) {
   var color = this._currentColor;
   var mask = this._currentMask;
@@ -4065,6 +4112,9 @@ Neo.Painter.prototype.setCurrent = function (item) {
   item.push(type);
 };
 
+/**
+ * @param {number[]} item
+ */
 Neo.Painter.prototype.getCurrent = function (item) {
   this._currentColor = [item[2], item[3], item[4], item[5]];
   this._currentMask = [item[6], item[7], item[8]];

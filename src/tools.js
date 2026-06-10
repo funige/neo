@@ -938,7 +938,7 @@ Neo.HandTool.prototype.rollOutHandler = function (oe) {};
 Neo.SliderTool = class extends Neo.ToolBase {
   constructor() {
     super();
-    this.target = null;
+    this.target = /** @type {HTMLElement} */ (/** @type {unknown} */ (null));
   }
 };
 Neo.SliderTool.prototype.type = Neo.Painter.TOOLTYPE_SLIDER;
@@ -1090,6 +1090,13 @@ Neo.EffectToolBase.prototype.ticking = false;
 Neo.EffectToolBase.prototype.latestX = 0;
 Neo.EffectToolBase.prototype.latestY = 0;
 Neo.EffectToolBase.prototype.defaultAlpha = 0;
+/**
+ * @param {Neo.Painter} oe
+ * @param {number} x
+ * @param {number} y
+ * @param {number} width
+ * @param {number} height
+ */
 Neo.EffectToolBase.prototype.doEffect = function (oe, x, y, width, height) {};
 
 /** @param {Neo.Painter} oe */
@@ -1155,10 +1162,13 @@ Neo.EffectToolBase.prototype.moveHandler = function (oe) {
     this.ticking = false;
   });
 };
+/** @param {Neo.Painter} oe */
 Neo.EffectToolBase.prototype.rollOutHandler = function (oe) {};
+/** @param {Neo.Painter} oe */
 Neo.EffectToolBase.prototype.upMoveHandler = function (oe) {};
+/** @param {Neo.Painter} oe */
 Neo.EffectToolBase.prototype.rollOverHandler = function (oe) {};
-
+/** @param {Neo.Painter} oe */
 Neo.EffectToolBase.prototype.drawCursor = function (oe) {
   var ctx = oe.destCanvasCtx;
 
