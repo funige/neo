@@ -151,20 +151,24 @@ Neo.ActionManager.prototype.play = function () {
   var func;
   // restoreが存在するかどうか判定
   //古いPCHファイルにはrestoreが存在しないためアニメーションをスキップできない
-  const hasRestore = this._items.some((item) => item[0] === "restore");
+  const hasRestore = this._items.some(
+    (/**@type {any}**/ item) => item[0] === "restore",
+  );
   if (Neo.painter.busySkipped && hasRestore) {
     // アニメーションをスキップする時はrestoreのみを関数として扱う
     func =
-      item[0] && this[item[0]] && item[0] === "restore" ? item[0] : "dummy";
+      item[0] && /**@type {any}**/ (this)[item[0]] && item[0] === "restore"
+        ? item[0]
+        : "dummy";
   } else {
     // アニメーションを再生する時は全ての関数を実行する
-    func = item[0] && this[item[0]] ? item[0] : "dummy";
+    func = item[0] && /**@type {any}**/ (this)[item[0]] ? item[0] : "dummy";
   }
 
   const ref = this;
   var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
-  this[func](item, function (result) {
+  /**@type {any}*/ (this)[func](item, function (/**@type {any}*/ result) {
     if (result) {
       if (
         Neo.painter.busySkipped &&
@@ -1182,7 +1186,8 @@ Neo.initViewer = function (pch) {
 Neo.startViewer = function () {
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "pch";
-    if (!document[name]) document[name] = Neo;
+    if (!(/** @type {any} */ (document)[name]))
+      /** @type {any} */ (document)[name] = Neo;
     if (Neo.applet.parentNode) {
       Neo.applet.parentNode.removeChild(Neo.applet);
     }

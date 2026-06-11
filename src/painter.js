@@ -20,6 +20,7 @@ Neo.Painter.prototype.container = null;
 Neo.Painter.prototype.tool = null;
 /** @type {HTMLElement|null} */
 Neo.Painter.prototype.inputText = null;
+/** @type {number[]|null} */
 Neo.Painter.prototype.cursorRect = null;
 
 //Canvas Info
@@ -63,7 +64,9 @@ Neo.Painter.prototype.isSpaceDown = false;
 Neo.Painter.prototype.isBezierActive = false;
 Neo.Painter.prototype.isCopyActive = false;
 
+/** @type {any} */
 Neo.Painter.prototype.prevMouseX = null;
+/** @type {any} */
 Neo.Painter.prototype.prevMouseY = null;
 
 Neo.Painter.prototype.mouseX = 0;
@@ -842,12 +845,18 @@ Neo.Painter.prototype._keyUpHandler = function (e) {
   }
 };
 
+/**
+ * @param {MouseEvent} e
+ */
 Neo.Painter.prototype._rollOverHandler = function (e) {
   if (this.tool.rollOverHandler) {
     this.tool.rollOverHandler(this);
   }
 };
 
+/**
+ * @param {MouseEvent} e
+ */
 Neo.Painter.prototype._rollOutHandler = function (e) {
   if (this.tool.rollOutHandler) {
     this.tool.rollOutHandler(this);
@@ -932,9 +941,13 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
       return;
     }
   }
+  /** @typedef {HTMLElement & { "data-bar": boolean | string | number }} BarElement */
 
   if (!this.isUIPaused()) {
-    if (e.target instanceof HTMLElement && e.target["data-bar"]) {
+    if (
+      e.target instanceof HTMLElement &&
+      /** @type {BarElement} */ (e.target)["data-bar"]
+    ) {
       this.pushTool(this.handTool);
       this.handTool.reverse = false;
     } else if (this.isSpaceDown && document.activeElement != this.inputText) {
@@ -942,7 +955,7 @@ Neo.Painter.prototype._mouseDownHandler = function (e) {
       this.handTool.reverse = true;
     } else if (
       e.target instanceof HTMLElement &&
-      e.target["data-slider"] != undefined
+      /** @type {any} */ (e.target)["data-slider"] != undefined
     ) {
       this.pushTool(this.sliderTool);
       this.sliderTool.target = e.target;
@@ -1024,10 +1037,13 @@ Neo.Painter.prototype._mouseMoveHandler = function (e) {
   }
 };
 
+/**
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.Painter.prototype.getPosition = function (e) {
-  if (e.clientX !== undefined) {
+  if (e instanceof MouseEvent && e.clientX !== undefined) {
     return { x: e.clientX, y: e.clientY, e: e.type };
-  } else {
+  } else if (e instanceof TouchEvent) {
     var touch = e.changedTouches[0];
     return { x: touch.clientX, y: touch.clientY, e: e.type };
 
@@ -1039,6 +1055,9 @@ Neo.Painter.prototype.getPosition = function (e) {
     //      }
     //      console.log("getPosition error");
     //      return {x:0, y:0};
+  } else {
+    console.warn("Unknown event:", e.type);
+    return { x: 0, y: 0, e: e.type || "unknown" };
   }
 };
 
@@ -1098,12 +1117,16 @@ Neo.Painter.prototype._stabilizer = function () {
     this.stabilizedY = null;
   }
 };
-
+/**
+ * ポインターの位置を更新する
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.Painter.prototype._updateMousePosition = function (e) {
   var rect = this.destCanvas.getBoundingClientRect();
   //  var x = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
   //  var y = (e.clientY !== undefined) ? e.clientY : e.touches[0].clientY;
   var pos = this.getPosition(e);
+
   var x = pos.x;
   var y = pos.y;
 
@@ -1161,9 +1184,9 @@ Neo.Painter.prototype._updateMousePosition = function (e) {
   this.clipMouseY = Math.max(Math.min(this.canvasHeight, this.mouseY), 0);
 };
 
-Neo.Painter.prototype._beforeUnloadHandler = function (e) {
-  // quick save
-};
+// Neo.Painter.prototype._beforeUnloadHandler = function (e) {
+//   // quick save
+// };
 
 /*
    Neo.Painter.prototype.getStabilized = function() {
@@ -2590,7 +2613,7 @@ Neo.Painter.prototype.drawBezier = function (
     },
   );
 };
-
+/** @type {any} */
 Neo.Painter.prototype.prevLine = null; // 始点または終点が2度プロットされることがあるので
 
 /**
@@ -3819,7 +3842,7 @@ Neo.Painter.prototype.isContainer = function (element) {
  * 実行中のツールを強制終了し、マウスの状態をリセットする。
  * @returns {void}
  */
-Neo.Painter.prototype.cancelTool = function (e) {
+Neo.Painter.prototype.cancelTool = function () {
   if (this.tool) {
     this.isMouseDown = false;
     this.tool.upHandler(this);

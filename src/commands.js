@@ -91,9 +91,9 @@ Neo.RedoCommand.prototype.execute = function () {
 };
 
 Neo.WindowCommand = class extends Neo.CommandBase {
+  /** @param {any} data */
   constructor(data) {
     super();
-    /**@type {any} */
     this.data = data;
   }
 };

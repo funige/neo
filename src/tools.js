@@ -10,6 +10,7 @@ Neo.ToolBase.prototype.ticking = false;
 
 Neo.ToolBase.prototype.startX = 0;
 Neo.ToolBase.prototype.startY = 0;
+/**@type {any} */
 Neo.ToolBase.prototype.type = null;
 Neo.ToolBase.prototype.step = 0;
 Neo.ToolBase.prototype.reverse = false;
@@ -222,10 +223,13 @@ Neo.DrawToolBase.prototype.upMoveHandler = function (oe) {
       break;
   }
 };
-
+/**
+ * @param {KeyboardEvent} e
+ */
 Neo.DrawToolBase.prototype.keyDownHandler = function (e) {
   switch (Neo.painter.drawType) {
     case Neo.Painter.DRAWTYPE_BEZIER:
+      //Bz曲線をエスケープキーでキャンセル
       this.bezierKeyDownHandler(e);
       break;
   }
@@ -568,7 +572,10 @@ Neo.DrawToolBase.prototype.bezierUpMoveHandler = function (oe) {
     this.ticking = false;
   }, 10);
 };
-
+/**
+ * Bz曲線をエスケープキーでキャンセル
+ * @param {KeyboardEvent} e
+ */
 Neo.DrawToolBase.prototype.bezierKeyDownHandler = function (e) {
   if (e.key == "Escape") {
     //Escでキャンセル
@@ -938,7 +945,8 @@ Neo.HandTool.prototype.rollOutHandler = function (oe) {};
 Neo.SliderTool = class extends Neo.ToolBase {
   constructor() {
     super();
-    this.target = /** @type {HTMLElement} */ (/** @type {unknown} */ (null));
+    /** @type {any} */
+    this.target = null;
   }
 };
 Neo.SliderTool.prototype.type = Neo.Painter.TOOLTYPE_SLIDER;
@@ -1481,7 +1489,10 @@ Neo.PasteTool.prototype.moveHandler = function (oe) {
     this.ticking = false;
   });
 };
-
+/**
+ * コピーアンドペーストをエスケープキーでキャンセル
+ * @param {KeyboardEvent} e
+ */
 Neo.PasteTool.prototype.keyDownHandler = function (e) {
   var oe = Neo.painter;
 

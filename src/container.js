@@ -160,7 +160,9 @@ Neo.extractBootConfig = function (targetName) {
     typeof Neo.params === "object" &&
     Object.keys(Neo.params).length > 0
   ) {
-    return Neo.params[targetName] ? { ...Neo.params[targetName] } : {};
+    /** @type {any} */
+    const params = Neo.params;
+    return params[targetName] ? { ...params[targetName] } : {};
   }
 
   // 2. DOMの探索（指定された名前を持つ要素を最初に1つ見つける）
@@ -206,7 +208,6 @@ Neo.init = function () {
         }
       }
       if (name == "paintbbs" || name == "pch") {
-
         Neo.applet = applet;
 
         if (name == "paintbbs") {
@@ -1101,7 +1102,7 @@ Neo.initComponents = function () {
         e.target instanceof Element &&
         !Neo.painter.isContainer(e.target)
       ) {
-        Neo.painter.cancelTool(e.target);
+        Neo.painter.cancelTool();
       }
     },
     false,
@@ -1172,7 +1173,9 @@ Neo.initButtons = function () {
   }
 
   if (Neo.isMobile() || Neo.config.neo_show_right_button == "true") {
-    Neo.rightButton.element.style.display = "block";
+    if (Neo.rightButton.element) {
+      Neo.rightButton.element.style.display = "block";
+    }
   }
 
   // toolTip
@@ -1264,7 +1267,7 @@ Neo.start = function (isApp = false) {
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "paintbbs";
     Neo.applet.outerHTML = "";
-    document[name] = Neo;
+    /** @type {any} */ (document)[name] = Neo;
 
     Neo.resizeCanvas();
 
