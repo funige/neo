@@ -1,11 +1,13 @@
 "use strict";
 //@ts-check
-
+/**
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.getModifier = function (e) {
   if (e.shiftKey) {
     return "shift";
   } else if (
-    e.button == 2 ||
+    (e instanceof MouseEvent && e.button == 2) ||
     e.ctrlKey ||
     e.altKey ||
     Neo.painter.virtualRight
@@ -23,12 +25,15 @@ Neo.getModifier = function (e) {
 
 Neo.Button = class {
   constructor() {
+    /**@type {HTMLElement|null} */
     this.element = null;
+    /** @type {any} */
     this.params = null;
     this.elementID = "";
     this.selected = false;
     this.isMouseDown = false;
-    this.disable = function () {};
+    /** @param {number} wait */
+    this.disable = function (wait) {};
     this.enable = function () {};
 
     /** @type {((Button: Neo.Button) => void) | null} */
@@ -43,7 +48,7 @@ Neo.Button = class {
 };
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.Button|null}
  */
 Neo.Button.prototype.init = function (elementID, params = {}) {
@@ -54,39 +59,57 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
   this.isMouseDown = false;
 
   var ref = this;
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.onmouseup = function (e) {
-    ref._mouseUpHandler(e);
-  };
-  this.element.onmouseover = function (e) {
-    ref._mouseOverHandler(e);
-  };
-  this.element.onmouseout = function (e) {
-    ref._mouseOutHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
+  if (this.element) {
+    /** @param {MouseEvent} e */
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "touchend",
-    function (e) {
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseup = function (e) {
       ref._mouseUpHandler(e);
-    },
-    { passive: false, capture: true },
-  );
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseover = function (e) {
+      ref._mouseOverHandler(e);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseout = function (e) {
+      ref._mouseOutHandler(e);
+    };
+    /** @param {MouseEvent} e */
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+    this.element.addEventListener(
+      "touchend",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseUpHandler(e);
+      },
+      { passive: false, capture: true },
+    );
 
-  this.element.className = "buttonOff";
+    this.element.className = "buttonOff";
+  }
 
+  /**
+   * @param {number} wait
+   */
   this.disable = function (wait) {
-    this.element.style.pointerEvents = "none";
-    this.element.style.opacity = "0.5";
+    if (this.element) {
+      this.element.style.pointerEvents = "none";
+      this.element.style.opacity = "0.5";
+    }
     if (wait) {
       setTimeout(function () {
         ref.enable();
@@ -95,20 +118,24 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
   };
 
   this.enable = function () {
-    this.element.style.pointerEvents = "inherit";
-    this.element.style.opacity = "1.0";
+    if (this.element) {
+      this.element.style.pointerEvents = "inherit";
+      this.element.style.opacity = "1.0";
+    }
   };
-
   return this;
 };
-
+/**
+ * @param {MouseEvent|TouchEvent} e
+ */
 Neo.Button.prototype._mouseDownHandler = function (e) {
   if (Neo.painter.isUIPaused()) return;
   this.isMouseDown = true;
 
   if (this.params.type == "fill" && this.selected == false) {
-    for (var i = 0; i < Neo.toolButtons.length; i++) {
-      var toolTip = Neo.toolButtons[i];
+    for (let i = 0; i < Neo.toolButtons.length; i++) {
+      /** @type {any} */
+      const toolTip = Neo.toolButtons[i];
       toolTip.setSelected(this.selected ? false : true);
     }
     Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -116,6 +143,7 @@ Neo.Button.prototype._mouseDownHandler = function (e) {
 
   if (this.onmousedown) this.onmousedown(this);
 };
+/** @param {MouseEvent|TouchEvent} e */
 Neo.Button.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
@@ -123,21 +151,27 @@ Neo.Button.prototype._mouseUpHandler = function (e) {
     if (this.onmouseup) this.onmouseup(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.Button.prototype._mouseOutHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseout) this.onmouseout(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.Button.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
-
+/**
+ * @param {boolean} selected
+ */
 Neo.Button.prototype.setSelected = function (selected) {
-  if (selected) {
-    this.element.className = "buttonOn";
-  } else {
-    this.element.className = "buttonOff";
+  if (this.element) {
+    if (selected) {
+      this.element.className = "buttonOn";
+    } else {
+      this.element.className = "buttonOff";
+    }
   }
   this.selected = selected;
 };
@@ -153,44 +187,54 @@ Neo.Button.prototype.update = function () {};
 Neo.RightButton = class extends Neo.Button {
   constructor() {
     super();
+    /** @type {any} */
     this.params = null;
+    /**@type {HTMLElement|null} */
     this.element = null;
     this.selected = false;
   }
 };
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @return {Neo.RightButton|null}
  */
-Neo.RightButton.prototype.init = function (elementID, params) {
+Neo.RightButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "right";
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.RightButton.prototype._mouseDownHandler = function (e) {};
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.RightButton.prototype._mouseUpHandler = function (e) {
   this.setSelected(!this.selected);
 };
 
+/** @param {MouseEvent} e */
 Neo.RightButton.prototype._mouseOutHandler = function (e) {};
 
+/**
+ * @param {boolean} selected
+ */
 Neo.RightButton.prototype.setSelected = function (selected) {
-  if (selected) {
-    this.element.className = "buttonOn";
-    Neo.painter.virtualRight = true;
-  } else {
-    this.element.className = "buttonOff";
-    Neo.painter.virtualRight = false;
+  if (this.element) {
+    if (selected) {
+      this.element.className = "buttonOn";
+      Neo.painter.virtualRight = true;
+    } else {
+      this.element.className = "buttonOff";
+      Neo.painter.virtualRight = false;
+    }
   }
   this.selected = selected;
 };
 
 Neo.RightButton.clear = function () {
-  var right = Neo.rightButton;
-  right.setSelected(false);
+  const right = Neo.rightButton;
+  right?.setSelected(false);
 };
 
 /*
@@ -207,10 +251,10 @@ Neo.FillButton = class extends Neo.Button {
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.FillButton|null}
  */
-Neo.FillButton.prototype.init = function (elementID, params) {
+Neo.FillButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
   this.params.type = "fill";
   return this;
@@ -222,25 +266,33 @@ Neo.FillButton.prototype.init = function (elementID, params) {
   -------------------------------------------------------------------------
 */
 
-Neo.colorTips = [];
-
 Neo.ColorTip = class {
   constructor() {
+    /**@type {HTMLElement|null} */
     this.element = null;
+    /** @type {any} */
     this.params = null;
     this.elementID = "";
     this.selected = false;
     this.isMouseDown = false;
-    this.color = null;
+    this.color = "";
+    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
     this.onmousedown = null;
+    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
     this.onmouseup = null;
+    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
     this.onmouseover = null;
+    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
     this.onmouseout = null;
   }
 };
+/** @typedef {Neo.ColorTip} ColorTip */
+/** @type {ColorTip[]} */
+Neo.colorTips = [];
+
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {any} [params]
  */
 Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
@@ -251,50 +303,60 @@ Neo.ColorTip.prototype.init = function (elementID, params = {}) {
   this.isMouseDown = false;
 
   var ref = this;
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.onmouseup = function (e) {
-    ref._mouseUpHandler(e);
-  };
-  this.element.onmouseover = function (e) {
-    ref._mouseOverHandler(e);
-  };
-  this.element.onmouseout = function (e) {
-    ref._mouseOutHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
+  if (this.element) {
+    /** @param {MouseEvent} e */
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "touchend",
-    function (e) {
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseup = function (e) {
       ref._mouseUpHandler(e);
-    },
-    true,
-  );
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseover = function (e) {
+      ref._mouseOverHandler(e);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseout = function (e) {
+      ref._mouseOutHandler(e);
+    };
+    /** @param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchstart",
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+    /** @param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchend",
+      function (e) {
+        ref._mouseUpHandler(e);
+      },
+      true,
+    );
 
-  this.element.className = "colorTipOff";
+    this.element.className = "colorTipOff";
 
-  var index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
-  this.element.style.left = index % 2 ? "0px" : "26px";
-  this.element.style.top = Math.floor(index / 2) * 21 + "px";
+    var index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
+    this.element.style.left = index % 2 ? "0px" : "26px";
+    this.element.style.top = Math.floor(index / 2) * 21 + "px";
 
-  // base64 ColorTip.png
-  this.element.innerHTML =
-    "<img style='max-width:44px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />";
-
+    // base64 ColorTip.png
+    this.element.innerHTML =
+      "<img style='max-width:44px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />";
+  }
   this.setColor(Neo.config.colors[params.index - 1]);
 
   this.setSelected(this.selected);
   Neo.colorTips.push(this);
 };
-
+/**
+ * @param {MouseEvent|TouchEvent} e
+ * @returns {void}
+ */
 Neo.ColorTip.prototype._mouseDownHandler = function (e) {
   if (Neo.painter.isUIPaused()) return;
   this.isMouseDown = true;
@@ -325,23 +387,37 @@ Neo.ColorTip.prototype._mouseDownHandler = function (e) {
 
   if (this.onmousedown) this.onmousedown(this);
 };
+/**
+ * @param {MouseEvent|TouchEvent} e
+ * @returns {void}
+ */
 Neo.ColorTip.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseup) this.onmouseup(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.ColorTip.prototype._mouseOutHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseout) this.onmouseout(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.ColorTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
 
+/**
+ * @param {boolean} selected
+ */
 Neo.ColorTip.prototype.setSelected = function (selected) {
+  if (!this.element) {
+    console.error("setSelected: Element not found");
+    return null;
+  }
+
   if (selected) {
     this.element.className = "colorTipOn";
   } else {
@@ -349,8 +425,17 @@ Neo.ColorTip.prototype.setSelected = function (selected) {
   }
   this.selected = selected;
 };
-
+/**
+ * カラーチップに色をセット
+ * @param {string} color
+ * @returns
+ */
 Neo.ColorTip.prototype.setColor = function (color) {
+  if (!this.element) {
+    console.error("setColor: Element not found");
+    return null;
+  }
+
   this.color = color;
   this.element.style.backgroundColor = color;
 };
@@ -369,20 +454,28 @@ Neo.ColorTip.getCurrent = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.toolTips = [];
+/** @type {object[]} */
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
   constructor() {
+    /** @type {string[]} */
+    this.toolStrings = [];
+    /** @type {HTMLElement|null} */
     this.element = null;
+    /** @type {any} */
     this.params = null;
     this.elementID = "";
     this.mode = 0;
     this.isMouseDown = false;
+    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
     this.onmousedown = null;
+    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
     this.onmouseup = null;
-    this.onmouseout = null;
+    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
     this.onmouseover = null;
+    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    this.onmouseout = null;
     this.selected = false;
     this.isTool = false;
     this.fixed = false;
@@ -390,8 +483,9 @@ Neo.ToolTip = class {
 };
 
 Neo.ToolTip.prototype.prevMode = -1;
-Neo.ToolTip.prototype.toolStrings = [];
+/**@type {any} */
 Neo.ToolTip.prototype.tools = [];
+/**@type {any} */
 Neo.ToolTip.prototype.toolIcons = [];
 Neo.ToolTip.prototype.hasTintImage = false;
 
@@ -402,71 +496,82 @@ Neo.ToolTip.prototype.label = null;
 
 /**
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ToolTip|null}
  */
 Neo.ToolTip.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
-  this.params.type = this.element.id;
   this.elementID = elementID;
   this.mode = 0;
 
   this.isMouseDown = false;
 
   var ref = this;
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.onmouseup = function (e) {
-    ref._mouseUpHandler(e);
-  };
-  this.element.onmouseover = function (e) {
-    ref._mouseOverHandler(e);
-  };
-  this.element.onmouseout = function (e) {
-    ref._mouseOutHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
+
+  if (this.element) {
+    this.params.type = this.element.id;
+    /** @param {MouseEvent} e */
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "touchend",
-    function (e) {
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseup = function (e) {
       ref._mouseUpHandler(e);
-    },
-    true,
-  );
-  // console.log("this.params.type", this.params.type);
-  this.selected = this.params.type == "neo-pen" ? true : false;
-  this.setSelected(this.selected);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseover = function (e) {
+      ref._mouseOverHandler(e);
+    };
+    /** @param {MouseEvent} e */
+    this.element.onmouseout = function (e) {
+      ref._mouseOutHandler(e);
+    };
+    /**@param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+    /**@param {TouchEvent} e */
+    this.element.addEventListener(
+      "touchend",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseUpHandler(e);
+      },
+      true,
+    );
+    // console.log("this.params.type", this.params.type);
+    this.selected = this.params.type == "neo-pen" ? true : false;
+    this.setSelected(this.selected);
 
-  this.element.innerHTML =
-    "<canvas width=46 height=18></canvas><div class='label'></div>";
-  this.canvas = this.element.getElementsByTagName("canvas")[0];
-  if (!this.canvas) {
-    console.error("Canvas element not found for " + elementID);
-    return null;
+    this.element.innerHTML =
+      "<canvas width=46 height=18></canvas><div class='label'></div>";
+    this.canvas = this.element.querySelector("canvas");
+    this.label = this.element.querySelector("div");
   }
-
-  this.label = this.element.getElementsByTagName("div")[0];
-
   this.update();
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.ToolTip.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
   if (this.isTool) {
     if (this.selected == false) {
-      for (var i = 0; i < Neo.toolButtons.length; i++) {
-        var toolTip = Neo.toolButtons[i];
+      for (let i = 0; i < Neo.toolButtons.length; i++) {
+        /** @type {any} */
+        const toolTip = Neo.toolButtons[i];
         toolTip.setSelected(this == toolTip ? true : false);
       }
     } else {
@@ -486,6 +591,7 @@ Neo.ToolTip.prototype._mouseDownHandler = function (e) {
   if (this.onmousedown) this.onmousedown(this);
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.ToolTip.prototype._mouseUpHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
@@ -493,17 +599,26 @@ Neo.ToolTip.prototype._mouseUpHandler = function (e) {
   }
 };
 
+/** @param {MouseEvent} e */
 Neo.ToolTip.prototype._mouseOutHandler = function (e) {
   if (this.isMouseDown) {
     this.isMouseDown = false;
     if (this.onmouseout) this.onmouseout(this);
   }
 };
+/** @param {MouseEvent} e */
 Neo.ToolTip.prototype._mouseOverHandler = function (e) {
   if (this.onmouseover) this.onmouseover(this);
 };
-
+/**
+ * @param {boolean} selected
+ */
 Neo.ToolTip.prototype.setSelected = function (selected) {
+  if (!this.element) {
+    console.error("setSelected: Element not found");
+    return null;
+  }
+
   if (this.fixed) {
     this.element.className = "toolTipFixed";
   } else {
@@ -518,9 +633,17 @@ Neo.ToolTip.prototype.setSelected = function (selected) {
 
 Neo.ToolTip.prototype.update = function () {};
 
-Neo.ToolTip.prototype.draw = function (c) {
+/**
+ * ツールチップのアイコンを描画し、必要に応じて色調補正（ティント）を施す。
+ * 動作モードが変更された際には新たな画像を読み込み、
+ * 変更がない場合は既存のキャンバスに対し色調のみを再適用し効率化を図る。
+ *
+ * @param {string|number} color - アイコンに適用すべき色彩。カラー文字列、またはNeo.painterで解釈可能な数値IDを指定する。
+ */
+Neo.ToolTip.prototype.draw = function (color) {
   if (this.hasTintImage) {
-    if (typeof c != "string") c = Neo.painter.getColorString(c);
+    const c =
+      typeof color === "string" ? color : Neo.painter.getColorString(color);
     if (!this.canvas) {
       console.error("Canvas not found for ToolTip.");
       return;
@@ -552,7 +675,16 @@ Neo.ToolTip.prototype.draw = function (c) {
     }
   }
 };
-
+/**
+ * 指定された座標へ画像を配置し、その上から特定の色調を合成する。
+ * 画像の描画と、それに続く色調の適用という二段階の処理を担う。
+ *
+ * @param {CanvasRenderingContext2D} ctx - 描画先となる2Dレンダリングコンテキスト。
+ * @param {HTMLImageElement} img - 描画対象のソース画像。
+ * @param {string} c - 合成すべき色彩を表すカラー文字列。
+ * @param {number} x - 描画始点のX座標。
+ * @param {number} y - 描画始点のY座標。
+ */
 Neo.ToolTip.prototype.drawTintImage = function (ctx, img, c, x, y) {
   ctx.drawImage(img, x, y);
   Neo.tintImage(ctx, c);
@@ -607,6 +739,7 @@ Neo.PenTip = class extends Neo.ToolTip {
   constructor() {
     super();
     this.isTool = true;
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -624,11 +757,12 @@ Neo.PenTip.prototype.toolIcons = [
 ];
 
 /**
+ * 鉛筆･水彩･テキスト
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.PenTip|null}
  */
-Neo.PenTip.prototype.init = function (elementID, params) {
+Neo.PenTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("鉛筆"),
     Neo.translate("水彩"),
@@ -659,6 +793,7 @@ Neo.PenTip.prototype.update = function () {
 Neo.Pen2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -679,11 +814,12 @@ Neo.Pen2Tip.prototype.toolIcons = [
 ];
 
 /**
+ * トーン･ぼかし･覆い焼き･焼き込み
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.Pen2Tip|null}
  */
-Neo.Pen2Tip.prototype.init = function (elementID, params) {
+Neo.Pen2Tip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("トーン"),
     Neo.translate("ぼかし"),
@@ -774,10 +910,13 @@ Neo.Pen2Tip.prototype.drawTone = function () {
 Neo.EraserTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
     this.drawOnce = false;
     this.isTool = true;
+    /** @type {HTMLElement|null} */
     this.label = null;
+    /** @type {HTMLCanvasElement|null} */
     this.canvas = null;
   }
 };
@@ -789,11 +928,12 @@ Neo.EraserTip.prototype.tools = [
 ];
 
 /**
+ * 消しペン･消し四角･全消し
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.EraserTip|null}
  */
-Neo.EraserTip.prototype.init = function (elementID, params) {
+Neo.EraserTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("消しペン"),
     Neo.translate("消し四角"),
@@ -821,14 +961,23 @@ Neo.EraserTip.prototype.update = function () {
 };
 
 Neo.EraserTip.prototype.draw = function () {
+  if (!this.canvas) {
+    console.error("EraserTip: Canvas element not found");
+    return null;
+  }
   var ctx = this.canvas.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!ctx) {
+    console.error("Failed to get 2D context for EraserTip canvas.");
+    return null;
+  }
+
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   var img = new Image();
 
   img.onload = function () {
-    ctx.drawImage(img, 0, 0);
+    ctx?.drawImage(img, 0, 0);
   };
   img.src = Neo.ToolTip.eraser;
 };
@@ -842,7 +991,9 @@ Neo.EraserTip.prototype.draw = function () {
 Neo.EffectTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
+    /** @type {HTMLElement|null} */
     this.label = null;
     this.isTool = false;
   }
@@ -864,11 +1015,12 @@ Neo.EffectTip.prototype.toolIcons = [
 ];
 
 /**
+ * 四角･線四角･楕円･線楕円
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.EffectTip|null}
  */
-Neo.EffectTip.prototype.init = function (elementID, params) {
+Neo.EffectTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("四角"),
     Neo.translate("線四角"),
@@ -901,8 +1053,10 @@ Neo.EffectTip.prototype.update = function () {
 Neo.Effect2Tip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
     this.isTool = true;
+    /** @type {HTMLImageElement|null} */
     this.img = null;
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -929,11 +1083,12 @@ Neo.Effect2Tip.prototype.toolIcons = [
 ];
 
 /**
+ * コピー･レイヤー結合･角取り･左右反転･上下反転･傾け
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.Effect2Tip|null}
  */
-Neo.Effect2Tip.prototype.init = function (elementID, params) {
+Neo.Effect2Tip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("コピー"),
     Neo.translate("ﾚｲﾔ結合"),
@@ -948,7 +1103,7 @@ Neo.Effect2Tip.prototype.init = function (elementID, params) {
 
   this.img = document.createElement("img");
   this.img.src = Neo.ToolTip.copy2;
-  this.element.appendChild(this.img);
+  this.element?.appendChild(this.img);
   return this;
 };
 
@@ -973,18 +1128,22 @@ Neo.MaskTip = class extends Neo.ToolTip {
   constructor() {
     super();
     this.isMouseDown = false;
+    /** @type {((MaskTip: Neo.MaskTip) => void) | null} */
     this.onmousedown = null;
+    /** @type {HTMLCanvasElement|null} */
     this.canvas = null;
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
 
 /**
+ * 通常･マスク･逆マスク･加算･逆加算
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.MaskTip|null}
  */
-Neo.MaskTip.prototype.init = function (elementID, params) {
+Neo.MaskTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("通常"),
     Neo.translate("マスク"),
@@ -998,6 +1157,7 @@ Neo.MaskTip.prototype.init = function (elementID, params) {
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.MaskTip.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
@@ -1021,12 +1181,25 @@ Neo.MaskTip.prototype.update = function () {
   }
 };
 
-Neo.MaskTip.prototype.draw = function (c) {
-  if (typeof c != "string") c = Neo.painter.getColorString(c);
-
-  var ctx = this.canvas.getContext("2d", {
+/**
+ * マスクチップのアイコンを描画して色調補正（ティント）を施す。
+ *
+ * @param {string|number} color - アイコンに適用すべき色彩。カラー文字列、またはNeo.painterで解釈可能な数値IDを指定する。
+ */
+Neo.MaskTip.prototype.draw = function (color) {
+  const c =
+    typeof color === "string" ? color : Neo.painter.getColorString(color);
+  var ctx = this.canvas?.getContext("2d", {
     willReadFrequently: true,
   });
+  if (!ctx) {
+    console.error("Failed to get 2D context for MaskTip canvas.");
+    return null;
+  }
+  if (!this.canvas) {
+    console.error("MaskTip: Canvas element not found");
+    return null;
+  }
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   ctx.fillStyle = c;
   ctx.fillRect(1, 1, 43, 9);
@@ -1041,6 +1214,7 @@ Neo.MaskTip.prototype.draw = function (c) {
 Neo.DrawTip = class extends Neo.ToolTip {
   constructor() {
     super();
+    /** @type {string[]} */
     this.toolStrings = [];
   }
 };
@@ -1053,11 +1227,12 @@ Neo.DrawTip.prototype.toolIcons = [
 ];
 
 /**
+ * 手書き･直線･BZ曲線
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.DrawTip|null}
  */
-Neo.DrawTip.prototype.init = function (elementID, params) {
+Neo.DrawTip.prototype.init = function (elementID, params = {}) {
   this.toolStrings = [
     Neo.translate("手書き"),
     Neo.translate("直線"),
@@ -1069,6 +1244,7 @@ Neo.DrawTip.prototype.init = function (elementID, params) {
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.DrawTip.prototype._mouseDownHandler = function (e) {
   this.isMouseDown = true;
 
@@ -1101,11 +1277,13 @@ Neo.DrawTip.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
+/**@type {any} */
 Neo.sliders = [];
 
 Neo.ColorSlider = class {
   constructor() {
     this.selected = false;
+    /** @type {string[]} */
     this.toolStrings = [];
     this.type = 0;
     this.prefix = "";
@@ -1115,8 +1293,8 @@ Neo.ColorSlider = class {
     this.element = null;
     /** @type {string} */
     this.elementID = "";
-    /** @type {Object} */
-    this.params = /** @type {unknown} */ {};
+    /** @type {any} */
+    this.params = {};
     /** @type {number} */
     this.value = 0;
     this.isMouseDown = false;
@@ -1124,7 +1302,7 @@ Neo.ColorSlider = class {
     this.slider = null;
     /** @type {Element|null} */
     this.label = null;
-    /** @type {Element|null} */
+    /** @type {any} */
     this.hit = null;
   }
 };
@@ -1132,7 +1310,7 @@ Neo.ColorSlider = class {
 /**
  * カラースライダーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {any} [params]
  * @returns {Neo.ColorSlider|null}
  */
 Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
@@ -1142,49 +1320,49 @@ Neo.ColorSlider.prototype.init = function (elementID, params = {}) {
   this.isMouseDown = false;
   this.value = 0;
   this.type = this.params.type;
-  if (!this.element) {
-    console.error("Element not found: " + elementID);
-    return null;
-  }
-  this.element.className = "colorSlider";
-  this.element.innerHTML =
-    "<div class='slider'></div><div class='label'></div>";
-  this.element.innerHTML += "<div class='hit'></div>";
+  if (this.element) {
+    this.element.className = "colorSlider";
+    this.element.innerHTML =
+      "<div class='slider'></div><div class='label'></div>";
+    this.element.innerHTML += "<div class='hit'></div>";
 
-  this.slider = this.element.getElementsByClassName("slider")[0];
-  this.label = this.element.getElementsByClassName("label")[0];
-  this.hit = this.element.getElementsByClassName("hit")[0];
-  this.hit["data-slider"] = params.type;
-
-  if (!(this.slider instanceof HTMLElement)) {
-    console.error("One or more required elements not found: " + elementID);
-    return null;
+    this.slider = this.element.querySelector(".slider");
+    this.label = this.element.querySelector(".label");
+    this.hit = this.element.querySelector(".hit");
+    if (this.hit) {
+      this.hit["data-slider"] = params.type;
+    }
   }
 
-  switch (this.type) {
-    case Neo.SLIDERTYPE_RED:
-      this.prefix = "R";
-      this.slider.style.backgroundColor = "#fa9696";
-      break;
-    case Neo.SLIDERTYPE_GREEN:
-      this.prefix = "G";
-      this.slider.style.backgroundColor = "#82f238";
-      break;
-    case Neo.SLIDERTYPE_BLUE:
-      this.prefix = "B";
-      this.slider.style.backgroundColor = "#8080ff";
-      break;
-    case Neo.SLIDERTYPE_ALPHA:
-      this.prefix = "A";
-      this.slider.style.backgroundColor = "#aaaaaa";
-      this.value = 255;
-      break;
+  if (this.slider instanceof HTMLElement) {
+    switch (this.type) {
+      case Neo.SLIDERTYPE_RED:
+        this.prefix = "R";
+        this.slider.style.backgroundColor = "#fa9696";
+        break;
+      case Neo.SLIDERTYPE_GREEN:
+        this.prefix = "G";
+        this.slider.style.backgroundColor = "#82f238";
+        break;
+      case Neo.SLIDERTYPE_BLUE:
+        this.prefix = "B";
+        this.slider.style.backgroundColor = "#8080ff";
+        break;
+      case Neo.SLIDERTYPE_ALPHA:
+        this.prefix = "A";
+        this.slider.style.backgroundColor = "#aaaaaa";
+        this.value = 255;
+        break;
+    }
   }
 
   this.update();
   return this;
 };
-
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.downHandler = function (x, y) {
   if (Neo.painter.isShiftDown) {
     this.shift(x, y);
@@ -1193,13 +1371,25 @@ Neo.ColorSlider.prototype.downHandler = function (x, y) {
   }
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.moveHandler = function (x, y) {
   this.slide(x, y);
   //event.preventDefault();
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.upHandler = function (x, y) {};
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.shift = function (x, y) {
   var value;
   if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
@@ -1231,6 +1421,10 @@ Neo.ColorSlider.prototype.shift = function (x, y) {
   }
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.ColorSlider.prototype.slide = function (x, y) {
   var value;
   if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
@@ -1305,10 +1499,13 @@ Neo.ColorSlider.prototype.update = function () {
 Neo.SizeSlider = class {
   constructor() {
     this.selected = false;
+    /** @type {string[]} */
     this.toolStrings = [];
     this.y0 = 0;
     this.value0 = 0;
     this.onmousedown = null;
+    /**@type {any} */
+    this.params = {};
   }
 };
 
@@ -1316,8 +1513,6 @@ Neo.SizeSlider = class {
 Neo.SizeSlider.prototype.element = null;
 /** @type {string} */
 Neo.SizeSlider.prototype.elementID = "";
-/** @type {Object} */
-Neo.SizeSlider.prototype.params = /** @type {unknown} */ {};
 /** @type {number} */
 Neo.SizeSlider.prototype.value = 1;
 Neo.SizeSlider.prototype.isMouseDown = false;
@@ -1329,9 +1524,9 @@ Neo.SizeSlider.prototype.label = null;
 Neo.SizeSlider.prototype.hit = null;
 
 /**
- * サイズスライダーを初期化する。
+ * サイズスライダーを初期化
  * @param {string} elementID - 要素のID
- * @param {Object|null} [params] - パラメータ
+ * @param {any} [params] - パラメータ
  * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
  */
 Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
@@ -1340,19 +1535,17 @@ Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   this.elementID = elementID;
   this.isMouseDown = false;
   this.value = this.value0 = 1;
-  if (!this.element) {
-    console.error("SizeSlider: Element not found: " + elementID);
-    return null;
-  }
-  this.element.className = "sizeSlider";
-  this.element.innerHTML =
-    "<div class='slider'></div><div class='label'></div>";
-  this.element.innerHTML += "<div class='hit'></div>";
+  if (this.element) {
+    this.element.className = "sizeSlider";
+    this.element.innerHTML =
+      "<div class='slider'></div><div class='label'></div>";
+    this.element.innerHTML += "<div class='hit'></div>";
 
-  this.slider = this.element.getElementsByClassName("slider")[0];
-  this.label = this.element.getElementsByClassName("label")[0];
-  this.hit = this.element.getElementsByClassName("hit")[0];
-  this.hit["data-slider"] = params.type;
+    this.slider = this.element.querySelector(".slider");
+    this.label = this.element.querySelector(".label");
+    this.hit = this.element.querySelector(".hit");
+    /**@type {any}*/ (this.hit)["data-slider"] = params.type;
+  }
   if (this.slider instanceof HTMLElement) {
     this.slider.style.backgroundColor = Neo.painter.foregroundColor;
   }
@@ -1360,6 +1553,10 @@ Neo.SizeSlider.prototype.init = function (elementID, params = {}) {
   return this;
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.downHandler = function (x, y) {
   if (Neo.painter.isShiftDown) {
     this.shift(x, y);
@@ -1370,13 +1567,25 @@ Neo.SizeSlider.prototype.downHandler = function (x, y) {
   }
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.moveHandler = function (x, y) {
   this.slide(x, y);
   //event.preventDefault();
 };
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.upHandler = function (x, y) {};
 
+/**
+ * @param {number} x
+ * @param {number} y
+ */
 Neo.SizeSlider.prototype.shift = function (x, y) {
   var value0 = Neo.painter.lineWidth;
   var value;
@@ -1422,6 +1631,10 @@ Neo.SizeSlider.prototype.slide = function (x, y) {
   this.setSize(value);
 };
 
+/**
+ * サイズをセット
+ * @param {number} value
+ */
 Neo.SizeSlider.prototype.setSize = function (value) {
   value = Math.round(value);
   Neo.painter.lineWidth = Math.max(Math.min(30, value), 1);
@@ -1460,18 +1673,24 @@ Neo.SizeSlider.prototype.update = function () {
 
 Neo.LayerControl = class {
   constructor() {
+    /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
     this.onmousedown = null;
+    /** @type {HTMLElement|null}*/
     this.bg = null;
+    /** @type {HTMLElement|null}*/
     this.label0 = null;
+    /** @type {HTMLElement|null}*/
     this.label1 = null;
+    /** @type {HTMLElement|null}*/
     this.line0 = null;
+    /** @type {HTMLElement|null}*/
     this.line1 = null;
   }
 };
 /** @type {HTMLElement|null} */
 Neo.LayerControl.prototype.element = null;
 
-/** @type {Object|null} */
+/** @type {any} */
 Neo.LayerControl.prototype.params = null;
 Neo.LayerControl.prototype.elementID = "";
 Neo.LayerControl.prototype.isMouseDown = false;
@@ -1479,7 +1698,7 @@ Neo.LayerControl.prototype.isMouseDown = false;
 /**
  * レイヤーコントローラーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.LayerControl|null}
  */
 Neo.LayerControl.prototype.init = function (elementID, params = {}) {
@@ -1490,47 +1709,59 @@ Neo.LayerControl.prototype.init = function (elementID, params = {}) {
 
   var ref = this;
 
-  if (!this.element) {
-    console.error("LayerControl: Element not found: " + elementID);
-    return null;
-  }
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
+  if (this.element) {
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
+    };
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
 
-  this.element.className = "layerControl";
+    this.element.className = "layerControl";
 
-  var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+    var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
 
-  this.element.innerHTML =
-    "<div class='bg'></div><div class='label0'>" +
-    layerStrings[0] +
-    "</div><div class='label1'>" +
-    layerStrings[1] +
-    "</div><div class='line1'></div><div class='line0'></div>";
+    this.element.innerHTML =
+      "<div class='bg'></div><div class='label0'>" +
+      layerStrings[0] +
+      "</div><div class='label1'>" +
+      layerStrings[1] +
+      "</div><div class='line1'></div><div class='line0'></div>";
 
-  this.bg = this.element.getElementsByClassName("bg")[0];
-  this.label0 = this.element.getElementsByClassName("label0")[0];
-  this.label1 = this.element.getElementsByClassName("label1")[0];
-  this.line0 = this.element.getElementsByClassName("line0")[0];
-  this.line1 = this.element.getElementsByClassName("line1")[0];
-
-  this.line0.style.display = "none";
-  this.line1.style.display = "none";
-  this.label1.style.display = "none";
+    this.bg = this.element.querySelector(".bg");
+    //Layer0の文字
+    this.label0 = this.element.querySelector(".label0");
+    //Layer1の文字
+    this.label1 = this.element.querySelector(".label1");
+    //Layer0非表示の取り消し線
+    this.line0 = this.element.querySelector(".line0");
+    //Layer1非表示の取り消し線
+    this.line1 = this.element.querySelector(".line1");
+  }
+  //初期化時に非表示にする
+  if (this.line0) {
+    this.line0.style.display = "none";
+  }
+  if (this.line1) {
+    this.line1.style.display = "none";
+  }
+  if (this.label1) {
+    this.label1.style.display = "none";
+  }
 
   this.update();
   return this;
 };
 
+/** @param {MouseEvent|TouchEvent} e */
 Neo.LayerControl.prototype._mouseDownHandler = function (e) {
   if (Neo.getModifier(e) == "right") {
     var visible = Neo.painter.visible[Neo.painter.current];
@@ -1554,10 +1785,18 @@ Neo.LayerControl.prototype._mouseDownHandler = function (e) {
 };
 
 Neo.LayerControl.prototype.update = function () {
-  this.label0.style.display = Neo.painter.current == 0 ? "block" : "none";
-  this.label1.style.display = Neo.painter.current == 1 ? "block" : "none";
-  this.line0.style.display = Neo.painter.visible[0] ? "none" : "block";
-  this.line1.style.display = Neo.painter.visible[1] ? "none" : "block";
+  if (this.label0) {
+    this.label0.style.display = Neo.painter.current == 0 ? "block" : "none";
+  }
+  if (this.label1) {
+    this.label1.style.display = Neo.painter.current == 1 ? "block" : "none";
+  }
+  if (this.line0) {
+    this.line0.style.display = Neo.painter.visible[0] ? "none" : "block";
+  }
+  if (this.line1) {
+    this.line1.style.display = Neo.painter.visible[1] ? "none" : "block";
+  }
 };
 
 /*
@@ -1565,22 +1804,23 @@ Neo.LayerControl.prototype.update = function () {
     ReserveControl
   -------------------------------------------------------------------------
 */
+/** @type {any} */
 Neo.reserveControls = [];
 
 Neo.ReserveControl = function () {};
 /** @type {HTMLElement|null} */
 Neo.ReserveControl.prototype.element = null;
 Neo.ReserveControl.prototype.elementID = "";
-/** @type {Object|null} */
+/** @type {any} */
 Neo.ReserveControl.prototype.params = null;
-/** @type {Object|null} */
+/** @type {any} */
 Neo.ReserveControl.prototype.reserve = null;
 Neo.ReserveControl.prototype.isMouseDown = false;
 
 /**
  * リバースコントローラーを初期化
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ReserveControl|null}
  */
 Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
@@ -1590,36 +1830,38 @@ Neo.ReserveControl.prototype.init = function (elementID, params = {}) {
 
   var ref = this;
 
-  if (!this.element) {
-    console.error("ReserveControl: Element not found: " + elementID);
-    return null;
-  }
-
-  this.element.onmousedown = function (e) {
-    ref._mouseDownHandler(e);
-  };
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
+  if (this.element) {
+    this.element.onmousedown = function (e) {
       ref._mouseDownHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
+    };
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._mouseDownHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
 
-  this.element.className = "reserve";
+    this.element.className = "reserve";
 
-  var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
-  this.element.style.top = "1px";
-  this.element.style.left = index * 15 + 2 + "px";
-
-  this.reserve = Neo.clone(Neo.config.reserves[index]);
+    var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
+    this.element.style.top = "1px";
+    this.element.style.left = index * 15 + 2 + "px";
+    this.reserve = Neo.clone(Neo.config.reserves[index]);
+  }
   this.update();
-
+  //どこからも参照されていない?
   Neo.reserveControls.push(this);
   return this;
 };
-
+/**
+ * 保管ペンに保存
+ */
+/** @param {MouseEvent|TouchEvent} e */
 Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
   if (Neo.getModifier(e) == "right") {
     this.save();
@@ -1630,6 +1872,10 @@ Neo.ReserveControl.prototype._mouseDownHandler = function (e) {
 };
 
 Neo.ReserveControl.prototype.load = function () {
+  if (!this.reserve) {
+    console.error("Reserve not found for ReserveControl load.");
+    return;
+  }
   Neo.painter.setToolByType(this.reserve.tool);
   Neo.painter.foregroundColor = this.reserve.color;
   Neo.painter.lineWidth = this.reserve.size;
@@ -1645,6 +1891,10 @@ Neo.ReserveControl.prototype.load = function () {
 };
 
 Neo.ReserveControl.prototype.save = function () {
+  if (!this.reserve) {
+    console.error("Reserve not found for ReserveControl save");
+    return;
+  }
   this.reserve.color = Neo.painter.foregroundColor;
   this.reserve.size = Neo.painter.lineWidth;
   this.reserve.drawType = Neo.painter.drawType;
@@ -1673,8 +1923,10 @@ Neo.ReserveControl.prototype.update = function () {
   -------------------------------------------------------------------------
 */
 
-Neo.scrollH;
-Neo.scrollV;
+/** @type {Neo.ScrollBarButton|null} */
+Neo.scrollH = null;
+/** @type {Neo.ScrollBarButton|null} */
+Neo.scrollV = null;
 
 Neo.ScrollBarButton = function () {};
 /** @type {HTMLElement|null} */
@@ -1696,15 +1948,16 @@ Neo.ScrollBarButton.prototype.init = function (elementID, params = {}) {
   this.params = params || {};
   this.elementID = elementID;
 
-  if (!this.element) {
-    console.error("Element not found: " + elementID);
-    return null;
+  if (this.element) {
+    this.element.innerHTML = "<div></div>";
+    this.barButton = this.element.querySelector("div");
+    /**@type {any} */
+    (this.element)["data-bar"] = true;
   }
-
-  this.element.innerHTML = "<div></div>";
-  this.barButton = this.element.getElementsByTagName("div")[0];
-  this.element["data-bar"] = true;
-  this.barButton["data-bar"] = true;
+  if (this.barButton) {
+    /**@type {any} */
+    (this.barButton)["data-bar"] = true;
+  }
 
   if (elementID == "neo-scrollH") Neo.scrollH = this;
   if (elementID == "neo-scrollV") Neo.scrollV = this;
@@ -1760,16 +2013,17 @@ Neo.ViewerButton.speedStrings = ["最", "早", "既", "鈍"];
 /**
  *
  * @param {string} elementID
- * @param {Object|null} [params]
+ * @param {Object} [params]
  * @returns {Neo.ViewerButton|null}
  */
 Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
   Neo.Button.prototype.init.call(this, elementID, params);
 
   if (elementID != "neo-viewerSpeed") {
-    this.element.innerHTML = "<canvas width=24 height=24></canvas>";
-    this.canvas = this.element.getElementsByTagName("canvas")[0];
-
+    if (this.element) {
+      this.element.innerHTML = "<canvas width=24 height=24></canvas>";
+      this.canvas = this.element.querySelector("canvas");
+    }
     if (!this.canvas) {
       console.error("Canvas element not found for " + elementID);
       return null;
@@ -1791,10 +2045,14 @@ Neo.ViewerButton.prototype.init = function (elementID, params = {}) {
       ctx.drawImage(img, 0, 0);
       Neo.tintImage(ctx, Neo.config.color_text);
     }.bind(this);
-    img.src =
-      Neo.ViewerButton[elementID.toLowerCase().replace(/neo-viewer/, "")];
+    img.src = /**@type {any}*/ (Neo.ViewerButton)[
+      elementID.toLowerCase().replace(/neo-viewer/, "")
+    ];
   } else {
-    this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>";
+    if (this.element) {
+      this.element.innerHTML =
+        "<div></div><canvas width=24 height=24></canvas>";
+    }
     this.update();
   }
   return this;
@@ -1804,7 +2062,9 @@ Neo.ViewerButton.prototype.update = function () {
   if (this.elementID == "neo-viewerSpeed") {
     var mode = Neo.painter._actionMgr.speedMode();
     var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
-    this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
+    if (this.element) {
+      this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
+    }
   }
 };
 
@@ -1832,77 +2092,94 @@ Neo.ViewerButton.rewind =
 // length/mark/count
 // update
 
-Neo.ViewerBar = function () {};
-Neo.ViewerBar.prototype.element = null;
-Neo.ViewerBar.prototype.seekElement = null;
-Neo.ViewerBar.prototype.params = null;
-Neo.ViewerBar.prototype.elementID = "";
-Neo.ViewerBar.prototype.isMouseDown = false;
-Neo.ViewerBar.prototype.seekElement = null;
-Neo.ViewerBar.prototype.markElement = null;
-Neo.ViewerBar.prototype.textElement = null;
-Neo.ViewerBar.prototype.width = 0;
-Neo.ViewerBar.prototype.length = 0;
-Neo.ViewerBar.prototype.mark = 0;
-Neo.ViewerBar.prototype.seek = 0;
+Neo.ViewerBar = class {
+  constructor() {
+    /** @type {any} */
+    this.params = null;
+    this.elementID = "";
+    this.isMouseDown = false;
+    /**@type {HTMLElement|null} */
+    this.element;
+    /**@type {HTMLElement} */
+    this.seekElement;
+    /**@type {HTMLElement} */
+    this.markElement;
+    /**@type {HTMLElement} */
+    this.textElement;
+    this.width = 0;
+    this.length = 0;
+    this.mark = 0;
+    this.seek = 0;
+  }
+};
 /**
  *
  * @param {string} elementID
- * @param {Object|null} [params]
- * @returns
+ * @param {Object} [params]
+ * @returns {Neo.ViewerBar}
  */
-
 Neo.ViewerBar.prototype.init = function (elementID, params = {}) {
   this.element = document.getElementById(elementID);
   this.params = params || {};
   this.elementID = elementID;
   this.isMouseDown = false;
+  if (this.element) {
+    this.element.style.display = "inline-block";
+    this.element.innerHTML =
+      "<div id='neo-viewerBarLeft'></div>" +
+      "<div id='neo-viewerBarMark'></div>" +
+      "<div id='neo-viewerBarText'>hoge</div>";
 
-  this.element.style.display = "inline-block";
-  this.element.innerHTML =
-    "<div id='neo-viewerBarLeft'></div>" +
-    "<div id='neo-viewerBarMark'></div>" +
-    "<div id='neo-viewerBarText'>hoge</div>";
-  this.seekElement = this.element.children[0];
-  this.markElement = this.element.children[1];
-  this.textElement = this.element.children[2];
+    if (this.element.children[0] instanceof HTMLElement) {
+      this.seekElement = this.element.children[0];
+    }
+    if (this.element.children[1] instanceof HTMLElement) {
+      this.markElement = this.element.children[1];
+    }
+    if (this.element.children[2] instanceof HTMLElement) {
+      this.textElement = this.element.children[2];
+    }
+  }
 
   this.width = this.seekElement.offsetWidth;
 
   this.length = this.params.length || 100;
   this.mark = this.length;
   this.seek = 0;
-
-  var ref = this;
-  this.element.addEventListener(
-    "pointerdown",
-    function (e) {
-      ref.isMouseDown = true;
-      ref._touchHandler(e);
-    },
-    { passive: false, capture: true },
-  );
-  this.element.addEventListener(
-    "pointermove",
-    function (e) {
-      e.preventDefault();
-      if (ref.isMouseDown) {
+  if (this.element) {
+    var ref = this;
+    this.element.addEventListener(
+      "pointerdown",
+      function (e) {
+        ref.isMouseDown = true;
         ref._touchHandler(e);
-      }
-    },
-    { passive: false, capture: true },
-  );
-  //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
-  //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
-  this.element.addEventListener(
-    "touchstart",
-    function (e) {
-      ref._touchHandler(e);
-      e.preventDefault();
-    },
-    { passive: false, capture: true },
-  );
-
+      },
+      { passive: false, capture: true },
+    );
+    this.element.addEventListener(
+      "pointermove",
+      function (e) {
+        e.preventDefault();
+        if (ref.isMouseDown) {
+          ref._touchHandler(e);
+        }
+      },
+      { passive: false, capture: true },
+    );
+    //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
+    //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
+    this.element.addEventListener(
+      "touchstart",
+      /**
+       * @param {TouchEvent} e
+       */
+      function (e) {
+        ref._touchHandler(e);
+        e.preventDefault();
+      },
+      { passive: false, capture: true },
+    );
+  }
   this.update();
   return this;
 };
@@ -1918,15 +2195,16 @@ Neo.ViewerBar.prototype.update = function () {
   this.seekElement.style.width = seekX + "px";
   this.textElement.innerHTML = this.seek + "/" + this.length;
 };
-
+/**@param {TouchEvent|PointerEvent} e */
 Neo.ViewerBar.prototype._touchHandler = function (e) {
-  if (e.offsetX === undefined) {
-    return;
+  if (e instanceof PointerEvent) {
+    if (e.offsetX === undefined) {
+      return;
+    }
+    let x = e.offsetX / this.width;
+    x = Math.max(Math.min(x, 1), 0);
+    Neo.painter._actionMgr._mark = Math.round(x * this.length);
   }
-
-  var x = e.offsetX / this.width;
-  x = Math.max(Math.min(x, 1), 0);
-  Neo.painter._actionMgr._mark = Math.round(x * this.length);
   //this.update();
   //  console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
 

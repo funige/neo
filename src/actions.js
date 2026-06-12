@@ -8,6 +8,7 @@
 
 Neo.ActionManager = class {
   constructor() {
+    /** @type {any} */
     this._items = [];
     this._head = 0;
     this._index = 0;
@@ -150,20 +151,24 @@ Neo.ActionManager.prototype.play = function () {
   var func;
   // restoreが存在するかどうか判定
   //古いPCHファイルにはrestoreが存在しないためアニメーションをスキップできない
-  const hasRestore = this._items.some((item) => item[0] === "restore");
+  const hasRestore = this._items.some(
+    (/**@type {any}**/ item) => item[0] === "restore",
+  );
   if (Neo.painter.busySkipped && hasRestore) {
     // アニメーションをスキップする時はrestoreのみを関数として扱う
     func =
-      item[0] && this[item[0]] && item[0] === "restore" ? item[0] : "dummy";
+      item[0] && /**@type {any}**/ (this)[item[0]] && item[0] === "restore"
+        ? item[0]
+        : "dummy";
   } else {
     // アニメーションを再生する時は全ての関数を実行する
-    func = item[0] && this[item[0]] ? item[0] : "dummy";
+    func = item[0] && /**@type {any}**/ (this)[item[0]] ? item[0] : "dummy";
   }
 
-  var ref = this;
+  const ref = this;
   var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
-  this[func](item, function (result) {
+  /**@type {any}*/ (this)[func](item, function (/**@type {any}*/ result) {
     if (result) {
       if (
         Neo.painter.busySkipped &&
@@ -354,6 +359,14 @@ Neo.ActionManager.prototype.freeHandFast = function (x0, y0, lineType) {
   if (callback && typeof callback == "function") callback(true);
 };
 
+/**
+ * フリーハンド
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} lineType
+ */
 Neo.ActionManager.prototype.freeHandMove = function (x0, y0, x1, y1, lineType) {
   if (arguments.length > 1) {
     var oe = Neo.painter;
@@ -912,13 +925,23 @@ Neo.ActionManager.prototype.text = function (
   var layer = oe.current;
 
   if (typeof arguments[0] != "object") {
-    x = Number(x);
-    y = Number(y);
-    color = Number(color);
-    alpha = Number(alpha);
+    const numX = Number(x);
+    const numY = Number(y);
+    const numColor = Number(color);
+    const numAlpha = Number(alpha);
 
-    this.push("text", layer, x, y, color, alpha, string, size, family);
-    oe.doText(layer, x, y, color, alpha, string, size, family);
+    this.push(
+      "text",
+      layer,
+      numX,
+      numY,
+      numColor,
+      numAlpha,
+      string,
+      size,
+      family,
+    );
+    oe.doText(layer, numX, numY, numColor, numAlpha, string, size, family);
   } else {
     const item = arguments[0];
 
@@ -1049,7 +1072,15 @@ Neo.initViewer = function (pch) {
   pageview.style.height = pageHeight + "px";
 
   Neo.canvas = document.getElementById("neo-canvas");
+  if (!Neo.canvas) {
+    console.error("initViewer: Canvas element not found");
+    return;
+  }
   Neo.container = document.getElementById("neo-container");
+  if (!Neo.container) {
+    console.error("initViewer: Container element not found");
+    return;
+  }
   Neo.container.style.backgroundColor = Neo.config.color_back;
   Neo.container.style.border = "0";
 
@@ -1129,7 +1160,9 @@ Neo.initViewer = function (pch) {
     "pointerup",
     function () {
       Neo.painter._actionMgr.isMouseDown = false;
-      Neo.viewerBar.isMouseDown = false;
+      if (Neo.viewerBar) {
+        Neo.viewerBar.isMouseDown = false;
+      }
     },
     false,
   );
@@ -1153,7 +1186,8 @@ Neo.initViewer = function (pch) {
 Neo.startViewer = function () {
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "pch";
-    if (!document[name]) document[name] = Neo;
+    if (!(/** @type {any} */ (document)[name]))
+      /** @type {any} */ (document)[name] = Neo;
     if (Neo.applet.parentNode) {
       Neo.applet.parentNode.removeChild(Neo.applet);
     }
@@ -1246,15 +1280,29 @@ Neo.startViewer = function () {
 
   setTimeout(function () {
     Neo.viewerPlay = new Neo.ViewerButton().init("neo-viewerPlay");
+    if (!Neo.viewerPlay) {
+      console.error("startViewer: ViewerPlay not found");
+      return;
+    }
     Neo.viewerPlay.setSelected(true);
     Neo.viewerPlay.onmouseup = function () {
       Neo.painter.onplay();
     };
     Neo.viewerStop = new Neo.ViewerButton().init("neo-viewerStop");
+    if (!Neo.viewerStop) {
+      console.error("startViewer: ViewerStop not found");
+      return;
+    }
+
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
     Neo.viewerSpeed = new Neo.ViewerButton().init("neo-viewerSpeed");
+    if (!Neo.viewerSpeed) {
+      console.error("startViewer: ViewerSpeed not found");
+      return;
+    }
+
     Neo.viewerSpeed.onmouseup = function () {
       Neo.painter.onspeed();
       this.update();
@@ -1319,14 +1367,10 @@ Neo.getPCH = function (filename, callback) {
  * * @typedef {Object} PCHData
  * @property {number} width - キャンバスの横幅
  * @property {number} height - キャンバスの高さ
- * @property {Array} data - 描画命令の配列（fixPCH適用済み）
+ * @property {Array<any>} data - 描画命令の配列（fixPCH適用済み）
  * * @param {ArrayBuffer} rawdata - fetchで取得した生のバイナリデータ
  * @returns {PCHData|null} デコード成功時はオブジェクト、失敗時はnullを返す
  * * @example
- * const pch = Neo.decodePCH(buffer);
- * if (pch) {
- * console.log(`Canvas size: ${pch.width}x${pch.height}`);
- * }
  */
 Neo.decodePCH = function (rawdata) {
   var byteArray = new Uint8Array(rawdata);
@@ -1391,6 +1435,7 @@ Neo.suspendDraw = function () {
   Neo.painter.onstop();
 };
 
+/** @param {number} value */
 Neo.setSpeed = function (value) {
   Neo.speed = value;
 };
@@ -1410,6 +1455,9 @@ Neo.setVisit = function (layer, value) {
   );
 };
 
+/**
+ * @param {number} value
+ */
 Neo.setMark = function (value) {
   Neo.painter._actionMgr._mark = value;
   Neo.painter.onmark();

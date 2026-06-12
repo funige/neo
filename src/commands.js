@@ -2,6 +2,7 @@
 //@ts-check
 Neo.CommandBase = class {
   constructor() {
+    /**@type {any} */
     this.data = null;
   }
 };
@@ -20,6 +21,7 @@ Neo.CommandBase.prototype.execute = function () {};
  */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
   /** @param {ZoomPlusData} data */
+  /**@param {any} data */
   constructor(data) {
     super();
     this.data = data;
@@ -43,6 +45,7 @@ Neo.ZoomPlusCommand.prototype.execute = function () {
  */
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
   /** @param {ZoomMinusData} data */
+  /**@param {any} data */
   constructor(data) {
     super();
     this.data = data;
@@ -65,6 +68,7 @@ Neo.ZoomMinusCommand.prototype.execute = function () {
   ---------------------------------------------------
 */
 Neo.UndoCommand = class extends Neo.CommandBase {
+  /**@param {any} data */
   constructor(data) {
     super();
     this.data = data;
@@ -76,6 +80,7 @@ Neo.UndoCommand.prototype.execute = function () {
 };
 
 Neo.RedoCommand = class extends Neo.CommandBase {
+  /**@param {any} data */
   constructor(data) {
     super();
     this.data = data;
@@ -86,6 +91,7 @@ Neo.RedoCommand.prototype.execute = function () {
 };
 
 Neo.WindowCommand = class extends Neo.CommandBase {
+  /** @param {any} data */
   constructor(data) {
     super();
     this.data = data;
@@ -106,6 +112,7 @@ Neo.WindowCommand.prototype.execute = function () {
 };
 
 Neo.SubmitCommand = class extends Neo.CommandBase {
+  /**@param {any} data */
   constructor(data) {
     super();
     this.data = data;
@@ -117,6 +124,7 @@ Neo.SubmitCommand.prototype.execute = function () {
 };
 
 Neo.CopyrightCommand = class extends Neo.CommandBase {
+  /**@param {any} data */
   constructor(data) {
     super();
     this.data = data;

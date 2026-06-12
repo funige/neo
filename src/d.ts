@@ -2,7 +2,7 @@
 interface NeoInterface {
     [key: string]: any;
     painter: any; // 必要に応じて具体的な型に置き換え
-    props: { [key: string]: any };
+    // props: { [key: string]: any };
 }
 
 // 2. グローバル変数「Neo」として宣言する
@@ -10,5 +10,5 @@ interface NeoInterface {
 declare var Neo: NeoInterface;
 
 // 3. 他のグローバル変数の宣言
-declare var oe: any; // Painter型を別途定義しているならそれに置き換え
+// declare var oe: any; // Painter型を別途定義しているならそれに置き換え
 declare var LZString: any;
