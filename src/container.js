@@ -862,26 +862,6 @@ Neo.applyStyle = function (name, defaultColor) {
     Neo.config[name] = Neo.rules[name] || defaultColor;
   }
 };
-// /** @param {HTMLElement|null} element */
-// Neo.getInheritColor = function (element) {
-//   var result = "#000000";
-//   while (element && element.style) {
-//     if (element.style.color != "") {
-//       result = element.style.color;
-//       break;
-//     }
-//     const textAttributes = element.attributes.getNamedItem("text");
-
-//     if (textAttributes) {
-//       result = textAttributes.value;
-//       console.log("result", result);
-//       break;
-//     }
-//     element =
-//       element.parentNode instanceof HTMLElement ? element.parentNode : null;
-//   }
-//   return result;
-// };
 
 Neo.backgroundImage = function () {
   var c1 = Neo.painter.getColor(Neo.config.color_bk) | 0xff000000;
