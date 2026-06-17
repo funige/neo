@@ -333,6 +333,29 @@ Neo.init2 = function () {
     },
     false,
   );
+  /**
+   * Chromeのメモリーセーバによるタブ破棄対策
+   * 非アクティブになった時にタイトルタグにアスタリスクを追加
+   */
+  //オリジナルのタイトルタグを保持
+  const originalTitle = document.title;
+  document.addEventListener("visibilitychange", () => {
+    if (Neo.config.neo_visibility_change_title_rewrite === "true") {
+      // ページが見えている時は元に戻す
+      if (document.visibilityState === "visible") {
+        document.title = originalTitle;
+      }
+      // ページが隠れた時はタイマーをセット
+      else if (document.visibilityState === "hidden") {
+        setTimeout(() => {
+          if (document.visibilityState === "hidden") {
+            document.title = `${originalTitle} *`;
+            console.log(document.title);
+          }
+        }, 3000);
+      }
+    }
+  });
 };
 /**
  * 初期設定
