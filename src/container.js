@@ -348,9 +348,11 @@ Neo.init2 = function () {
       // ページが隠れた時はタイマーをセット
       else if (document.visibilityState === "hidden") {
         setTimeout(() => {
-          if (document.visibilityState === "hidden") {
+          if (
+            document.visibilityState === "hidden" &&
+            document.title === originalTitle
+          ) {
             document.title = `${originalTitle} *`;
-            console.log(document.title);
           }
         }, 3000);
       }
