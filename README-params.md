@@ -79,6 +79,21 @@ Windows版Chrome149でテストし有効性を確認しました。
 しかしながら、もっとも確実な回避方法は、Chromeの設定でサイトを ｢常にアクティブにするサイト｣ 除外リストに追加する事です。  
 **デフォルトはfalse** です。
 
+- **&lt;PARAM NAME="neo_color_picker_id" value="neo-colorPicker">**   
+(id名、"neo-colorPicker"はあくまでも一例で、各自で自由に設定できます。)    
+PaintBBS NEO更新。外部の`<input type="color">`を使用して描画色を設定できるようになりました。   
+その時のIDを実際の実装に合わせて指定します。  
+NEO本体で指定した色が
+`<input type="color" id="neo-colorPicker">`
+に入ります。  
+id名は自由に設定可能です。  
+このオプションはそのidを指定するためのものです。   
+実装例。  
+```
+<input id="neo-colorPicker" type="color" onChange="Neo.setColor(this.value)">  
+```
+sampleと、sample2にも実装しましたので、動作するsampleで確認したほうが早いかもしれません。    
+
 ## applet-dummyタグとparamタグを使用しない新しい設定
 - `param`タグは2022年にHTML Living Standardから削除されており、突然使用できなくなる可能性があります。    
 そのため、v1.7.2でデーターセットとオブジェクトによる設定に対応しました。  
