@@ -1843,6 +1843,7 @@ Neo.Painter.prototype.getBound = function (x0, y0, x1, y1, r) {
   }
   return [left, top, width, height];
 };
+
 /**
  * 色を取得
  * @param {string} [color]
@@ -1853,7 +1854,30 @@ Neo.Painter.prototype.getColor = function (color = "") {
   const g = parseInt(c.slice(3, 5), 16);
   const b = parseInt(c.slice(5, 7), 16);
   const a = Math.floor(this.alpha * 255);
-  return (a << 24) | (b << 16) | (g << 8) | r;
+
+  const value = (a << 24) | (b << 16) | (g << 8) | r;
+
+  //<input type="color">で色を取得するElementのID
+  /**@type {string} */
+  const colorPickerId = Neo.config.neo_color_picker_id;
+  if (colorPickerId) {
+    // value から各成分を再度取り出し、#RRGGBB の順で結合し直す
+    // 0xFF は 11111111 (2進数) で、特定の8ビットだけを抽出するマスク
+    const rb = value & 0xff; // 元の式での r
+    const gb = (value >> 8) & 0xff; // 元の式での g
+    const bb = (value >> 16) & 0xff; // 元の式での b
+
+    // 正しい順序 #RRGGBB で文字列を作成
+    const hex =
+      "#" + ((1 << 24) + (rb << 16) + (gb << 8) + bb).toString(16).slice(1);
+
+    const colorPicker = document.getElementById(colorPickerId);
+    if (colorPicker instanceof HTMLInputElement) {
+      colorPicker.value = hex;
+    }
+  }
+
+  return value;
 };
 
 /**
@@ -1869,13 +1893,26 @@ Neo.Painter.prototype.getColorString = function (c) {
 };
 /**
  * 色をセット
- * @param {string|number} c
+ * @param {string|number} color
  */
-Neo.Painter.prototype.setColor = function (c) {
-  if (typeof c != "string") c = this.getColorString(c);
-  this.foregroundColor = c;
+Neo.Painter.prototype.setColor = function (color) {
+  if (typeof color != "string") color = this.getColorString(color);
+  this.foregroundColor = color;
 
   Neo.updateUI();
+};
+
+/**
+ * カラーピッカーで色をセット
+ * @param {string} color - <input type="color">で取得した色
+ */
+Neo.setColor = function (color) {
+  Neo.painter.setColor(color); //色をセット
+  var colorTip = Neo.ColorTip.getCurrent();
+  if (colorTip) {
+    //カラーチップに色をセット
+    colorTip.setColor(color);
+  }
 };
 
 /**
