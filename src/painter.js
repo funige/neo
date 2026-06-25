@@ -1869,11 +1869,11 @@ Neo.Painter.prototype.getColorString = function (c) {
 };
 /**
  * 色をセット
- * @param {string|number} c
+ * @param {string|number} color
  */
-Neo.Painter.prototype.setColor = function (c) {
-  if (typeof c != "string") c = this.getColorString(c);
-  this.foregroundColor = c;
+Neo.Painter.prototype.setColor = function (color) {
+  if (typeof c != "string") color = this.getColorString(color);
+  this.foregroundColor = color;
 
   Neo.updateUI();
 };
