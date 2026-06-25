@@ -6309,6 +6309,10 @@ Neo.Painter.prototype.doText = function (
   this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 };
 
+/**
+ * Bzで操作中かどうか
+ * @returns {boolean} - Bzで操作中ならtrueが返る
+ */
 Neo.Painter.prototype.isUIPaused = function () {
   if (this.drawType == Neo.Painter.DRAWTYPE_BEZIER) {
     if (this.tool.step && this.tool.step > 0) {
@@ -9917,7 +9921,6 @@ Neo.Button.prototype.init = function (elementID, params = {}) {
     this.element.onmouseout = function (e) {
       ref._mouseOutHandler(e);
     };
-    /** @param {MouseEvent} e */
     this.element.addEventListener(
       "touchstart",
       /**
@@ -10161,18 +10164,18 @@ Neo.ColorTip.prototype.init = function (elementID, params = {}) {
     this.element.onmouseout = function (e) {
       ref._mouseOutHandler(e);
     };
-    /** @param {TouchEvent} e */
     this.element.addEventListener(
       "touchstart",
+      /** @param {TouchEvent} e */
       function (e) {
         ref._mouseDownHandler(e);
         e.preventDefault();
       },
       { passive: false, capture: true },
     );
-    /** @param {TouchEvent} e */
     this.element.addEventListener(
       "touchend",
+      /** @param {TouchEvent} e */
       function (e) {
         ref._mouseUpHandler(e);
       },
@@ -10368,7 +10371,6 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
     this.element.onmouseout = function (e) {
       ref._mouseOutHandler(e);
     };
-    /**@param {TouchEvent} e */
     this.element.addEventListener(
       "touchstart",
       /**
@@ -10380,7 +10382,6 @@ Neo.ToolTip.prototype.init = function (elementID, params = {}) {
       },
       { passive: false, capture: true },
     );
-    /**@param {TouchEvent} e */
     this.element.addEventListener(
       "touchend",
       /**
