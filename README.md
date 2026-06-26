@@ -131,7 +131,7 @@ id名は自由に設定可能です。
 このオプションはそのidを指定するためのものです。   
 実装例。  
 ```
-<input id="neo-colorPicker" type="color" onChange="Neo.setColor(this.value)">  
+<input id="neo-colorPicker" type="color" oninput="Neo.setColor(this.value)">  
 ```
 sampleと、sample2にも実装しましたので、動作するsampleで確認したほうが早いかもしれません。    
 
