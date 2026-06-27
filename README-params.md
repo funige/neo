@@ -83,7 +83,7 @@ Windows版Chrome149でテストし有効性を確認しました。
 (id名、"neo-colorPicker"はあくまでも一例で、各自で自由に設定できます。)    
 PaintBBS NEO更新。外部の`<input type="color">`を使用して描画色を設定できるようになりました。   
 その時のIDを実際の実装に合わせて指定します。  
-NEO本体で指定した色が
+NEO本体で変更した色が
 `<input type="color" id="neo-colorPicker">`
 に入ります。  
 id名は自由に設定可能です。  
@@ -92,7 +92,15 @@ id名は自由に設定可能です。
 ```
 <input id="neo-colorPicker" type="color" oninput="Neo.setColor(this.value)">  
 ```
-sampleと、sample2にも実装しましたので、動作するsampleで確認したほうが早いかもしれません。    
+`<input type="color">`ではなく、Javascriptのライブラリを使ったカラーピッカーにNEO本体で変更した色を反映させたい時もあります。  
+そのような時は  
+```
+document.addEventListener("neo:colorchange", (e) => {
+    colorWheel.hex = e.detail.hex;
+});
+```
+カスタムイベントを受けとってカラーピッカーに反映させます。  
+sampleと、sample2に実装しましたので、動作するsampleで確認したほうが早いかもしれません。      
 
 ## applet-dummyタグとparamタグを使用しない新しい設定
 - `param`タグは2022年にHTML Living Standardから削除されており、突然使用できなくなる可能性があります。    
