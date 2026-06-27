@@ -124,6 +124,10 @@ document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
 
+document.getElementById("colorWheelContainer").addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+});
+
 // please call redraw() after changing some appearance properties.
 colorWheel.wheelDiameter = 100;
 colorWheel.wheelThickness = 8;
