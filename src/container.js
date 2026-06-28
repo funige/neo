@@ -1399,7 +1399,9 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
    リサイズ対応
    -----------------------------------------------------------------------
  */
-
+/**
+ * @returns {void}
+ */
 Neo.updateWindow = function () {
   const windowView = document.getElementById("neo-windowView");
   const pageView = document.getElementById("neo-pageView");
@@ -1419,7 +1421,15 @@ Neo.updateWindow = function () {
       pageView.appendChild(Neo.container);
     }
   }
+
   Neo.resizeCanvas();
+
+  //ウィンドウビューに切り替わった事を通知するカスタムイベント
+  document.dispatchEvent(
+    new CustomEvent("neo:fullscreenchange", {
+      detail: { fullscreen: Neo.fullScreen },
+    }),
+  );
 };
 
 Neo.resizeCanvas = function () {
