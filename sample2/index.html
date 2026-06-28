@@ -123,11 +123,21 @@ var colorWheel = new ReinventedColorWheel({
         Neo.setColor(color.hex);
     },
 });
-
+/** 
+ * NEOの色の変更を検出して変更された色をHEXで取得
+ */
 document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
-
+/**
+ * ウィンドウビューページビュー切り替えを検出
+ */
+document.addEventListener("neo:fullscreenchange", (e) => {
+	console.log("fullscreen",e.detail.fullscreen);//true|false
+});
+/** 
+ * カラーホイールの長押しで右クリックメニューが開くのを防止 
+ */ 
 document.getElementById("colorWheelContainer").addEventListener("contextmenu", (e) => {
   e.preventDefault();
 });
