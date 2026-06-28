@@ -157,7 +157,7 @@ sampleとsample2に[luncheon/reinvented-color-wheel: A vanilla-js touch-friendly
 #### ver1.7.8 (2026/06/25)
 - **&lt;PARAM NAME="neo_color_picker_id" value="neo-colorPicker">**   
 (id名、"neo-colorPicker"はあくまでも一例で、各自で自由に設定できます。)    
-PaintBBS NEO更新。外部の`<input type="color">`を使用して描画色を設定できるようになりました。   
+外部の`<input type="color">`を使用して描画色を設定できるようになりました。   
 その時のIDを実際の実装に合わせて指定します。  
 NEO本体で変更した色が
 `<input type="color" id="neo-colorPicker">`
