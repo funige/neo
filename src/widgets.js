@@ -2108,102 +2108,102 @@ Neo.ViewerBar = class {
     this.mark = 0;
     this.seek = 0;
   }
-};
-/**
- *
- * @param {string} elementID
- * @param {Object} [params]
- * @returns {Neo.ViewerBar}
- */
-Neo.ViewerBar.prototype.init = function (elementID, params = {}) {
-  this.element = document.getElementById(elementID);
-  this.params = params || {};
-  this.elementID = elementID;
-  this.isMouseDown = false;
-  if (this.element) {
-    this.element.style.display = "inline-block";
-    this.element.innerHTML =
-      "<div id='neo-viewerBarLeft'></div>" +
-      "<div id='neo-viewerBarMark'></div>" +
-      "<div id='neo-viewerBarText'>hoge</div>";
+  /**
+   *
+   * @param {string} elementID
+   * @param {Object} [params]
+   * @returns {Neo.ViewerBar}
+   */
+  init(elementID, params = {}) {
+    this.element = document.getElementById(elementID);
+    this.params = params || {};
+    this.elementID = elementID;
+    this.isMouseDown = false;
+    if (this.element) {
+      this.element.style.display = "inline-block";
+      this.element.innerHTML =
+        "<div id='neo-viewerBarLeft'></div>" +
+        "<div id='neo-viewerBarMark'></div>" +
+        "<div id='neo-viewerBarText'>hoge</div>";
 
-    if (this.element.children[0] instanceof HTMLElement) {
-      this.seekElement = this.element.children[0];
+      if (this.element.children[0] instanceof HTMLElement) {
+        this.seekElement = this.element.children[0];
+      }
+      if (this.element.children[1] instanceof HTMLElement) {
+        this.markElement = this.element.children[1];
+      }
+      if (this.element.children[2] instanceof HTMLElement) {
+        this.textElement = this.element.children[2];
+      }
     }
-    if (this.element.children[1] instanceof HTMLElement) {
-      this.markElement = this.element.children[1];
-    }
-    if (this.element.children[2] instanceof HTMLElement) {
-      this.textElement = this.element.children[2];
-    }
-  }
 
-  this.width = this.seekElement.offsetWidth;
+    this.width = this.seekElement.offsetWidth;
 
-  this.length = this.params.length || 100;
-  this.mark = this.length;
-  this.seek = 0;
-  if (this.element) {
-    var ref = this;
-    this.element.addEventListener(
-      "pointerdown",
-      function (e) {
-        ref.isMouseDown = true;
-        ref._touchHandler(e);
-      },
-      { passive: false, capture: true },
-    );
-    this.element.addEventListener(
-      "pointermove",
-      function (e) {
-        e.preventDefault();
-        if (ref.isMouseDown) {
+    this.length = this.params.length || 100;
+    this.mark = this.length;
+    this.seek = 0;
+    if (this.element) {
+      var ref = this;
+      this.element.addEventListener(
+        "pointerdown",
+        function (e) {
+          ref.isMouseDown = true;
           ref._touchHandler(e);
-        }
-      },
-      { passive: false, capture: true },
-    );
-    //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
-    //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
-    this.element.addEventListener(
-      "touchstart",
-      /**
-       * @param {TouchEvent} e
-       */
-      function (e) {
-        ref._touchHandler(e);
-        e.preventDefault();
-      },
-      { passive: false, capture: true },
-    );
-  }
-  this.update();
-  return this;
-};
-
-Neo.ViewerBar.prototype.update = function () {
-  this.mark = Neo.painter._actionMgr._mark;
-  this.seek = Neo.painter._actionMgr._head;
-
-  var markX = (this.mark / this.length) * this.width;
-  this.markElement.style.left = markX + "px";
-
-  var seekX = (this.seek / this.length) * this.width;
-  this.seekElement.style.width = seekX + "px";
-  this.textElement.innerHTML = this.seek + "/" + this.length;
-};
-/**@param {TouchEvent|PointerEvent} e */
-Neo.ViewerBar.prototype._touchHandler = function (e) {
-  if (e instanceof PointerEvent) {
-    if (e.offsetX === undefined) {
-      return;
+        },
+        { passive: false, capture: true },
+      );
+      this.element.addEventListener(
+        "pointermove",
+        function (e) {
+          e.preventDefault();
+          if (ref.isMouseDown) {
+            ref._touchHandler(e);
+          }
+        },
+        { passive: false, capture: true },
+      );
+      //  this.element.onmouseup = function(e) { this.isMouseDown = false; }
+      //  this.element.onmouseout = function(e) { this.isMouseDown = false; }
+      this.element.addEventListener(
+        "touchstart",
+        /**
+         * @param {TouchEvent} e
+         */
+        function (e) {
+          ref._touchHandler(e);
+          e.preventDefault();
+        },
+        { passive: false, capture: true },
+      );
     }
-    let x = e.offsetX / this.width;
-    x = Math.max(Math.min(x, 1), 0);
-    Neo.painter._actionMgr._mark = Math.round(x * this.length);
+    this.update();
+    return this;
   }
-  //this.update();
-  //  console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
 
-  Neo.painter.onmark();
+  update() {
+    this.mark = Neo.painter._actionMgr._mark;
+    this.seek = Neo.painter._actionMgr._head;
+
+    var markX = (this.mark / this.length) * this.width;
+    this.markElement.style.left = markX + "px";
+
+    var seekX = (this.seek / this.length) * this.width;
+    this.seekElement.style.width = seekX + "px";
+    this.textElement.innerHTML = this.seek + "/" + this.length;
+  }
+  /**@param {TouchEvent|PointerEvent} e */
+  _touchHandler(e) {
+    if (e instanceof PointerEvent) {
+      if (e.offsetX === undefined) {
+        return;
+      }
+      let x = e.offsetX / this.width;
+      x = Math.max(Math.min(x, 1), 0);
+      Neo.painter._actionMgr._mark = Math.round(x * this.length);
+    }
+    //this.update();
+    //  console.log('mark=', this.mark, 'head=', Neo.painter._actionMgr._head);
+
+    Neo.painter.onmark();
+  }
 };

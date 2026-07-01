@@ -18,8 +18,6 @@ Neo.ToolBase.prototype.reverse = false;
 /** @param {Neo.Painter} oe * */
 Neo.ToolBase.prototype.init = function (oe) {};
 Neo.ToolBase.prototype.kill = function () {};
-/** @param {Neo.Painter} oe * */
-Neo.ToolBase.prototype.transformForZoom = function (oe) {};
 Neo.ToolBase.prototype.lineType = Neo.Painter.LINETYPE_NONE;
 
 /** @param {Neo.Painter} oe * */
@@ -369,14 +367,12 @@ Neo.DrawToolBase.prototype.drawCursor = function (oe) {
   var y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
   var r = d * 0.5 * oe.zoom;
 
-  if (
-    !(
-      x > -r &&
-      y > -r &&
-      x < oe.destCanvas.width + r &&
-      y < oe.destCanvas.height + r
-    )
-  )
+  if (!(
+    x > -r &&
+    y > -r &&
+    x < oe.destCanvas.width + r &&
+    y < oe.destCanvas.height + r
+  ))
     return;
 
   var ctx = oe.destCanvasCtx;
