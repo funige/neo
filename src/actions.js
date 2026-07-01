@@ -982,10 +982,10 @@ Neo.ActionManager = class {
     }
   }
 
-  dummy = function () {
+  dummy() {
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
-  };
+  }
 };
 
 /*
