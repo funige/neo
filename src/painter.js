@@ -12,16 +12,28 @@ Neo.Painter = class {
     this.scrollBarY = 0;
     this.scrollWidth = 0;
     this.scrollHeight = 0;
+    this.lineWidth = 1;
+    this.alpha = 1;
+    this.zoom = 1;
+    this.zoomX = 0;
+    this.zoomY = 0;
+    this.isMouseDown = false;
+    this.isMouseDownRight = false;
+    this.isSpaceDown = false;
+    this.isBezierActive = false;
+    this.isCopyActive = false;
+    this.tempX = 0;
+    this.tempY = 0;
+    /** @type {HTMLElement|null} */
+    this.container = null;
+    /** @type {any} */
+    this.tool = null;
+    /** @type {HTMLElement|null} */
+    this.inputText = null;
+    /** @type {number[]|null} */
+    this.cursorRect = null;
   }
 };
-/** @type {HTMLElement|null} */
-Neo.Painter.prototype.container = null;
-/** @type {any} */
-Neo.Painter.prototype.tool = null;
-/** @type {HTMLElement|null} */
-Neo.Painter.prototype.inputText = null;
-/** @type {number[]|null} */
-Neo.Painter.prototype.cursorRect = null;
 
 //Canvas Info
 /** @type {Array<HTMLCanvasElement>} */
@@ -37,8 +49,6 @@ Neo.Painter.prototype.current = 0;
 Neo.Painter.prototype.tempCanvas;
 /** @type {CanvasRenderingContext2D}*/
 Neo.Painter.prototype.tempCanvasCtx;
-Neo.Painter.prototype.tempX = 0;
-Neo.Painter.prototype.tempY = 0;
 /** @type {Uint32Array|null} */
 Neo.Painter.prototype.temp = null;
 
@@ -50,19 +60,6 @@ Neo.Painter.prototype.destCanvasCtx;
 
 Neo.Painter.prototype.backgroundColor = "#ffffff";
 Neo.Painter.prototype.foregroundColor = "#000000";
-
-Neo.Painter.prototype.lineWidth = 1;
-Neo.Painter.prototype.alpha = 1;
-Neo.Painter.prototype.zoom = 1;
-Neo.Painter.prototype.zoomX = 0;
-Neo.Painter.prototype.zoomY = 0;
-
-Neo.Painter.prototype.isMouseDown = false;
-Neo.Painter.prototype.isMouseDownRight = false;
-Neo.Painter.prototype.isSpaceDown = false;
-
-Neo.Painter.prototype.isBezierActive = false;
-Neo.Painter.prototype.isCopyActive = false;
 
 /** @type {any} */
 Neo.Painter.prototype.prevMouseX = null;
@@ -1811,7 +1808,7 @@ Neo.Painter.prototype.updateDestCanvas = function (
 };
 
 /**
- * ブラシで描画した時に、書き換える必要が「範囲」を計算する。
+ * ブラシで描画した時に、書き換える必要がある「範囲」を計算する。
  * @description
  * 線を引いた時に、キャンバス全体を再描画すると重くなるため
  * 「線が引かれた場所」の「最小限の矩形」だけ更新する必要がある。

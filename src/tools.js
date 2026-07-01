@@ -2,14 +2,15 @@
 //@ts-check
 
 Neo.ToolBase = class {
-  constructor() {}
+  constructor() {
+    this.startX = 0;
+    this.startY = 0;
+  }
 };
 Neo.ToolBase.prototype.isDrag = false;
 Neo.ToolBase.prototype.isUpMove = false;
 Neo.ToolBase.prototype.ticking = false;
 
-Neo.ToolBase.prototype.startX = 0;
-Neo.ToolBase.prototype.startY = 0;
 /**@type {any} */
 Neo.ToolBase.prototype.type = null;
 Neo.ToolBase.prototype.step = 0;
@@ -1081,6 +1082,10 @@ Neo.EraseAllTool.prototype.rollOverHandler = function (oe) {};
 Neo.EffectToolBase = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.startX = 0;
+    this.startY = 0;
+    this.latestX = 0;
+    this.latestY = 0;
   }
 };
 Neo.EffectToolBase.prototype.isUpMove = false;
@@ -1088,11 +1093,7 @@ Neo.EffectToolBase.prototype.isEllipse = false;
 Neo.EffectToolBase.prototype.isFill = false;
 Neo.EffectToolBase.prototype.endX = 0;
 Neo.EffectToolBase.prototype.endY = 0;
-Neo.EffectToolBase.prototype.startX = 0;
-Neo.EffectToolBase.prototype.startY = 0;
 Neo.EffectToolBase.prototype.ticking = false;
-Neo.EffectToolBase.prototype.latestX = 0;
-Neo.EffectToolBase.prototype.latestY = 0;
 Neo.EffectToolBase.prototype.defaultAlpha = 0;
 /**
  * @param {Neo.Painter} oe
