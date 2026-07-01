@@ -97,12 +97,12 @@ document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
 ```
-のように記述する事で、ライブラリのカラーピッカーにNEOで変更した色を渡す事ができるようになりました。     
+このように記述する事で、ライブラリのカラーピッカーにNEOで変更した色を渡す事ができるようになりました。     
 カラーピッカーからNEOへの色のセットは  
 ```
 Neo.setColor(color.hex);
 ```
-のような形式で16進数を渡すだけです。  
+このような形式で16進数を渡すだけです。  
 [luncheon/reinvented-color-wheel: A vanilla-js touch-friendly HSV color picker inspired by Farbtastic Color Picker.](https://github.com/luncheon/reinvented-color-wheel)  
 を使用した例を、sampleに実装しています。  
 また、その他のライブラリでも使用できます。  
