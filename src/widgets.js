@@ -45,137 +45,137 @@ Neo.Button = class {
     /** @type {((Button: Neo.Button) => void) | null} */
     this.onmouseout = null;
   }
-};
-/**
- * @param {string} elementID
- * @param {Object} [params]
- * @returns {Neo.Button|null}
- */
-Neo.Button.prototype.init = function (elementID, params = {}) {
-  this.element = document.getElementById(elementID);
-  this.params = params || {};
-  this.elementID = elementID;
-  this.selected = false;
-  this.isMouseDown = false;
-
-  var ref = this;
-  if (this.element) {
-    /** @param {MouseEvent} e */
-    this.element.onmousedown = function (e) {
-      ref._mouseDownHandler(e);
-    };
-    /** @param {MouseEvent} e */
-    this.element.onmouseup = function (e) {
-      ref._mouseUpHandler(e);
-    };
-    /** @param {MouseEvent} e */
-    this.element.onmouseover = function (e) {
-      ref._mouseOverHandler(e);
-    };
-    /** @param {MouseEvent} e */
-    this.element.onmouseout = function (e) {
-      ref._mouseOutHandler(e);
-    };
-    this.element.addEventListener(
-      "touchstart",
-      /**
-       * @param {TouchEvent} e
-       */
-      function (e) {
-        ref._mouseDownHandler(e);
-        e.preventDefault();
-      },
-      { passive: false, capture: true },
-    );
-    this.element.addEventListener(
-      "touchend",
-      /**
-       * @param {TouchEvent} e
-       */
-      function (e) {
-        ref._mouseUpHandler(e);
-      },
-      { passive: false, capture: true },
-    );
-
-    this.element.className = "buttonOff";
-  }
-
   /**
-   * @param {number} wait
+   * @param {string} elementID
+   * @param {Object} [params]
+   * @returns {Neo.Button|null}
    */
-  this.disable = function (wait) {
-    if (this.element) {
-      this.element.style.pointerEvents = "none";
-      this.element.style.opacity = "0.5";
-    }
-    if (wait) {
-      setTimeout(function () {
-        ref.enable();
-      }, wait);
-    }
-  };
-
-  this.enable = function () {
-    if (this.element) {
-      this.element.style.pointerEvents = "inherit";
-      this.element.style.opacity = "1.0";
-    }
-  };
-  return this;
-};
-/**
- * @param {MouseEvent|TouchEvent} e
- */
-Neo.Button.prototype._mouseDownHandler = function (e) {
-  if (Neo.painter.isUIPaused()) return;
-  this.isMouseDown = true;
-
-  if (this.params.type == "fill" && this.selected == false) {
-    for (let i = 0; i < Neo.toolButtons.length; i++) {
-      /** @type {any} */
-      const toolTip = Neo.toolButtons[i];
-      toolTip.setSelected(this.selected ? false : true);
-    }
-    Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
-  }
-
-  if (this.onmousedown) this.onmousedown(this);
-};
-/** @param {MouseEvent|TouchEvent} e */
-Neo.Button.prototype._mouseUpHandler = function (e) {
-  if (this.isMouseDown) {
+  init(elementID, params = {}) {
+    this.element = document.getElementById(elementID);
+    this.params = params || {};
+    this.elementID = elementID;
+    this.selected = false;
     this.isMouseDown = false;
 
-    if (this.onmouseup) this.onmouseup(this);
-  }
-};
-/** @param {MouseEvent} e */
-Neo.Button.prototype._mouseOutHandler = function (e) {
-  if (this.isMouseDown) {
-    this.isMouseDown = false;
-    if (this.onmouseout) this.onmouseout(this);
-  }
-};
-/** @param {MouseEvent} e */
-Neo.Button.prototype._mouseOverHandler = function (e) {
-  if (this.onmouseover) this.onmouseover(this);
-};
-/**
- * @param {boolean} selected
- */
-Neo.Button.prototype.setSelected = function (selected) {
-  if (this.element) {
-    if (selected) {
-      this.element.className = "buttonOn";
-    } else {
+    var ref = this;
+    if (this.element) {
+      /** @param {MouseEvent} e */
+      this.element.onmousedown = function (e) {
+        ref._mouseDownHandler(e);
+      };
+      /** @param {MouseEvent} e */
+      this.element.onmouseup = function (e) {
+        ref._mouseUpHandler(e);
+      };
+      /** @param {MouseEvent} e */
+      this.element.onmouseover = function (e) {
+        ref._mouseOverHandler(e);
+      };
+      /** @param {MouseEvent} e */
+      this.element.onmouseout = function (e) {
+        ref._mouseOutHandler(e);
+      };
+      this.element.addEventListener(
+        "touchstart",
+        /**
+         * @param {TouchEvent} e
+         */
+        function (e) {
+          ref._mouseDownHandler(e);
+          e.preventDefault();
+        },
+        { passive: false, capture: true },
+      );
+      this.element.addEventListener(
+        "touchend",
+        /**
+         * @param {TouchEvent} e
+         */
+        function (e) {
+          ref._mouseUpHandler(e);
+        },
+        { passive: false, capture: true },
+      );
+
       this.element.className = "buttonOff";
     }
-  }
-  this.selected = selected;
-};
 
-Neo.Button.prototype.update = function () {};
+    /**
+     * @param {number} wait
+     */
+    this.disable = function (wait) {
+      if (this.element) {
+        this.element.style.pointerEvents = "none";
+        this.element.style.opacity = "0.5";
+      }
+      if (wait) {
+        setTimeout(function () {
+          ref.enable();
+        }, wait);
+      }
+    };
+
+    this.enable = function () {
+      if (this.element) {
+        this.element.style.pointerEvents = "inherit";
+        this.element.style.opacity = "1.0";
+      }
+    };
+    return this;
+  }
+  /**
+   * @param {MouseEvent|TouchEvent} e
+   */
+  _mouseDownHandler(e) {
+    if (Neo.painter.isUIPaused()) return;
+    this.isMouseDown = true;
+
+    if (this.params.type == "fill" && this.selected == false) {
+      for (let i = 0; i < Neo.toolButtons.length; i++) {
+        /** @type {any} */
+        const toolTip = Neo.toolButtons[i];
+        toolTip.setSelected(this.selected ? false : true);
+      }
+      Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
+    }
+
+    if (this.onmousedown) this.onmousedown(this);
+  }
+  /** @param {MouseEvent|TouchEvent} e */
+  _mouseUpHandler(e) {
+    if (this.isMouseDown) {
+      this.isMouseDown = false;
+
+      if (this.onmouseup) this.onmouseup(this);
+    }
+  }
+  /** @param {MouseEvent} e */
+  _mouseOutHandler(e) {
+    if (this.isMouseDown) {
+      this.isMouseDown = false;
+      if (this.onmouseout) this.onmouseout(this);
+    }
+  }
+  /** @param {MouseEvent} e */
+  _mouseOverHandler(e) {
+    if (this.onmouseover) this.onmouseover(this);
+  }
+  /**
+   * @param {boolean} selected
+   */
+  setSelected(selected) {
+    if (this.element) {
+      if (selected) {
+        this.element.className = "buttonOn";
+      } else {
+        this.element.className = "buttonOff";
+      }
+    }
+    this.selected = selected;
+  }
+
+  update = function () {};
+};
 
 /*
   -------------------------------------------------------------------------
@@ -517,213 +517,213 @@ Neo.ToolTip = class {
     this.selected = false;
     this.isTool = false;
     this.fixed = false;
+
+    this.prevMode = -1;
+    /**@type {any} */
+    this.tools = [];
+    /**@type {any} */
+    this.toolIcons = [];
+    this.hasTintImage = false;
+
+    /** @type {HTMLCanvasElement|null} */
+    this.canvas = null;
+    /** @type {HTMLElement|null} */
+    this.label = null;
   }
-};
 
-Neo.ToolTip.prototype.prevMode = -1;
-/**@type {any} */
-Neo.ToolTip.prototype.tools = [];
-/**@type {any} */
-Neo.ToolTip.prototype.toolIcons = [];
-Neo.ToolTip.prototype.hasTintImage = false;
+  /**
+   * @param {string} elementID
+   * @param {Object} [params]
+   * @returns {Neo.ToolTip|null}
+   */
+  init(elementID, params = {}) {
+    this.element = document.getElementById(elementID);
+    this.params = params || {};
+    this.elementID = elementID;
+    this.mode = 0;
 
-/** @type {HTMLCanvasElement|null} */
-Neo.ToolTip.prototype.canvas = null;
-/** @type {HTMLElement|null} */
-Neo.ToolTip.prototype.label = null;
+    this.isMouseDown = false;
 
-/**
- * @param {string} elementID
- * @param {Object} [params]
- * @returns {Neo.ToolTip|null}
- */
-Neo.ToolTip.prototype.init = function (elementID, params = {}) {
-  this.element = document.getElementById(elementID);
-  this.params = params || {};
-  this.elementID = elementID;
-  this.mode = 0;
+    var ref = this;
 
-  this.isMouseDown = false;
-
-  var ref = this;
-
-  if (this.element) {
-    this.params.type = this.element.id;
-    /** @param {MouseEvent} e */
-    this.element.onmousedown = function (e) {
-      ref._mouseDownHandler(e);
-    };
-    /** @param {MouseEvent} e */
-    this.element.onmouseup = function (e) {
-      ref._mouseUpHandler(e);
-    };
-    /** @param {MouseEvent} e */
-    this.element.onmouseover = function (e) {
-      ref._mouseOverHandler(e);
-    };
-    /** @param {MouseEvent} e */
-    this.element.onmouseout = function (e) {
-      ref._mouseOutHandler(e);
-    };
-    this.element.addEventListener(
-      "touchstart",
-      /**
-       * @param {TouchEvent} e
-       */
-      function (e) {
+    if (this.element) {
+      this.params.type = this.element.id;
+      /** @param {MouseEvent} e */
+      this.element.onmousedown = function (e) {
         ref._mouseDownHandler(e);
-        e.preventDefault();
-      },
-      { passive: false, capture: true },
-    );
-    this.element.addEventListener(
-      "touchend",
-      /**
-       * @param {TouchEvent} e
-       */
-      function (e) {
-        ref._mouseUpHandler(e);
-      },
-      true,
-    );
-    // console.log("this.params.type", this.params.type);
-    this.selected = this.params.type == "neo-pen" ? true : false;
-    this.setSelected(this.selected);
-
-    this.element.innerHTML =
-      "<canvas width=46 height=18></canvas><div class='label'></div>";
-    this.canvas = this.element.querySelector("canvas");
-    this.label = this.element.querySelector("div");
-  }
-  this.update();
-  return this;
-};
-
-/** @param {MouseEvent|TouchEvent} e */
-Neo.ToolTip.prototype._mouseDownHandler = function (e) {
-  this.isMouseDown = true;
-
-  if (this.isTool) {
-    if (this.selected == false) {
-      for (let i = 0; i < Neo.toolButtons.length; i++) {
-        /** @type {any} */
-        const toolTip = Neo.toolButtons[i];
-        toolTip.setSelected(this == toolTip ? true : false);
-      }
-    } else {
-      var length = this.toolStrings.length;
-      if (Neo.getModifier(e) == "right") {
-        this.mode--;
-        if (this.mode < 0) this.mode = length - 1;
-      } else {
-        this.mode++;
-        if (this.mode >= length) this.mode = 0;
-      }
-    }
-    Neo.painter.setToolByType(this.tools[this.mode]);
-    this.update();
-  }
-
-  if (this.onmousedown) this.onmousedown(this);
-};
-
-/** @param {MouseEvent|TouchEvent} e */
-Neo.ToolTip.prototype._mouseUpHandler = function (e) {
-  if (this.isMouseDown) {
-    this.isMouseDown = false;
-    if (this.onmouseup) this.onmouseup(this);
-  }
-};
-
-/** @param {MouseEvent} e */
-Neo.ToolTip.prototype._mouseOutHandler = function (e) {
-  if (this.isMouseDown) {
-    this.isMouseDown = false;
-    if (this.onmouseout) this.onmouseout(this);
-  }
-};
-/** @param {MouseEvent} e */
-Neo.ToolTip.prototype._mouseOverHandler = function (e) {
-  if (this.onmouseover) this.onmouseover(this);
-};
-/**
- * @param {boolean} selected
- */
-Neo.ToolTip.prototype.setSelected = function (selected) {
-  if (!this.element) {
-    console.error("setSelected: Element not found");
-    return null;
-  }
-
-  if (this.fixed) {
-    this.element.className = "toolTipFixed";
-  } else {
-    if (selected) {
-      this.element.className = "toolTipOn";
-    } else {
-      this.element.className = "toolTipOff";
-    }
-  }
-  this.selected = selected;
-};
-
-Neo.ToolTip.prototype.update = function () {};
-
-/**
- * ツールチップのアイコンを描画し、必要に応じて色調補正（ティント）を施す。
- * 動作モードが変更された際には新たな画像を読み込み、
- * 変更がない場合は既存のキャンバスに対し色調のみを再適用し効率化を図る。
- *
- * @param {string|number} color - アイコンに適用すべき色彩。カラー文字列、またはNeo.painterで解釈可能な数値IDを指定する。
- */
-Neo.ToolTip.prototype.draw = function (color) {
-  if (this.hasTintImage) {
-    const c =
-      typeof color === "string" ? color : Neo.painter.getColorString(color);
-    if (!this.canvas) {
-      console.error("Canvas not found for ToolTip.");
-      return;
-    }
-    /** @type {CanvasRenderingContext2D|null} */
-    const ctx = this.canvas.getContext("2d", {
-      willReadFrequently: true,
-    });
-    if (!ctx) {
-      console.error("Failed to get 2D context for ToolTip canvas.");
-      return;
-    }
-    if (this.prevMode != this.mode) {
-      this.prevMode = this.mode;
-
-      var img = new Image();
-      var ref = this;
-      img.onload = function () {
-        if (!ref.canvas) {
-          console.error("Canvas not found for ToolTip on image load.");
-          return;
-        }
-        ctx.clearRect(0, 0, ref.canvas.width, ref.canvas.height);
-        ref.drawTintImage(ctx, img, c, 0, 0);
       };
-      img.src = this.toolIcons[this.mode];
-    } else {
-      Neo.tintImage(ctx, c);
+      /** @param {MouseEvent} e */
+      this.element.onmouseup = function (e) {
+        ref._mouseUpHandler(e);
+      };
+      /** @param {MouseEvent} e */
+      this.element.onmouseover = function (e) {
+        ref._mouseOverHandler(e);
+      };
+      /** @param {MouseEvent} e */
+      this.element.onmouseout = function (e) {
+        ref._mouseOutHandler(e);
+      };
+      this.element.addEventListener(
+        "touchstart",
+        /**
+         * @param {TouchEvent} e
+         */
+        function (e) {
+          ref._mouseDownHandler(e);
+          e.preventDefault();
+        },
+        { passive: false, capture: true },
+      );
+      this.element.addEventListener(
+        "touchend",
+        /**
+         * @param {TouchEvent} e
+         */
+        function (e) {
+          ref._mouseUpHandler(e);
+        },
+        true,
+      );
+      // console.log("this.params.type", this.params.type);
+      this.selected = this.params.type == "neo-pen" ? true : false;
+      this.setSelected(this.selected);
+
+      this.element.innerHTML =
+        "<canvas width=46 height=18></canvas><div class='label'></div>";
+      this.canvas = this.element.querySelector("canvas");
+      this.label = this.element.querySelector("div");
+    }
+    this.update();
+    return this;
+  }
+
+  /** @param {MouseEvent|TouchEvent} e */
+  _mouseDownHandler(e) {
+    this.isMouseDown = true;
+
+    if (this.isTool) {
+      if (this.selected == false) {
+        for (let i = 0; i < Neo.toolButtons.length; i++) {
+          /** @type {any} */
+          const toolTip = Neo.toolButtons[i];
+          toolTip.setSelected(this == toolTip ? true : false);
+        }
+      } else {
+        var length = this.toolStrings.length;
+        if (Neo.getModifier(e) == "right") {
+          this.mode--;
+          if (this.mode < 0) this.mode = length - 1;
+        } else {
+          this.mode++;
+          if (this.mode >= length) this.mode = 0;
+        }
+      }
+      Neo.painter.setToolByType(this.tools[this.mode]);
+      this.update();
+    }
+
+    if (this.onmousedown) this.onmousedown(this);
+  }
+
+  /** @param {MouseEvent|TouchEvent} e */
+  _mouseUpHandler(e) {
+    if (this.isMouseDown) {
+      this.isMouseDown = false;
+      if (this.onmouseup) this.onmouseup(this);
     }
   }
-};
-/**
- * 指定された座標へ画像を配置し、その上から特定の色調を合成する。
- * 画像の描画と、それに続く色調の適用という二段階の処理を担う。
- *
- * @param {CanvasRenderingContext2D} ctx - 描画先となる2Dレンダリングコンテキスト。
- * @param {HTMLImageElement} img - 描画対象のソース画像。
- * @param {string} c - 合成すべき色彩を表すカラー文字列。
- * @param {number} x - 描画始点のX座標。
- * @param {number} y - 描画始点のY座標。
- */
-Neo.ToolTip.prototype.drawTintImage = function (ctx, img, c, x, y) {
-  ctx.drawImage(img, x, y);
-  Neo.tintImage(ctx, c);
+
+  /** @param {MouseEvent} e */
+  _mouseOutHandler(e) {
+    if (this.isMouseDown) {
+      this.isMouseDown = false;
+      if (this.onmouseout) this.onmouseout(this);
+    }
+  }
+  /** @param {MouseEvent} e */
+  _mouseOverHandler(e) {
+    if (this.onmouseover) this.onmouseover(this);
+  }
+  /**
+   * @param {boolean} selected
+   */
+  setSelected(selected) {
+    if (!this.element) {
+      console.error("setSelected: Element not found");
+      return null;
+    }
+
+    if (this.fixed) {
+      this.element.className = "toolTipFixed";
+    } else {
+      if (selected) {
+        this.element.className = "toolTipOn";
+      } else {
+        this.element.className = "toolTipOff";
+      }
+    }
+    this.selected = selected;
+  }
+
+  update() {}
+
+  /**
+   * ツールチップのアイコンを描画し、必要に応じて色調補正（ティント）を施す。
+   * 動作モードが変更された際には新たな画像を読み込み、
+   * 変更がない場合は既存のキャンバスに対し色調のみを再適用し効率化を図る。
+   *
+   * @param {string|number} color - アイコンに適用すべき色彩。カラー文字列、またはNeo.painterで解釈可能な数値IDを指定する。
+   */
+  draw(color) {
+    if (this.hasTintImage) {
+      const c =
+        typeof color === "string" ? color : Neo.painter.getColorString(color);
+      if (!this.canvas) {
+        console.error("Canvas not found for ToolTip.");
+        return;
+      }
+      /** @type {CanvasRenderingContext2D|null} */
+      const ctx = this.canvas.getContext("2d", {
+        willReadFrequently: true,
+      });
+      if (!ctx) {
+        console.error("Failed to get 2D context for ToolTip canvas.");
+        return;
+      }
+      if (this.prevMode != this.mode) {
+        this.prevMode = this.mode;
+
+        var img = new Image();
+        var ref = this;
+        img.onload = function () {
+          if (!ref.canvas) {
+            console.error("Canvas not found for ToolTip on image load.");
+            return;
+          }
+          ctx.clearRect(0, 0, ref.canvas.width, ref.canvas.height);
+          ref.drawTintImage(ctx, img, c, 0, 0);
+        };
+        img.src = this.toolIcons[this.mode];
+      } else {
+        Neo.tintImage(ctx, c);
+      }
+    }
+  }
+  /**
+   * 指定された座標へ画像を配置し、その上から特定の色調を合成する。
+   * 画像の描画と、それに続く色調の適用という二段階の処理を担う。
+   *
+   * @param {CanvasRenderingContext2D} ctx - 描画先となる2Dレンダリングコンテキスト。
+   * @param {HTMLImageElement} img - 描画対象のソース画像。
+   * @param {string} c - 合成すべき色彩を表すカラー文字列。
+   * @param {number} x - 描画始点のX座標。
+   * @param {number} y - 描画始点のY座標。
+   */
+  drawTintImage(ctx, img, c, x, y) {
+    ctx.drawImage(img, x, y);
+    Neo.tintImage(ctx, c);
+  }
 };
 
 /*
