@@ -101,6 +101,7 @@
     <div id="colorWheelContainer"></div>
 
     <script>
+      let isUpdatingFromNeo = false;
       // create a new color picker
       var colorWheel = new ReinventedColorWheel({
         // appendTo is the only required property. specify the parent element of the color wheel.
@@ -109,7 +110,7 @@
         // followings are optional properties and their default values.
 
         // initial color (can be specified in hsv / hsl / rgb / hex)
-        hsv: [0, 100, 100],
+        hsv: [0, 0, 0],
         // hex: "#ff0000",
 
         // appearance
@@ -120,6 +121,8 @@
 
         // handler
         onChange: function (color) {
+          if (isUpdatingFromNeo) return;
+
           // the only argument is the ReinventedColorWheel instance itself.
           // console.log("hsv:", color.hsv[0], color.hsv[1], color.hsv[2]);
           Neo.setColor(color.hex);
@@ -129,7 +132,9 @@
        * NEOの色の変更を検出して変更された色をHEXで取得
        */
       document.addEventListener("neo:colorchange", (e) => {
+        isUpdatingFromNeo = true;
         colorWheel.hex = e.detail.hex;
+        isUpdatingFromNeo = false;
       });
       /**
        * ウィンドウビューページビュー切り替えを検出
