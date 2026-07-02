@@ -6620,6 +6620,8 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     this.y3 = 0;
     this.isUpMove = false;
     this.step = 0;
+    this.startX = 0;
+    this.startY = 0;
   }
 
   init() {
@@ -7553,122 +7555,122 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
     this.startY = 0;
     this.latestX = 0;
     this.latestY = 0;
-  }
-};
-Neo.EffectToolBase.prototype.isUpMove = false;
-Neo.EffectToolBase.prototype.isEllipse = false;
-Neo.EffectToolBase.prototype.isFill = false;
-Neo.EffectToolBase.prototype.endX = 0;
-Neo.EffectToolBase.prototype.endY = 0;
-Neo.EffectToolBase.prototype.ticking = false;
-Neo.EffectToolBase.prototype.defaultAlpha = 0;
-/**
- * @param {Neo.Painter} oe
- * @param {number} x
- * @param {number} y
- * @param {number} width
- * @param {number} height
- */
-Neo.EffectToolBase.prototype.doEffect = function (oe, x, y, width, height) {};
-
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.downHandler = function (oe) {
-  this.isUpMove = false;
-  this.ticking = false;
-
-  this.startX = this.endX = oe.clipMouseX;
-  this.startY = this.endY = oe.clipMouseY;
-};
-
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.upHandler = function (oe) {
-  if (this.isUpMove) return;
-  this.isUpMove = true;
-
-  this.startX = Math.floor(this.startX);
-  this.startY = Math.floor(this.startY);
-  this.endX = Math.floor(this.endX);
-  this.endY = Math.floor(this.endY);
-
-  var x = this.startX < this.endX ? this.startX : this.endX;
-  var y = this.startY < this.endY ? this.startY : this.endY;
-  var width = Math.abs(this.startX - this.endX) + 1;
-  var height = Math.abs(this.startY - this.endY) + 1;
-  var ctx = oe.canvasCtx[oe.current];
-
-  if (x < 0) x = 0;
-  if (y < 0) y = 0;
-  if (x + width > oe.canvasWidth) width = oe.canvasWidth - x;
-  if (y + height > oe.canvasHeight) height = oe.canvasHeight - y;
-
-  if (width > 0 && height > 0) {
-    oe._pushUndo();
-    oe.prepareDrawing();
-    this.doEffect(oe, x, y, width, height);
-  }
-
-  if (Neo.CurrentToolType != Neo.Painter.TOOLTYPE_PASTE) {
-    setTimeout(() => {
-      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    }, 10);
-  }
-};
-
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.moveHandler = function (oe) {
-  this.latestX = oe.clipMouseX;
-  this.latestY = oe.clipMouseY;
-
-  if (this.ticking) return;
-  this.ticking = true;
-
-  requestAnimationFrame(() => {
-    this.endX = this.latestX;
-    this.endY = this.latestY;
-
-    //ペーストの時はカーソルを描画しない
-    if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
-      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-      this.drawCursor(oe);
-    }
+    this.isUpMove = false;
+    this.isEllipse = false;
+    this.isFill = false;
+    this.endX = 0;
+    this.endY = 0;
     this.ticking = false;
-  });
-};
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.rollOutHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.upMoveHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.rollOverHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.EffectToolBase.prototype.drawCursor = function (oe) {
-  var ctx = oe.destCanvasCtx;
-
-  ctx.save();
-  this.transformForZoom(oe);
-
-  var start = oe.getDestCanvasPosition(this.startX, this.startY, true);
-  var end = oe.getDestCanvasPosition(this.endX, this.endY, true);
-
-  var x = start.x < end.x ? start.x : end.x;
-  var y = start.y < end.y ? start.y : end.y;
-  var width = Math.abs(start.x - end.x) + oe.zoom;
-  var height = Math.abs(start.y - end.y) + oe.zoom;
-
-  if (this.isEllipse) {
-    oe.drawXOREllipse(ctx, x, y, width, height, this.isFill);
-  } else {
-    oe.drawXORRect(ctx, x, y, width, height, this.isFill);
+    this.defaultAlpha = 0;
   }
-  ctx.restore();
-};
+  /**
+   * @param {Neo.Painter} oe
+   * @param {number} x
+   * @param {number} y
+   * @param {number} width
+   * @param {number} height
+   */
+  doEffect(oe, x, y, width, height) {}
 
-Neo.EffectToolBase.prototype.loadStates = function () {
-  var reserve = this.getReserve();
-  if (reserve) {
-    Neo.painter.lineWidth = reserve.size;
-    Neo.painter.alpha = this.defaultAlpha || 1.0;
-    Neo.updateUI();
+  /** @param {Neo.Painter} oe */
+  downHandler(oe) {
+    this.isUpMove = false;
+    this.ticking = false;
+
+    this.startX = this.endX = oe.clipMouseX;
+    this.startY = this.endY = oe.clipMouseY;
+  }
+
+  /** @param {Neo.Painter} oe */
+  upHandler(oe) {
+    if (this.isUpMove) return;
+    this.isUpMove = true;
+
+    this.startX = Math.floor(this.startX);
+    this.startY = Math.floor(this.startY);
+    this.endX = Math.floor(this.endX);
+    this.endY = Math.floor(this.endY);
+
+    var x = this.startX < this.endX ? this.startX : this.endX;
+    var y = this.startY < this.endY ? this.startY : this.endY;
+    var width = Math.abs(this.startX - this.endX) + 1;
+    var height = Math.abs(this.startY - this.endY) + 1;
+    var ctx = oe.canvasCtx[oe.current];
+
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x + width > oe.canvasWidth) width = oe.canvasWidth - x;
+    if (y + height > oe.canvasHeight) height = oe.canvasHeight - y;
+
+    if (width > 0 && height > 0) {
+      oe._pushUndo();
+      oe.prepareDrawing();
+      this.doEffect(oe, x, y, width, height);
+    }
+
+    if (Neo.CurrentToolType != Neo.Painter.TOOLTYPE_PASTE) {
+      setTimeout(() => {
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+      }, 10);
+    }
+  }
+
+  /** @param {Neo.Painter} oe */
+  moveHandler(oe) {
+    this.latestX = oe.clipMouseX;
+    this.latestY = oe.clipMouseY;
+
+    if (this.ticking) return;
+    this.ticking = true;
+
+    requestAnimationFrame(() => {
+      this.endX = this.latestX;
+      this.endY = this.latestY;
+
+      //ペーストの時はカーソルを描画しない
+      if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        this.drawCursor(oe);
+      }
+      this.ticking = false;
+    });
+  }
+  /** @param {Neo.Painter} oe */
+  rollOutHandler = function (oe) {};
+  /** @param {Neo.Painter} oe */
+  upMoveHandler = function (oe) {};
+  /** @param {Neo.Painter} oe */
+  rollOverHandler = function (oe) {};
+  /** @param {Neo.Painter} oe */
+  drawCursor(oe) {
+    var ctx = oe.destCanvasCtx;
+
+    ctx.save();
+    this.transformForZoom(oe);
+
+    var start = oe.getDestCanvasPosition(this.startX, this.startY, true);
+    var end = oe.getDestCanvasPosition(this.endX, this.endY, true);
+
+    var x = start.x < end.x ? start.x : end.x;
+    var y = start.y < end.y ? start.y : end.y;
+    var width = Math.abs(start.x - end.x) + oe.zoom;
+    var height = Math.abs(start.y - end.y) + oe.zoom;
+
+    if (this.isEllipse) {
+      oe.drawXOREllipse(ctx, x, y, width, height, this.isFill);
+    } else {
+      oe.drawXORRect(ctx, x, y, width, height, this.isFill);
+    }
+    ctx.restore();
+  }
+
+  loadStates() {
+    var reserve = this.getReserve();
+    if (reserve) {
+      Neo.painter.lineWidth = reserve.size;
+      Neo.painter.alpha = this.defaultAlpha || 1.0;
+      Neo.updateUI();
+    }
   }
 };
 
@@ -8119,124 +8121,106 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
 Neo.TextTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.type = Neo.Painter.TOOLTYPE_TEXT;
+    this.isUpMove = false;
   }
-};
-Neo.TextTool.prototype.type = Neo.Painter.TOOLTYPE_TEXT;
-Neo.TextTool.prototype.isUpMove = false;
 
-/** @param {Neo.Painter} oe */
-Neo.TextTool.prototype.downHandler = function (oe) {
-  this.startX = oe.mouseX;
-  this.startY = oe.mouseY;
+  /** @param {Neo.Painter} oe */
+  downHandler(oe) {
+    this.startX = oe.mouseX;
+    this.startY = oe.mouseY;
 
-  if (Neo.painter.inputText) {
-    Neo.painter.updateInputText();
+    if (Neo.painter.inputText) {
+      Neo.painter.updateInputText();
 
-    var rect = oe.container?.getBoundingClientRect();
-    if (!rect) {
-      console.error("Rect not found for TextTool");
-      return;
-    }
-    var text = Neo.painter.inputText;
-    var x = oe.rawMouseX - rect.left - 5;
-    var y = oe.rawMouseY - rect.top - 5;
+      var rect = oe.container?.getBoundingClientRect();
+      if (!rect) {
+        console.error("Rect not found for TextTool");
+        return;
+      }
+      var text = Neo.painter.inputText;
+      var x = oe.rawMouseX - rect.left - 5;
+      var y = oe.rawMouseY - rect.top - 5;
 
-    text.style.left = x + "px";
-    text.style.top = y + "px";
-    text.style.display = "block";
-    text.focus();
-  }
-};
-
-/** @param {Neo.Painter} oe */
-Neo.TextTool.prototype.upHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.TextTool.prototype.moveHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.TextTool.prototype.upMoveHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.TextTool.prototype.rollOverHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.TextTool.prototype.rollOutHandler = function (oe) {};
-
-/**
- * テキスト入力の確定処理
- * @description
- * ユーザーがテキスト入力中にEnterキーを押した際、
- * 入力された内容をキャンバスに描画し、入力UIを終了する。
- * @param {KeyboardEvent} e - キーボードイベント
- */
-Neo.TextTool.prototype.keyDownHandler = function (e) {
-  if (e.key == "Enter") {
-    // Returnで確定
-    e.preventDefault();
-
-    const oe = Neo.painter;
-    /** @type {HTMLElement|null} **/
-    const text = oe.inputText;
-
-    if (text) {
-      oe._pushUndo();
-      //this.drawText(oe);
-      //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-      /** @type {string} **/
-      const string = text.textContent || text.innerText;
-      /** @type {string} **/
-      const size = text.style.fontSize;
-      /** @type {string} **/
-      const family = text.style.fontFamily || "Arial";
-      /** @type {number} **/
-      const color = oe.getColor();
-      /** @type {number} **/
-      const alpha = oe.alpha;
-      // const layer = oe.current;
-      // const x = this.startX;
-      // const y = this.startY;
-      //oe.doText(layer, this.startX, this.startY, color, string, size, family);
-      oe._actionMgr.text(
-        this.startX,
-        this.startY,
-        color,
-        alpha,
-        string,
-        size,
-        family,
-      );
-
-      text.style.display = "none";
-      text.blur();
+      text.style.left = x + "px";
+      text.style.top = y + "px";
+      text.style.display = "block";
+      text.focus();
     }
   }
-};
 
-Neo.TextTool.prototype.kill = function () {
-  Neo.painter.hideInputText();
-};
+  /** @param {Neo.Painter} oe */
+  upHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  moveHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  upMoveHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  rollOverHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  rollOutHandler = function (oe) {};
 
-/*
-Neo.TextTool.prototype.drawText = function(oe) {
-    var text = oe.inputText;
+  /**
+   * テキスト入力の確定処理
+   * @description
+   * ユーザーがテキスト入力中にEnterキーを押した際、
+   * 入力された内容をキャンバスに描画し、入力UIを終了する。
+   * @param {KeyboardEvent} e - キーボードイベント
+   */
+  keyDownHandler(e) {
+    if (e.key == "Enter") {
+      // Returnで確定
+      e.preventDefault();
 
-    var string = text.textContent || text.innerText;
-    var size = text.style.fontSize;
-    var family = text.style.fontFamily || "Arial";
-    var layer = oe.current;
-    var color = oe.getColor();
-    var alpha = oe.alpha;
-    var x = this.startX;
-    var y = this.startY;
-    //oe.doText(layer, this.startX, this.startY, color, string, size, family);
-    oe._actionMgr.doText(layer, this.startX, this.startY,
-                         color, alpha, string, size, family);
-};
-*/
+      const oe = Neo.painter;
+      /** @type {HTMLElement|null} **/
+      const text = oe.inputText;
 
-Neo.TextTool.prototype.loadStates = function () {
-  var reserve = this.getReserve();
-  if (reserve) {
-    Neo.painter.lineWidth = reserve.size;
-    Neo.painter.alpha = 1.0;
-    Neo.updateUI();
+      if (text) {
+        oe._pushUndo();
+        //this.drawText(oe);
+        //oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+        /** @type {string} **/
+        const string = text.textContent || text.innerText;
+        /** @type {string} **/
+        const size = text.style.fontSize;
+        /** @type {string} **/
+        const family = text.style.fontFamily || "Arial";
+        /** @type {number} **/
+        const color = oe.getColor();
+        /** @type {number} **/
+        const alpha = oe.alpha;
+        // const layer = oe.current;
+        // const x = this.startX;
+        // const y = this.startY;
+        //oe.doText(layer, this.startX, this.startY, color, string, size, family);
+        oe._actionMgr.text(
+          this.startX,
+          this.startY,
+          color,
+          alpha,
+          string,
+          size,
+          family,
+        );
+
+        text.style.display = "none";
+        text.blur();
+      }
+    }
+  }
+
+  kill() {
+    Neo.painter.hideInputText();
+  }
+
+  loadStates() {
+    var reserve = this.getReserve();
+    if (reserve) {
+      Neo.painter.lineWidth = reserve.size;
+      Neo.painter.alpha = 1.0;
+      Neo.updateUI();
+    }
   }
 };
 
@@ -8249,25 +8233,25 @@ Neo.TextTool.prototype.loadStates = function () {
 Neo.DummyTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    this.type = Neo.Painter.TOOLTYPE_NONE;
+    this.isUpMove = false;
   }
-};
-Neo.DummyTool.prototype.type = Neo.Painter.TOOLTYPE_NONE;
-Neo.DummyTool.prototype.isUpMove = false;
 
-/** @param {Neo.Painter} oe */
-Neo.DummyTool.prototype.downHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.DummyTool.prototype.upHandler = function (oe) {
-  oe.popTool();
+  /** @param {Neo.Painter} oe */
+  downHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  upHandler(oe) {
+    oe.popTool();
+  }
+  /** @param {Neo.Painter} oe */
+  moveHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  upMoveHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  rollOverHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  rollOutHandler(oe) {}
 };
-/** @param {Neo.Painter} oe */
-Neo.DummyTool.prototype.moveHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.DummyTool.prototype.upMoveHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.DummyTool.prototype.rollOverHandler = function (oe) {};
-/** @param {Neo.Painter} oe */
-Neo.DummyTool.prototype.rollOutHandler = function (oe) {};
 
 "use strict";
 //@ts-check
