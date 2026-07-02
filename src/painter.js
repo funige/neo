@@ -4045,9 +4045,11 @@ Neo.UndoItem = class {
  * 描画操作のスナップショット（Neo.UndoItem）をスタックとして保持する。
  * 最大ステップ数（_maxStep）を設定することで、メモリの肥大化を抑制しつつ
  * ユーザーの操作履歴を安全に管理する。
- * @param {number} _maxStep - 保持する履歴の最大数
  */
 Neo.UndoManager = class {
+  /**
+   * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
+   */
   constructor(_maxStep) {
     this._maxStep = _maxStep;
     /** @type {Neo.UndoItem[]} */

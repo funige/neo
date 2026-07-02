@@ -1938,7 +1938,7 @@ Neo.ScrollBarButton = class {
     /** @type {string} */
     this.elementID = "";
     /** @type {Object} */
-    this.params = /** @type {unknown} */ (null);
+    this.params = /** @type {any} */ (null);
     /** @type {HTMLElement|null} */
     this.barButton = null;
   }
