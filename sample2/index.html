@@ -1,37 +1,39 @@
 <!doctype html>
 <html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEO Test 2</title>
+    <link rel="stylesheet" href="../dist/neo.css" />
+    <script src="../dist/neo.js" charset="UTF-8"></script>
+    <link
+      rel="stylesheet"
+      href="./library/reinvented-color-wheel/reinvented-color-wheel.min.css"
+    />
+    <script src="./library/reinvented-color-wheel/reinvented-color-wheel.min.js"></script>
+    <script>
+      const params = location.search
+        .substring(1)
+        .split("&")
+        .reduce((result, query) => {
+          const [k, v] = query.split("=");
+          result[k] = decodeURI(v);
+          return result;
+        }, {});
+      const appw = params.w || 400;
+      const apph = params.h || 460;
+      const w = params.iw || 300;
+      const h = params.ih || 300;
+    </script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEO Test 2</title>
-  <link rel="stylesheet" href="../dist/neo.css" />
-  <script src="../dist/neo.js" charset="UTF-8"></script>
-  <link rel="stylesheet" href="./library/reinvented-color-wheel/reinvented-color-wheel.min.css">
-  <script src="./library/reinvented-color-wheel/reinvented-color-wheel.min.js"></script>
-  <script>
-    const params = location.search
-      .substring(1)
-      .split("&")
-      .reduce((result, query) => {
-        const [k, v] = query.split("=");
-        result[k] = decodeURI(v);
-        return result;
-      }, {});
-    const appw = params.w || 400;
-    const apph = params.h || 460;
-    const w = params.iw || 300;
-    const h = params.ih || 300;
-  </script>
-</head>
+  <body>
+    <a href="viewer.html">PCH Test 2</a>
+    <h1>PaintBBS NEO Test 2</h1>
+    <div id="appletdummy"></div>
 
-<body>
-  <a href="viewer.html">PCH Test 2</a>
-  <h1>PaintBBS NEO Test 2</h1>
-  <div id="appletdummy"></div>
-
-  <script>
-    const html = `<div class="neo-applet-paintbbs" data-width="${appw}" data-height="${apph}" ></div>
+    <script>
+      const html = `<div class="neo-applet-paintbbs" data-width="${appw}" data-height="${apph}" ></div>
         <br>
         <form>
           <input type="number" name="w" value="${appw}"> x
@@ -43,131 +45,141 @@
         </form>
       `;
 
-    Neo.params = {
-      paintbbs: {
-        image_width: `${w}`,
-        image_height: `${h}`,
-        thumbnail_type: "animation",
-        neo_show_right_button: true,
-        neo_disable_grid_touch_move: true,
-        neo_disable_turn_original_glitch: true,
-        neo_enable_zoom_out: true,
-        neo_visibility_change_title_rewrite: true,
-        neo_color_picker_id: "neo-colorPicker",
+      Neo.params = {
+        paintbbs: {
+          image_width: `${w}`,
+          image_height: `${h}`,
+          thumbnail_type: "animation",
+          neo_show_right_button: true,
+          neo_disable_grid_touch_move: true,
+          neo_disable_turn_original_glitch: true,
+          neo_enable_zoom_out: true,
+          neo_visibility_change_title_rewrite: true,
+          neo_color_picker_id: "neo-colorPicker",
+        },
+      };
+
+      const appletdummy = document.getElementById("appletdummy");
+      appletdummy.insertAdjacentHTML("afterbegin", html);
+
+      document.paintBBSCallback = function (str) {
+        if (str === "check") {
+          const image = Neo.painter.getImage();
+          const animation = Neo.painter.getThumbnail("animation");
+
+          const img = document.createElement("img");
+          img.src = image.toDataURL("image/png");
+          img.className = "sample";
+
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(animation);
+          a.innerHTML = a.download = new Date() - 0 + ".pch";
+
+          const top = document.querySelector("img.sample");
+          document.body.insertBefore(img, top);
+          document.body.insertBefore(a, top);
+          return false;
+        }
+      };
+    </script>
+
+    <br />
+    <select onchange="Neo.setStabilizeLevel(this.value)">
+      <option value="0">0</option>
+      <option value="1" selected>1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    Stabilizer
+    <p></p>
+    <input
+      id="neo-colorPicker"
+      type="color"
+      oninput="Neo.setColor(this.value)"
+    />
+    Color
+    <p></p>
+
+    <div id="colorWheelContainer"></div>
+
+    <script>
+      let isUpdatingFromNeo = false;
+      // create a new color picker
+      var colorWheel = new ReinventedColorWheel({
+        // appendTo is the only required property. specify the parent element of the color wheel.
+        appendTo: document.getElementById("colorWheelContainer"),
+
+        // followings are optional properties and their default values.
+
+        // initial color (can be specified in hsv / hsl / rgb / hex)
+        hsv: [0, 0, 0],
+        // hex: "#ff0000",
+
+        // appearance
+        wheelDiameter: 200,
+        wheelThickness: 20,
+        handleDiameter: 16,
+        wheelReflectsSaturation: false,
+
+        // handler
+        onChange: function (color) {
+          if (isUpdatingFromNeo) return;
+
+          // the only argument is the ReinventedColorWheel instance itself.
+          // console.log("hsv:", color.hsv[0], color.hsv[1], color.hsv[2]);
+          Neo.setColor(color.hex);
+        },
+      });
+      /**
+       * NEOの色の変更を検出して変更された色をHEXで取得
+       */
+      document.addEventListener("neo:colorchange", (e) => {
+        isUpdatingFromNeo = true;
+        colorWheel.hex = e.detail.hex;
+        isUpdatingFromNeo = false;
+      });
+      /**
+       * ウィンドウビューページビュー切り替えを検出
+       */
+      document.addEventListener("neo:fullscreenchange", (e) => {
+        console.log("fullscreen", e.detail.fullscreen); //true|false
+      });
+      /**
+       * カラーホイールの長押しで右クリックメニューが開くのを防止
+       */
+      document
+        .getElementById("colorWheelContainer")
+        .addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+        });
+
+      // please call redraw() after changing some appearance properties.
+      colorWheel.wheelDiameter = 100;
+      colorWheel.wheelThickness = 8;
+      colorWheel.redraw();
+    </script>
+    <p></p>
+
+    <style>
+      img.sample {
+        border: 1px solid black;
+        margin-bottom: 5px;
+        display: block;
       }
-    }
 
-    const appletdummy = document.getElementById("appletdummy");
-    appletdummy.insertAdjacentHTML("afterbegin", html);
-
-    document.paintBBSCallback = function(str) {
-      if (str === "check") {
-        const image = Neo.painter.getImage();
-        const animation = Neo.painter.getThumbnail("animation");
-
-        const img = document.createElement("img");
-        img.src = image.toDataURL("image/png");
-        img.className = "sample";
-
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(animation);
-        a.innerHTML = a.download = new Date() - 0 + ".pch";
-
-        const top = document.querySelector("img.sample");
-        document.body.insertBefore(img, top);
-        document.body.insertBefore(a, top);
-        return false;
+      input {
+        width: 100px;
       }
-    };
-  </script>
 
-  <br>
-  <select onchange="Neo.setStabilizeLevel(this.value)">
-    <option value="0">0</option>
-    <option value="1" selected>1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-  </select>
-  Stabilizer
-  <p></p>
-  <input id="neo-colorPicker" type="color" oninput="Neo.setColor(this.value)">
-  Color
-  <p></p>
+      #pageView {
+        margin: 0 !important;
+      }
 
-  <div id="colorWheelContainer">
- 
- <script>
-    // create a new color picker
-var colorWheel = new ReinventedColorWheel({
-    // appendTo is the only required property. specify the parent element of the color wheel.
-    appendTo: document.getElementById("colorWheelContainer"),
-
-    // followings are optional properties and their default values.
-
-    // initial color (can be specified in hsv / hsl / rgb / hex)
-    hsv: [0, 100, 100],
-    // hex: "#ff0000",
-
-    // appearance
-    wheelDiameter: 200,
-    wheelThickness: 20,
-    handleDiameter: 16,
-    wheelReflectsSaturation: false,
-
-    // handler
-    onChange: function (color) {
-        // the only argument is the ReinventedColorWheel instance itself.
-        // console.log("hsv:", color.hsv[0], color.hsv[1], color.hsv[2]);
-        Neo.setColor(color.hex);
-    },
-});
-/** 
- * NEOの色の変更を検出して変更された色をHEXで取得
- */
-document.addEventListener("neo:colorchange", (e) => {
-    colorWheel.hex = e.detail.hex;
-});
-/**
- * ウィンドウビューページビュー切り替えを検出
- */
-document.addEventListener("neo:fullscreenchange", (e) => {
-	console.log("fullscreen",e.detail.fullscreen);//true|false
-});
-/** 
- * カラーホイールの長押しで右クリックメニューが開くのを防止 
- */ 
-document.getElementById("colorWheelContainer").addEventListener("contextmenu", (e) => {
-  e.preventDefault();
-});
-
-// please call redraw() after changing some appearance properties.
-colorWheel.wheelDiameter = 100;
-colorWheel.wheelThickness = 8;
-colorWheel.redraw();
-</script>
- <p></p>
- 
-  <style>
-    img.sample {
-      border: 1px solid black;
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    input {
-      width: 100px;
-    }
-
-    #pageView {
-      margin: 0 !important;
-    }
-
-    div#appletdummy {
-      display: contents;
-    }
-  </style>
-</body>
-
+      div#appletdummy {
+        display: contents;
+      }
+    </style>
+  </body>
 </html>
