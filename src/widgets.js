@@ -174,7 +174,7 @@ Neo.Button = class {
     this.selected = selected;
   }
 
-  update = function () {};
+  update() {}
 };
 
 /*
