@@ -2,6 +2,58 @@
 //@ts-check
 
 Neo.Painter = class {
+  static LINETYPE_NONE = 0;
+  static LINETYPE_PEN = 1;
+  static LINETYPE_ERASER = 2;
+  static LINETYPE_BRUSH = 3;
+  static LINETYPE_TONE = 4;
+  static LINETYPE_DODGE = 5;
+  static LINETYPE_BURN = 6;
+  static LINETYPE_BLUR = 7;
+
+  static MASKTYPE_NONE = 0;
+  static MASKTYPE_NORMAL = 1;
+  static MASKTYPE_REVERSE = 2;
+  static MASKTYPE_ADD = 3;
+  static MASKTYPE_SUB = 4;
+
+  static DRAWTYPE_FREEHAND = 0;
+  static DRAWTYPE_LINE = 1;
+  static DRAWTYPE_BEZIER = 2;
+
+  static ALPHATYPE_NONE = 0;
+  static ALPHATYPE_PEN = 1;
+  static ALPHATYPE_FILL = 2;
+  static ALPHATYPE_BRUSH = 3;
+
+  static TOOLTYPE_NONE = 0;
+  static TOOLTYPE_PEN = 1;
+  static TOOLTYPE_ERASER = 2;
+  static TOOLTYPE_HAND = 3;
+  static TOOLTYPE_SLIDER = 4;
+  static TOOLTYPE_FILL = 5;
+  static TOOLTYPE_MASK = 6;
+  static TOOLTYPE_ERASEALL = 7;
+  static TOOLTYPE_ERASERECT = 8;
+  static TOOLTYPE_COPY = 9;
+  static TOOLTYPE_PASTE = 10;
+  static TOOLTYPE_MERGE = 11;
+  static TOOLTYPE_FLIP_H = 12;
+  static TOOLTYPE_FLIP_V = 13;
+
+  static TOOLTYPE_BRUSH = 14;
+  static TOOLTYPE_TEXT = 15;
+  static TOOLTYPE_TONE = 16;
+  static TOOLTYPE_BLUR = 17;
+  static TOOLTYPE_DODGE = 18;
+  static TOOLTYPE_BURN = 19;
+  static TOOLTYPE_RECT = 20;
+  static TOOLTYPE_RECTFILL = 21;
+  static TOOLTYPE_ELLIPSE = 22;
+  static TOOLTYPE_ELLIPSEFILL = 23;
+  static TOOLTYPE_BLURRECT = 24;
+  static TOOLTYPE_TURN = 25;
+
   constructor() {
     this._undoMgr = new Neo.UndoManager(50);
     /** @type {Neo.ActionManager} */
@@ -174,58 +226,6 @@ Neo.Painter.prototype.ellipseFillTool;
 Neo.Painter.prototype.blurRectTool;
 /**@type {Neo.TurnTool} */
 Neo.Painter.prototype.turnTool;
-
-Neo.Painter.LINETYPE_NONE = 0;
-Neo.Painter.LINETYPE_PEN = 1;
-Neo.Painter.LINETYPE_ERASER = 2;
-Neo.Painter.LINETYPE_BRUSH = 3;
-Neo.Painter.LINETYPE_TONE = 4;
-Neo.Painter.LINETYPE_DODGE = 5;
-Neo.Painter.LINETYPE_BURN = 6;
-Neo.Painter.LINETYPE_BLUR = 7;
-
-Neo.Painter.MASKTYPE_NONE = 0;
-Neo.Painter.MASKTYPE_NORMAL = 1;
-Neo.Painter.MASKTYPE_REVERSE = 2;
-Neo.Painter.MASKTYPE_ADD = 3;
-Neo.Painter.MASKTYPE_SUB = 4;
-
-Neo.Painter.DRAWTYPE_FREEHAND = 0;
-Neo.Painter.DRAWTYPE_LINE = 1;
-Neo.Painter.DRAWTYPE_BEZIER = 2;
-
-Neo.Painter.ALPHATYPE_NONE = 0;
-Neo.Painter.ALPHATYPE_PEN = 1;
-Neo.Painter.ALPHATYPE_FILL = 2;
-Neo.Painter.ALPHATYPE_BRUSH = 3;
-
-Neo.Painter.TOOLTYPE_NONE = 0;
-Neo.Painter.TOOLTYPE_PEN = 1;
-Neo.Painter.TOOLTYPE_ERASER = 2;
-Neo.Painter.TOOLTYPE_HAND = 3;
-Neo.Painter.TOOLTYPE_SLIDER = 4;
-Neo.Painter.TOOLTYPE_FILL = 5;
-Neo.Painter.TOOLTYPE_MASK = 6;
-Neo.Painter.TOOLTYPE_ERASEALL = 7;
-Neo.Painter.TOOLTYPE_ERASERECT = 8;
-Neo.Painter.TOOLTYPE_COPY = 9;
-Neo.Painter.TOOLTYPE_PASTE = 10;
-Neo.Painter.TOOLTYPE_MERGE = 11;
-Neo.Painter.TOOLTYPE_FLIP_H = 12;
-Neo.Painter.TOOLTYPE_FLIP_V = 13;
-
-Neo.Painter.TOOLTYPE_BRUSH = 14;
-Neo.Painter.TOOLTYPE_TEXT = 15;
-Neo.Painter.TOOLTYPE_TONE = 16;
-Neo.Painter.TOOLTYPE_BLUR = 17;
-Neo.Painter.TOOLTYPE_DODGE = 18;
-Neo.Painter.TOOLTYPE_BURN = 19;
-Neo.Painter.TOOLTYPE_RECT = 20;
-Neo.Painter.TOOLTYPE_RECTFILL = 21;
-Neo.Painter.TOOLTYPE_ELLIPSE = 22;
-Neo.Painter.TOOLTYPE_ELLIPSEFILL = 23;
-Neo.Painter.TOOLTYPE_BLURRECT = 24;
-Neo.Painter.TOOLTYPE_TURN = 25;
 
 /**
  * ペインターの描画コンポーネントを初期化して、描画可能な状態にする。
@@ -1356,26 +1356,6 @@ Neo.UndoManager.prototype.pushRedo = function (undoItem) {
 
 Neo.UndoManager.prototype.popRedo = function () {
   return this._redoItems.pop();
-};
-
-/**
- * キャンバスの状態を保持するUndo/Redo用のクラス
- */
-Neo.UndoItem = class {
-  /**
-   * @param {ImageData[]} [data]
-   * @param {number} [x]
-   * @param {number} [y]
-   * @param {number} [width]
-   * @param {number} [height]
-   */
-  constructor(data = [], x = 0, y = 0, width = 0, height = 0) {
-    this.data = data;
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-  }
 };
 
 /*
@@ -4186,4 +4166,24 @@ Neo.Painter.prototype.getCurrent = function (item) {
 
 Neo.Painter.prototype.isDirty = function () {
   return this.dirty;
+};
+
+/**
+ * キャンバスの状態を保持するUndo/Redo用のクラス
+ */
+Neo.UndoItem = class {
+  /**
+   * @param {ImageData[]} [data]
+   * @param {number} [x]
+   * @param {number} [y]
+   * @param {number} [width]
+   * @param {number} [height]
+   */
+  constructor(data = [], x = 0, y = 0, width = 0, height = 0) {
+    this.data = data;
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+  }
 };
