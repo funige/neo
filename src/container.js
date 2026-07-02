@@ -834,7 +834,13 @@ Neo.addRule = function (selector, styleName, value, sheet = null) {
     );
   }
 };
-
+/**
+ * ドキュメント内の全スタイルシートを走査し、Neo.rules に読み込む。
+ * スタイルシートの解析は Neo.readStyle() で行う。
+ *
+ * @function
+ * @returns {void}
+ */
 Neo.readStyles = function () {
   Neo.rules = {};
   for (var i = 0; i < document.styleSheets.length; i++) {
@@ -878,7 +884,7 @@ Neo.readStyle = function (sheet) {
   } catch (e) {}
 };
 /**
- * 指定された設定名に色を適用する
+ * 指定された設定名に初期値の色を適用する
  * @param {string} name
  * @param {string} defaultColor
  */

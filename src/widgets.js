@@ -198,7 +198,7 @@ Neo.RightButton = class extends Neo.Button {
    * @return {Neo.RightButton|null}
    */
   init(elementID, params = {}) {
-    Neo.Button.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     this.params.type = "right";
     return this;
   }
@@ -253,7 +253,7 @@ Neo.FillButton = class extends Neo.Button {
    * @returns {Neo.FillButton|null}
    */
   init(elementID, params = {}) {
-    Neo.Button.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     this.params.type = "fill";
     return this;
   }
@@ -762,7 +762,7 @@ Neo.PenTip = class extends Neo.ToolTip {
       Neo.translate("ﾃｷｽﾄ"),
     ];
     this.isTool = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     return this;
   }
 
@@ -821,7 +821,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
     ];
 
     this.isTool = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     return this;
   }
 
@@ -936,7 +936,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
 
     this.drawOnce = false;
     this.isTool = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     return this;
   }
 
@@ -1024,7 +1024,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
     ];
 
     this.isTool = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     return this;
   }
 
@@ -1095,7 +1095,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
     ];
 
     this.isTool = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
 
     this.img = document.createElement("img");
     this.img.src = Neo.ToolTip.copy2;
@@ -1150,7 +1150,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     ];
 
     this.fixed = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     return this;
   }
 
@@ -1237,7 +1237,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
     ];
 
     this.fixed = true;
-    Neo.ToolTip.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
     return this;
   }
 
@@ -2035,7 +2035,7 @@ Neo.ViewerButton = class extends Neo.Button {
    * @returns {Neo.ViewerButton|null}
    */
   init(elementID, params = {}) {
-    Neo.Button.prototype.init.call(this, elementID, params);
+    super.init(elementID, params);
 
     if (elementID != "neo-viewerSpeed") {
       if (this.element) {
