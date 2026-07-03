@@ -1170,11 +1170,11 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
     });
   }
   /** @param {Neo.Painter} oe */
-  rollOutHandler = function (oe) {};
+  rollOutHandler(oe) {}
   /** @param {Neo.Painter} oe */
-  upMoveHandler = function (oe) {};
+  upMoveHandler(oe) {}
   /** @param {Neo.Painter} oe */
-  rollOverHandler = function (oe) {};
+  rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   drawCursor(oe) {
     var ctx = oe.destCanvasCtx;
@@ -1692,7 +1692,7 @@ Neo.TextTool = class extends Neo.ToolBase {
   /** @param {Neo.Painter} oe */
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
-  rollOutHandler = function (oe) {};
+  rollOutHandler(oe) {}
 
   /**
    * テキスト入力の確定処理
