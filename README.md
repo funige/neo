@@ -102,12 +102,13 @@ document.addEventListener("neo:colorchange", (e) => {
 ```
 Neo.setColor(color.hex);
 ```
-このような形式で16進数を渡すだけです。  
+このような形式で16進数を渡します。  
 [luncheon/reinvented-color-wheel: A vanilla-js touch-friendly HSV color picker inspired by Farbtastic Color Picker.](https://github.com/luncheon/reinvented-color-wheel)  
 を使用した例を、sampleに実装しています。  
 また、その他のライブラリでも使用できます。  
-使用するライブラリによっては無限ループが発生する場合がありますので、十分にご注意ください。  
-たとえば、[simonwep/pickr: 🎨 Pickr - A simple, multi-themed, responsive and hackable Color-Picker library. No dependencies, no jQuery. Compatible with all CSS Frameworks e.g. Bootstrap, Materialize. Supports alpha channel, rgba, hsla, hsva and more!](https://github.com/simonwep/pickr)を使用する場合は、フラグを管理するコードを別途追加する必要があります。
+使用するライブラリによってはループが発生する場合がありますので、ご注意ください。  
+たとえば、[simonwep/pickr: 🎨 Pickr - A simple, multi-themed, responsive and hackable Color-Picker library. No dependencies, no jQuery. Compatible with all CSS Frameworks e.g. Bootstrap, Materialize. Supports alpha channel, rgba, hsla, hsva and more!](https://github.com/simonwep/pickr)を使用する場合にも、フラグを管理するコードを追加する必要があります。  
+sampleでは`isUpdatingFromNeo`という変数をNEOから受け取った値かどうかを判定するフラグとして使用しています。  
 
 ### ウィンドウビュー(全画面)モードへの切り替えを検出するカスタムイベント
 ウィンドウビュー(全画面)モードに切り替わった事を通知するカスタムイベントを追加しました。  
