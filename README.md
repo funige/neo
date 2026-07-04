@@ -136,8 +136,8 @@ document.addEventListener("neo:fullscreenchange", (e) => {
   <option value="5">5</option>
 </select>
 ```
-`Neo.setStabilizeLevel(5)`引数0-5の範囲で、手ぶれ補正の強度を設定できます。    
-無指定で、手ぶれ補正なし。   
+`Neo.setStabilizeLevel(5)`引数0-5の範囲で、手ぶれ補正の強度を設定します。    
+無指定の時には、手ぶれ補正機能が無効になります。   
 
 ### PaintBBS NEOのサポート
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
