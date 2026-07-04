@@ -77,6 +77,10 @@
           return false;
         }
       };
+      //この例では手ぶれ補正の初期値を1に
+      document.addEventListener("DOMContentLoaded", (e) => {
+        Neo.setStabilizeLevel(1);
+      });
     </script>
 
     <br />
