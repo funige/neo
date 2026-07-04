@@ -119,6 +119,26 @@ document.addEventListener("neo:fullscreenchange", (e) => {
 ```
 ウィンドウビュー(全画面)の時は、`e.detail.fullscreen`が`true`になり、ページビューの時には`false`になります。
 
+### 手ぶれ補正機能
+```
+<script>     
+ document.addEventListener("DOMContentLoaded", (e) => {
+      Neo.setStabilizeLevel(1);//0-5の範囲で手ぶれ補正の初期値を設定する
+    });
+</script>
+
+<select onchange="Neo.setStabilizeLevel(this.value)">
+  <option value="0">0</option>
+  <option value="1" selected>1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+  <option value="5">5</option>
+</select>
+```
+`Neo.setStabilizeLevel(5)`引数0-5の範囲で、手ぶれ補正の強度を設定できます。    
+無指定で、手ぶれ補正なし。   
+
 ### PaintBBS NEOのサポート
 **掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
 
