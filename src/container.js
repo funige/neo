@@ -52,7 +52,7 @@ Neo.isPinchZooming = function () {
   return false;
 };
 Neo.updateUI = function () {};
-Neo.stabilize_level = 1;
+Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
 /** @type {any} **/
@@ -2053,8 +2053,9 @@ Neo.setToolSide = function (htmlConfiguredSide) {
  */
 Neo.setStabilizeLevel = function (htmlConfig) {
   let level = parseInt(String(htmlConfig));
+
   if (isNaN(level) || level < 0) {
-    level = 1; //デフォルトは1
+    level = 0; //最小0
   } else if (level > 5) {
     level = 5; //最大5
   }

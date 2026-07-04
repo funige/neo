@@ -1078,7 +1078,7 @@ Neo.Painter = class {
 
     const isDrawTool = freeHandMode && toolTypes.includes(Neo.CurrentToolType);
 
-    if (Neo.config.neo_disable_stabilizer == "true" || !isDrawTool) {
+    if (!isDrawTool || !Neo.stabilize_level) {
       return;
     }
     if (this.isMouseDown) {
