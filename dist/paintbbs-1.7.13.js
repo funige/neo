@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 var Neo = {};
 
-Neo.version = "1.7.15";
+Neo.version = "1.7.13";
 // @ts-ignore
 /** @type {Neo.Painter} */
 Neo.painter;
@@ -3049,13 +3049,15 @@ Neo.Painter = class {
    * @param {KeyboardEvent} e
    */
   _keyDownHandler(e) {
-    /**
-     * ctrlキーとの組み合わせのブラウザデフォルトのショートカットキーを無効化
-     * @description ctrl+z,ctrl+y,ctrl+v,ctrl+x,ctrl+aは使用可能
-     * @param {KeyboardEvent} e
-     */
-    const preventCtrlKeyDefaults = (e) => {
-      const keys = ["+", ";", "=", "-", "s", "h", "r", "u", "o"];
+    const target = e.target;
+    //NEO外部の input textAreaへの入力中にショートカットキーが動作しないようにする
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement
+    ) {
+      //ctrlキーとの組み合わせのブラウザデフォルトのショートカットキーを無効化
+      //但しctrl+v,ctrl+x,ctrl+aは使用可能
+      const keys = ["+", ";", "=", "-", "s", "h", "r", "y", "z", "u", "o"];
       if (
         (e.ctrlKey || e.metaKey) &&
         e.key &&
@@ -3063,76 +3065,57 @@ Neo.Painter = class {
       ) {
         e.preventDefault();
       }
-    };
-
-    const target = e.target;
-    //NEO外部の input textAreaへの入力をNEOで処理しない
-    if (
-      target instanceof HTMLInputElement ||
-      target instanceof HTMLTextAreaElement
-    ) {
       //NEO外部の input textAreaへの入力中はフラグをリセット
       this.isShiftDown = false;
       this.isCtrlDown = false;
       this.isAltDown = false;
       this.isSpaceDown = false;
-      preventCtrlKeyDefaults(e);
+
       return;
     }
+    //テキスト入力をしていない時のにのみキーボードショートカットキーを有効にする
+    if (target !== this.inputText) {
+      this.isShiftDown = e.shiftKey;
+      this.isCtrlDown = e.ctrlKey;
+      this.isAltDown = e.altKey;
+      var key = e.key ? e.key.toLowerCase() : null;
+      if (key === " ") this.isSpaceDown = true;
 
-    if (this.tool.keyDownHandler) {
-      this.tool.keyDownHandler(e);
-    }
-
-    //テキスト入力をしている時はキーボードショートカットキーを使用しないため早期return
-    if (target === this.inputText) {
-      preventCtrlKeyDefaults(e);
-      return;
-    }
-
-    //スペースキーでスクロールしないようにする
-    //テキスト入力をしていない時はデフォルトのキーボードイベントをキャンセルする
-    e.preventDefault();
-
-    /**
-     * キーボードショートカット
-     */
-    this.isShiftDown = e.shiftKey;
-    this.isCtrlDown = e.ctrlKey;
-    this.isAltDown = e.altKey;
-    var key = e.key ? e.key.toLowerCase() : null;
-    if (key === " ") this.isSpaceDown = true;
-
-    if (!this.isShiftDown && this.isCtrlDown) {
-      if (!this.isAltDown) {
-        if (key === "z" || key === "u") {
-          this.cancelCopy();
-          this.undo(); // Ctrl+Z, Ctrl+U
+      if (!this.isShiftDown && this.isCtrlDown) {
+        if (!this.isAltDown) {
+          if (key === "z" || key === "u") {
+            this.cancelCopy();
+            this.undo(); // Ctrl+Z, Ctrl+U
+          }
+          if (key === "y") this.redo(); // Ctrl+Y
+        } else {
+          if (key === "z") this.redo(); // Ctrl+Alt+Z
         }
-        if (key === "y") this.redo(); // Ctrl+Y
-      } else {
-        if (key === "z") this.redo(); // Ctrl+Alt+Z
       }
-    }
-    if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-      if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
-      if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
-      //鉛筆
-      if (key == "b") this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
-      //水彩
-      if (key == "w") this.setToolByType(Neo.Painter.TOOLTYPE_BRUSH);
-      //消しゴム
-      if (key == "e") this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
-      //全消し
-      if (
-        document.activeElement != this.inputText &&
-        key &&
-        ["delete", "backspace"].includes(key)
-      ) {
-        this._pushUndo();
-        this._actionMgr.eraseAll();
+      if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
+        if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
+        if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
+        //鉛筆
+        if (key == "b") this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
+        //水彩
+        if (key == "w") this.setToolByType(Neo.Painter.TOOLTYPE_BRUSH);
+        //消しゴム
+        if (key == "e") this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
+        //全消し
+        if (
+          document.activeElement != this.inputText &&
+          key &&
+          ["delete", "backspace"].includes(key)
+        ) {
+          this._pushUndo();
+          this._actionMgr.eraseAll();
+        }
       }
+      e.preventDefault();
     }
+    if (this.tool.keyDownHandler) {
+    }
+    this.tool.keyDownHandler(e);
   }
   /**
    * @param {KeyboardEvent} e

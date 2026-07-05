@@ -830,7 +830,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
       if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
-    switch (this.tools[Number(this.mode)]) {
+    switch (this.tools[this.mode]) {
       case Neo.Painter.TOOLTYPE_TONE:
         // this.drawTone(Neo.painter.foregroundColor);
         this.drawTone();
