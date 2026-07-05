@@ -797,6 +797,18 @@ Neo.Painter = class {
       return;
     }
 
+    /**
+     * キー押下状態を記録
+     */
+    this.isShiftDown = e.shiftKey;
+    this.isCtrlDown = e.ctrlKey;
+    this.isAltDown = e.altKey;
+    var key = e.key ? e.key.toLowerCase() : null;
+    if (key === " ") this.isSpaceDown = true;
+
+    /**
+     * 現在のツールにキー入力を伝える
+     */
     if (this.tool.keyDownHandler) {
       this.tool.keyDownHandler(e);
     }
@@ -814,11 +826,6 @@ Neo.Painter = class {
     /**
      * キーボードショートカット
      */
-    this.isShiftDown = e.shiftKey;
-    this.isCtrlDown = e.ctrlKey;
-    this.isAltDown = e.altKey;
-    var key = e.key ? e.key.toLowerCase() : null;
-    if (key === " ") this.isSpaceDown = true;
 
     if (!this.isShiftDown && this.isCtrlDown) {
       if (!this.isAltDown) {
@@ -4137,9 +4144,10 @@ Neo.setColor = function (color) {
   }
 };
 // デバッグ用: コンソールから状態を確認できるようにする
+/** @ts-ignore */
 window["__neodebug"] = () => {
   console.log({
-    tool: Neo.painter.tool?.constructor?.name,
+    tool: Neo.painter.tool,
     isMouseDown: Neo.painter.isMouseDown,
     isMouseDownRight: Neo.painter.isMouseDownRight,
     isSpaceDown: Neo.painter.isSpaceDown,
