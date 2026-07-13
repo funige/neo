@@ -72,8 +72,11 @@ Neo.config = {
     "#F9DDCF",
   ],
 };
-Neo.reservePen = {};
-Neo.reserveEraser = {};
+
+Neo.reservePen =
+  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
+Neo.reserveEraser =
+  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
 //@ts-ignore
 /**@type {Neo.Button|null} */
 Neo.submitButton = null;
@@ -454,10 +457,14 @@ Neo.initConfig = function (applet) {
     },
   ];
 
-  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-  Neo.reservePen = Neo.clone(Neo.config.reserves[0]);
-  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-  Neo.reserveEraser = Neo.clone(Neo.config.reserves[1]);
+  Neo.reservePen =
+    /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ (
+      Neo.clone(Neo.config.reserves[0])
+    );
+  Neo.reserveEraser =
+    /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ (
+      Neo.clone(Neo.config.reserves[1])
+    );
 };
 
 /**
