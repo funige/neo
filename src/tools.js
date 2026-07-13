@@ -83,8 +83,21 @@ Neo.ToolBase = class {
   }
 
   /**
-   * 保管ペンから情報を取り出す
-   * @returns {any}
+   * Java版PaintBBSの「消しゴムは独立した線の幅を持っています」
+   * を再現する。
+   *
+   * ペン/ブラシ/トーン/矩形/楕円/コピー/反転など「描画系」に分類される
+   * ツールは全て Neo.reservePen を共有し、消しゴムだけは Neo.reserveEraser を
+   * 独立して使う。
+   *
+   * this.type に応じて、上記2つのうちどちらに対応するかを判定し、
+   * 共有オブジェクトへの参照そのものを返す(値のコピーではない)。
+   * 呼び出し側でプロパティを書き換えると、その変更はグローバルな
+   * 保管状態に直接反映される。
+   * - loadStates() はこれを「読み取り専用」として使用する
+   * - saveStates() はこれに「書き込み」を行うことで、現在の設定を記憶させる
+   *
+   * @returns {{size:number,color:string,alpha:number,tool:number,drawType:number}|null}
    */
   getReserve() {
     switch (this.type) {
@@ -117,16 +130,18 @@ Neo.ToolBase = class {
     return null;
   }
 
+  //描画系ブラシまたは消しゴムのブラシサイズを取得し更新する
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.updateUI();
     }
   }
 
+  //描画系ブラシまたは消しゴムのブラシサイズを保存し上書きする
   saveStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       reserve.size = Neo.painter.lineWidth;
     }
