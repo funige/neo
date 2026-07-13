@@ -31,7 +31,17 @@ Neo.ToolBase = class {
 
   /** @param {Neo.Painter} oe * */
   moveHandler(oe) {}
-
+  /** @param {Neo.Painter} oe */
+  rollOverHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  rollOutHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  upMoveHandler(oe) {}
+  /** @param {KeyboardEvent} e */
+  keyDownHandler(e) {}
+  /** @param {KeyboardEvent} e */
+  keyUpHandler(e) {}
+  cancelBezier() {}
   /** @param {Neo.Painter} oe * */
   transformForZoom(oe) {
     var ctx = oe.destCanvasCtx;
@@ -1435,11 +1445,11 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
     oe.isCopyActive = true;
     //  oe.copy(oe.current, x, y, width, height);
     oe._actionMgr.copy(x, y, width, height);
-    oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
-    oe.tool.x = x;
-    oe.tool.y = y;
-    oe.tool.width = width;
-    oe.tool.height = height;
+    oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE); // ツールをPasteToolに切り替える
+    oe.pasteTool.x = x; // 切り替わったインスタンスに座標を設定
+    oe.pasteTool.y = y;
+    oe.pasteTool.width = width;
+    oe.pasteTool.height = height;
   }
 };
 

@@ -83,8 +83,8 @@ Neo.Painter = class {
 
     /** @type {HTMLElement|null} */
     this.container = null;
-    /** @type {any} */
-    this.tool = null;
+
+    this.tool = /** @type {Neo.ToolBase} */ ({});
     /** @type {HTMLElement|null} */
     this.inputText = null;
     /** @type {number[]|null} */
