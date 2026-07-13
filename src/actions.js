@@ -806,11 +806,6 @@ Neo.ActionManager = class {
       const height = item[5];
       oe.copy(layer, x, y, width, height);
     }
-
-    oe.tool.x = x;
-    oe.tool.y = y;
-    oe.tool.width = width;
-    oe.tool.height = height;
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     var callback = arguments[1];

@@ -1587,7 +1587,7 @@ Neo.SizeSlider = class {
     var value0 = Neo.painter.lineWidth;
     var value;
 
-    if (!Neo.painter.tool.alt) {
+    if (!Neo.painter.sliderTool.alt) {
       var v = Math.floor(((y - 4) * 30.0) / 33.0);
 
       value = Math.max(Math.min(v, 30), 1);
@@ -1607,7 +1607,7 @@ Neo.SizeSlider = class {
    */
   slide(x, y) {
     var value;
-    if (!Neo.painter.tool.alt) {
+    if (!Neo.painter.sliderTool.alt) {
       if (x >= 0 && x < 48 && y >= 0 && y < 41) {
         var v = Math.floor(((y - 4) * 30.0) / 33.0);
         value = v;
@@ -1775,7 +1775,7 @@ Neo.LayerControl = class {
       Neo.painter.canvasHeight,
     );
     if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
-      Neo.painter.tool.drawCursor(Neo.painter);
+      Neo.painter.pasteTool.drawCursor(Neo.painter);
     }
     this.update();
 

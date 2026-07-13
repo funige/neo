@@ -2360,8 +2360,8 @@ Neo.Painter = class {
 
     /** @type {HTMLElement|null} */
     this.container = null;
-    /** @type {any} */
-    this.tool = null;
+
+    this.tool = /** @type {Neo.ToolBase} */ ({});
     /** @type {HTMLElement|null} */
     this.inputText = null;
     /** @type {number[]|null} */
@@ -6473,7 +6473,17 @@ Neo.ToolBase = class {
 
   /** @param {Neo.Painter} oe * */
   moveHandler(oe) {}
-
+  /** @param {Neo.Painter} oe */
+  rollOverHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  rollOutHandler(oe) {}
+  /** @param {Neo.Painter} oe */
+  upMoveHandler(oe) {}
+  /** @param {KeyboardEvent} e */
+  keyDownHandler(e) {}
+  /** @param {KeyboardEvent} e */
+  keyUpHandler(e) {}
+  cancelBezier() {}
   /** @param {Neo.Painter} oe * */
   transformForZoom(oe) {
     var ctx = oe.destCanvasCtx;
@@ -7877,11 +7887,11 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
     oe.isCopyActive = true;
     //  oe.copy(oe.current, x, y, width, height);
     oe._actionMgr.copy(x, y, width, height);
-    oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE);
-    oe.tool.x = x;
-    oe.tool.y = y;
-    oe.tool.width = width;
-    oe.tool.height = height;
+    oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE); // ツールをPasteToolに切り替える
+    oe.pasteTool.x = x; // 切り替わったインスタンスに座標を設定
+    oe.pasteTool.y = y;
+    oe.pasteTool.width = width;
+    oe.pasteTool.height = height;
   }
 };
 
@@ -9196,11 +9206,6 @@ Neo.ActionManager = class {
       const height = item[5];
       oe.copy(layer, x, y, width, height);
     }
-
-    oe.tool.x = x;
-    oe.tool.y = y;
-    oe.tool.width = width;
-    oe.tool.height = height;
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
     var callback = arguments[1];
@@ -11438,7 +11443,7 @@ Neo.SizeSlider = class {
     var value0 = Neo.painter.lineWidth;
     var value;
 
-    if (!Neo.painter.tool.alt) {
+    if (!Neo.painter.sliderTool.alt) {
       var v = Math.floor(((y - 4) * 30.0) / 33.0);
 
       value = Math.max(Math.min(v, 30), 1);
@@ -11458,7 +11463,7 @@ Neo.SizeSlider = class {
    */
   slide(x, y) {
     var value;
-    if (!Neo.painter.tool.alt) {
+    if (!Neo.painter.sliderTool.alt) {
       if (x >= 0 && x < 48 && y >= 0 && y < 41) {
         var v = Math.floor(((y - 4) * 30.0) / 33.0);
         value = v;
@@ -11626,7 +11631,7 @@ Neo.LayerControl = class {
       Neo.painter.canvasHeight,
     );
     if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
-      Neo.painter.tool.drawCursor(Neo.painter);
+      Neo.painter.pasteTool.drawCursor(Neo.painter);
     }
     this.update();
 
