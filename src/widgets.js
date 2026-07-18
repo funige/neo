@@ -519,7 +519,7 @@ Neo.ToolTip = class {
     this.fixed = false;
 
     this.prevMode = -1;
-    /**@type {any} */
+    /**@type {number[]} */
     this.tools = [];
     /**@type {any} */
     this.toolIcons = [];
@@ -738,6 +738,7 @@ Neo.PenTip = class extends Neo.ToolTip {
     this.isTool = true;
     /** @type {string[]} */
     this.toolStrings = [];
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_PEN,
       Neo.Painter.TOOLTYPE_BRUSH,
@@ -789,6 +790,8 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
     super();
     /** @type {string[]} */
     this.toolStrings = [];
+
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_TONE,
       Neo.Painter.TOOLTYPE_BLUR,
@@ -914,6 +917,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
     this.canvas = null;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_ERASER,
       Neo.Painter.TOOLTYPE_ERASERECT,
@@ -993,6 +997,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
     this.isTool = false;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_RECTFILL,
       Neo.Painter.TOOLTYPE_RECT,
@@ -1058,6 +1063,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
     this.element = null;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_COPY,
       Neo.Painter.TOOLTYPE_MERGE,
@@ -2198,7 +2204,7 @@ Neo.ViewerBar = class {
     this.seekElement.style.width = seekX + "px";
     this.textElement.innerHTML = this.seek + "/" + this.length;
   }
-  /**@param {TouchEvent|PointerEvent} e */
+  /** @param {TouchEvent|PointerEvent} e */
   _touchHandler(e) {
     if (e instanceof PointerEvent) {
       if (e.offsetX === undefined) {

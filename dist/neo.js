@@ -5725,14 +5725,14 @@ Neo.Painter = class {
       // 常に透明(0)を返す
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現しない
-      /**@param {number} index */
+      /** @param {number} index */
       fillPixel = function (index) {
         return 0;
       };
     } else {
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現
-      /**@param {number} index */
+      /** @param {number} index */
       fillPixel = function (index) {
         return buf32[index % width];
       };
@@ -8270,13 +8270,11 @@ Neo.CommandBase = class {
   ---------------------------------------------------
 */
 /**
- * @typedef {Object} ZoomPlusData
  * @property {number} zoom - 現在のズーム値
  * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
  */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
-  /** @param {ZoomPlusData} data */
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -8294,13 +8292,11 @@ Neo.ZoomPlusCommand = class extends Neo.CommandBase {
   }
 };
 /**
- * @typedef {Object} ZoomMinusData
  * @property {number} zoom - 現在のズーム値
  * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
  */
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
-  /** @param {ZoomMinusData} data */
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -8323,7 +8319,7 @@ Neo.ZoomMinusCommand = class extends Neo.CommandBase {
   ---------------------------------------------------
 */
 Neo.UndoCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -8335,7 +8331,7 @@ Neo.UndoCommand = class extends Neo.CommandBase {
 };
 
 Neo.RedoCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -8346,7 +8342,7 @@ Neo.RedoCommand = class extends Neo.CommandBase {
 };
 
 Neo.WindowCommand = class extends Neo.CommandBase {
-  /** @param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -8367,7 +8363,7 @@ Neo.WindowCommand = class extends Neo.CommandBase {
 };
 
 Neo.SubmitCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -8379,7 +8375,7 @@ Neo.SubmitCommand = class extends Neo.CommandBase {
 };
 
 Neo.CopyrightCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -9388,7 +9384,7 @@ Neo.ActionManager = class {
     動画表示モード
   -----------------------------------------------------------------------
 */
-/**@param {HTMLElement} applet */
+/** @param {HTMLElement} applet */
 Neo.createViewer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
@@ -10375,7 +10371,7 @@ Neo.ToolTip = class {
     this.fixed = false;
 
     this.prevMode = -1;
-    /**@type {any} */
+    /**@type {number[]} */
     this.tools = [];
     /**@type {any} */
     this.toolIcons = [];
@@ -10594,6 +10590,7 @@ Neo.PenTip = class extends Neo.ToolTip {
     this.isTool = true;
     /** @type {string[]} */
     this.toolStrings = [];
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_PEN,
       Neo.Painter.TOOLTYPE_BRUSH,
@@ -10645,6 +10642,8 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
     super();
     /** @type {string[]} */
     this.toolStrings = [];
+
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_TONE,
       Neo.Painter.TOOLTYPE_BLUR,
@@ -10770,6 +10769,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
     this.canvas = null;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_ERASER,
       Neo.Painter.TOOLTYPE_ERASERECT,
@@ -10849,6 +10849,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
     this.isTool = false;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_RECTFILL,
       Neo.Painter.TOOLTYPE_RECT,
@@ -10914,6 +10915,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
     this.element = null;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_COPY,
       Neo.Painter.TOOLTYPE_MERGE,
@@ -12054,7 +12056,7 @@ Neo.ViewerBar = class {
     this.seekElement.style.width = seekX + "px";
     this.textElement.innerHTML = this.seek + "/" + this.length;
   }
-  /**@param {TouchEvent|PointerEvent} e */
+  /** @param {TouchEvent|PointerEvent} e */
   _touchHandler(e) {
     if (e instanceof PointerEvent) {
       if (e.offsetX === undefined) {

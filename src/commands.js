@@ -14,13 +14,11 @@ Neo.CommandBase = class {
   ---------------------------------------------------
 */
 /**
- * @typedef {Object} ZoomPlusData
  * @property {number} zoom - 現在のズーム値
  * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
  */
 Neo.ZoomPlusCommand = class extends Neo.CommandBase {
-  /** @param {ZoomPlusData} data */
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -38,13 +36,11 @@ Neo.ZoomPlusCommand = class extends Neo.CommandBase {
   }
 };
 /**
- * @typedef {Object} ZoomMinusData
  * @property {number} zoom - 現在のズーム値
  * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
  */
 Neo.ZoomMinusCommand = class extends Neo.CommandBase {
-  /** @param {ZoomMinusData} data */
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -67,7 +63,7 @@ Neo.ZoomMinusCommand = class extends Neo.CommandBase {
   ---------------------------------------------------
 */
 Neo.UndoCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -79,7 +75,7 @@ Neo.UndoCommand = class extends Neo.CommandBase {
 };
 
 Neo.RedoCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -90,7 +86,7 @@ Neo.RedoCommand = class extends Neo.CommandBase {
 };
 
 Neo.WindowCommand = class extends Neo.CommandBase {
-  /** @param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -111,7 +107,7 @@ Neo.WindowCommand = class extends Neo.CommandBase {
 };
 
 Neo.SubmitCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;
@@ -123,7 +119,7 @@ Neo.SubmitCommand = class extends Neo.CommandBase {
 };
 
 Neo.CopyrightCommand = class extends Neo.CommandBase {
-  /**@param {any} data */
+  /** @param {Neo.Painter} data */
   constructor(data) {
     super();
     this.data = data;

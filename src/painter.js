@@ -3448,14 +3448,14 @@ Neo.Painter = class {
       // 常に透明(0)を返す
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現しない
-      /**@param {number} index */
+      /** @param {number} index */
       fillPixel = function (index) {
         return 0;
       };
     } else {
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現
-      /**@param {number} index */
+      /** @param {number} index */
       fillPixel = function (index) {
         return buf32[index % width];
       };

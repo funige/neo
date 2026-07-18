@@ -988,7 +988,7 @@ Neo.ActionManager = class {
     動画表示モード
   -----------------------------------------------------------------------
 */
-/**@param {HTMLElement} applet */
+/** @param {HTMLElement} applet */
 Neo.createViewer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
