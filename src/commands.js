@@ -2,7 +2,7 @@
 //@ts-check
 Neo.CommandBase = class {
   constructor() {
-    /**@type {any} */
+    /** @type {any} */
     this.data = null;
   }
   execute() {}

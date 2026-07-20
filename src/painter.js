@@ -1,5 +1,6 @@
 "use strict";
 //@ts-check
+
 Neo.CurrentToolType = 1;
 
 Neo.Painter = class {
@@ -115,10 +116,8 @@ Neo.Painter = class {
     this.backgroundColor = "#ffffff";
     this.foregroundColor = "#000000";
 
-    /** @type {any} */
-    this.prevMouseX = null;
-    /** @type {any} */
-    this.prevMouseY = null;
+    this.prevMouseX = 0;
+    this.prevMouseY = 0;
 
     this.mouseX = 0;
     this.mouseY = 0;
@@ -254,7 +253,7 @@ Neo.Painter = class {
    * 2. 特定のツール（テキストやペースト）の終了処理を実行する。
    * 3. ツールを入れ替え、新しいツールの初期化を行う。
    * 4. 新しいツールの状態を読み込む。
-   * @param {any} tool - 新しく設定するツールインスタンス
+   * @param {any} tool - Neo.ToolBase 新しく設定するツールインスタンス
    */
   setTool(tool) {
     if (this.tool && this.tool.saveStates) this.tool.saveStates();
@@ -272,8 +271,8 @@ Neo.Painter = class {
     if (this.tool && this.tool.kill) {
       this.tool.kill();
     }
-    this.tool = tool;
-    tool.init();
+    this.tool = /**@type {Neo.ToolBase} */ (tool);
+    /**@type {Neo.ToolBase} */ (tool).init(this);
     if (this.tool && this.tool.loadStates) this.tool.loadStates();
   }
 
@@ -287,8 +286,8 @@ Neo.Painter = class {
    */
   pushTool(tool) {
     this.toolStack.push(this.tool);
-    this.tool = tool;
-    tool.init();
+    this.tool = /**@type {Neo.ToolBase} */ (tool);
+    /**@type {Neo.ToolBase} */ (tool).init(this);
   }
 
   /**
@@ -311,7 +310,7 @@ Neo.Painter = class {
    * ツールがスライダー等の設定変更中である場合、スタックの最上位にある
    * 以前のツール（ペイントツール等）を優先的に返すことで、
    * 現在の操作文脈を正しく取得する。
-   * @returns {any} 現在のツールインスタンス、またはnull
+   * @returns {Neo.ToolBase|null} 現在のツールインスタンス、またはnull
    */
   getCurrentTool() {
     if (this.tool) {
