@@ -132,7 +132,7 @@ Neo.Button = class {
 
     if (this.params.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
-        /** @type {any} */
+        /**@type {Neo.ToolTip}**/
         const toolTip = Neo.toolButtons[i];
         toolTip.setSelected(this.selected ? false : true);
       }
@@ -605,7 +605,7 @@ Neo.ToolTip = class {
     if (this.isTool) {
       if (this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          /** @type {any} */
+          /**@type {Neo.ToolTip}**/
           const toolTip = Neo.toolButtons[i];
           toolTip.setSelected(this == toolTip ? true : false);
         }
