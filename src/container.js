@@ -1290,8 +1290,8 @@ Neo.showWarning = function () {
 Neo.updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
   for (let i = 0; i < Neo.toolButtons.length; i++) {
-    /** @type {any} */
-    const toolTip = Neo.toolButtons[i];
+    //@ts-ignore
+    const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
     if (current) {
       if (current == toolTip) {
         toolTip.setSelected(true);
@@ -1314,15 +1314,17 @@ Neo.updateUI = function () {
  */
 Neo.updateUIColor = function (updateSlider, updateColorTip) {
   for (let i = 0; i < Neo.toolButtons.length; i++) {
-    /** @type {any} */
-    const toolTip = Neo.toolButtons[i];
+    //@ts-ignore
+    const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
     toolTip.update();
   }
 
   if (updateSlider) {
     for (let i = 0; i < Neo.sliders.length; i++) {
-      /** @type {any} */
-      var slider = Neo.sliders[i];
+      //@ts-ignore
+      const slider = /** @type {Neo.ColorSlider|Neo.SizeSlider} */ (
+        Neo.sliders[i]
+      );
       slider.update();
     }
   }

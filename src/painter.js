@@ -3864,6 +3864,7 @@ Neo.Painter = class {
    * @param {string} string - 描画するテキスト
    * @param {string} fontSize - フォントサイズ
    * @param {string} fontFamily - フォントファミリー
+   * @returns {void}
    */
   doText(layer, x, y, color, alpha, string, fontSize, fontFamily) {
     //テキスト描画
@@ -3945,6 +3946,9 @@ Neo.Painter = class {
     return false;
   }
 
+  /**
+   * @returns {number}
+   */
   getEmulationMode() {
     return parseFloat(Neo.config.neo_emulation_mode || 2.22);
   }
@@ -3955,6 +3959,9 @@ Neo.Painter = class {
    -------------------------------------------------------------------------
  */
 
+  /**
+   * @returns {void}
+   */
   play() {
     if (this._actionMgr) {
       this._actionMgr.clearCanvas();
@@ -3970,6 +3977,9 @@ Neo.Painter = class {
     }
   }
 
+  /**
+   * @returns {void}
+   */
   onrewind() {
     if (this._actionMgr) {
       this._actionMgr.clearCanvas();
@@ -3983,6 +3993,9 @@ Neo.Painter = class {
     }
   }
 
+  /**
+   * @returns {void}
+   */
   onmark() {
     if (Neo.viewerBar) Neo.viewerBar.update();
     if (!this._actionMgr._pause) {
@@ -3994,6 +4007,9 @@ Neo.Painter = class {
     }
   }
 
+  /**
+   * @returns {void}
+   */
   onplay() {
     Neo.viewerPlay?.setSelected(true);
     Neo.viewerStop?.setSelected(false);
@@ -4002,12 +4018,17 @@ Neo.Painter = class {
     this._actionMgr.play();
   }
 
+  /**
+   * @returns {void}
+   */
   onstop() {
     Neo.viewerPlay?.setSelected(false);
     Neo.viewerStop?.setSelected(true);
     this._actionMgr._pause = true;
   }
-
+  /**
+   * @returns {void}
+   */
   onspeed() {
     var mgr = this._actionMgr;
     var mode = mgr.speedMode();
@@ -4030,6 +4051,7 @@ Neo.Painter = class {
 
   /**
    * @param {number[]} item
+   * @returns {void}
    */
   getCurrent(item) {
     this._currentColor = [item[2], item[3], item[4], item[5]];
@@ -4038,6 +4060,9 @@ Neo.Painter = class {
     this._currentMaskType = item[10];
   }
 
+  /**
+   * @returns {boolean}
+   */
   isDirty() {
     return this.dirty;
   }
@@ -4097,6 +4122,7 @@ Neo.UndoManager = class {
    * 操作の分岐点を明確にする。
    * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
    * @param {boolean} holdRedo - Redo履歴を保持するかどうか
+   * @returns {void}
    */
   pushUndo(undoItem, holdRedo) {
     this._undoItems.push(undoItem);
@@ -4132,6 +4158,7 @@ Neo.UndoManager = class {
 /**
  * カラーピッカーで色をセット
  * @param {string} color - <input type="color">で取得した色
+ * @returns {void}
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット

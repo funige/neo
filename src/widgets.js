@@ -132,8 +132,7 @@ Neo.Button = class {
 
     if (this.params.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
-        /**@type {Neo.ToolTip}**/
-        const toolTip = Neo.toolButtons[i];
+        const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
       }
       Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -162,6 +161,7 @@ Neo.Button = class {
   }
   /**
    * @param {boolean} selected
+   * @returns {void}
    */
   setSelected(selected) {
     if (this.element) {
@@ -216,6 +216,7 @@ Neo.RightButton = class extends Neo.Button {
 
   /**
    * @param {boolean} selected
+   * @returns {void}
    */
   setSelected(selected) {
     if (this.element) {
@@ -378,7 +379,7 @@ Neo.ColorTip = class {
         //              this.setColor(Neo.painter.foregroundColor);
         //          }
       }
-      colorTip.setSelected(this == colorTip) ? true : false;
+      colorTip.setSelected(this === colorTip);
     }
     Neo.painter.setColor(this.color);
     Neo.updateUIColor(true, false);
@@ -409,6 +410,7 @@ Neo.ColorTip = class {
 
   /**
    * @param {boolean} selected
+   * @returns {void|null}
    */
   setSelected(selected) {
     if (!this.element) {
@@ -426,7 +428,7 @@ Neo.ColorTip = class {
   /**
    * カラーチップに色をセット
    * @param {string} color
-   * @returns
+   * @returns {void|null}
    */
   setColor(color) {
     if (!this.element) {
@@ -437,7 +439,9 @@ Neo.ColorTip = class {
     this.color = color;
     this.element.style.backgroundColor = color;
   }
-
+  /**
+   * @returns {Neo.ColorTip|null}
+   */
   static getCurrent() {
     for (var i = 0; i < Neo.colorTips.length; i++) {
       var colorTip = Neo.colorTips[i];
@@ -453,7 +457,7 @@ Neo.ColorTip = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {object[]} */
+/** @type {(Neo.FillButton|Neo.ToolTip)[]} */
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
@@ -605,9 +609,8 @@ Neo.ToolTip = class {
     if (this.isTool) {
       if (this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          /**@type {Neo.ToolTip}**/
-          const toolTip = Neo.toolButtons[i];
-          toolTip.setSelected(this == toolTip ? true : false);
+          const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+          toolTip.setSelected(this === toolTip);
         }
       } else {
         var length = this.toolStrings.length;
@@ -647,6 +650,7 @@ Neo.ToolTip = class {
   }
   /**
    * @param {boolean} selected
+   * @returns {void|null}
    */
   setSelected(selected) {
     if (!this.element) {
@@ -1645,7 +1649,7 @@ Neo.SizeSlider = class {
     var tool = Neo.painter.getCurrentTool();
     if (tool) {
       if (tool.type == Neo.Painter.TOOLTYPE_BRUSH) {
-        Neo.painter.alpha = tool.getAlpha();
+        Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
         Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
       } else if (tool.type == Neo.Painter.TOOLTYPE_TEXT) {
         Neo.painter.updateInputText();
@@ -1809,7 +1813,7 @@ Neo.LayerControl = class {
     ReserveControl
   -------------------------------------------------------------------------
 */
-/** @type {any} */
+/** @type {Neo.ReserveControl[]} */
 Neo.reserveControls = [];
 
 Neo.ReserveControl = class {
@@ -1958,15 +1962,16 @@ Neo.ScrollBarButton = class {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
+    /** @typedef {HTMLElement & { "data-bar": boolean | string | number }} BarElement */
 
     if (this.element) {
       this.element.innerHTML = "<div></div>";
       this.barButton = this.element.querySelector("div");
-      /**@type {any} */
+      /** @type {BarElement} */
       (this.element)["data-bar"] = true;
     }
     if (this.barButton) {
-      /**@type {any} */
+      /** @type {BarElement} */
       (this.barButton)["data-bar"] = true;
     }
 
