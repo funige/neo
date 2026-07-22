@@ -976,12 +976,11 @@ Neo.HandTool = class extends Neo.ToolBase {
 Neo.SliderTool = class extends Neo.ToolBase {
   constructor() {
     super();
-    /** @type {any} */
-    this.target = null;
+    this.target = /**@type {any} **/ (null);
     /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_SLIDER;
     this.isUpMove = false;
-    this.alt = false;
+    this.isAlt = false;
   }
 
   /** @param {Neo.Painter} oe */
@@ -991,8 +990,12 @@ Neo.SliderTool = class extends Neo.ToolBase {
     if (!oe.isCopyActive) {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
-    var rect = this.target.getBoundingClientRect();
-    var sliderType = this.alt
+    if (!this.target) {
+      console.error("SliderTool: Target element not found");
+      return;
+    }
+    const rect = this.target.getBoundingClientRect();
+    const sliderType = this.isAlt
       ? Neo.SLIDERTYPE_SIZE
       : this.target["data-slider"];
     Neo.sliders[sliderType].downHandler(
@@ -1006,8 +1009,13 @@ Neo.SliderTool = class extends Neo.ToolBase {
     this.isDrag = false;
     oe.popTool();
 
-    var rect = this.target.getBoundingClientRect();
-    var sliderType = this.alt
+    if (!this.target) {
+      console.error("SliderTool: Target element not found");
+      return;
+    }
+
+    const rect = this.target.getBoundingClientRect();
+    const sliderType = this.isAlt
       ? Neo.SLIDERTYPE_SIZE
       : this.target["data-slider"];
     Neo.sliders[sliderType].upHandler(
@@ -1019,8 +1027,13 @@ Neo.SliderTool = class extends Neo.ToolBase {
   /** @param {Neo.Painter} oe */
   moveHandler(oe) {
     if (this.isDrag) {
-      var rect = this.target.getBoundingClientRect();
-      var sliderType = this.alt
+      if (!this.target) {
+        console.error("SliderTool: Target element not found");
+        return;
+      }
+
+      const rect = this.target.getBoundingClientRect();
+      const sliderType = this.isAlt
         ? Neo.SLIDERTYPE_SIZE
         : this.target["data-slider"];
       Neo.sliders[sliderType].moveHandler(

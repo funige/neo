@@ -49,7 +49,7 @@ Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
 /** @type {any} **/
-Neo.rules = {};
+Neo.rules = [];
 /** @type {any} **/
 Neo.config = {
   width: 300,
@@ -778,7 +778,7 @@ Neo.addRule = function (selector, styleName, value, sheet = null) {
  * @returns {void}
  */
 Neo.readStyles = function () {
-  Neo.rules = {};
+  Neo.rules = [];
   for (var i = 0; i < document.styleSheets.length; i++) {
     Neo.readStyle(document.styleSheets[i]);
   }
@@ -1331,7 +1331,7 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 
   // パレットを変更するとき
   if (updateColorTip) {
-    var colorTip = Neo.ColorTip.getCurrent();
+    var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
     if (colorTip) {
       colorTip.setColor(Neo.painter.foregroundColor);
     }

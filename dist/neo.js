@@ -49,7 +49,7 @@ Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
 /** @type {any} **/
-Neo.rules = {};
+Neo.rules = [];
 /** @type {any} **/
 Neo.config = {
   width: 300,
@@ -778,7 +778,7 @@ Neo.addRule = function (selector, styleName, value, sheet = null) {
  * @returns {void}
  */
 Neo.readStyles = function () {
-  Neo.rules = {};
+  Neo.rules = [];
   for (var i = 0; i < document.styleSheets.length; i++) {
     Neo.readStyle(document.styleSheets[i]);
   }
@@ -1331,7 +1331,7 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 
   // パレットを変更するとき
   if (updateColorTip) {
-    var colorTip = Neo.ColorTip.getCurrent();
+    var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
     if (colorTip) {
       colorTip.setColor(Neo.painter.foregroundColor);
     }
@@ -3268,11 +3268,11 @@ Neo.Painter = class {
       ) {
         this.pushTool(this.sliderTool);
         this.sliderTool.target = e.target;
-        this.sliderTool.alt = false;
+        this.sliderTool.isAlt = false;
       } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
         this.pushTool(this.sliderTool);
         this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.sliderTool.alt = true;
+        this.sliderTool.isAlt = true;
       } else if (e.target instanceof HTMLElement && this.isWidget(e.target)) {
         // UI操作時のツール切り替え（dummyToolへの差し替え）
         this.isMouseDown = false;
@@ -6441,7 +6441,7 @@ Neo.UndoManager = class {
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット
-  var colorTip = Neo.ColorTip.getCurrent();
+  var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
   if (colorTip) {
     //カラーチップに色をセット
     colorTip.setColor(color);
@@ -7445,12 +7445,11 @@ Neo.HandTool = class extends Neo.ToolBase {
 Neo.SliderTool = class extends Neo.ToolBase {
   constructor() {
     super();
-    /** @type {any} */
-    this.target = null;
+    this.target = /**@type {any} **/ (null);
     /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_SLIDER;
     this.isUpMove = false;
-    this.alt = false;
+    this.isAlt = false;
   }
 
   /** @param {Neo.Painter} oe */
@@ -7460,8 +7459,12 @@ Neo.SliderTool = class extends Neo.ToolBase {
     if (!oe.isCopyActive) {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
-    var rect = this.target.getBoundingClientRect();
-    var sliderType = this.alt
+    if (!this.target) {
+      console.error("SliderTool: Target element not found");
+      return;
+    }
+    const rect = this.target.getBoundingClientRect();
+    const sliderType = this.isAlt
       ? Neo.SLIDERTYPE_SIZE
       : this.target["data-slider"];
     Neo.sliders[sliderType].downHandler(
@@ -7475,8 +7478,13 @@ Neo.SliderTool = class extends Neo.ToolBase {
     this.isDrag = false;
     oe.popTool();
 
-    var rect = this.target.getBoundingClientRect();
-    var sliderType = this.alt
+    if (!this.target) {
+      console.error("SliderTool: Target element not found");
+      return;
+    }
+
+    const rect = this.target.getBoundingClientRect();
+    const sliderType = this.isAlt
       ? Neo.SLIDERTYPE_SIZE
       : this.target["data-slider"];
     Neo.sliders[sliderType].upHandler(
@@ -7488,8 +7496,13 @@ Neo.SliderTool = class extends Neo.ToolBase {
   /** @param {Neo.Painter} oe */
   moveHandler(oe) {
     if (this.isDrag) {
-      var rect = this.target.getBoundingClientRect();
-      var sliderType = this.alt
+      if (!this.target) {
+        console.error("SliderTool: Target element not found");
+        return;
+      }
+
+      const rect = this.target.getBoundingClientRect();
+      const sliderType = this.isAlt
         ? Neo.SLIDERTYPE_SIZE
         : this.target["data-slider"];
       Neo.sliders[sliderType].moveHandler(
@@ -8458,7 +8471,7 @@ Neo.CopyrightCommand = class extends Neo.CommandBase {
 
 Neo.ActionManager = class {
   constructor() {
-    /** @type {any} */
+    /** @type {Array<Array<any>>} */
     this._items = [];
     this._head = 0;
     this._index = 0;
@@ -8847,7 +8860,7 @@ Neo.ActionManager = class {
       }
       oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
     } else {
-      console.log("error in freeHandMove: called from recorder", head);
+      console.log("error in freeHandMove: called from recorder");
     }
   }
 
@@ -11191,7 +11204,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-/**@type {any} */
+/** @type {(Neo.ColorSlider|Neo.SizeSlider)[]} */
 Neo.sliders = [];
 
 Neo.ColorSlider = class {
@@ -11224,7 +11237,7 @@ Neo.ColorSlider = class {
    * カラースライダーを初期化
    * @param {string} elementID
    * @param {any} [params]
-   * @returns {Neo.ColorSlider|null}
+   * @returns {Neo.ColorSlider}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -11364,7 +11377,8 @@ Neo.ColorSlider = class {
       var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
       var color = (r << 16) | (g << 8) | b;
 
-      var colorTip = Neo.ColorTip.getCurrent();
+      var colorTip =
+        /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.getColorString(color));
       }
@@ -11440,7 +11454,7 @@ Neo.SizeSlider = class {
    * サイズスライダーを初期化
    * @param {string} elementID - 要素のID
    * @param {any} [params] - パラメータ
-   * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
+   * @returns {Neo.SizeSlider} - 初期化されたサイズスライダー
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -11503,7 +11517,7 @@ Neo.SizeSlider = class {
     var value0 = Neo.painter.lineWidth;
     var value;
 
-    if (!Neo.painter.sliderTool.alt) {
+    if (!Neo.painter.sliderTool.isAlt) {
       var v = Math.floor(((y - 4) * 30.0) / 33.0);
 
       value = Math.max(Math.min(v, 30), 1);
@@ -11518,12 +11532,14 @@ Neo.SizeSlider = class {
 
   /**
    * スライダーのドラッグ操作によりブラシサイズを更新する。
-   * @param {number} x - 相対X座標
-   * @param {number} y - 相対Y座標
+   * yはサイズ値の算出に、xはポインタがスライダー領域内にあるかの
+   * 当たり判定にのみ使用する。
+   * @param {number} x - 相対X座標(スライダー領域内判定用)
+   * @param {number} y - 相対Y座標(ブラシサイズの算出に使用)
    */
   slide(x, y) {
     var value;
-    if (!Neo.painter.sliderTool.alt) {
+    if (!Neo.painter.sliderTool.isAlt) {
       if (x >= 0 && x < 48 && y >= 0 && y < 41) {
         var v = Math.floor(((y - 4) * 30.0) / 33.0);
         value = v;

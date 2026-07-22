@@ -989,11 +989,11 @@ Neo.Painter = class {
       ) {
         this.pushTool(this.sliderTool);
         this.sliderTool.target = e.target;
-        this.sliderTool.alt = false;
+        this.sliderTool.isAlt = false;
       } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
         this.pushTool(this.sliderTool);
         this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.sliderTool.alt = true;
+        this.sliderTool.isAlt = true;
       } else if (e.target instanceof HTMLElement && this.isWidget(e.target)) {
         // UI操作時のツール切り替え（dummyToolへの差し替え）
         this.isMouseDown = false;
@@ -4162,7 +4162,7 @@ Neo.UndoManager = class {
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット
-  var colorTip = Neo.ColorTip.getCurrent();
+  var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
   if (colorTip) {
     //カラーチップに色をセット
     colorTip.setColor(color);
