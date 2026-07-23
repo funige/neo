@@ -8,7 +8,7 @@
 
 Neo.ActionManager = class {
   constructor() {
-    /** @type {any} */
+    /** @type {Array<Array<any>>} */
     this._items = [];
     this._head = 0;
     this._index = 0;
@@ -397,7 +397,7 @@ Neo.ActionManager = class {
       }
       oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
     } else {
-      console.log("error in freeHandMove: called from recorder", head);
+      console.log("error in freeHandMove: called from recorder");
     }
   }
 
@@ -988,7 +988,7 @@ Neo.ActionManager = class {
     動画表示モード
   -----------------------------------------------------------------------
 */
-/**@param {HTMLElement} applet */
+/** @param {HTMLElement} applet */
 Neo.createViewer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";

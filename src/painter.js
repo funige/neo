@@ -1,5 +1,6 @@
 "use strict";
 //@ts-check
+
 Neo.CurrentToolType = 1;
 
 Neo.Painter = class {
@@ -115,10 +116,8 @@ Neo.Painter = class {
     this.backgroundColor = "#ffffff";
     this.foregroundColor = "#000000";
 
-    /** @type {any} */
-    this.prevMouseX = null;
-    /** @type {any} */
-    this.prevMouseY = null;
+    this.prevMouseX = 0;
+    this.prevMouseY = 0;
 
     this.mouseX = 0;
     this.mouseY = 0;
@@ -254,7 +253,7 @@ Neo.Painter = class {
    * 2. 特定のツール（テキストやペースト）の終了処理を実行する。
    * 3. ツールを入れ替え、新しいツールの初期化を行う。
    * 4. 新しいツールの状態を読み込む。
-   * @param {any} tool - 新しく設定するツールインスタンス
+   * @param {any} tool - Neo.ToolBase 新しく設定するツールインスタンス
    */
   setTool(tool) {
     if (this.tool && this.tool.saveStates) this.tool.saveStates();
@@ -272,8 +271,8 @@ Neo.Painter = class {
     if (this.tool && this.tool.kill) {
       this.tool.kill();
     }
-    this.tool = tool;
-    tool.init();
+    this.tool = /**@type {Neo.ToolBase} */ (tool);
+    /**@type {Neo.ToolBase} */ (tool).init(this);
     if (this.tool && this.tool.loadStates) this.tool.loadStates();
   }
 
@@ -287,8 +286,8 @@ Neo.Painter = class {
    */
   pushTool(tool) {
     this.toolStack.push(this.tool);
-    this.tool = tool;
-    tool.init();
+    this.tool = /**@type {Neo.ToolBase} */ (tool);
+    /**@type {Neo.ToolBase} */ (tool).init(this);
   }
 
   /**
@@ -311,7 +310,7 @@ Neo.Painter = class {
    * ツールがスライダー等の設定変更中である場合、スタックの最上位にある
    * 以前のツール（ペイントツール等）を優先的に返すことで、
    * 現在の操作文脈を正しく取得する。
-   * @returns {any} 現在のツールインスタンス、またはnull
+   * @returns {Neo.ToolBase|null} 現在のツールインスタンス、またはnull
    */
   getCurrentTool() {
     if (this.tool) {
@@ -990,11 +989,11 @@ Neo.Painter = class {
       ) {
         this.pushTool(this.sliderTool);
         this.sliderTool.target = e.target;
-        this.sliderTool.alt = false;
+        this.sliderTool.isAlt = false;
       } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
         this.pushTool(this.sliderTool);
         this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.sliderTool.alt = true;
+        this.sliderTool.isAlt = true;
       } else if (e.target instanceof HTMLElement && this.isWidget(e.target)) {
         // UI操作時のツール切り替え（dummyToolへの差し替え）
         this.isMouseDown = false;
@@ -1119,12 +1118,11 @@ Neo.Painter = class {
       const level = Math.max(0, Math.min(Neo.stabilize_level, 5));
       //手ぶれ補正のレベルを6段階に分けたテーブル
       //0で補正なし、5で最強
-      // [0:無効, 1:0.55, 2:0.8, 3:0.85, 4:0.9, 5:0.96]
-      const stabilityTable = [0.0, 0.55, 0.8, 0.85, 0.9, 0.96];
+      const stabilityTable = [0.0, 0.5, 0.65, 0.8, 0.9, 0.95];
       const stabilityLebel = stabilityTable[level];
       //ブラシサイズが大きい時と拡大時は補正強度を下げる
-      const zoomModifier = this.zoom <= 1 ? 1 : 0.88;
-      const sizeModifier = this.lineWidth <= 8 ? 1 : 0.96;
+      const zoomModifier = this.zoom <= 1 ? 1 : 0.8;
+      const sizeModifier = this.lineWidth <= 8 ? 1 : 0.8;
       const stability = stabilityLebel * zoomModifier * sizeModifier;
       const factor = 1.0 - stability;
 
@@ -3448,14 +3446,14 @@ Neo.Painter = class {
       // 常に透明(0)を返す
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現しない
-      /**@param {number} index */
+      /** @param {number} index */
       fillPixel = function (index) {
         return 0;
       };
     } else {
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現
-      /**@param {number} index */
+      /** @param {number} index */
       fillPixel = function (index) {
         return buf32[index % width];
       };
@@ -3866,6 +3864,7 @@ Neo.Painter = class {
    * @param {string} string - 描画するテキスト
    * @param {string} fontSize - フォントサイズ
    * @param {string} fontFamily - フォントファミリー
+   * @returns {void}
    */
   doText(layer, x, y, color, alpha, string, fontSize, fontFamily) {
     //テキスト描画
@@ -3947,6 +3946,9 @@ Neo.Painter = class {
     return false;
   }
 
+  /**
+   * @returns {number}
+   */
   getEmulationMode() {
     return parseFloat(Neo.config.neo_emulation_mode || 2.22);
   }
@@ -3957,6 +3959,9 @@ Neo.Painter = class {
    -------------------------------------------------------------------------
  */
 
+  /**
+   * @returns {void}
+   */
   play() {
     if (this._actionMgr) {
       this._actionMgr.clearCanvas();
@@ -3972,6 +3977,9 @@ Neo.Painter = class {
     }
   }
 
+  /**
+   * @returns {void}
+   */
   onrewind() {
     if (this._actionMgr) {
       this._actionMgr.clearCanvas();
@@ -3985,6 +3993,9 @@ Neo.Painter = class {
     }
   }
 
+  /**
+   * @returns {void}
+   */
   onmark() {
     if (Neo.viewerBar) Neo.viewerBar.update();
     if (!this._actionMgr._pause) {
@@ -3996,6 +4007,9 @@ Neo.Painter = class {
     }
   }
 
+  /**
+   * @returns {void}
+   */
   onplay() {
     Neo.viewerPlay?.setSelected(true);
     Neo.viewerStop?.setSelected(false);
@@ -4004,12 +4018,17 @@ Neo.Painter = class {
     this._actionMgr.play();
   }
 
+  /**
+   * @returns {void}
+   */
   onstop() {
     Neo.viewerPlay?.setSelected(false);
     Neo.viewerStop?.setSelected(true);
     this._actionMgr._pause = true;
   }
-
+  /**
+   * @returns {void}
+   */
   onspeed() {
     var mgr = this._actionMgr;
     var mode = mgr.speedMode();
@@ -4032,6 +4051,7 @@ Neo.Painter = class {
 
   /**
    * @param {number[]} item
+   * @returns {void}
    */
   getCurrent(item) {
     this._currentColor = [item[2], item[3], item[4], item[5]];
@@ -4040,6 +4060,9 @@ Neo.Painter = class {
     this._currentMaskType = item[10];
   }
 
+  /**
+   * @returns {boolean}
+   */
   isDirty() {
     return this.dirty;
   }
@@ -4099,6 +4122,7 @@ Neo.UndoManager = class {
    * 操作の分岐点を明確にする。
    * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
    * @param {boolean} holdRedo - Redo履歴を保持するかどうか
+   * @returns {void}
    */
   pushUndo(undoItem, holdRedo) {
     this._undoItems.push(undoItem);
@@ -4134,10 +4158,11 @@ Neo.UndoManager = class {
 /**
  * カラーピッカーで色をセット
  * @param {string} color - <input type="color">で取得した色
+ * @returns {void}
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット
-  var colorTip = Neo.ColorTip.getCurrent();
+  var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
   if (colorTip) {
     //カラーチップに色をセット
     colorTip.setColor(color);

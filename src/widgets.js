@@ -132,8 +132,7 @@ Neo.Button = class {
 
     if (this.params.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
-        /** @type {any} */
-        const toolTip = Neo.toolButtons[i];
+        const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
       }
       Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -162,6 +161,7 @@ Neo.Button = class {
   }
   /**
    * @param {boolean} selected
+   * @returns {void}
    */
   setSelected(selected) {
     if (this.element) {
@@ -216,6 +216,7 @@ Neo.RightButton = class extends Neo.Button {
 
   /**
    * @param {boolean} selected
+   * @returns {void}
    */
   setSelected(selected) {
     if (this.element) {
@@ -378,7 +379,7 @@ Neo.ColorTip = class {
         //              this.setColor(Neo.painter.foregroundColor);
         //          }
       }
-      colorTip.setSelected(this == colorTip) ? true : false;
+      colorTip.setSelected(this === colorTip);
     }
     Neo.painter.setColor(this.color);
     Neo.updateUIColor(true, false);
@@ -409,6 +410,7 @@ Neo.ColorTip = class {
 
   /**
    * @param {boolean} selected
+   * @returns {void|null}
    */
   setSelected(selected) {
     if (!this.element) {
@@ -426,7 +428,7 @@ Neo.ColorTip = class {
   /**
    * カラーチップに色をセット
    * @param {string} color
-   * @returns
+   * @returns {void|null}
    */
   setColor(color) {
     if (!this.element) {
@@ -437,7 +439,9 @@ Neo.ColorTip = class {
     this.color = color;
     this.element.style.backgroundColor = color;
   }
-
+  /**
+   * @returns {Neo.ColorTip|null}
+   */
   static getCurrent() {
     for (var i = 0; i < Neo.colorTips.length; i++) {
       var colorTip = Neo.colorTips[i];
@@ -453,7 +457,7 @@ Neo.ColorTip = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {object[]} */
+/** @type {(Neo.FillButton|Neo.ToolTip)[]} */
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
@@ -519,7 +523,7 @@ Neo.ToolTip = class {
     this.fixed = false;
 
     this.prevMode = -1;
-    /**@type {any} */
+    /**@type {number[]} */
     this.tools = [];
     /**@type {any} */
     this.toolIcons = [];
@@ -605,9 +609,8 @@ Neo.ToolTip = class {
     if (this.isTool) {
       if (this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          /** @type {any} */
-          const toolTip = Neo.toolButtons[i];
-          toolTip.setSelected(this == toolTip ? true : false);
+          const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+          toolTip.setSelected(this === toolTip);
         }
       } else {
         var length = this.toolStrings.length;
@@ -647,6 +650,7 @@ Neo.ToolTip = class {
   }
   /**
    * @param {boolean} selected
+   * @returns {void|null}
    */
   setSelected(selected) {
     if (!this.element) {
@@ -738,6 +742,7 @@ Neo.PenTip = class extends Neo.ToolTip {
     this.isTool = true;
     /** @type {string[]} */
     this.toolStrings = [];
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_PEN,
       Neo.Painter.TOOLTYPE_BRUSH,
@@ -789,6 +794,8 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
     super();
     /** @type {string[]} */
     this.toolStrings = [];
+
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_TONE,
       Neo.Painter.TOOLTYPE_BLUR,
@@ -914,6 +921,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
     this.canvas = null;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_ERASER,
       Neo.Painter.TOOLTYPE_ERASERECT,
@@ -993,6 +1001,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
     this.isTool = false;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_RECTFILL,
       Neo.Painter.TOOLTYPE_RECT,
@@ -1058,6 +1067,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
     this.element = null;
     this.mode = 0;
 
+    /** @type {number[]} **/
     this.tools = [
       Neo.Painter.TOOLTYPE_COPY,
       Neo.Painter.TOOLTYPE_MERGE,
@@ -1275,7 +1285,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-/**@type {any} */
+/** @type {(Neo.ColorSlider|Neo.SizeSlider)[]} */
 Neo.sliders = [];
 
 Neo.ColorSlider = class {
@@ -1308,7 +1318,7 @@ Neo.ColorSlider = class {
    * カラースライダーを初期化
    * @param {string} elementID
    * @param {any} [params]
-   * @returns {Neo.ColorSlider|null}
+   * @returns {Neo.ColorSlider}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1448,7 +1458,8 @@ Neo.ColorSlider = class {
       var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
       var color = (r << 16) | (g << 8) | b;
 
-      var colorTip = Neo.ColorTip.getCurrent();
+      var colorTip =
+        /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.getColorString(color));
       }
@@ -1524,7 +1535,7 @@ Neo.SizeSlider = class {
    * サイズスライダーを初期化
    * @param {string} elementID - 要素のID
    * @param {any} [params] - パラメータ
-   * @returns {Neo.SizeSlider|null} - 初期化されたサイズスライダーまたはnull
+   * @returns {Neo.SizeSlider} - 初期化されたサイズスライダー
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1587,7 +1598,7 @@ Neo.SizeSlider = class {
     var value0 = Neo.painter.lineWidth;
     var value;
 
-    if (!Neo.painter.sliderTool.alt) {
+    if (!Neo.painter.sliderTool.isAlt) {
       var v = Math.floor(((y - 4) * 30.0) / 33.0);
 
       value = Math.max(Math.min(v, 30), 1);
@@ -1602,12 +1613,14 @@ Neo.SizeSlider = class {
 
   /**
    * スライダーのドラッグ操作によりブラシサイズを更新する。
-   * @param {number} x - 相対X座標
-   * @param {number} y - 相対Y座標
+   * yはサイズ値の算出に、xはポインタがスライダー領域内にあるかの
+   * 当たり判定にのみ使用する。
+   * @param {number} x - 相対X座標(スライダー領域内判定用)
+   * @param {number} y - 相対Y座標(ブラシサイズの算出に使用)
    */
   slide(x, y) {
     var value;
-    if (!Neo.painter.sliderTool.alt) {
+    if (!Neo.painter.sliderTool.isAlt) {
       if (x >= 0 && x < 48 && y >= 0 && y < 41) {
         var v = Math.floor(((y - 4) * 30.0) / 33.0);
         value = v;
@@ -1639,7 +1652,7 @@ Neo.SizeSlider = class {
     var tool = Neo.painter.getCurrentTool();
     if (tool) {
       if (tool.type == Neo.Painter.TOOLTYPE_BRUSH) {
-        Neo.painter.alpha = tool.getAlpha();
+        Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
         Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
       } else if (tool.type == Neo.Painter.TOOLTYPE_TEXT) {
         Neo.painter.updateInputText();
@@ -1803,7 +1816,7 @@ Neo.LayerControl = class {
     ReserveControl
   -------------------------------------------------------------------------
 */
-/** @type {any} */
+/** @type {Neo.ReserveControl[]} */
 Neo.reserveControls = [];
 
 Neo.ReserveControl = class {
@@ -1952,15 +1965,16 @@ Neo.ScrollBarButton = class {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
+    /** @typedef {HTMLElement & { "data-bar": boolean | string | number }} BarElement */
 
     if (this.element) {
       this.element.innerHTML = "<div></div>";
       this.barButton = this.element.querySelector("div");
-      /**@type {any} */
+      /** @type {BarElement} */
       (this.element)["data-bar"] = true;
     }
     if (this.barButton) {
-      /**@type {any} */
+      /** @type {BarElement} */
       (this.barButton)["data-bar"] = true;
     }
 
@@ -2198,7 +2212,7 @@ Neo.ViewerBar = class {
     this.seekElement.style.width = seekX + "px";
     this.textElement.innerHTML = this.seek + "/" + this.length;
   }
-  /**@param {TouchEvent|PointerEvent} e */
+  /** @param {TouchEvent|PointerEvent} e */
   _touchHandler(e) {
     if (e instanceof PointerEvent) {
       if (e.offsetX === undefined) {

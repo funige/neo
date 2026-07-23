@@ -9,8 +9,7 @@ Neo.ToolBase = class {
     this.isUpMove = false;
     this.ticking = false;
 
-    /**@type {any} */
-    this.type = null;
+    this.type = 0;
     this.step = 0;
     this.reverse = false;
     this.lineType = Neo.Painter.LINETYPE_NONE;
@@ -53,7 +52,9 @@ Neo.ToolBase = class {
   getType() {
     return this.type;
   }
-
+  /**
+   * @returns {Neo.ToolTip|Neo.FillButton|null}
+   */
   getToolButton() {
     switch (this.type) {
       case Neo.Painter.TOOLTYPE_PEN:
@@ -405,6 +406,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     ctx.save();
     this.transformForZoom(oe);
 
+    /** @type {number} */
     var c = this.type == Neo.Painter.TOOLTYPE_ERASER ? 0x0000ff : 0xffff7f;
     oe.drawXOREllipse(ctx, x - r, y - r, r * 2, r * 2, false, c);
 
@@ -729,6 +731,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
 Neo.PenTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_PEN;
     this.lineType = Neo.Painter.LINETYPE_PEN;
   }
@@ -752,6 +755,7 @@ Neo.PenTool = class extends Neo.DrawToolBase {
 Neo.BrushTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_BRUSH;
     this.lineType = Neo.Painter.LINETYPE_BRUSH;
   }
@@ -780,6 +784,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
 Neo.ToneTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_TONE;
     this.lineType = Neo.Painter.LINETYPE_TONE;
   }
@@ -803,6 +808,7 @@ Neo.ToneTool = class extends Neo.DrawToolBase {
 Neo.EraserTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ERASER;
     this.lineType = Neo.Painter.LINETYPE_ERASER;
   }
@@ -817,6 +823,7 @@ Neo.EraserTool = class extends Neo.DrawToolBase {
 Neo.BlurTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_BLUR;
     this.lineType = Neo.Painter.LINETYPE_BLUR;
   }
@@ -840,6 +847,7 @@ Neo.BlurTool = class extends Neo.DrawToolBase {
 Neo.DodgeTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_DODGE;
     this.lineType = Neo.Painter.LINETYPE_DODGE;
   }
@@ -863,6 +871,7 @@ Neo.DodgeTool = class extends Neo.DrawToolBase {
 Neo.BurnTool = class extends Neo.DrawToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_BURN;
     this.lineType = Neo.Painter.LINETYPE_BURN;
   }
@@ -890,6 +899,7 @@ Neo.HandTool = class extends Neo.ToolBase {
     this.latestY = 0;
     this.startX = 0;
     this.startY = 0;
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_HAND;
     this.isUpMove = false;
     this.reverse = false;
@@ -966,11 +976,11 @@ Neo.HandTool = class extends Neo.ToolBase {
 Neo.SliderTool = class extends Neo.ToolBase {
   constructor() {
     super();
-    /** @type {any} */
-    this.target = null;
+    this.target = /**@type {any} **/ (null);
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_SLIDER;
     this.isUpMove = false;
-    this.alt = false;
+    this.isAlt = false;
   }
 
   /** @param {Neo.Painter} oe */
@@ -980,8 +990,12 @@ Neo.SliderTool = class extends Neo.ToolBase {
     if (!oe.isCopyActive) {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
-    var rect = this.target.getBoundingClientRect();
-    var sliderType = this.alt
+    if (!this.target) {
+      console.error("SliderTool: Target element not found");
+      return;
+    }
+    const rect = this.target.getBoundingClientRect();
+    const sliderType = this.isAlt
       ? Neo.SLIDERTYPE_SIZE
       : this.target["data-slider"];
     Neo.sliders[sliderType].downHandler(
@@ -995,8 +1009,13 @@ Neo.SliderTool = class extends Neo.ToolBase {
     this.isDrag = false;
     oe.popTool();
 
-    var rect = this.target.getBoundingClientRect();
-    var sliderType = this.alt
+    if (!this.target) {
+      console.error("SliderTool: Target element not found");
+      return;
+    }
+
+    const rect = this.target.getBoundingClientRect();
+    const sliderType = this.isAlt
       ? Neo.SLIDERTYPE_SIZE
       : this.target["data-slider"];
     Neo.sliders[sliderType].upHandler(
@@ -1008,8 +1027,13 @@ Neo.SliderTool = class extends Neo.ToolBase {
   /** @param {Neo.Painter} oe */
   moveHandler(oe) {
     if (this.isDrag) {
-      var rect = this.target.getBoundingClientRect();
-      var sliderType = this.alt
+      if (!this.target) {
+        console.error("SliderTool: Target element not found");
+        return;
+      }
+
+      const rect = this.target.getBoundingClientRect();
+      const sliderType = this.isAlt
         ? Neo.SLIDERTYPE_SIZE
         : this.target["data-slider"];
       Neo.sliders[sliderType].moveHandler(
@@ -1036,6 +1060,7 @@ Neo.SliderTool = class extends Neo.ToolBase {
 Neo.FillTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_FILL;
     this.isUpMove = false;
   }
@@ -1075,6 +1100,7 @@ Neo.FillTool = class extends Neo.ToolBase {
 Neo.EraseAllTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ERASEALL;
     this.isUpMove = false;
   }
@@ -1242,6 +1268,7 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
 Neo.EraseRectTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ERASERECT;
   }
 
@@ -1271,6 +1298,7 @@ Neo.EraseRectTool = class extends Neo.EffectToolBase {
 Neo.FlipHTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_FLIP_H;
   }
 
@@ -1299,6 +1327,7 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
 Neo.FlipVTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_FLIP_V;
   }
 
@@ -1327,6 +1356,7 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
 Neo.BlurRectTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_BLURRECT;
   }
 
@@ -1364,6 +1394,7 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
 Neo.TurnTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_TURN;
   }
 
@@ -1402,6 +1433,7 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
 Neo.MergeTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_MERGE;
   }
 
@@ -1430,6 +1462,7 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
 Neo.CopyTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_COPY;
   }
 
@@ -1470,6 +1503,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
     this.startY = 0;
     this.latestDX = 0;
     this.latestDY = 0;
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_PASTE;
   }
 
@@ -1564,6 +1598,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
 Neo.RectTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_RECT;
   }
 
@@ -1573,6 +1608,7 @@ Neo.RectTool = class extends Neo.EffectToolBase {
    * @param {Number} y
    * @param {Number} width
    * @param {Number} height
+   * @returns {void}
    *
    */
   doEffect(oe, x, y, width, height) {
@@ -1592,8 +1628,8 @@ Neo.RectTool = class extends Neo.EffectToolBase {
 Neo.RectFillTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_RECTFILL;
-
     this.isFill = true;
   }
   /**
@@ -1621,6 +1657,7 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
 Neo.EllipseTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ELLIPSE;
     this.isEllipse = true;
   }
@@ -1650,6 +1687,7 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
 Neo.EllipseFillTool = class extends Neo.EffectToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
     this.isEllipse = true;
     this.isFill = true;
@@ -1680,6 +1718,7 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
 Neo.TextTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_TEXT;
     this.isUpMove = false;
   }
@@ -1792,6 +1831,7 @@ Neo.TextTool = class extends Neo.ToolBase {
 Neo.DummyTool = class extends Neo.ToolBase {
   constructor() {
     super();
+    /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_NONE;
     this.isUpMove = false;
   }

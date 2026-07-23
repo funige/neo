@@ -49,7 +49,7 @@ Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
 /** @type {any} **/
-Neo.rules = {};
+Neo.rules = [];
 /** @type {any} **/
 Neo.config = {
   width: 300,
@@ -778,7 +778,7 @@ Neo.addRule = function (selector, styleName, value, sheet = null) {
  * @returns {void}
  */
 Neo.readStyles = function () {
-  Neo.rules = {};
+  Neo.rules = [];
   for (var i = 0; i < document.styleSheets.length; i++) {
     Neo.readStyle(document.styleSheets[i]);
   }
@@ -1290,8 +1290,8 @@ Neo.showWarning = function () {
 Neo.updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
   for (let i = 0; i < Neo.toolButtons.length; i++) {
-    /** @type {any} */
-    const toolTip = Neo.toolButtons[i];
+    //@ts-ignore
+    const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
     if (current) {
       if (current == toolTip) {
         toolTip.setSelected(true);
@@ -1314,22 +1314,24 @@ Neo.updateUI = function () {
  */
 Neo.updateUIColor = function (updateSlider, updateColorTip) {
   for (let i = 0; i < Neo.toolButtons.length; i++) {
-    /** @type {any} */
-    const toolTip = Neo.toolButtons[i];
+    //@ts-ignore
+    const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
     toolTip.update();
   }
 
   if (updateSlider) {
     for (let i = 0; i < Neo.sliders.length; i++) {
-      /** @type {any} */
-      var slider = Neo.sliders[i];
+      //@ts-ignore
+      const slider = /** @type {Neo.ColorSlider|Neo.SizeSlider} */ (
+        Neo.sliders[i]
+      );
       slider.update();
     }
   }
 
   // パレットを変更するとき
   if (updateColorTip) {
-    var colorTip = Neo.ColorTip.getCurrent();
+    var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
     if (colorTip) {
       colorTip.setColor(Neo.painter.foregroundColor);
     }
