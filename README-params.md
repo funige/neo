@@ -275,3 +275,47 @@ v1.6 からはより安全で扱いやすい formData を使ったデータ送�
 [エラーチェックとか省略した短いサンプル](sample/posttest.php)を作りましたので、参考にどうぞ。
 
 [実際の掲示板で使われているコード](sample/sample_handler.php)の例はこちら。
+
+# Neo.handleExit()  
+
+パスワード等の機密データをGETパラメータにセットして送信する事がありました。
+```
+<param name="url_exit" value="./?pwd="パスワード">
+```
+これをより安全なPOSTに変更する事ができるようになりました。  
+投稿ボタンを押したあとの画面移動を、`Neo.handleExit()`関数を経由して行います。      
+この関数でFetch APIを使ったPOSTを行えばパスワードなどの機密データをより安全に送信する事ができます。  
+```
+Neo.handleExit = ()=>{
+	const formData = new FormData();
+	formData.append("pwd", "パスワード"); // 画像差し換え
+fetch("./", {
+	method: 'POST',
+	mode: 'same-origin',
+	headers: {
+		'X-Requested-With': 'PaintBBS'
+		,
+	},
+	body: formData
+})
+.then(response => {
+	if (response.ok) {
+		if (response.redirected) {
+			return window.location.href = response.url;
+		}
+		response.text().then((text) => {
+			if (text.startsWith("error\n")) {
+					return window.location.href = "./?mode=paintcom";
+				}
+		})
+	}
+})
+.catch(error => {
+	console.error('There was a problem with the fetch operation:', error);
+	return window.location.href = "./?mode=paintcom";
+});
+}
+```
+PaintBBS NEOの`neo.js`から参照可能なスコープの中で`Neo.handleExit()`関数を定義すると、`Neo.handleExit()`が実行され、FormDataをセットして画面移動する事ができるようになります。  
+`Neo.handleExit()`が参照可能なスコープの中にある時は、`url_exit`による画面移動は行われなくなります。   
+そのため画面移動の移動先を`Neo.handleExit()`で指定する必要があります。  

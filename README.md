@@ -62,6 +62,12 @@ PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/
 ### Javaアプレットを前提とした古い掲示板でNEOを使うための[移行ガイド](README-potiboard.md)      
 (古い PHP のコードには色々問題がありますので、お勧めできません)
 
+### PaintBBS NEOのサポート
+**掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
+
+## [動作確認用掲示板](http://futabize.websozai.jp)
+
+以前ここで公開していた旧掲示板は[こちら](http://neo.websozai.jp)。
 
 ### 起動オプション
 - PaintBBS オリジナルの起動オプションについては[オリジナルの README](https://web.archive.org/web/20070822002857/https://hp.vector.co.jp/authors/VA016309/paintbbs/document/Readme_Shichan.html)
@@ -140,13 +146,6 @@ document.addEventListener("neo:fullscreenchange", (e) => {
 0で手ぶれ補正なし、5で最大。  
 無指定の時には、手ぶれ補正機能が無効になります。     
 
-### PaintBBS NEOのサポート
-**掲示板の設置以外についての質問・要望は[こちら](https://github.com/funige/neo/issues)でお願いします。**
-
-## [動作確認用掲示板](http://futabize.websozai.jp)
-
-以前ここで公開していた旧掲示板は[こちら](http://neo.websozai.jp)。
-
 ## <a name="app">Mac/Win 用アプリについて</a>
 
 Mac/Win 用アプリは、NEO 開発の過程で使われたものです。  
@@ -168,6 +167,14 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 -->
 
 ## <a name="history">履歴</a>
+#### ver1.7.18 (2026/08/23)
+- 画像をキャンバスに読み込んで、何も描画せずに投稿を完了した時に、データの配列が空の不正な動画データが作成される事がありました。    
+そのため動画データから続きを描く事ができなくなっていました。    
+この問題に対応するため、描画履歴の配列が空の時は、アンドゥの履歴をプッシュして画像データを配列に追加するようになりました。      
+
+#### ver1.7.17 (2026/07/25)
+- boardやboardURLではわかりにくいため、基準となるURLの変数名をbaseURLに変更しました。
+- JSDocを修正しました。
 #### ver1.7.16 (2026/07/23)
 #### 手ぶれ補正強度の見直し
 - 手ぶれ補正レベル1の時の補正強度を弱めました。
