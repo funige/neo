@@ -1345,8 +1345,11 @@ Neo.Painter = class {
     var miny = (this.destCanvas.height / this.zoom) * 0.5;
     var maxy = this.canvasHeight - miny;
 
-    x = Math.round(Math.max(Math.min(maxx, x), minx));
-    y = Math.round(Math.max(Math.min(maxy, y), miny));
+    // Math.roundでで丸めない。
+    // 拡大時にキャンバスの端で円カーソルのグリッチが発生するため
+    // 浮動小数点数で計算。
+    x = Math.max(Math.min(maxx, x), minx);
+    y = Math.max(Math.min(maxy, y), miny);
 
     this.zoomX = x;
     this.zoomY = y;
