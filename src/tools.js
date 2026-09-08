@@ -1178,8 +1178,8 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
 
     var x = this.startX < this.endX ? this.startX : this.endX;
     var y = this.startY < this.endY ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX);
-    var height = Math.abs(this.startY - this.endY);
+    var width = Math.abs(this.startX - this.endX) + 1;
+    var height = Math.abs(this.startY - this.endY) + 1;
     var ctx = oe.canvasCtx[oe.current];
 
     if (x < 0) x = 0;
