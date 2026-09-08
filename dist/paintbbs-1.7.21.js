@@ -7901,10 +7901,15 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
     this.endX = Math.floor(this.endX);
     this.endY = Math.floor(this.endY);
 
+    if (this.startX >= oe.canvasWidth) this.startX = oe.canvasWidth - 1;
+    if (this.endX >= oe.canvasWidth) this.endX = oe.canvasWidth - 1;
+    if (this.startY >= oe.canvasHeight) this.startY = oe.canvasHeight - 1;
+    if (this.endY >= oe.canvasHeight) this.endY = oe.canvasHeight - 1;
+
     var x = this.startX < this.endX ? this.startX : this.endX;
     var y = this.startY < this.endY ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX);
-    var height = Math.abs(this.startY - this.endY);
+    var width = Math.abs(this.startX - this.endX) + 1;
+    var height = Math.abs(this.startY - this.endY) + 1;
 
     if (width > 0 && height > 0) {
       oe._pushUndo();
