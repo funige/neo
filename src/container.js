@@ -2012,7 +2012,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const touch_move_grid_control = function (e) {
     if (Neo.config.neo_disable_grid_touch_move) {
       let screenwidth = Number(screen.width);
-      if (screenwidth - Neo.config.applet_width > 100) {
+      if (
+        e.touches.length === 1 &&
+        (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)
+      ) {
         if (typeof e.cancelable !== "boolean" || e.cancelable) {
           e.preventDefault();
           e.stopPropagation();
