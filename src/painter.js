@@ -1311,8 +1311,8 @@ Neo.Painter = class {
 
     const container = document.getElementById("neo-container");
     if (!container) return;
-    var width = Math.round(this.canvasWidth * this.zoom);
-    var height = Math.round(this.canvasHeight * this.zoom);
+    var width = this.canvasWidth * this.zoom;
+    var height = this.canvasHeight * this.zoom;
 
     if (width > container.clientWidth - 100)
       width = container.clientWidth - 100;
