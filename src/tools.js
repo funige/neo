@@ -322,11 +322,10 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
       oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
       oe.cursorRect = null;
     }
-    if (oe.zoom < 1) {
-      //縮小時はポインターアップで全体更新
-      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
-    }
-    //  this.drawCursor(oe);
+    // if (oe.zoom < 1) {
+    //   //縮小時はポインターアップで全体更新
+    //   oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+    // }
     oe.prevLine = null;
   }
 
