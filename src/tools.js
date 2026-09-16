@@ -266,7 +266,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
   rollOutHandler(oe) {
     if (!oe.isMouseDown && !oe.isMouseDownRight) {
       oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+      // oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
   }
 

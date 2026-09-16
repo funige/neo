@@ -1398,14 +1398,13 @@ Neo.resizeCanvas = function () {
   var width = width0 < appletWidth - 100 ? width0 : appletWidth - 100;
   var height = height0 < appletHeight - 120 ? height0 : appletHeight - 120;
 
-  //width, heightは偶数でないと誤差が出るため
-  width = Math.floor(width / 2) * 2;
-  height = Math.floor(height / 2) * 2;
-
   if (Neo.viewer) {
     width = canvasWidth;
     height = canvasHeight;
   }
+  //width, heightは偶数でないと誤差が出るため
+  width = Math.floor(width / 2) * 2;
+  height = Math.floor(height / 2) * 2;
 
   Neo.painter.destWidth = width;
   Neo.painter.destHeight = height;
@@ -1426,9 +1425,9 @@ Neo.resizeCanvas = function () {
   if (Neo.painter.zoom < 1) {
     // 表示用アンチエイリアスを有効化
     ctx.imageSmoothingEnabled = true;
+    destCanvas.style.imageRendering = "smooth";
     // 品質を指定（対応ブラウザのみ有効）
     if (Neo.painter.zoom < 0.5 && "imageSmoothingQuality" in ctx) {
-      destCanvas.style.imageRendering = "smooth";
       ctx.imageSmoothingQuality = "high";
     }
   } else {
