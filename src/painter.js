@@ -855,6 +855,16 @@ Neo.Painter = class {
         this._pushUndo();
         this._actionMgr.eraseAll();
       }
+      //ショートカットキー
+      //`]`でブラシサイズを1px上げる`[`でブラシサイズを1px下げる
+      if (e.key === "]") {
+        Neo.sizeslider.value++;
+        Neo.sizeslider.setSize(Neo.sizeslider.value);
+      }
+      if (e.key === "[") {
+        Neo.sizeslider.value = Math.max(Neo.sizeslider.value - 1, 1);
+        Neo.sizeslider.setSize(Neo.sizeslider.value);
+      }
     }
   }
   /**

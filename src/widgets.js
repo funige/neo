@@ -1529,18 +1529,6 @@ Neo.SizeSlider = class {
     this.label = null;
     /** @type {Element|null} */
     this.hit = null;
-    //ショートカットキー
-    //`]`でブラシサイズを1px上げる`[`でブラシサイズを1px下げる
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "]") {
-        this.value++;
-        this.setSize(this.value);
-      }
-      if (e.key === "[") {
-        this.value = Math.max(this.value - 1, 1);
-        this.setSize(this.value);
-      }
-    });
   }
 
   /**

@@ -127,7 +127,9 @@ Neo.speed = 0;
 Neo.params = null;
 /**@type {object|null} */
 Neo.param = null;
-
+// @ts-ignore
+/**@type {Neo.SizeSlider|null} */
+Neo.sizeslider = null;
 Neo.SLIDERTYPE_RED = 0;
 Neo.SLIDERTYPE_GREEN = 1;
 Neo.SLIDERTYPE_BLUE = 2;
@@ -1185,12 +1187,10 @@ Neo.initButtons = function () {
   );
 
   // sizeSlider
-  Neo.sliders[Neo.SLIDERTYPE_SIZE] = new Neo.SizeSlider().init(
-    "neo-sliderSize",
-    {
-      type: Neo.SLIDERTYPE_SIZE,
-    },
-  );
+  Neo.sizeslider = new Neo.SizeSlider();
+  Neo.sliders[Neo.SLIDERTYPE_SIZE] = Neo.sizeslider.init("neo-sliderSize", {
+    type: Neo.SLIDERTYPE_SIZE,
+  });
 
   // reserveControl
   for (var i = 1; i <= 3; i++) {
