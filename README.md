@@ -42,12 +42,9 @@ Firefoxでは描画がスムーズに行えない場合があります。
 
 ## <a name="deploy">お絵かき掲示板の設置方法について</a>
 
-PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/satopian)、[さこつ](https://github.com/sakots)は、お絵かき掲示板のPHPスクリプトを開発しています。  
+PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/satopian)は、お絵かき掲示板のPHPスクリプトを開発しています。  
 ぜひご利用ください。    
-### noReita
-- [SABRINA NO REITA お絵かき掲示板](https://oekakibbs.moe/)   
-  
-サイト内にサポート掲示板があります。
+
 ### POTI-board EVO
 - [お絵かき掲示板PHPスクリプト POTI-board改公式サイト](https://paintbbs.sakura.ne.jp/poti/)
 ### Petit Note
