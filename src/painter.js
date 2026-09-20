@@ -1687,23 +1687,48 @@ Neo.Painter = class {
     ctx.globalAlpha = 1.0;
 
     const zoom = this.zoom;
+    // 1.5倍のときだけ「3倍(最近傍) → 2:1縮小」を使う
+    const isZoom1_5 = zoom === 1.5;
+
     // ---- 描画先座標（拡大／縮小後のキャンバス側） ----
     // scrollBarX/Y は 0～1 の比率
     this.scrollBarX = isNaN(this.scrollBarX) ? 0 : this.scrollBarX;
     this.scrollBarY = isNaN(this.scrollBarY) ? 0 : this.scrollBarY;
-    const offsetX =
+    let offsetX =
       this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width);
-    const offsetY =
+    let offsetY =
       this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height);
+    // 1.5倍表示のときは、最近傍で3倍に拡大してから2:1(2x2平均)で縮小する。
+    // 非整数倍の最近傍で線の太さが1px<->2pxに偏るのを防ぐため。
+    // 更新矩形は元画像の2px単位(=表示側3px周期)に、オフセットは整数に揃え、
+    // 部分更新と全面更新で補間結果が一致するようにする。
+    if (isZoom1_5) {
+      // 部分更新と全面更新で補間の位相を揃えるため、オフセットを整数化
+      offsetX = Math.round(offsetX);
+      offsetY = Math.round(offsetY);
+
+      // 3px周期に合わせるため、更新矩形を2px単位で外側に丸める
+      const x1 = Math.min(canvasWidth, Math.ceil((x + width) / 2) * 2);
+      const y1 = Math.min(canvasHeight, Math.ceil((y + height) / 2) * 2);
+      x = Math.floor(x / 2) * 2;
+      y = Math.floor(y / 2) * 2;
+      width = x1 - x;
+      height = y1 - y;
+      const pad = 2;
+      const px0 = Math.max(0, x - pad);
+      const py0 = Math.max(0, y - pad);
+      const px1 = Math.min(canvasWidth, x + width + pad);
+      const py1 = Math.min(canvasHeight, y + height + pad);
+      x = px0;
+      y = py0;
+      width = px1 - px0;
+      height = py1 - py0;
+    }
 
     const zx = Math.round(x * zoom - offsetX);
     const zy = Math.round(y * zoom - offsetY);
-
-    const zx2 = Math.round((x + width) * zoom - offsetX);
-    const zy2 = Math.round((y + height) * zoom - offsetY);
-
-    const zw = zx2 - zx;
-    const zh = zy2 - zy;
+    const zw = Math.round((x + width) * zoom - offsetX) - zx;
+    const zh = Math.round((y + height) * zoom - offsetY) - zy;
 
     // ---- 背景クリア ----
     if (updateAll) {
@@ -1713,10 +1738,48 @@ Neo.Painter = class {
     }
 
     // ---- レイヤー描画 ----
-    if (this.visible[0])
-      ctx.drawImage(this.canvas[0], x, y, width, height, zx, zy, zw, zh);
-    if (this.visible[1])
-      ctx.drawImage(this.canvas[1], x, y, width, height, zx, zy, zw, zh);
+    let drawn = false;
+
+    if (isZoom1_5) {
+      const tw = width * 3;
+      const th = height * 3;
+
+      let tmp = this._zoom15Canvas;
+      if (!tmp) {
+        tmp = this._zoom15Canvas = document.createElement("canvas");
+        this._zoom15Ctx = tmp.getContext("2d");
+      }
+      const tctx = this._zoom15Ctx;
+
+      if (tctx) {
+        if (tmp.width !== tw || tmp.height !== th) {
+          // サイズ変更でクリアされる（コンテキスト状態もリセットされる）
+          tmp.width = tw;
+          tmp.height = th;
+        } else {
+          tctx.clearRect(0, 0, tw, th);
+        }
+        // リサイズ後に設定する
+        tctx.imageSmoothingEnabled = false;
+        for (let i = 0; i < 2; i++) {
+          if (this.visible[i])
+            tctx.drawImage(this.canvas[i], x, y, width, height, 0, 0, tw, th);
+        }
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "low"; // 2:1 = 2x2平均
+        ctx.drawImage(tmp, 0, 0, tw, th, zx, zy, zw, zh);
+        drawn = true;
+      }
+    }
+
+    if (!drawn) {
+      // 1.5倍以外、またはコンテキスト取得失敗時は従来どおり
+      if (this.visible[0])
+        ctx.drawImage(this.canvas[0], x, y, width, height, zx, zy, zw, zh);
+      if (this.visible[1])
+        ctx.drawImage(this.canvas[1], x, y, width, height, zx, zy, zw, zh);
+    }
 
     // ---- テンポラリレイヤー ----
     if (useTemp) {
