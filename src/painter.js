@@ -1687,8 +1687,8 @@ Neo.Painter = class {
     ctx.globalAlpha = 1.0;
 
     const zoom = this.zoom;
-    // 1.5倍のときだけ「3倍(最近傍) → 2:1縮小」を使う
-    const isZoom1_5 = zoom === 1.5;
+    // 1.5倍のときだけ「最近傍 → 2:1縮小」を使う
+    const is_useSuperSample = zoom === 1.5;
 
     // ---- 描画先座標（拡大／縮小後のキャンバス側） ----
     // scrollBarX/Y は 0～1 の比率
@@ -1702,7 +1702,7 @@ Neo.Painter = class {
     // 非整数倍の最近傍で線の太さが1px<->2pxに偏るのを防ぐため。
     // 更新矩形は元画像の2px単位(=表示側3px周期)に、オフセットは整数に揃え、
     // 部分更新と全面更新で補間結果が一致するようにする。
-    if (isZoom1_5) {
+    if (is_useSuperSample) {
       // 部分更新と全面更新で補間の位相を揃えるため、オフセットを整数化
       offsetX = Math.round(offsetX);
       offsetY = Math.round(offsetY);
@@ -1714,6 +1714,34 @@ Neo.Painter = class {
       y = Math.floor(y / 2) * 2;
       width = x1 - x;
       height = y1 - y;
+
+      // 表示されている範囲（元画像座標）に絞り込む。これも2px単位で外側に丸める。
+      // 中間キャンバスが元キャンバスのサイズに依存して巨大化するのを防ぐ。
+      const vx0 = Math.max(0, Math.floor(offsetX / zoom / 2) * 2);
+      const vy0 = Math.max(0, Math.floor(offsetY / zoom / 2) * 2);
+      const vx1 = Math.min(
+        canvasWidth,
+        Math.ceil((offsetX + this.destCanvas.width) / zoom / 2) * 2,
+      );
+      const vy1 = Math.min(
+        canvasHeight,
+        Math.ceil((offsetY + this.destCanvas.height) / zoom / 2) * 2,
+      );
+      const nx = Math.max(x, vx0);
+      const ny = Math.max(y, vy0);
+      const nw = Math.min(x + width, vx1) - nx;
+      const nh = Math.min(y + height, vy1) - ny;
+      if (nw <= 0 || nh <= 0) {
+        // 更新範囲が画面外。save済みなので必ず戻す
+        ctx.restore();
+        return;
+      }
+      x = nx;
+      y = ny;
+      width = nw;
+      height = nh;
+
+      // 縮小時に矩形の縁で補間が欠けないよう、周囲に余白を持たせる
       const pad = 2;
       const px0 = Math.max(0, x - pad);
       const py0 = Math.max(0, y - pad);
@@ -1740,9 +1768,10 @@ Neo.Painter = class {
     // ---- レイヤー描画 ----
     let drawn = false;
 
-    if (isZoom1_5) {
-      const tw = width * 3;
-      const th = height * 3;
+    if (is_useSuperSample) {
+      const k = zoom * 2;
+      const tw = width * k;
+      const th = height * k;
 
       let tmp = this._zoom15Canvas;
       if (!tmp) {
