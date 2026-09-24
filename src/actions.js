@@ -1097,7 +1097,12 @@ Neo.initViewer = function (pch) {
     viewerBar.style.position = "absolute";
     viewerBar.style.right = "2px";
     viewerBar.style.top = "1px";
-    viewerBar.style.width = pageWidth - 24 * 6 - 2 + "px";
+    if (Neo.config.neo_viewer_max_width_100) {
+      viewerBar.style.left = 24 * 6 - 2 + "px"; // ボタン6個ぶん
+      viewerBar.style.width = "auto";
+    } else {
+      viewerBar.style.width = pageWidth - 24 * 6 - 2 + "px";
+    }
   }
 
   Neo.canvas.style.width = Neo.config.width + "px";
@@ -1260,6 +1265,14 @@ Neo.startViewer = function () {
     "background-color",
     Neo.config.color_text + " !important",
   );
+
+  if (Neo.config.neo_viewer_max_width_100) {
+    Neo.addRule(".NEO #neo-pageView", "max-width", "100%");
+    Neo.addRule(".NEO #neo-painter", "max-width", "100%");
+    Neo.addRule(".NEO #neo-canvas", "max-width", "100%");
+    Neo.addRule(".NEO #neo-canvas canvas", "max-width", "100%");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "max-width", "100%");
+  }
 
   setTimeout(function () {
     Neo.viewerPlay = new Neo.ViewerButton().init("neo-viewerPlay");
