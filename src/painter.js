@@ -1833,8 +1833,25 @@ Neo.Painter = class {
       );
     }
     ctx.restore();
+    if (Neo.viewer && Neo.config.neo_viewer_max_width_100) {
+      this.clearCanvasHeight();
+    }
   }
 
+  clearCanvasHeight() {
+    const pageview = document.getElementById("neo-pageView");
+    const painter = document.getElementById("neo-painter");
+    const canvasBox = document.getElementById("neo-canvas");
+
+    if (pageview) pageview.style.height = "";
+    if (canvasBox) canvasBox.style.height = "";
+    if (painter) {
+      painter.style.position = "relative";
+      painter.style.bottom = "";
+      painter.style.left = "";
+      painter.style.margin = "0 auto"; // 26px をやめる
+    }
+  }
   /**
    * ブラシで描画した時に、書き換える必要がある「範囲」を計算する。
    * @description

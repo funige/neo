@@ -1072,15 +1072,18 @@ Neo.initViewer = function (pch) {
 
   var painter = document.getElementById("neo-painter");
 
-  const viewerWrapperOnTop =
+  Neo.viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
     window.innerHeight < pageHeight + 100;
   if (painter) {
     painter.style.marginTop = "0";
     painter.style.position = "absolute";
     painter.style.padding = "0";
-    painter.style.bottom = viewerWrapperOnTop ? "0" : dy + 26 + "px";
     painter.style.left = dx + "px";
+  }
+  if (Neo.container) {
+    Neo.container.style.boxSizing = "border-box";
+    Neo.container.style.paddingTop = Neo.viewerWrapperOnTop ? "26px" : "";
   }
 
   var viewerButtonsWrapper = document.getElementById(
@@ -1088,8 +1091,10 @@ Neo.initViewer = function (pch) {
   );
   if (viewerButtonsWrapper) {
     viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
-    viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
-    viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0" : "";
+    viewerButtonsWrapper.style.position = Neo.viewerWrapperOnTop
+      ? "absolute"
+      : "";
+    viewerButtonsWrapper.style.top = Neo.viewerWrapperOnTop ? "0" : "";
   }
 
   var viewerBar = document.getElementById("neo-viewerBar");
@@ -1266,12 +1271,19 @@ Neo.startViewer = function () {
     Neo.config.color_text + " !important",
   );
 
+  //幅の狭い端末に動画の幅をあわせる
   if (Neo.config.neo_viewer_max_width_100) {
     Neo.addRule(".NEO #neo-pageView", "max-width", "100%");
     Neo.addRule(".NEO #neo-painter", "max-width", "100%");
     Neo.addRule(".NEO #neo-canvas", "max-width", "100%");
+    Neo.addRule(".NEO #neo-canvas", "height", "auto");
     Neo.addRule(".NEO #neo-canvas canvas", "max-width", "100%");
+    Neo.addRule(".NEO #neo-canvas canvas", "height", "auto");
     Neo.addRule(".NEO #neo-viewerButtonsWrapper", "max-width", "100%");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "position", "relative");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "bottom", "auto");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "left", "auto");
+    Neo.painter.clearCanvasHeight();
   }
 
   setTimeout(function () {

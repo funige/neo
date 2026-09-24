@@ -43,6 +43,7 @@ Neo.toolSide = false;
 /**@type {HTMLElement|null} */
 Neo.applet = null;
 Neo.isAnimation = false;
+Neo.viewerWrapperOnTop = false;
 Neo.storage = localStorage;
 Neo.updateUI = function () {};
 Neo.stabilize_level = 0;
@@ -1422,6 +1423,7 @@ Neo.resizeCanvas = function () {
   Neo.painter.destCanvasCtx = destctx;
 
   const ctx = Neo.painter.destCanvasCtx;
+
   if (Neo.painter.zoom < 1) {
     // 表示用アンチエイリアスを有効化
     ctx.imageSmoothingEnabled = true;
@@ -4121,8 +4123,25 @@ Neo.Painter = class {
       );
     }
     ctx.restore();
+    if (Neo.viewer && Neo.config.neo_viewer_max_width_100) {
+      this.clearCanvasHeight();
+    }
   }
 
+  clearCanvasHeight() {
+    const pageview = document.getElementById("neo-pageView");
+    const painter = document.getElementById("neo-painter");
+    const canvasBox = document.getElementById("neo-canvas");
+
+    if (pageview) pageview.style.height = "";
+    if (canvasBox) canvasBox.style.height = "";
+    if (painter) {
+      painter.style.position = "relative";
+      painter.style.bottom = "";
+      painter.style.left = "";
+      painter.style.margin = "0 auto"; // 26px をやめる
+    }
+  }
   /**
    * ブラシで描画した時に、書き換える必要がある「範囲」を計算する。
    * @description
@@ -9709,15 +9728,18 @@ Neo.initViewer = function (pch) {
 
   var painter = document.getElementById("neo-painter");
 
-  const viewerWrapperOnTop =
+  Neo.viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
     window.innerHeight < pageHeight + 100;
   if (painter) {
     painter.style.marginTop = "0";
     painter.style.position = "absolute";
     painter.style.padding = "0";
-    painter.style.bottom = viewerWrapperOnTop ? "0" : dy + 26 + "px";
     painter.style.left = dx + "px";
+  }
+  if (Neo.container) {
+    Neo.container.style.boxSizing = "border-box";
+    Neo.container.style.paddingTop = Neo.viewerWrapperOnTop ? "26px" : "";
   }
 
   var viewerButtonsWrapper = document.getElementById(
@@ -9725,8 +9747,10 @@ Neo.initViewer = function (pch) {
   );
   if (viewerButtonsWrapper) {
     viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
-    viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
-    viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0" : "";
+    viewerButtonsWrapper.style.position = Neo.viewerWrapperOnTop
+      ? "absolute"
+      : "";
+    viewerButtonsWrapper.style.top = Neo.viewerWrapperOnTop ? "0" : "";
   }
 
   var viewerBar = document.getElementById("neo-viewerBar");
@@ -9903,12 +9927,19 @@ Neo.startViewer = function () {
     Neo.config.color_text + " !important",
   );
 
+  //幅の狭い端末に動画の幅をあわせる
   if (Neo.config.neo_viewer_max_width_100) {
     Neo.addRule(".NEO #neo-pageView", "max-width", "100%");
     Neo.addRule(".NEO #neo-painter", "max-width", "100%");
     Neo.addRule(".NEO #neo-canvas", "max-width", "100%");
+    Neo.addRule(".NEO #neo-canvas", "height", "auto");
     Neo.addRule(".NEO #neo-canvas canvas", "max-width", "100%");
+    Neo.addRule(".NEO #neo-canvas canvas", "height", "auto");
     Neo.addRule(".NEO #neo-viewerButtonsWrapper", "max-width", "100%");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "position", "relative");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "bottom", "auto");
+    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "left", "auto");
+    Neo.painter.clearCanvasHeight();
   }
 
   setTimeout(function () {
