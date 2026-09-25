@@ -118,7 +118,6 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
     neo_disable_grid_touch_move:true,
     neo_disable_turn_original_glitch:true,
     neo_enable_zoom_out:true,
-    neo_emulation_mode:2.04
     }
   }
 </script>
@@ -134,6 +133,7 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
   Neo.params = {
     pch:{
     neo_enable_zoom_out:true,
+    neo_viewer_max_width_100:true,
     }
   }
 </script>
