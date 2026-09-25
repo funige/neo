@@ -4139,7 +4139,7 @@ Neo.Painter = class {
       painter.style.position = "relative";
       painter.style.bottom = "";
       painter.style.left = "";
-      painter.style.margin = "0 auto"; // 26px をやめる
+      painter.style.margin = "0 auto";
     }
   }
   /**
