@@ -99,6 +99,10 @@ document.addEventListener("neo:colorchange", (e) => {
 カスタムイベントを受けとってカラーピッカーに反映させます。  
 sampleと、sample2に実装しましたので、動作するsampleで確認したほうが早いかもしれません。      
 
+- **&lt;PARAM NAME="neo_viewer_max_width_100" value="true">**   
+このフラグをtrueにする事で、動画再生のビューワーをレスポンシブ対応にする事ができます。  
+横幅は`max-width:100%`になり、狭くなった横幅に追従して高さも変化します。  
+
 ## applet-dummyタグとparamタグを使用しない新しい設定
 - `param`タグは2022年にHTML Living Standardから削除されており、突然使用できなくなる可能性があります。    
 そのため、v1.7.2でデーターセットとオブジェクトによる設定に対応しました。  
@@ -118,7 +122,6 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
     neo_disable_grid_touch_move:true,
     neo_disable_turn_original_glitch:true,
     neo_enable_zoom_out:true,
-    neo_emulation_mode:2.04
     }
   }
 </script>
@@ -134,6 +137,7 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
   Neo.params = {
     pch:{
     neo_enable_zoom_out:true,
+    neo_viewer_max_width_100:true,
     }
   }
 </script>

@@ -43,6 +43,7 @@ Neo.toolSide = false;
 /**@type {HTMLElement|null} */
 Neo.applet = null;
 Neo.isAnimation = false;
+Neo.viewerWrapperOnTop = false;
 Neo.storage = localStorage;
 Neo.updateUI = function () {};
 Neo.stabilize_level = 0;
@@ -1422,6 +1423,7 @@ Neo.resizeCanvas = function () {
   Neo.painter.destCanvasCtx = destctx;
 
   const ctx = Neo.painter.destCanvasCtx;
+
   if (Neo.painter.zoom < 1) {
     // 表示用アンチエイリアスを有効化
     ctx.imageSmoothingEnabled = true;
