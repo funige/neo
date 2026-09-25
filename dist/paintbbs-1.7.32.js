@@ -9753,7 +9753,7 @@ Neo.initViewer = function (pch) {
     viewerButtonsWrapper.style.top = Neo.viewerWrapperOnTop ? "0" : "";
   }
 
-  var viewerBar = document.getElementById("neo-viewerBar");
+  const viewerBar = document.getElementById("neo-viewerBar");
   if (viewerBar) {
     viewerBar.style.position = "absolute";
     viewerBar.style.right = "2px";
@@ -9994,6 +9994,14 @@ Neo.startViewer = function () {
     Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {
       length: length,
     });
+    if (Neo.config.neo_viewer_max_width_100 && Neo.viewerBar) {
+      const viewerBar = document.getElementById("neo-viewerBar");
+      if (viewerBar) {
+        new ResizeObserver(() => {
+          Neo.viewerBar.update();
+        }).observe(viewerBar);
+      }
+    }
   }, 0);
 };
 
@@ -12339,6 +12347,9 @@ Neo.ViewerBar = class {
   }
 
   update() {
+    if (this.element) {
+      this.width = this.element.offsetWidth;
+    }
     this.mark = Neo.painter._actionMgr._mark;
     this.seek = Neo.painter._actionMgr._head;
 

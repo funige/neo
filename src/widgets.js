@@ -2202,6 +2202,9 @@ Neo.ViewerBar = class {
   }
 
   update() {
+    if (this.element) {
+      this.width = this.element.offsetWidth;
+    }
     this.mark = Neo.painter._actionMgr._mark;
     this.seek = Neo.painter._actionMgr._head;
 
