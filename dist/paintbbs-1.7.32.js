@@ -9935,6 +9935,7 @@ Neo.startViewer = function () {
     Neo.addRule(".NEO #neo-canvas", "height", "auto");
     Neo.addRule(".NEO #neo-canvas canvas", "max-width", "100%");
     Neo.addRule(".NEO #neo-canvas canvas", "height", "auto");
+    Neo.addRule(".NEO #neo-canvas canvas", "display", "block");
     Neo.addRule(".NEO #neo-viewerButtonsWrapper", "max-width", "100%");
     Neo.addRule(".NEO #neo-viewerButtonsWrapper", "position", "relative");
     Neo.addRule(".NEO #neo-viewerButtonsWrapper", "bottom", "auto");
