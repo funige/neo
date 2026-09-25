@@ -2201,6 +2201,7 @@ Neo.ViewerBar = class {
     return this;
   }
 
+  /** 現在の再生位置に合わせて、シーク位置とマークを再描画する */
   update() {
     if (this.element) {
       this.width = this.element.offsetWidth;

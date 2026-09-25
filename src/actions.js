@@ -1341,6 +1341,7 @@ Neo.startViewer = function () {
     if (Neo.config.neo_viewer_max_width_100 && Neo.viewerBar) {
       const viewerBar = document.getElementById("neo-viewerBar");
       if (viewerBar) {
+        // バー幅の変化(画面リサイズやズーム)に合わせて、シーク位置とマークを再計算する
         new ResizeObserver(() => {
           Neo.viewerBar.update();
         }).observe(viewerBar);
