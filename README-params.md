@@ -1,6 +1,6 @@
 # NEO の独自拡張について
 
-&lt;applet>の下に、他のパラメータと同じように指定してください。
+`<applet>`の下に、他のパラメータと同じように指定してください。
 
 - **&lt;PARAM NAME="neo_confirm_unload" VALUE="true">**  
   このフラグを true にすると、「戻る」ボタンを押した時などに「このサイトを離れますか？」という警告を出して、うっかり描画履歴が失われるのを防ぐことができます。  
@@ -26,7 +26,7 @@
   キャンバス画面で動画を再生する事なく、レイヤー情報を取得します。  
   オリジナルのPaintBBSにより近い動作になります。  
   これまでは、キャンバスをタップするまでアニメーションが再生されていました。  
-  このパラメータが未設定の時は、従来と同じように画面をタップするまでアニメーションを再生します。       
+  このパラメータが未設定の時は、従来と同じように画面をタップするまでアニメーションを再生します。  
   **デフォルトは false です**  
 
 - **&lt;PARAM NAME="neo_disable_grid_touch_move" VALUE="true">**  
@@ -40,11 +40,14 @@
 - **&lt;PARAM NAME="neo_validate_exact_ok_text_in_response" VALUE="true">**  
 このフラグを true にするとサーバから返って来たテキストが正確に文字列の"ok"では無かった時にエラーメッセージをアラートで表示して描画中の画面から移動しません。
 PHP等で、
-```
+
+```php
 die("ok")
 ```
+
 のように指定する必要があるため、対応していないPHPで、このフラグをtrueにすると投稿できなくなってしまいます。  
 そのため**デフォルトは false です**。
+
 - **&lt;PARAM NAME="neo_enable_zoom_out" VALUE="true">**  
 このフラグを true にするとズームで、0.5倍、0.2倍に縮小表示できるようになります。  
 オリジナルのPaintBBSには無い機能なので**デフォルトは false です**。  
@@ -53,7 +56,7 @@ die("ok")
 ブラウザの表示領域の高さが動画の高さに対して不足している時にのみ上に配置します。  
 極めて大きなサイズの動画の再生時や、小さな画面のスマホ等のデバイスで動作を縮小表示して再生するためのUIです。  
 オリジナルのPaintBBSには無い機能なので**デフォルトは false です**。  
-- **&lt;PARAM NAME="neo_disable_neo_center_min_width" VALUE="true">**   
+- **&lt;PARAM NAME="neo_disable_neo_center_min_width" VALUE="true">**  
 id `neo-center`の最小幅を300pxのキャンバスの時と同じ幅にするインラインCSS`minWidth="397px"`を追加しました。  
 オリジナルでもNEOでも、50pxなどの小さなキャンバスを開いた時に、ボタンが画面の外にでる重なり合うなどのレイアウト崩れが発生するからです。  
 しかしながら、もとに戻したい場合もありえます。  
@@ -62,55 +65,61 @@ id `neo-center`の最小幅を300pxのキャンバスの時と同じ幅にする
 APPLETの幅が400px未満の場合は、自動的に`minWidth="397px"`を無効化します。
 - **&lt;PARAM NAME="neo_disable_turn_original_glitch" VALUE="true">**  
 このフラグをtrueにすると、｢傾け｣を使った時に出るバグストライプが発生しなくなります。  
-｢傾け｣のバグを使ったストライプ模様の作成を利用したい場合もあれば、傾けたいだけなのにストライプ模様が出現して、それを消す作業が必要になる場合もあります。    
+｢傾け｣のバグを使ったストライプ模様の作成を利用したい場合もあれば、傾けたいだけなのにストライプ模様が出現して、それを消す作業が必要になる場合もあります。  
 そのため、バグストライプが発生しないようにするオプションを追加します。  
 [ぴくらぼ](http://piclab.sakura.ne.jp/kouza/straip/straip.htm)  
 バグストライプ使用例。  
 オリジナルのPaintBBSではバグストライプが発生するため  
 **デフォルトはfalse** です。
 
-- **&lt;PARAM NAME="neo_visibility_change_title_rewrite" VALUE="true">**   
+- **&lt;PARAM NAME="neo_visibility_change_title_rewrite" VALUE="true">**  
 このフラグをtrueにすると、タブが非アクティブになった時にタイトルタグにアスタリスク｢*｣を追加しします。  
-これにより、Chromeのメモリーセーバーによるタブの破棄を回避します。   
+これにより、Chromeのメモリーセーバーによるタブの破棄を回避します。  
 Windows版Chrome149でテストし有効性を確認しました。  
 しかしながら、もっとも確実な回避方法は、Chromeの設定でサイトを ｢常にアクティブにするサイト｣ 除外リストに追加する事です。  
 **デフォルトはfalse** です。
 
-- **&lt;PARAM NAME="neo_color_picker_id" value="neo-colorPicker">**   
-(id名、"neo-colorPicker"はあくまでも一例で、各自で自由に設定できます。)    
-PaintBBS NEO更新。外部の`<input type="color">`を使用して描画色を設定できるようになりました。   
+- **&lt;PARAM NAME="neo_color_picker_id" value="neo-colorPicker">**  
+(id名、"neo-colorPicker"はあくまでも一例で、各自で自由に設定できます。)  
+PaintBBS NEO更新。外部の`<input type="color">`を使用して描画色を設定できるようになりました。  
 その時のIDを実際の実装に合わせて指定します。  
 NEO本体で変更した色が
 `<input type="color" id="neo-colorPicker">`
 に入ります。  
 id名は自由に設定可能です。  
-このオプションはそのidを指定するためのものです。   
+このオプションはそのidを指定するためのものです。  
 実装例。  
-```
+
+```html
 <input id="neo-colorPicker" type="color" oninput="Neo.setColor(this.value)">  
 ```
+
 `<input type="color">`ではなく、Javascriptのライブラリを使ったカラーピッカーにNEO本体で変更した色を反映させたい時もあります。  
 そのような時は  
-```
+
+```js
 document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
 ```
-カスタムイベントを受けとってカラーピッカーに反映させます。  
-sampleと、sample2に実装しましたので、動作するsampleで確認したほうが早いかもしれません。      
 
-- **&lt;PARAM NAME="neo_viewer_max_width_100" value="true">**   
+カスタムイベントを受けとってカラーピッカーに反映させます。  
+sampleと、sample2に実装しましたので、動作するsampleで確認したほうが早いかもしれません。  
+
+- **&lt;PARAM NAME="neo_viewer_max_width_100" value="true">**  
 このフラグをtrueにする事で、動画再生のビューワーをレスポンシブ対応にする事ができます。  
 横幅は`max-width:100%`になり、狭くなった横幅に追従して高さも変化します。  
 
 ## applet-dummyタグとparamタグを使用しない新しい設定
-- `param`タグは2022年にHTML Living Standardから削除されており、突然使用できなくなる可能性があります。    
+
+- `param`タグは2022年にHTML Living Standardから削除されており、突然使用できなくなる可能性があります。  
 そのため、v1.7.2でデーターセットとオブジェクトによる設定に対応しました。  
-互換性を維持し、既存のapplet、applet-dummy、paramによる従来の設定でも動作するようにしています。    
-これから新しくお絵かき掲示板を開発するのであれば、新しい方式のほうが記述する文字数がすくなくてすみます。 
+互換性を維持し、既存のapplet、applet-dummy、paramによる従来の設定でも動作するようにしています。  
+これから新しくお絵かき掲示板を開発するのであれば、新しい方式のほうが記述する文字数がすくなくてすみます。
 
 ### 描画画面の設定例
-```
+
+```html
 <div class="neo-applet-paintbbs" data-width="400" data-height="460" ></div>
 <script>
  Neo.params = {
@@ -126,12 +135,13 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
   }
 </script>
 ```
+
 `class="neo-applet-paintbbs"`と`paintbbs:{`で、描画画面判定をしています。  
 別のclass名では動作しません。  
 
 ### 動画再生画面の設定例
-  
-```
+
+```html
 <div class="neo-applet-pch" data-width="400" data-height="450" ></div>
 <script>
   Neo.params = {
@@ -142,8 +152,10 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
   }
 </script>
 ```
-`class="neo-applet-pch"`と`pch:{`で動画画面判定をしています。  
-```
+
+`class="neo-applet-pch"`と`pch:{`で動画画面判定をしています。
+
+```html
 <script>
 Neo.params = {
   paintbbs:{},
@@ -151,11 +163,12 @@ Neo.params = {
 }
 </script>
 ```
-このようにひとつのオブジェクトに描画画面と動作再生のパラメータを同時に設定する事もできます。      
+
+このようにひとつのオブジェクトに描画画面と動作再生のパラメータを同時に設定する事もできます。
 
 このデーターセットとオブジェクトを使用した動作サンプルはsample2にあります。
 
-# 動画の仕様の違い
+## 動画の仕様の違い
 
 v1.5 で動画記録をサポートしました。
 
@@ -165,27 +178,33 @@ v1.5 で動画記録をサポートしました。
 
 残念ながら動画データ（.pch）は解析できなかったので、NEO は互換性のない記録方法を採用しています。
 
-- **PaintBBS の pch**  
+- **PaintBBS の pch**
+
+```txt
   magic (4byte: 1f 8b 08 00)  
   speed (2byte)  
   width (2byte)  
   height (2byte)  
   :
+```
 
-- **NEO の pch**  
+- **NEO の pch**
+
+```txt
   magic (3byte: 4e 45 4f) + version (1byte: 20)  
   width (2byte)  
   height (2byte)  
   拡張用 (4byte: 00 00 00 00)  
   :
+```
 
 POTI-board や Relm ではこれが問題になることはないのですが、BBSNote はヘッダをチェックするので、NEO の動画データを受け付けてくれません。
 
 詳細はミミニャーさんの記事を参照してください。  
 お絵かき掲示板 NEO の設置方法(BBSnote 編)
-https://oekakiart.net/blog/bbsnoteneo/
+[https://oekakiart.net/blog/bbsnoteneo/](https://oekakiart.net/blog/bbsnoteneo/)
 
-# 多国語対応
+## 多国語対応
 
 オリジナルの PaintBBS は日本語以外の環境では英語で文字列を表示するのですが
 わかりにくい英語なので、海外の掲示板では訳を修正して使用することがありました。  
@@ -197,36 +216,38 @@ NEO では、とりあえず以下のような方針で多国語対応してい�
 - neo_emulation_mode に"x"で終わる文字列（"2.04x"など）を指定したときはベストな翻訳を。
 - "x"がないときはオリジナルに忠実な動作を。
 
-```
-  現在（日本語以外では）英語とスペイン語のみ対応しています。
-  他の言語の翻訳も募集中です。
-```
+> 現在（日本語以外では）英語とスペイン語のみ対応しています。
+> 他の言語の翻訳も募集中です。
 
-# スタイルシートによる色の指定
+## スタイルシートによる色の指定
 
 アプレットの背景やアイコンの色は&lt;applet>のパラメータで&lt;PARAM NAME="color_bk" VALUE="#ffffff">みたいな感じで指定していますが、スタイルシートでも指定できるようにしました。
 
 優先順位は、（１）param で指定した色（２）スタイルシートで指定した色（３）デフォルトの色です。
 
-    .NEO .color_bk           { color: #ccccff; }
-    .NEO .color_bk2          { color: #bbbbff; }
-    .NEO .color_tool_icon    { color: #e8dfae; }
-    .NEO .color_icon         { color: #ccccff; }
-    .NEO .color_iconselect   { color: #ffaaaa; }
-    .NEO .color_text         { color: #666699; }
-    .NEO .color_bar          { color: #6f6fae; }
+```css
+  .NEO .color_bk           { color: #ccccff; }
+  .NEO .color_bk2          { color: #bbbbff; }
+  .NEO .color_tool_icon    { color: #e8dfae; }
+  .NEO .color_icon         { color: #ccccff; }
+  .NEO .color_iconselect   { color: #ffaaaa; }
+  .NEO .color_text         { color: #666699; }
+  .NEO .color_bar          { color: #6f6fae; }
 
-    .NEO .tool_color_button  { color: #e8dfae; }
-    .NEO .tool_color_button2 { color: #f8daaa; }
-    .NEO .tool_color_text    { color: #773333; }
-    .NEO .tool_color_bar     { color: #ddddff; }
-    .NEO .tool_color_frame   { color: #000000; }
+  .NEO .tool_color_button  { color: #e8dfae; }
+  .NEO .tool_color_button2 { color: #f8daaa; }
+  .NEO .tool_color_text    { color: #773333; }
+  .NEO .tool_color_bar     { color: #ddddff; }
+  .NEO .tool_color_frame   { color: #000000; }
+```
 
-# ツールをキャンバスの左側に配置する
+## ツールをキャンバスの左側に配置する
 
 タブレット使用時に「キャンバスの右側にツールがあると邪魔になって描きにくい」という声があったので、位置を逆にすることができるようになりました。
 
-    Neo.setToolSide(true) // true|false
+```js
+Neo.setToolSide(true) // true|false
+```
 
 true のときツールはキャンバスの左側になります。
 
@@ -234,7 +255,7 @@ true のときツールはキャンバスの左側になります。
 
   &lt;applet>の&lt;param>で指定することもできます。
 
-# セキュリティ関連のオプション
+## セキュリティ関連のオプション
 
 オリジナルの PaintBBS には、描画時間やキャンバスをクリックした回数が閾値より少なかった時に、投稿を受け付けずに他の URL（警察庁の URL とか）に飛ばす機能がありました。
 
@@ -257,12 +278,12 @@ true のときツールはキャンバスの左側になります。
 
 を指定すると、送信されるデータの拡張ヘッダに
 
-    timer=3391&count=1&...
+`timer=3391&count=1&...`
 
 などの文字列が追加されます（timer の単位は ms です）。  
 一応実装しておきますね。
 
-# formData を使ったデータ送信
+## formData を使ったデータ送信
 
 NEO は古い Java アプレットの通信方式をそのまま継承していますが、WAF 対策など現在のセキュリティ対策に合わない問題が報告されています。
 
@@ -275,51 +296,54 @@ v1.6 からはより安全で扱いやすい formData を使ったデータ送�
 で、サーバの`post_max_size`を渡し超過する時はアニメーションデータを切り捨てて画像の投稿を成功させます。  
 パラメータが未設定の時や値が0の時は制限せず、アニメーションデータの投稿を試みます。  
 
-
 [エラーチェックとか省略した短いサンプル](sample/posttest.php)を作りましたので、参考にどうぞ。
 
 [実際の掲示板で使われているコード](sample/sample_handler.php)の例はこちら。
 
-# Neo.handleExit()  
+## Neo.handleExit()
 
 パスワード等の機密データをGETパラメータにセットして送信する事がありました。
-```
+
+```html
 <param name="url_exit" value="./?pwd="パスワード">
 ```
+
 これをより安全なPOSTに変更する事ができるようになりました。  
-投稿ボタンを押したあとの画面移動を、`Neo.handleExit()`関数を経由して行います。      
-この関数でFetch APIを使ったPOSTを行えばパスワードなどの機密データをより安全に送信する事ができます。  
-```
+投稿ボタンを押したあとの画面移動を、`Neo.handleExit()`関数を経由して行います。  
+この関数でFetch APIを使ったPOSTを行えばパスワードなどの機密データをより安全に送信する事ができます。
+
+```js
 Neo.handleExit = ()=>{
-	const formData = new FormData();
-	formData.append("pwd", "パスワード"); // 画像差し換え
+const formData = new FormData();
+formData.append("pwd", "パスワード"); // 画像差し換え
 fetch("./", {
-	method: 'POST',
-	mode: 'same-origin',
-	headers: {
-		'X-Requested-With': 'PaintBBS'
-		,
-	},
-	body: formData
+method: 'POST',
+mode: 'same-origin',
+headers: {
+'X-Requested-With': 'PaintBBS'
+,
+},
+body: formData
 })
 .then(response => {
-	if (response.ok) {
-		if (response.redirected) {
-			return window.location.href = response.url;
-		}
-		response.text().then((text) => {
-			if (text.startsWith("error\n")) {
-					return window.location.href = "./?mode=paintcom";
-				}
-		})
-	}
+  if (response.ok) {
+    if (response.redirected) {
+      return window.location.href = response.url;
+    }
+    response.text().then((text) => {
+      if (text.startsWith("error\n")) {
+        return window.location.href = "./?mode=paintcom";
+      }
+    })
+  }
 })
 .catch(error => {
-	console.error('There was a problem with the fetch operation:', error);
-	return window.location.href = "./?mode=paintcom";
-});
+  console.error('There was a problem with the fetch operation:', error);
+  return window.location.href = "./?mode=paintcom";
+  });
 }
 ```
+
 PaintBBS NEOの`neo.js`から参照可能なスコープの中で`Neo.handleExit()`関数を定義すると、`Neo.handleExit()`が実行され、FormDataをセットして画面移動する事ができるようになります。  
-`Neo.handleExit()`が参照可能なスコープの中にある時は、`url_exit`による画面移動は行われなくなります。   
+`Neo.handleExit()`が参照可能なスコープの中にある時は、`url_exit`による画面移動は行われなくなります。  
 そのため画面移動の移動先を`Neo.handleExit()`で指定する必要があります。  
