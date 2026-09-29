@@ -4,10 +4,10 @@
 
 リポジトリをクローンしたら、「npm i」で初期化してください。
 
-```
-> git clone https://github.com/funige/neo.git
-> cd neo
-> npm i
+```bash
+git clone https://github.com/funige/neo.git
+cd neo
+npm i
 ```
 
 ## ファイル構成
@@ -15,6 +15,7 @@
 srcの下がソースコード本体です。  
 distの下ビルドツールで自動生成されるので、直接変更しない方がいいです。
 
+```txt
     /    package.json
          gulpfile.js
 
@@ -37,13 +38,14 @@ distの下ビルドツールで自動生成されるので、直接変更しな�
                PaintBBS-*.*.*.js
                PaintBBS-*.*.*.css
                ...
+```
 
 ## gulpについて
 
 ビルドツールはgulpを使用しています。
 
-```
-> npx gulp
+```bash
+npx gulp
 ```
 
 を実行すると、package.jsonやsrcのファイルを変更するたびにgulpのタスクが実行されて,distが更新されるようになります。
@@ -60,11 +62,11 @@ gulpが実際に行ってる処理の詳細は、gulpfile.jsを参照のこと�
 
 軽微な変更後の流れはこんな感じです（コマンドラインの場合）。
 
-```
-> git rm ...  // 削除したファイル
-> git add ... // 変更・追加したファイル
-> git commit -a -m "..."
-> git push
+```bash
+git rm ...  // 削除したファイル
+git add ... // 変更・追加したファイル
+git commit -a -m "..."
+git push
 ```
 
 大きな変更をするときは、新しいbranchを作って、十分テストした後 merge したほうがいいです。
