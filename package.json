@@ -9,7 +9,7 @@
   "scripts": {
     "app": "electron .",
     "format": "prettier --write \"src/!(lz-string).js\" \"src/neo.css\" \"sample/*.html\" \"sample2/*.html\"",
-    "build": "sh build.sh watch"
+    "dev": "sh build.sh watch"
   },
   "devDependencies": {
     "prettier": "^3.3.3"
