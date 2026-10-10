@@ -1292,7 +1292,6 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
             }
         }
     }
-    /** @type {FormData | null} */
     let formData = null;
     if (Neo.config.neo_send_with_formdata == "true") {
         formData = new FormData();
@@ -3355,9 +3354,7 @@ Neo.Painter = class {
      */
     getThumbnail(type) {
         if (type != "animation") {
-            /** @type {number|null} */
             let thumbnailWidth = this.getThumbnailWidth();
-            /** @type {number|null} */
             let thumbnailHeight = this.getThumbnailHeight();
             if (thumbnailWidth || thumbnailHeight) {
                 const width = this.canvasWidth;
@@ -7880,7 +7877,7 @@ Neo.ActionManager = class {
                 if (x1 != head[head.length - 4] ||
                     y1 != head[head.length - 3] ||
                     lineType != head[11]) {
-                    console.log("eror in freeHandMove?", x, y, lineType, head);
+                    console.log("error in freeHandMove?", x, y, lineType, head);
                 }
             }
             oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
@@ -9296,6 +9293,8 @@ Neo.ToolTip = class {
         this.canvas = null;
         /** @type {HTMLElement|null} */
         this.label = null;
+        this.drawOnce = false;
+        this.img = null;
     }
     /**
      * @param {string} elementID
@@ -10254,7 +10253,8 @@ Neo.SizeSlider = class {
             this.slider = this.element.querySelector(".slider");
             this.label = this.element.querySelector(".label");
             this.hit = this.element.querySelector(".hit");
-            /**@type {any}*/ (this.hit)["data-slider"] = params.type;
+            if (this.hit)
+                this.hit["data-slider"] = params.type;
         }
         if (this.slider instanceof HTMLElement) {
             this.slider.style.backgroundColor = Neo.painter.foregroundColor;
@@ -10781,14 +10781,7 @@ Neo.ViewerBar = class {
         this.params = null;
         this.elementID = "";
         this.isMouseDown = false;
-        /**@type {HTMLElement|null} */
-        this.element;
-        /**@type {HTMLElement} */
-        this.seekElement;
-        /**@type {HTMLElement} */
-        this.markElement;
-        /**@type {HTMLElement} */
-        this.textElement;
+        this.element = null;
         this.width = 0;
         this.length = 0;
         this.mark = 0;

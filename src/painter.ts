@@ -1497,8 +1497,8 @@ Neo.Painter = class {
       }
     }
 
-    var thumbnail = null;
-    var thumbnail2 = null;
+    var thumbnail: Blob | null = null;
+    var thumbnail2: Blob | null = null;
 
     if (Neo.config.thumbnail_type == "animation" || this.useThumbnail()) {
       thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
@@ -1651,10 +1651,8 @@ Neo.Painter = class {
    */
   getThumbnail(type) {
     if (type != "animation") {
-      /** @type {number|null} */
-      let thumbnailWidth = this.getThumbnailWidth();
-      /** @type {number|null} */
-      let thumbnailHeight = this.getThumbnailHeight();
+      let thumbnailWidth: number | null = this.getThumbnailWidth();
+      let thumbnailHeight: number | null = this.getThumbnailHeight();
       if (thumbnailWidth || thumbnailHeight) {
         const width = this.canvasWidth;
         const height = this.canvasHeight;
@@ -1879,7 +1877,7 @@ Neo.Painter = class {
       let tmp = this._upscaledCanvas;
       if (!tmp) {
         tmp = this._upscaledCanvas = document.createElement("canvas");
-        this._upscaledCtx = tmp.getContext("2d");
+        this._upscaledCtx = tmp.getContext("2d")!;
       }
       const tctx = this._upscaledCtx;
 
@@ -2835,8 +2833,8 @@ Neo.Painter = class {
    * @returns {void}
    */
   draw(ctx, points, callback) {
-    var xs = [],
-      ys = [];
+    var xs: number[] = [],
+      ys: number[] = [];
     for (var i = 0; i < points.length; i++) {
       var point = points[i];
       xs.push(Math.round(point[0]));
@@ -3303,9 +3301,9 @@ Neo.Painter = class {
     var g = 0x00;
     var b = 0x00;
 
-    var imageData = [];
-    var buf32 = [];
-    var buf8 = [];
+    var imageData: ImageData[] = [];
+    var buf32: Uint32Array[] = [];
+    var buf8: Uint8ClampedArray[] = [];
     for (var i = 0; i < 2; i++) {
       imageData[i] = this.canvasCtx[i].getImageData(x, y, width, height);
       buf32[i] = new Uint32Array(imageData[i].data.buffer);

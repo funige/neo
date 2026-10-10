@@ -95,7 +95,7 @@ var LZString = (function () {
           buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
         }
 
-        var result = [];
+        var result: string[] = [];
         buf.forEach(function (c) {
           result.push(f(c));
         });
@@ -138,7 +138,7 @@ var LZString = (function () {
         context_enlargeIn = 2, // Compensate for the first entry which should not count
         context_dictSize = 3,
         context_numBits = 2,
-        context_data = [],
+        context_data: string[] = [],
         context_data_val = 0,
         context_data_position = 0,
         ii;
@@ -362,13 +362,13 @@ var LZString = (function () {
     },
 
     _decompress: function (length, resetValue, getNextValue) {
-      var dictionary = [],
+      var dictionary: Array<string | number> = [],
         next,
         enlargeIn = 4,
         dictSize = 4,
         numBits = 3,
         entry = "",
-        result = [],
+        result: string[] = [],
         i,
         w,
         bits,
@@ -502,7 +502,7 @@ var LZString = (function () {
         }
 
         if (dictionary[c]) {
-          entry = dictionary[c];
+          entry = dictionary[c] as string;
         } else {
           if (c === dictSize) {
             entry = w + w.charAt(0);

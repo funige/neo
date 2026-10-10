@@ -751,7 +751,12 @@ Neo.initSkin = function () {
  * @param {string|number} value - 設定する値 (例: "0px !important")
  * @param {CSSStyleSheet|null} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
  */
-Neo.addRule = function (selector, styleName, value, sheet = null) {
+Neo.addRule = function (
+  selector: string,
+  styleName: string,
+  value: string | number,
+  sheet: CSSStyleSheet | null = null,
+) {
   // 1. 省略時はデフォルトの stylesheet を適用
   if (!sheet) {
     sheet = Neo.styleSheet;
@@ -1605,8 +1610,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
       }
     }
   }
-  /** @type {FormData | null} */
-  let formData = null;
+  let formData: FormData | null = null;
   if (Neo.config.neo_send_with_formdata == "true") {
     formData = new FormData();
     formData.append("header", headerString);
@@ -1795,7 +1799,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
 Neo.getColors = function () {
   // console.log("getColors");
   // console.log("defaultColors==", Neo.config.colors.join("\n"));
-  var array = [];
+  var array: string[] = [];
   for (var i = 0; i < 14; i++) {
     array.push(Neo.colorTips[i].color);
   }

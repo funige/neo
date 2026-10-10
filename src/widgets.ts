@@ -577,6 +577,8 @@ Neo.ToolTip = class {
     this.canvas = null;
     /** @type {HTMLElement|null} */
     this.label = null;
+    this.drawOnce = false;
+    this.img = null;
   }
 
   /**
@@ -1625,7 +1627,7 @@ Neo.SizeSlider = class {
       this.slider = this.element.querySelector(".slider");
       this.label = this.element.querySelector(".label");
       this.hit = this.element.querySelector(".hit");
-      /**@type {any}*/ (this.hit)["data-slider"] = params.type;
+      if (this.hit) (this.hit as any)["data-slider"] = params.type;
     }
     if (this.slider instanceof HTMLElement) {
       this.slider.style.backgroundColor = Neo.painter.foregroundColor;
@@ -2209,10 +2211,10 @@ Neo.ViewerBar = class {
   params: any;
   elementID: string;
   isMouseDown: boolean;
-  element: HTMLElement | null;
-  seekElement: HTMLElement;
-  markElement: HTMLElement;
-  textElement: HTMLElement;
+  element!: HTMLElement | null;
+  seekElement!: HTMLElement;
+  markElement!: HTMLElement;
+  textElement!: HTMLElement;
   width: number;
   length: number;
   mark: number;
@@ -2223,14 +2225,7 @@ Neo.ViewerBar = class {
     this.params = null;
     this.elementID = "";
     this.isMouseDown = false;
-    /**@type {HTMLElement|null} */
-    this.element;
-    /**@type {HTMLElement} */
-    this.seekElement;
-    /**@type {HTMLElement} */
-    this.markElement;
-    /**@type {HTMLElement} */
-    this.textElement;
+    this.element = null;
     this.width = 0;
     this.length = 0;
     this.mark = 0;
