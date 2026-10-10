@@ -1,6 +1,6 @@
 {
   "name": "paintbbs",
-  "version": "1.7.32",
+  "version": "1.7.33",
   "main": "app/main.js",
   "repository": {
     "type": "git",
@@ -8,14 +8,10 @@
   },
   "scripts": {
     "app": "electron .",
-    "format": "prettier --write \"src/!(lz-string).js\" \"src/neo.css\" \"sample/*.html\" \"sample2/*.html\""
+    "format": "prettier --write \"src/!(lz-string).js\" \"src/neo.css\" \"sample/*.html\" \"sample2/*.html\"",
+    "dev": "sh build.sh watch"
   },
   "devDependencies": {
-    "gulp": "^5.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-rename": "^2.0.0",
-    "gulp-replace": "^1.1.4",
-    "npm-check-updates": "^17.1.11",
     "prettier": "^3.3.3"
   }
 }

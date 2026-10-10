@@ -1,6 +1,5 @@
 "use strict";
 //@ts-check
-
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
@@ -1623,7 +1622,8 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
       // 単位MB
       if (
         isNaN(Neo.config.neo_max_pch) ||
-        !Number(Neo.config.neo_max_pch) ||
+        //0,-1の場合は無制限
+        Number(Neo.config.neo_max_pch) <= 0 ||
         Number(Neo.config.neo_max_pch) * 1024 * 1024 >
           headerString.length + blob.size + thumbnail_size + thumbnail2.size
       ) {
