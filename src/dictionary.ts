@@ -186,12 +186,12 @@ Neo.dictionary = {
 };
 
 Neo.translate = (function () {
-  var language =
+  const language =
     (window.navigator.languages && window.navigator.languages[0]) ||
     window.navigator.language;
 
-  var lang = "en";
-  for (var key in Neo.dictionary) {
+  let lang = "en";
+  for (const key in Neo.dictionary) {
     if (language.indexOf(key) == 0) {
       lang = key;
       break;

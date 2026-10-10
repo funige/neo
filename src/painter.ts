@@ -394,7 +394,7 @@ Neo.Painter = class {
    * 現在のツールに対しては終了処理（kill）を行い、安全に切り替える。
    */
   popTool() {
-    var tool = this.tool;
+    const tool = this.tool;
     if (tool && tool.kill) {
       tool.kill();
     }
@@ -411,10 +411,10 @@ Neo.Painter = class {
    */
   getCurrentTool() {
     if (this.tool) {
-      var tool = this.tool;
+      let tool = this.tool;
       // スライダー操作中はスタックから直前のツールを参照する
       if (tool && tool.type == Neo.Painter.TOOLTYPE_SLIDER) {
-        var stack = this.toolStack;
+        const stack = this.toolStack;
         if (stack.length > 0) {
           tool = stack[stack.length - 1];
         }
@@ -527,8 +527,8 @@ Neo.Painter = class {
   _initCanvas(div, width, height) {
     width = parseInt(String(width));
     height = parseInt(String(height));
-    var destWidth = parseInt(String(div.clientWidth));
-    var destHeight = parseInt(String(div.clientHeight));
+    const destWidth = parseInt(String(div.clientWidth));
+    const destHeight = parseInt(String(div.clientHeight));
     this.destWidth = width;
     this.destHeight = height;
 
@@ -540,7 +540,7 @@ Neo.Painter = class {
     this.securityTimer = Date.now();
     this.securityCount = 0;
 
-    for (var i = 0; i < 2; i++) {
+    for (let i = 0; i < 2; i++) {
       this.canvas[i] = document.createElement("canvas");
       this.canvas[i].width = width;
       this.canvas[i].height = height;
@@ -573,7 +573,7 @@ Neo.Painter = class {
     this.tempCanvas.style.position = "absolute";
     // this.tempCanvas.enabled = false;
 
-    var array = this.container?.querySelectorAll("canvas");
+    const array = this.container?.querySelectorAll("canvas");
     if (array && array.length > 0) {
       this.destCanvas = array[0];
     } else {
@@ -702,15 +702,15 @@ Neo.Painter = class {
   }
 
   _initRoundData() {
-    for (var r = 1; r <= 30; r++) {
+    for (let r = 1; r <= 30; r++) {
       this._roundData[r] = new Uint8Array(r * r);
-      var mask = this._roundData[r];
-      var d = Math.floor(r / 2.0);
-      var index = 0;
-      for (var x = 0; x < r; x++) {
-        for (var y = 0; y < r; y++) {
-          var xx = x + 0.5 - r / 2.0;
-          var yy = y + 0.5 - r / 2.0;
+      const mask = this._roundData[r];
+      const d = Math.floor(r / 2.0);
+      let index = 0;
+      for (let x = 0; x < r; x++) {
+        for (let y = 0; y < r; y++) {
+          const xx = x + 0.5 - r / 2.0;
+          const yy = y + 0.5 - r / 2.0;
           mask[index++] = xx * xx + yy * yy <= (r * r) / 4 ? 1 : 0;
         }
       }
@@ -731,11 +731,11 @@ Neo.Painter = class {
   }
 
   _initToneData() {
-    var pattern = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    const pattern = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 
-    for (var i = 0; i < 16; i++) {
+    for (let i = 0; i < 16; i++) {
       this._toneData[i] = new Array(16);
-      for (var j = 0; j < 16; j++) {
+      for (let j = 0; j < 16; j++) {
         this._toneData[i][j] = i >= pattern[j] ? 1 : 0;
       }
     }
@@ -750,11 +750,12 @@ Neo.Painter = class {
    * @returns {Array<number>} 対応するハーフトーンパターン
    */
   getToneData(alpha) {
-    var alphaTable = [
+    const alphaTable = [
       23, 47, 69, 92, 114, 114, 114, 138, 161, 184, 184, 207, 230, 230, 253,
     ];
 
-    for (var i = 0; i < alphaTable.length; i++) {
+    let i = 0;
+    for (; i < alphaTable.length; i++) {
       if (alpha < alphaTable[i]) {
         return this._toneData[i];
       }
@@ -766,7 +767,7 @@ Neo.Painter = class {
    * テキスト入力
    */
   _initInputText() {
-    var text = document.getElementById("neo-inputText");
+    let text = document.getElementById("neo-inputText");
     if (!text) {
       text = document.createElement("div");
     }
@@ -899,7 +900,7 @@ Neo.Painter = class {
     this.isShiftDown = e.shiftKey;
     this.isCtrlDown = e.ctrlKey;
     this.isAltDown = e.altKey;
-    var key = e.key ? e.key.toLowerCase() : null;
+    const key = e.key ? e.key.toLowerCase() : null;
     if (key === " ") this.isSpaceDown = true;
 
     /**
@@ -1038,7 +1039,7 @@ Neo.Painter = class {
     this.prevMouseX = this.mouseX;
     this.prevMouseY = this.mouseY;
     this.securityCount++;
-    let autosaveCount = this.securityCount;
+    const autosaveCount = this.securityCount;
     if (autosaveCount % 10 === 0 && this.isDirty()) {
       this.saveSession(); //10ストロークごとに自動バックアップ
     }
@@ -1181,7 +1182,7 @@ Neo.Painter = class {
     if (e instanceof MouseEvent && e.clientX !== undefined) {
       return { x: e.clientX, y: e.clientY, e: e.type };
     } else if (e instanceof TouchEvent) {
-      var touch = e.changedTouches[0];
+      const touch = e.changedTouches[0];
       return { x: touch.clientX, y: touch.clientY, e: e.type };
 
       //      for (var i = 0; i < e.changedTouches.length; i++) {
@@ -1258,13 +1259,13 @@ Neo.Painter = class {
    * @param {MouseEvent|TouchEvent} e
    */
   _updateMousePosition(e) {
-    var rect = this.destCanvas.getBoundingClientRect();
+    const rect = this.destCanvas.getBoundingClientRect();
     //  var x = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
     //  var y = (e.clientY !== undefined) ? e.clientY : e.touches[0].clientY;
-    var pos = this.getPosition(e);
+    const pos = this.getPosition(e);
 
-    var x = pos.x;
-    var y = pos.y;
+    const x = pos.x;
+    const y = pos.y;
 
     if (this.zoom <= 0) this.zoom = 1; //なぜか0になることがあるので
 
@@ -1300,7 +1301,7 @@ Neo.Painter = class {
  */
 
   undo() {
-    var undoItem = this._undoMgr.popUndo();
+    const undoItem = this._undoMgr.popUndo();
 
     if (undoItem && undoItem.data.length > 0) {
       this._pushRedo();
@@ -1318,7 +1319,7 @@ Neo.Painter = class {
   }
 
   redo() {
-    var undoItem = this._undoMgr.popRedo();
+    const undoItem = this._undoMgr.popRedo();
 
     if (undoItem && undoItem.data.length > 0) {
       this._actionMgr.forward();
@@ -1355,7 +1356,7 @@ Neo.Painter = class {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new Neo.UndoItem();
+    const undoItem = new Neo.UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -1387,7 +1388,7 @@ Neo.Painter = class {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new Neo.UndoItem();
+    const undoItem = new Neo.UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -1418,8 +1419,8 @@ Neo.Painter = class {
 
     const container = document.getElementById("neo-container");
     if (!container) return;
-    var width = this.canvasWidth * this.zoom;
-    var height = this.canvasHeight * this.zoom;
+    let width = this.canvasWidth * this.zoom;
+    let height = this.canvasHeight * this.zoom;
 
     if (width > container.clientWidth - 100)
       width = container.clientWidth - 100;
@@ -1447,10 +1448,10 @@ Neo.Painter = class {
    * @param {number} y - 視点の中心Y座標
    */
   setZoomPosition(x, y) {
-    var minx = (this.destCanvas.width / this.zoom) * 0.5;
-    var maxx = this.canvasWidth - minx;
-    var miny = (this.destCanvas.height / this.zoom) * 0.5;
-    var maxy = this.canvasHeight - miny;
+    const minx = (this.destCanvas.width / this.zoom) * 0.5;
+    const maxx = this.canvasWidth - minx;
+    const miny = (this.destCanvas.height / this.zoom) * 0.5;
+    const maxy = this.canvasHeight - miny;
 
     // Math.roundでで丸めない。
     // 拡大時にキャンバスの端で円カーソルのグリッチが発生するため
@@ -1487,7 +1488,7 @@ Neo.Painter = class {
   submit(baseURL) {
     if (Neo.isAnimation) {
       // neo_save_layers
-      var items = this._actionMgr._items;
+      const items = this._actionMgr._items;
       if (
         (items.length > 0 && items[items.length - 1][0] != "restore") ||
         items.length < 1
@@ -1497,8 +1498,8 @@ Neo.Painter = class {
       }
     }
 
-    var thumbnail: Blob | null = null;
-    var thumbnail2: Blob | null = null;
+    let thumbnail: Blob | null = null;
+    let thumbnail2: Blob | null = null;
 
     if (Neo.config.thumbnail_type == "animation" || this.useThumbnail()) {
       thumbnail = this.getThumbnail(Neo.config.thumbnail_type || "png");
@@ -1524,8 +1525,8 @@ Neo.Painter = class {
   }
 
   useThumbnail() {
-    var thumbnailWidth = this.getThumbnailWidth();
-    var thumbnailHeight = this.getThumbnailHeight();
+    const thumbnailWidth = this.getThumbnailWidth();
+    const thumbnailHeight = this.getThumbnailHeight();
     if (thumbnailWidth && thumbnailHeight) {
       if (
         thumbnailWidth < this.canvasWidth ||
@@ -1547,7 +1548,7 @@ Neo.Painter = class {
    * @returns {Blob} 変換後のBlobオブジェクト（type: image/png）
    */
   dataURLtoBlob(dataURL) {
-    var byteString;
+    let byteString;
     if (dataURL.split(",")[0].indexOf("base64") >= 0) {
       byteString = atob(dataURL.split(",")[1]);
     } else {
@@ -1555,8 +1556,8 @@ Neo.Painter = class {
     }
 
     // write the bytes of the string to a typed array
-    var ia = new Uint8Array(byteString.length);
-    for (var i = 0; i < byteString.length; i++) {
+    const ia = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
     return new Blob([ia], { type: "image/png" });
@@ -1581,7 +1582,7 @@ Neo.Painter = class {
     const pngCanvas = document.createElement("canvas");
     pngCanvas.width = width;
     pngCanvas.height = height;
-    var pngCanvasCtx = pngCanvas.getContext("2d", {
+    const pngCanvasCtx = pngCanvas.getContext("2d", {
       willReadFrequently: true,
     });
     if (!pngCanvasCtx) {
@@ -1629,14 +1630,14 @@ Neo.Painter = class {
    */
   getPNG() {
     // レイヤーを統合した画像を取得
-    var image = this.getImage();
+    const image = this.getImage();
     if (!image) {
       console.error("Failed to export image.");
       return null;
     }
 
     // CanvasをBase64エンコードされたデータURL形式に変換
-    var dataURL = image.toDataURL("image/png");
+    const dataURL = image.toDataURL("image/png");
 
     // 文字列データをバイナリ（Blob）に変換して返す
     return this.dataURLtoBlob(dataURL);
@@ -1673,7 +1674,7 @@ Neo.Painter = class {
         console.error("Failed to export image.");
         return null;
       }
-      var dataURL = image.toDataURL("image/" + type);
+      const dataURL = image.toDataURL("image/" + type);
       return this.dataURLtoBlob(dataURL);
     } else {
       //動画データの中身が空の時は動画ファイルを作成しない
@@ -1683,9 +1684,9 @@ Neo.Painter = class {
       const jsonString = JSON.stringify(this._actionMgr._items);
       const data = LZString.compressToUint8Array(jsonString);
 
-      var magic = "NEO ";
-      var w = this.canvasWidth;
-      var h = this.canvasHeight;
+      const magic = "NEO ";
+      const w = this.canvasWidth;
+      const h = this.canvasHeight;
 
       return new Blob([
         magic,
@@ -1703,7 +1704,7 @@ Neo.Painter = class {
    */
 
   getThumbnailWidth() {
-    var width = Neo.config.thumbnail_width;
+    const width = Neo.config.thumbnail_width;
     if (width) {
       if (width.match(/%$/)) {
         return Math.floor(this.canvasWidth * (parseInt(width) / 100.0));
@@ -1719,7 +1720,7 @@ Neo.Painter = class {
    * @returns {Number}
    */
   getThumbnailHeight() {
-    var height = Neo.config.thumbnail_height;
+    const height = Neo.config.thumbnail_height;
     if (height) {
       if (height.match(/%$/)) {
         return Math.floor(this.canvasHeight * (parseInt(height) / 100.0));
@@ -1767,16 +1768,16 @@ Neo.Painter = class {
     x = Math.floor(x);
     y = Math.floor(y);
 
-    var canvasWidth = this.canvasWidth;
-    var canvasHeight = this.canvasHeight;
-    var updateAll =
+    const canvasWidth = this.canvasWidth;
+    const canvasHeight = this.canvasHeight;
+    const updateAll =
       x === 0 && y === 0 && width === canvasWidth && height === canvasHeight;
     if (x + width > canvasWidth) width = canvasWidth - x;
     if (y + height > canvasHeight) height = canvasHeight - y;
     if (x < 0) x = 0;
     if (y < 0) y = 0;
     if (width <= 0 || height <= 0) return;
-    var ctx = this.destCanvasCtx;
+    const ctx = this.destCanvasCtx;
     ctx.save();
     ctx.fillStyle = "#ffffff";
     ctx.globalAlpha = 1.0;
@@ -2127,7 +2128,7 @@ Neo.Painter = class {
     let r0 = buf8[index + 0];
     let g0 = buf8[index + 1];
     let b0 = buf8[index + 2];
-    let a0 = buf8[index + 3];
+    const a0 = buf8[index + 3];
 
     if (a0 == 0) {
       r0 = 0xff;
@@ -2158,9 +2159,9 @@ Neo.Painter = class {
 
       case Neo.Painter.MASKTYPE_ADD:
         if (a0 > 0) {
-          var sort = this.sortColor(r0, g0, b0);
-          for (var i = 0; i < 3; i++) {
-            var c = sort[i];
+          const sort = this.sortColor(r0, g0, b0);
+          for (let i = 0; i < 3; i++) {
+            const c = sort[i];
             if (buf8[index + c] < this._currentColor[c]) return true;
           }
           return false;
@@ -2170,9 +2171,9 @@ Neo.Painter = class {
 
       case Neo.Painter.MASKTYPE_SUB:
         if (a0 > 0) {
-          var sort = this.sortColor(r0, g0, b0);
-          for (var i = 0; i < 3; i++) {
-            var c = sort[i];
+          const sort = this.sortColor(r0, g0, b0);
+          for (let i = 0; i < 3; i++) {
+            const c = sort[i];
             if (buf8[index + c] > this._currentColor[c]) return true;
           }
           return false;
@@ -2241,36 +2242,36 @@ Neo.Painter = class {
    * @param {number} y - 相対Y座標
    */
   setPenPoint(buf8, width, x, y) {
-    var d = this._currentWidth;
+    const d = this._currentWidth;
     const r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
 
-    var index = (y * width + x) * 4;
+    let index = (y * width + x) * 4;
 
-    var shape = this._roundData[d];
-    var shapeIndex = 0;
+    const shape = this._roundData[d];
+    let shapeIndex = 0;
 
-    var r1 = this._currentColor[0];
-    var g1 = this._currentColor[1];
-    var b1 = this._currentColor[2];
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_PEN);
+    const r1 = this._currentColor[0];
+    const g1 = this._currentColor[1];
+    const b1 = this._currentColor[2];
+    const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_PEN);
     if (a1 == 0) return;
 
-    for (var i = 0; i < d; i++) {
-      for (var j = 0; j < d; j++) {
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-          let r0 = buf8[index + 0];
-          let g0 = buf8[index + 1];
-          let b0 = buf8[index + 2];
-          let a0 = buf8[index + 3] / 255.0;
+          const r0 = buf8[index + 0];
+          const g0 = buf8[index + 1];
+          const b0 = buf8[index + 2];
+          const a0 = buf8[index + 3] / 255.0;
 
-          var a = a0 + a1 - a0 * a1;
+          let a = a0 + a1 - a0 * a1;
           let r = r0,
             g = g0,
             b = b0;
           if (a > 0) {
-            var a1x = Math.max(a1, 1.0 / 255);
+            const a1x = Math.max(a1, 1.0 / 255);
 
             r = (r1 * a1x + r0 * a0 * (1 - a1x)) / a;
             g = (g1 * a1x + g0 * a0 * (1 - a1x)) / a;
@@ -2281,7 +2282,7 @@ Neo.Painter = class {
             b = b1 > b0 ? Math.ceil(b) : Math.floor(b);
           }
 
-          var tmp = a * 255;
+          const tmp = a * 255;
           a = Math.ceil(tmp);
 
           buf8[index + 0] = r;
@@ -2307,7 +2308,7 @@ Neo.Painter = class {
    */
   setBrushPoint(buf8, width, x, y) {
     const d = this._currentWidth;
-    let r0 = Math.floor(d / 2);
+    const r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
 
@@ -2322,20 +2323,20 @@ Neo.Painter = class {
     const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
-    for (var i = 0; i < d; i++) {
-      for (var j = 0; j < d; j++) {
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-          let r0 = buf8[index + 0];
-          let g0 = buf8[index + 1];
-          let b0 = buf8[index + 2];
-          let a0 = buf8[index + 3] / 255.0;
+          const r0 = buf8[index + 0];
+          const g0 = buf8[index + 1];
+          const b0 = buf8[index + 2];
+          const a0 = buf8[index + 3] / 255.0;
 
           let a = a0 + a1 - a0 * a1;
           let r = r0,
             g = g0,
             b = b0;
           if (a > 0) {
-            let a1x = Math.max(a1, 1.0 / 255);
+            const a1x = Math.max(a1, 1.0 / 255);
 
             r = (r1 * a1x + r0 * a0) / (a0 + a1x);
             g = (g1 * a1x + g0 * a0) / (a0 + a1x);
@@ -2346,7 +2347,7 @@ Neo.Painter = class {
             b = b1 > b0 ? Math.ceil(b) : Math.floor(b);
           }
 
-          var tmp = a * 255;
+          const tmp = a * 255;
           a = Math.ceil(tmp);
 
           buf8[index + 0] = r;
@@ -2373,17 +2374,17 @@ Neo.Painter = class {
    * @returns {void}
    */
   setTonePoint(buf8, width, x, y, x0, y0) {
-    var d = this._currentWidth;
-    var r0 = Math.floor(d / 2);
+    const d = this._currentWidth;
+    const r0 = Math.floor(d / 2);
 
     x -= r0;
     y -= r0;
     x0 -= r0;
     y0 -= r0;
 
-    var shape = this._roundData[d];
-    var shapeIndex = 0;
-    var index = (y * width + x) * 4;
+    const shape = this._roundData[d];
+    let shapeIndex = 0;
+    let index = (y * width + x) * 4;
 
     const r = this._currentColor[0];
     const g = this._currentColor[1];
@@ -2392,8 +2393,8 @@ Neo.Painter = class {
 
     const toneData = this.getToneData(a);
 
-    for (var i = 0; i < d; i++) {
-      for (var j = 0; j < d; j++) {
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
           if (toneData[((y0 + i) % 4) + ((x0 + j) % 4) * 4]) {
             buf8[index + 0] = r;
@@ -2429,10 +2430,10 @@ Neo.Painter = class {
     let index = (y * width + x) * 4;
     const a = Math.floor(this._currentColor[3]); //this.alpha * 255);
 
-    for (var i = 0; i < d; i++) {
-      for (var j = 0; j < d; j++) {
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-          var k = (buf8[index + 3] / 255.0) * (1.0 - a / 255.0);
+          const k = (buf8[index + 3] / 255.0) * (1.0 - a / 255.0);
 
           buf8[index + 3] -= a / ((d * (255.0 - a)) / 255.0);
         }
@@ -2455,43 +2456,43 @@ Neo.Painter = class {
    * @returns {void}
    */
   setBlurPoint(buf8, width, x, y, x0, y0) {
-    var d = this._currentWidth;
-    var r0 = Math.floor(d / 2);
+    const d = this._currentWidth;
+    const r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
 
-    var shape = this._roundData[d];
-    var shapeIndex = 0;
-    var height = buf8.length / (width * 4);
+    const shape = this._roundData[d];
+    let shapeIndex = 0;
+    const height = buf8.length / (width * 4);
 
     //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
     //  var a1 = this.alpha / 12;
-    var a1 = this._currentColor[3] / 255.0 / 12;
+    const a1 = this._currentColor[3] / 255.0 / 12;
     if (a1 == 0) return;
-    var blur = a1;
+    const blur = a1;
 
-    var tmp = new Uint8ClampedArray(buf8.length);
-    for (var i = 0; i < buf8.length; i++) {
+    const tmp = new Uint8ClampedArray(buf8.length);
+    for (let i = 0; i < buf8.length; i++) {
       tmp[i] = buf8[i];
     }
 
-    var left = x0 - x - r0;
-    var top = y0 - y - r0;
+    const left = x0 - x - r0;
+    const top = y0 - y - r0;
 
-    var xstart = 0,
+    let xstart = 0,
       xend = d;
-    var ystart = 0,
+    let ystart = 0,
       yend = d;
     if (xstart > left) xstart = -left;
     if (ystart > top) ystart = -top;
     if (xend > this.canvasWidth - left) xend = this.canvasWidth - left;
     if (yend > this.canvasHeight - top) yend = this.canvasHeight - top;
 
-    for (var j = ystart; j < yend; j++) {
-      var index = (j * width + xstart) * 4;
-      for (var i = xstart; i < xend; i++) {
+    for (let j = ystart; j < yend; j++) {
+      let index = (j * width + xstart) * 4;
+      for (let i = xstart; i < xend; i++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-          var rgba = [0, 0, 0, 0, 0];
+          const rgba = [0, 0, 0, 0, 0];
 
           this.addBlur(tmp, index, 1.0 - blur * 4, rgba);
           if (i > xstart) this.addBlur(tmp, index - 4, blur, rgba);
@@ -2522,26 +2523,26 @@ Neo.Painter = class {
     let g1;
     let b1;
 
-    var d = this._currentWidth;
+    const d = this._currentWidth;
     const r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
 
-    var index = (y * width + x) * 4;
+    let index = (y * width + x) * 4;
 
-    var shape = this._roundData[d];
-    var shapeIndex = 0;
+    const shape = this._roundData[d];
+    let shapeIndex = 0;
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
-    for (var i = 0; i < d; i++) {
-      for (var j = 0; j < d; j++) {
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-          let r0 = buf8[index + 0];
-          let g0 = buf8[index + 1];
-          let b0 = buf8[index + 2];
-          let a0 = buf8[index + 3] / 255.0;
+          const r0 = buf8[index + 0];
+          const g0 = buf8[index + 1];
+          const b0 = buf8[index + 2];
+          const a0 = buf8[index + 3] / 255.0;
 
           if (a1 != 255.0) {
             r1 = (r0 * 255) / (255 - a1);
@@ -2558,7 +2559,7 @@ Neo.Painter = class {
           const b = Math.ceil(b1);
           let a = a0;
 
-          var tmp = a * 255;
+          const tmp = a * 255;
           a = Math.ceil(tmp);
 
           buf8[index + 0] = r;
@@ -2587,26 +2588,26 @@ Neo.Painter = class {
     let g1;
     let b1;
 
-    var d = this._currentWidth;
+    const d = this._currentWidth;
     const r0 = Math.floor(d / 2);
     x -= r0;
     y -= r0;
 
-    var index = (y * width + x) * 4;
+    let index = (y * width + x) * 4;
 
-    var shape = this._roundData[d];
-    var shapeIndex = 0;
+    const shape = this._roundData[d];
+    let shapeIndex = 0;
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
-    for (var i = 0; i < d; i++) {
-      for (var j = 0; j < d; j++) {
+    for (let i = 0; i < d; i++) {
+      for (let j = 0; j < d; j++) {
         if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-          let r0 = buf8[index + 0];
-          let g0 = buf8[index + 1];
-          let b0 = buf8[index + 2];
-          let a0 = buf8[index + 3] / 255.0;
+          const r0 = buf8[index + 0];
+          const g0 = buf8[index + 1];
+          const b0 = buf8[index + 2];
+          const a0 = buf8[index + 3] / 255.0;
 
           if (a1 != 255.0) {
             r1 = 255 - ((255 - r0) * 255) / (255 - a1);
@@ -2623,7 +2624,7 @@ Neo.Painter = class {
           const b = Math.floor(b1);
           let a = a0;
 
-          var tmp = a * 255;
+          const tmp = a * 255;
           a = Math.ceil(tmp);
 
           buf8[index + 0] = r;
@@ -2648,7 +2649,7 @@ Neo.Painter = class {
    * @returns {void}
    */
   xorPixel(buf32, bufWidth, x, y, c) {
-    var index = y * bufWidth + x;
+    const index = y * bufWidth + x;
     if (!c) c = 0xffffff;
     buf32[index] ^= c;
   }
@@ -2670,13 +2671,13 @@ Neo.Painter = class {
    * @returns {Array<number>} 算出された座標 [x, y] を返す。
    */
   getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3) {
-    var a0 = (1 - t) * (1 - t) * (1 - t);
-    var a1 = (1 - t) * (1 - t) * t * 3;
-    var a2 = (1 - t) * t * t * 3;
-    var a3 = t * t * t;
+    const a0 = (1 - t) * (1 - t) * (1 - t);
+    const a1 = (1 - t) * (1 - t) * t * 3;
+    const a2 = (1 - t) * t * t * 3;
+    const a3 = t * t * t;
 
-    var x = x0 * a0 + x1 * a1 + x2 * a2 + x3 * a3;
-    var y = y0 * a0 + y1 * a1 + y2 * a2 + y3 * a3;
+    const x = x0 * a0 + x1 * a1 + x2 * a2 + x3 * a3;
+    const y = y0 * a0 + y1 * a1 + y2 * a2 + y3 * a3;
     return [x, y];
   }
 
@@ -2713,13 +2714,13 @@ Neo.Painter = class {
     isReplay,
     isPreview = false,
   ) {
-    var points = [
+    const points = [
       [x0, y0],
       [x1, y1],
       [x2, y2],
       [x3, y3],
     ];
-    var ref = this;
+    const ref = this;
     /**
      * @callback DrawCallback
      * @param {number} left
@@ -2740,18 +2741,18 @@ Neo.Painter = class {
         buf8,
         imageData,
       ) {
-        var n = Math.ceil((width + height) * 2.5);
-        var oType = ref._currentMaskType;
-        var oAlpha = ref._currentColor[3];
+        const n = Math.ceil((width + height) * 2.5);
+        const oType = ref._currentMaskType;
+        const oAlpha = ref._currentColor[3];
 
         if (isPreview) {
           ref._currentMaskType = Neo.Painter.MASKTYPE_NONE;
           ref._currentColor[3] = 255;
         }
 
-        for (var i = 0; i < n; i++) {
-          var t = (i * 1.0) / n;
-          var p = ref.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
+        for (let i = 0; i < n; i++) {
+          const t = (i * 1.0) / n;
+          const p = ref.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
 
           p[0] = Math.round(p[0]);
           p[1] = Math.round(p[1]);
@@ -2786,11 +2787,11 @@ Neo.Painter = class {
     x1 = Math.floor(x1);
     y1 = Math.floor(y1);
 
-    var points = [
+    const points = [
       [x0, y0],
       [x1, y1],
     ];
-    var ref = this;
+    const ref = this;
     this.aerr = 0;
     /**
      * @callback DrawCallback
@@ -2833,27 +2834,27 @@ Neo.Painter = class {
    * @returns {void}
    */
   draw(ctx, points, callback) {
-    var xs: number[] = [],
+    const xs: number[] = [],
       ys: number[] = [];
-    for (var i = 0; i < points.length; i++) {
-      var point = points[i];
+    for (let i = 0; i < points.length; i++) {
+      const point = points[i];
       xs.push(Math.round(point[0]));
       ys.push(Math.round(point[1]));
     }
-    var xmin = Math.min.apply(null, xs);
-    var xmax = Math.max.apply(null, xs);
-    var ymin = Math.min.apply(null, ys);
-    var ymax = Math.max.apply(null, ys);
+    const xmin = Math.min.apply(null, xs);
+    const xmax = Math.max.apply(null, xs);
+    const ymin = Math.min.apply(null, ys);
+    const ymax = Math.max.apply(null, ys);
 
-    var r = Math.ceil(this._currentWidth / 2);
-    var left = xmin - r;
-    var top = ymin - r;
-    var width = xmax - xmin;
-    var height = ymax - ymin;
+    const r = Math.ceil(this._currentWidth / 2);
+    const left = xmin - r;
+    const top = ymin - r;
+    const width = xmax - xmin;
+    const height = ymax - ymin;
 
-    var imageData = ctx.getImageData(left, top, width + r * 2, height + r * 2);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(left, top, width + r * 2, height + r * 2);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
     callback(left, top, width, height, buf8, imageData);
 
@@ -2870,16 +2871,16 @@ Neo.Painter = class {
    * @returns {void}
    */
   bresenham(points, callback) {
-    var x0 = points[0][0];
-    var y0 = points[0][1];
-    var x1 = points[1][0];
-    var y1 = points[1][1];
+    let x0 = points[0][0];
+    let y0 = points[0][1];
+    const x1 = points[1][0];
+    const y1 = points[1][1];
 
-    var dx = Math.abs(x1 - x0),
+    const dx = Math.abs(x1 - x0),
       sx = x0 < x1 ? 1 : -1;
-    var dy = Math.abs(y1 - y0),
+    const dy = Math.abs(y1 - y0),
       sy = y0 < y1 ? 1 : -1;
-    var err = (dx > dy ? dx : -dy) / 2;
+    let err = (dx > dy ? dx : -dy) / 2;
 
     while (true) {
       if (
@@ -2893,7 +2894,7 @@ Neo.Painter = class {
       }
 
       if (x0 === x1 && y0 === y1) break;
-      var e2 = err;
+      const e2 = err;
       if (e2 > -dx) {
         err -= dy;
         x0 += sx;
@@ -2915,8 +2916,8 @@ Neo.Painter = class {
    * @returns {void}
    */
   plot(point, callback) {
-    var x0 = point[0];
-    var y0 = point[1];
+    const x0 = point[0];
+    const y0 = point[1];
 
     if (
       this.prevLine == null ||
@@ -2957,9 +2958,9 @@ Neo.Painter = class {
    * @returns {void}
    */
   xorRect(buf32, bufWidth, x, y, width, height, c) {
-    var index = y * bufWidth + x;
-    for (var j = 0; j < height; j++) {
-      for (var i = 0; i < width; i++) {
+    let index = y * bufWidth + x;
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
         buf32[index] ^= c;
         index++;
       }
@@ -2987,36 +2988,36 @@ Neo.Painter = class {
     height = Math.round(height);
     if (width == 0 || height == 0) return;
 
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var index = 0;
+    const imageData = ctx.getImageData(x, y, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    let index = 0;
     if (!c) c = 0xffffff;
 
     if (isFill) {
       this.xorRect(buf32, width, 0, 0, width, height, c);
     } else {
-      for (var i = 0; i < width; i++) {
+      for (let i = 0; i < width; i++) {
         //top
         buf32[index] = buf32[index] ^= c;
         index++;
       }
       if (height > 1) {
         index = width;
-        for (var i = 1; i < height; i++) {
+        for (let i = 1; i < height; i++) {
           //left
           buf32[index] = buf32[index] ^= c;
           index += width;
         }
         if (width > 1) {
           index = width * 2 - 1;
-          for (var i = 1; i < height - 1; i++) {
+          for (let i = 1; i < height - 1; i++) {
             //right
             buf32[index] = buf32[index] ^= c;
             index += width;
           }
           index = width * (height - 1) + 1;
-          for (var i = 1; i < width; i++) {
+          for (let i = 1; i < width; i++) {
             // bottom
             buf32[index] = buf32[index] ^= c;
             index++;
@@ -3046,22 +3047,22 @@ Neo.Painter = class {
     if (width == 0 || height == 0) return;
     if (!c) c = 0xffffff;
 
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(x, y, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var a = width - 1,
-      b = height - 1,
-      b1 = b & 1; /* values of diameter */
-    var dx = 4 * (1 - a) * b * b,
+    let a = width - 1;
+    const b = height - 1;
+    let b1 = b & 1; /* values of diameter */
+    let dx = 4 * (1 - a) * b * b,
       dy = 4 * (b1 + 1) * a * a; /* error increment */
-    var err = dx + dy + b1 * a * a,
+    let err = dx + dy + b1 * a * a,
       e2; /* error of 1.step */
 
-    var x0 = x;
-    var y0 = y;
-    var x1 = x0 + a;
-    var y1 = y0 + b;
+    let x0 = x;
+    let y0 = y;
+    let x1 = x0 + a;
+    let y1 = y0 + b;
 
     if (x0 > x1) {
       x0 = x1;
@@ -3072,7 +3073,7 @@ Neo.Painter = class {
     y1 = y0 - b1; /* starting pixel */
     a *= 8 * a;
     b1 = 8 * b * b;
-    var ymin = y0 - 1;
+    let ymin = y0 - 1;
 
     do {
       if (isFill) {
@@ -3130,22 +3131,22 @@ Neo.Painter = class {
     y0 = Math.round(y0);
     y1 = Math.round(y1);
 
-    var width = Math.abs(x1 - x0);
-    var height = Math.abs(y1 - y0);
+    const width = Math.abs(x1 - x0);
+    const height = Math.abs(y1 - y0);
 
-    var left = x0 < x1 ? x0 : x1;
-    var top = y0 < y1 ? y0 : y1;
+    const left = x0 < x1 ? x0 : x1;
+    const top = y0 < y1 ? y0 : y1;
     //  console.log("left:"+left+" top:"+top+" width:"+width+" height:"+height);
 
-    var imageData = ctx.getImageData(left, top, width + 1, height + 1);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(left, top, width + 1, height + 1);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var dx = width,
+    const dx = width,
       sx = x0 < x1 ? 1 : -1;
-    var dy = height,
+    const dy = height,
       sy = y0 < y1 ? 1 : -1;
-    var err = (dx > dy ? dx : -dy) / 2;
+    let err = (dx > dy ? dx : -dy) / 2;
 
     while (true) {
       if (
@@ -3159,7 +3160,7 @@ Neo.Painter = class {
       }
 
       if (x0 === x1 && y0 === y1) break;
-      var e2 = err;
+      const e2 = err;
       if (e2 > -dx) {
         err -= dy;
         x0 += sx;
@@ -3183,27 +3184,27 @@ Neo.Painter = class {
    * @param {number} height - 高さ。
    */
   eraseRect(layer, x, y, width, height) {
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
     height = Math.round(height);
 
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(x, y, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var index = 0;
+    let index = 0;
 
-    var a = 1.0 - this._currentColor[3] / 255.0; //this.alpha;
+    let a = 1.0 - this._currentColor[3] / 255.0; //this.alpha;
     if (a != 0) {
       a = Math.ceil(2.0 / a);
     } else {
       a = 255;
     }
 
-    for (var j = 0; j < height; j++) {
-      for (var i = 0; i < width; i++) {
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
         if (!this.isMasked(buf8, index)) {
           buf8[index + 3] -= a;
         }
@@ -3224,22 +3225,22 @@ Neo.Painter = class {
    * @returns {void}
    */
   flipH(layer, x, y, width, height) {
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
     height = Math.round(height);
 
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(x, y, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var half = Math.floor(width / 2);
-    for (var j = 0; j < height; j++) {
-      var index = j * width;
-      var index2 = index + (width - 1);
-      for (var i = 0; i < half; i++) {
-        var value = buf32[index + i];
+    const half = Math.floor(width / 2);
+    for (let j = 0; j < height; j++) {
+      const index = j * width;
+      const index2 = index + (width - 1);
+      for (let i = 0; i < half; i++) {
+        const value = buf32[index + i];
         buf32[index + i] = buf32[index2 - i];
         buf32[index2 - i] = value;
       }
@@ -3258,22 +3259,22 @@ Neo.Painter = class {
    * @returns {void}
    */
   flipV(layer, x, y, width, height) {
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
     height = Math.round(height);
 
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(x, y, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var half = Math.floor(height / 2);
-    for (var j = 0; j < half; j++) {
-      var index = j * width;
-      var index2 = (height - 1 - j) * width;
-      for (var i = 0; i < width; i++) {
-        var value = buf32[index + i];
+    const half = Math.floor(height / 2);
+    for (let j = 0; j < half; j++) {
+      const index = j * width;
+      const index2 = (height - 1 - j) * width;
+      for (let i = 0; i < width; i++) {
+        const value = buf32[index + i];
         buf32[index + i] = buf32[index2 + i];
         buf32[index2 + i] = value;
       }
@@ -3297,34 +3298,34 @@ Neo.Painter = class {
     y = Math.round(y);
     width = Math.round(width);
     height = Math.round(height);
-    var r = 0x00;
-    var g = 0x00;
-    var b = 0x00;
+    let r = 0x00;
+    let g = 0x00;
+    let b = 0x00;
 
-    var imageData: ImageData[] = [];
-    var buf32: Uint32Array[] = [];
-    var buf8: Uint8ClampedArray[] = [];
-    for (var i = 0; i < 2; i++) {
+    const imageData: ImageData[] = [];
+    const buf32: Uint32Array[] = [];
+    const buf8: Uint8ClampedArray[] = [];
+    for (let i = 0; i < 2; i++) {
       imageData[i] = this.canvasCtx[i].getImageData(x, y, width, height);
       buf32[i] = new Uint32Array(imageData[i].data.buffer);
       buf8[i] = new Uint8ClampedArray(imageData[i].data.buffer);
     }
 
-    var dst = layer;
-    var src = dst == 1 ? 0 : 1;
-    var size = width * height;
-    var index = 0;
-    for (var i = 0; i < size; i++) {
-      var r0 = buf8[0][index + 0];
-      var g0 = buf8[0][index + 1];
-      var b0 = buf8[0][index + 2];
-      var a0 = buf8[0][index + 3] / 255.0;
-      var r1 = buf8[1][index + 0];
-      var g1 = buf8[1][index + 1];
-      var b1 = buf8[1][index + 2];
-      var a1 = buf8[1][index + 3] / 255.0;
+    const dst = layer;
+    const src = dst == 1 ? 0 : 1;
+    const size = width * height;
+    let index = 0;
+    for (let i = 0; i < size; i++) {
+      const r0 = buf8[0][index + 0];
+      const g0 = buf8[0][index + 1];
+      const b0 = buf8[0][index + 2];
+      const a0 = buf8[0][index + 3] / 255.0;
+      const r1 = buf8[1][index + 0];
+      const g1 = buf8[1][index + 1];
+      const b1 = buf8[1][index + 2];
+      const a1 = buf8[1][index + 3] / 255.0;
 
-      var a = a0 + a1 - a0 * a1;
+      const a = a0 + a1 - a0 * a1;
       if (a > 0) {
         r = Math.floor((r1 * a1 + r0 * a0 * (1 - a1)) / a + 0.5);
         g = Math.floor((g1 * a1 + g0 * a0 * (1 - a1)) / a + 0.5);
@@ -3341,7 +3342,7 @@ Neo.Painter = class {
       index += 4;
     }
 
-    for (var i = 0; i < 2; i++) {
+    for (let i = 0; i < 2; i++) {
       imageData[i].data.set(buf8[i]);
       this.canvasCtx[i].putImageData(imageData[i], x, y);
     }
@@ -3357,26 +3358,26 @@ Neo.Painter = class {
    * @returns {void}
    */
   blurRect(layer, x, y, width, height) {
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
     x = Math.round(x);
     y = Math.round(y);
     width = Math.round(width);
     height = Math.round(height);
 
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(x, y, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var tmp = new Uint8ClampedArray(buf8.length);
-    for (var i = 0; i < buf8.length; i++) tmp[i] = buf8[i];
+    const tmp = new Uint8ClampedArray(buf8.length);
+    for (let i = 0; i < buf8.length; i++) tmp[i] = buf8[i];
 
-    var index = 0;
-    var a1 = this._currentColor[3] / 255.0 / 12; //this.alpha / 12;
-    var blur = a1;
+    let index = 0;
+    const a1 = this._currentColor[3] / 255.0 / 12; //this.alpha / 12;
+    const blur = a1;
 
-    for (var j = 0; j < height; j++) {
-      for (var i = 0; i < width; i++) {
-        var rgba = [0, 0, 0, 0, 0];
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
+        const rgba = [0, 0, 0, 0, 0];
 
         this.addBlur(tmp, index, 1.0 - blur * 4, rgba);
 
@@ -3385,7 +3386,7 @@ Neo.Painter = class {
         if (j > 0) this.addBlur(tmp, index - width * 4, blur, rgba);
         if (j < height - 1) this.addBlur(tmp, index + width * 4, blur, rgba);
 
-        var w = rgba[4];
+        const w = rgba[4];
         buf8[index + 0] = Math.round(rgba[0]);
         buf8[index + 1] = Math.round(rgba[1]);
         buf8[index + 2] = Math.round(rgba[2]);
@@ -3407,22 +3408,22 @@ Neo.Painter = class {
    * @returns {void}
    */
   addBlur(buffer, index, a, rgba) {
-    var r0 = rgba[0];
-    var g0 = rgba[1];
-    var b0 = rgba[2];
-    var a0 = rgba[3];
-    var r1 = buffer[index + 0];
-    var g1 = buffer[index + 1];
-    var b1 = buffer[index + 2];
-    var a1 = (buffer[index + 3] / 255.0) * a;
+    const r0 = rgba[0];
+    const g0 = rgba[1];
+    const b0 = rgba[2];
+    const a0 = rgba[3];
+    const r1 = buffer[index + 0];
+    const g1 = buffer[index + 1];
+    const b1 = buffer[index + 2];
+    const a1 = (buffer[index + 3] / 255.0) * a;
     rgba[4] += a;
 
-    var a = a0 + a1;
-    if (a > 0) {
+    const alpha = a0 + a1;
+    if (alpha > 0) {
       rgba[0] = (r1 * a1 + r0 * a0) / (a0 + a1);
       rgba[1] = (g1 * a1 + g0 * a0) / (a0 + a1);
       rgba[2] = (b1 * a1 + b0 * a0) / (a0 + a1);
-      rgba[3] = a;
+      rgba[3] = alpha;
     }
   }
 
@@ -3447,7 +3448,7 @@ Neo.Painter = class {
     x = Math.floor(x);
     y = Math.floor(y);
     if (x >= 0 && x < this.canvasWidth && y >= 0 && y < this.canvasHeight) {
-      for (var i = 0; i < 2; i++) {
+      for (let i = 0; i < 2; i++) {
         if (this.visible[i]) {
           const ctx = this.canvasCtx[i];
           const imageData = ctx.getImageData(x, y, 1, 1);
@@ -3496,8 +3497,8 @@ Neo.Painter = class {
    * @returns {void}
    */
   fillHorizontalLine(buf32, x0, x1, y, color) {
-    var index = y * this.canvasWidth + x0;
-    for (var x = x0; x <= x1; x++) {
+    let index = y * this.canvasWidth + x0;
+    for (let x = x0; x <= x1; x++) {
       buf32[index++] = color;
     }
   }
@@ -3513,7 +3514,7 @@ Neo.Painter = class {
    */
   scanLine(x0, x1, y, baseColor, buf32, stack) {
     // var width = this.canvasWidth;
-    for (var x = x0; x <= x1; x++) {
+    for (let x = x0; x <= x1; x++) {
       stack.push({ x: x, y: y });
     }
   }
@@ -3528,7 +3529,7 @@ Neo.Painter = class {
   doFloodFill(layer, x, y, fillColor) {
     x = Math.round(x);
     y = Math.round(y);
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
 
     if (x < 0 || x >= this.canvasWidth || y < 0 || y >= this.canvasHeight) {
       return;
@@ -3545,14 +3546,14 @@ Neo.Painter = class {
     const width = imageData.width;
     const stack = [{ x: x, y: y }];
 
-    var baseColor = buf32[y * width + x];
+    const baseColor = buf32[y * width + x];
 
     if ((baseColor & 0xff000000) == 0 || baseColor != fillColor) {
       while (stack.length > 0) {
         if (stack.length > 1000000) {
           break;
         }
-        var point = stack.pop();
+        const point = stack.pop();
         if (!point) {
           break;
         }
@@ -3602,15 +3603,15 @@ Neo.Painter = class {
     const buf32 = new Uint32Array(imageData.data.buffer);
     // let buf8 = new Uint8ClampedArray(imageData.data.buffer);
     this.temp = new Uint32Array(buf32.length);
-    for (var i = 0; i < buf32.length; i++) {
+    for (let i = 0; i < buf32.length; i++) {
       this.temp[i] = buf32[i];
     }
 
     //tempCanvasに乗せる画像を作る
     const tempImageData = this.tempCanvasCtx.getImageData(x, y, width, height);
     const tempBuf32 = new Uint32Array(tempImageData.data.buffer);
-    let tempBuf8 = new Uint8ClampedArray(tempImageData.data.buffer);
-    for (var i = 0; i < tempBuf32.length; i++) {
+    const tempBuf8 = new Uint8ClampedArray(tempImageData.data.buffer);
+    for (let i = 0; i < tempBuf32.length; i++) {
       if (this.temp[i] >> 24) {
         tempBuf32[i] = this.temp[i] | 0xff000000;
       } else {
@@ -3634,15 +3635,15 @@ Neo.Painter = class {
    * @returns {void}
    */
   paste(layer, x, y, width, height, dx, dy) {
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
     //  console.log(this.tempX, this.tempY);
 
-    var imageData = ctx.getImageData(x + dx, y + dy, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const imageData = ctx.getImageData(x + dx, y + dy, width, height);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
     if (this.temp) {
-      for (var i = 0; i < buf32.length; i++) {
+      for (let i = 0; i < buf32.length; i++) {
         buf32[i] = this.temp[i];
       }
       imageData.data.set(buf8);
@@ -3670,13 +3671,13 @@ Neo.Painter = class {
    * により無効化できる。
    */
   turn(layer, x, y, width, height) {
-    var ctx = this.canvasCtx[layer];
+    const ctx = this.canvasCtx[layer];
 
     // 傾けツールのバグを再現するため一番上のラインで対象領域を埋める
-    var imageData = ctx.getImageData(x, y, width, height);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var temp = new Uint32Array(buf32.length);
+    let imageData = ctx.getImageData(x, y, width, height);
+    let buf32 = new Uint32Array(imageData.data.buffer);
+    let buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const temp = new Uint32Array(buf32.length);
 
     // 設定によって「塗りつぶし関数」を切り替える
     let fillPixel;
@@ -3697,9 +3698,9 @@ Neo.Painter = class {
       };
     }
 
-    var index = 0;
-    for (var j = 0; j < height; j++) {
-      for (var i = 0; i < width; i++) {
+    let index = 0;
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
         temp[index] = buf32[index];
         if (index >= width) {
           buf32[index] = fillPixel(index);
@@ -3716,8 +3717,8 @@ Neo.Painter = class {
     buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
     index = 0;
-    for (var j = height - 1; j >= 0; j--) {
-      for (var i = 0; i < width; i++) {
+    for (let j = height - 1; j >= 0; j--) {
+      for (let i = 0; i < width; i++) {
         buf32[i * height + j] = temp[index++];
       }
     }
@@ -3764,15 +3765,15 @@ Neo.Painter = class {
     // const buf32 = new Uint32Array(imageData.data.buffer);
     const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-    var index = 0;
+    let index = 0;
 
-    var r1 = this._currentColor[0];
-    var g1 = this._currentColor[1];
-    var b1 = this._currentColor[2];
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_FILL);
+    const r1 = this._currentColor[0];
+    const g1 = this._currentColor[1];
+    const b1 = this._currentColor[2];
+    const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_FILL);
 
-    for (var j = 0; j < height; j++) {
-      for (var i = 0; i < width; i++) {
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
         if (maskFunc && maskFunc.call(this, i, j, width, height)) {
           //なぜか加算逆加算は適用されない
           if (
@@ -3784,12 +3785,12 @@ Neo.Painter = class {
             const b0 = buf8[index + 2];
             const a0 = buf8[index + 3] / 255.0;
 
-            var a = a0 + a1 - a0 * a1;
+            let a = a0 + a1 - a0 * a1;
 
             if (a > 0) {
               //不透明なピクセルの場合
-              var a1x = a1;
-              var ax = 1 + a0 * (1 - a1x);
+              const a1x = a1;
+              const ax = 1 + a0 * (1 - a1x);
 
               let r = (r1 + r0 * a0 * (1 - a1x)) / ax;
               let g = (g1 + g0 * a0 * (1 - a1x)) / ax;
@@ -3799,7 +3800,7 @@ Neo.Painter = class {
               g = g1 > g0 ? Math.ceil(g) : Math.floor(g);
               b = b1 > b0 ? Math.ceil(b) : Math.floor(b);
 
-              var tmp = a * 255;
+              const tmp = a * 255;
               a = Math.ceil(tmp);
 
               buf8[index + 0] = r;
@@ -3836,7 +3837,7 @@ Neo.Painter = class {
    * @returns {boolean} 外周の線幅内であれば true
    */
   rectMask(x, y, width, height) {
-    var d = this._currentWidth;
+    const d = this._currentWidth;
     //  var d = this.lineWidth;
     return x < d || x > width - 1 - d || y < d || y > height - 1 - d
       ? true
@@ -3853,8 +3854,8 @@ Neo.Painter = class {
    * @returns {boolean} 楕円内部の時に true
    */
   ellipseFillMask(x, y, width, height) {
-    var cx = (width - 1) / 2.0;
-    var cy = (height - 1) / 2.0;
+    const cx = (width - 1) / 2.0;
+    const cy = (height - 1) / 2.0;
     x = (x - cx) / (cx + 1);
     y = (y - cy) / (cy + 1);
 
@@ -3871,15 +3872,15 @@ Neo.Painter = class {
    * @returns {boolean} 輪郭内であれば true
    */
   ellipseMask(x, y, width, height) {
-    var d = this._currentWidth;
+    const d = this._currentWidth;
     //  var d = this.lineWidth;
-    var cx = (width - 1) / 2.0;
-    var cy = (height - 1) / 2.0;
+    const cx = (width - 1) / 2.0;
+    const cy = (height - 1) / 2.0;
 
     if (cx <= d || cy <= d) return this.ellipseFillMask(x, y, width, height);
 
-    var x2 = (x - cx) / (cx - d + 1);
-    var y2 = (y - cy) / (cy - d + 1);
+    const x2 = (x - cx) / (cx - d + 1);
+    const y2 = (y - cy) / (cy - d + 1);
 
     x = (x - cx) / (cx + 1);
     y = (y - cy) / (cy + 1);
@@ -3913,9 +3914,9 @@ Neo.Painter = class {
     }
 
     // マウス座標（描画先キャンバス座標）を計算
-    var x =
+    let x =
       (mx - this.zoomX + (this.destCanvas.width * 0.5) / this.zoom) * this.zoom;
-    var y =
+    let y =
       (my - this.zoomY + (this.destCanvas.height * 0.5) / this.zoom) *
       this.zoom;
 
@@ -3994,7 +3995,7 @@ Neo.Painter = class {
    */
   loadImage(filename) {
     console.log("loadImage " + filename);
-    var img = new Image();
+    const img = new Image();
     const ref = this;
     img.onload = function () {
       ref.canvasCtx[0].drawImage(img, 0, 0);
@@ -4036,9 +4037,9 @@ Neo.Painter = class {
       const layerData1 = Neo.storage.getItem("layer1");
       if (!layerData0 || !layerData1) return;
 
-      var img0 = new Image();
+      const img0 = new Image();
       img0.onload = function () {
-        var img1 = new Image();
+        const img1 = new Image();
         img1.onload = function () {
           ref.canvasCtx[0].clearRect(0, 0, ref.canvasWidth, ref.canvasHeight);
           ref.canvasCtx[1].clearRect(0, 0, ref.canvasWidth, ref.canvasHeight);
@@ -4085,9 +4086,9 @@ Neo.Painter = class {
    * @returns {number[]} [最小値のインデックス, 中間値のインデックス, 最大値のインデックス]
    */
   sortColor(r0, g0, b0) {
-    var min = r0 < g0 ? (r0 < b0 ? 0 : 2) : g0 < b0 ? 1 : 2;
-    var max = r0 > g0 ? (r0 > b0 ? 0 : 2) : g0 > b0 ? 1 : 2;
-    var mid = min + max == 1 ? 2 : min + max == 2 ? 1 : 0;
+    const min = r0 < g0 ? (r0 < b0 ? 0 : 2) : g0 < b0 ? 1 : 2;
+    const max = r0 > g0 ? (r0 > b0 ? 0 : 2) : g0 > b0 ? 1 : 2;
+    const mid = min + max == 1 ? 2 : min + max == 2 ? 1 : 0;
     return [min, mid, max];
   }
 
@@ -4109,8 +4110,8 @@ Neo.Painter = class {
     if (string.length <= 0) return;
 
     //描画位置がずれるので適当に調整
-    var offset = parseInt(fontSize, 10);
-    var ctx = this.tempCanvasCtx;
+    const offset = parseInt(fontSize, 10);
+    let ctx = this.tempCanvasCtx;
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.save();
     ctx.translate(x, y);
@@ -4136,7 +4137,7 @@ Neo.Painter = class {
     const buf8 = new Uint8ClampedArray(imageData.data.buffer);
     const length = this.canvasWidth * this.canvasHeight;
     let index = 0;
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       if (buf8[index + 3] >= 0x60) {
         buf8[index + 0] = r;
         buf8[index + 1] = g;
@@ -4268,18 +4269,18 @@ Neo.Painter = class {
    * @returns {void}
    */
   onspeed() {
-    var mgr = this._actionMgr;
-    var mode = mgr.speedMode();
+    const mgr = this._actionMgr;
+    const mode = mgr.speedMode();
     Neo.speed = mgr._speedTable[(mode + 1) % 4];
   }
   /**
    * @param {number[]} item
    */
   setCurrent(item) {
-    var color = this._currentColor;
-    var mask = this._currentMask;
-    var width = this._currentWidth;
-    var type = this._currentMaskType;
+    const color = this._currentColor;
+    const mask = this._currentMask;
+    const width = this._currentWidth;
+    const type = this._currentMaskType;
 
     item.push(color[0], color[1], color[2], color[3]);
     item.push(mask[0], mask[1], mask[2]);
@@ -4406,7 +4407,7 @@ Neo.UndoManager = class {
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット
-  var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+  const colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
   if (colorTip) {
     //カラーチップに色をセット
     colorTip.setColor(color);

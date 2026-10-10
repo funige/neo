@@ -52,7 +52,7 @@ Neo.ToolBase = class {
   cancelBezier() {}
   /** @param {Neo.Painter} oe * */
   transformForZoom(oe) {
-    var ctx = oe.destCanvasCtx;
+    const ctx = oe.destCanvasCtx;
     ctx.translate(oe.canvasWidth * 0.5, oe.canvasHeight * 0.5);
     ctx.scale(oe.zoom, oe.zoom);
     ctx.translate(-oe.zoomX, -oe.zoomY);
@@ -280,7 +280,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 1.0;
@@ -298,10 +298,10 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
 
     oe.prepareDrawing();
     this.isUpMove = false;
-    var ctx = oe.canvasCtx[oe.current];
+    const ctx = oe.canvasCtx[oe.current];
     if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
-      var x0 = Math.floor(oe.mouseX);
-      var y0 = Math.floor(oe.mouseY);
+      const x0 = Math.floor(oe.mouseX);
+      const y0 = Math.floor(oe.mouseY);
       oe._actionMgr.freeHand(x0, y0, this.lineType);
       //      oe.drawLine(ctx, x0, y0, x0, y0, this.lineType);
     }
@@ -313,7 +313,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     }
 
     if (oe.alpha >= 1) {
-      var r = Math.ceil(oe.lineWidth / 2);
+      const r = Math.ceil(oe.lineWidth / 2);
       const rect = oe.getBound(oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, r);
       oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     }
@@ -327,7 +327,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
     if (oe.cursorRect) {
-      var rect = oe.cursorRect;
+      const rect = oe.cursorRect;
       oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
       oe.cursorRect = null;
     }
@@ -340,11 +340,11 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
 
   /** @param {Neo.Painter} oe */
   freeHandMoveHandler(oe) {
-    var ctx = oe.canvasCtx[oe.current];
-    var x0 = Math.floor(oe.mouseX);
-    var y0 = Math.floor(oe.mouseY);
-    var x1 = Math.floor(oe.prevMouseX);
-    var y1 = Math.floor(oe.prevMouseY);
+    const ctx = oe.canvasCtx[oe.current];
+    const x0 = Math.floor(oe.mouseX);
+    const y0 = Math.floor(oe.mouseY);
+    const x1 = Math.floor(oe.prevMouseX);
+    const y1 = Math.floor(oe.prevMouseY);
     //  oe.drawLine(ctx, x0, y0, x1, y1, this.lineType);
     oe._actionMgr.freeHandMove(x0, y0, x1, y1, this.lineType);
 
@@ -354,7 +354,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
       oe.cursorRect = null;
     }
 
-    var r = Math.ceil(oe.lineWidth / 2);
+    const r = Math.ceil(oe.lineWidth / 2);
     const rect = oe.getBound(
       oe.mouseX,
       oe.mouseY,
@@ -373,7 +373,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     this.isUpMove = true;
 
     if (oe.cursorRect) {
-      var rect = oe.cursorRect;
+      const rect = oe.cursorRect;
       oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
       oe.cursorRect = null;
     }
@@ -392,15 +392,15 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
       return;
     }
     // if (oe.lineWidth <= 8) return;
-    var mx = Math.floor(oe.mouseX);
-    var my = Math.floor(oe.mouseY);
+    const mx = Math.floor(oe.mouseX);
+    const my = Math.floor(oe.mouseY);
 
-    var d = oe.lineWidth;
+    let d = oe.lineWidth;
     d = d == 1 ? 2 : d; //1pxの時は2px相当の円カーソルを表示
 
-    var x = (mx - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) * oe.zoom;
-    var y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
-    var r = d * 0.5 * oe.zoom;
+    const x = (mx - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) * oe.zoom;
+    const y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
+    const r = d * 0.5 * oe.zoom;
 
     if (!(
       x > -r &&
@@ -410,12 +410,12 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     ))
       return;
 
-    var ctx = oe.destCanvasCtx;
+    const ctx = oe.destCanvasCtx;
     ctx.save();
     this.transformForZoom(oe);
 
     /** @type {number} */
-    var c = this.type == Neo.Painter.TOOLTYPE_ERASER ? 0x0000ff : 0xffff7f;
+    const c = this.type == Neo.Painter.TOOLTYPE_ERASER ? 0x0000ff : 0xffff7f;
     oe.drawXOREllipse(ctx, x - r, y - r, r * 2, r * 2, false, c);
 
     ctx.restore();
@@ -440,8 +440,8 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
 
       oe._pushUndo();
       oe.prepareDrawing();
-      var x0 = Math.floor(oe.mouseX);
-      var y0 = Math.floor(oe.mouseY);
+      const x0 = Math.floor(oe.mouseX);
+      const y0 = Math.floor(oe.mouseY);
       oe._actionMgr.line(x0, y0, this.startX, this.startY, this.lineType);
 
       /*
@@ -471,20 +471,20 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
   drawLineCursor(oe, mx = 0, my = 0) {
     if (!mx) mx = Math.floor(oe.mouseX);
     if (!my) my = Math.floor(oe.mouseY);
-    var nx = this.startX;
-    var ny = this.startY;
-    var ctx = oe.destCanvasCtx;
+    const nx = this.startX;
+    const ny = this.startY;
+    const ctx = oe.destCanvasCtx;
     ctx.save();
     this.transformForZoom(oe);
 
-    var x0 =
+    const x0 =
       (mx + 0.499 - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) * oe.zoom;
-    var y0 =
+    const y0 =
       (my + 0.499 - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) *
       oe.zoom;
-    var x1 =
+    const x1 =
       (nx + 0.499 - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) * oe.zoom;
-    var y1 =
+    const y1 =
       (ny + 0.499 - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) *
       oe.zoom;
     oe.drawXORLine(ctx, x0, y0, x1, y1);
@@ -507,7 +507,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
   cancelBezier() {
-    var oe = Neo.painter;
+    const oe = Neo.painter;
 
     this.step = 0;
     oe.isBezierActive = false;
@@ -619,18 +619,18 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
 
   /** @param {Neo.Painter} oe */
   drawBezierCursor1(oe) {
-    var ctx = oe.destCanvasCtx;
+    const ctx = oe.destCanvasCtx;
 
-    var x = oe.mouseX; //Math.floor(oe.mouseX);
-    var y = oe.mouseY; //Math.floor(oe.mouseY);
+    const x = oe.mouseX; //Math.floor(oe.mouseX);
+    const y = oe.mouseY; //Math.floor(oe.mouseY);
     /*
     var stab = oe.getStabilized();
     var x = Math.floor(stab[0]);
     var y = Math.floor(stab[1]);
     */
-    var p = oe.getDestCanvasPosition(x, y, false, true);
-    var p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
-    var p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
+    const p = oe.getDestCanvasPosition(x, y, false, true);
+    const p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
+    const p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
 
     // handle
     oe.drawXORLine(ctx, p0.x, p0.y, p.x, p.y);
@@ -674,19 +674,19 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
 
   /** @param {Neo.Painter} oe */
   drawBezierCursor2(oe) {
-    var ctx = oe.destCanvasCtx;
+    const ctx = oe.destCanvasCtx;
 
-    var x = oe.mouseX; //Math.floor(oe.mouseX);
-    var y = oe.mouseY; //Math.floor(oe.mouseY);
+    const x = oe.mouseX; //Math.floor(oe.mouseX);
+    const y = oe.mouseY; //Math.floor(oe.mouseY);
     /*
     var stab = oe.getStabilized();
     var x = Math.floor(stab[0]);
     var y = Math.floor(stab[1]);
     */
-    var p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY, false, true);
-    var p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
-    var p1 = oe.getDestCanvasPosition(this.x1, this.y1, false, true);
-    var p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
+    const p = oe.getDestCanvasPosition(oe.mouseX, oe.mouseY, false, true);
+    const p0 = oe.getDestCanvasPosition(this.x0, this.y0, false, true);
+    const p1 = oe.getDestCanvasPosition(this.x1, this.y1, false, true);
+    const p3 = oe.getDestCanvasPosition(this.x3, this.y3, false, true);
 
     // handle
     oe.drawXORLine(ctx, p3.x, p3.y, p.x, p.y);
@@ -745,7 +745,7 @@ Neo.PenTool = class extends Neo.DrawToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 1.0;
@@ -769,7 +769,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = this.getAlpha();
@@ -778,7 +778,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
   }
 
   getAlpha() {
-    var alpha = 241 - Math.floor(Neo.painter.lineWidth / 2) * 6;
+    const alpha = 241 - Math.floor(Neo.painter.lineWidth / 2) * 6;
     return alpha / 255.0;
   }
 };
@@ -798,7 +798,7 @@ Neo.ToneTool = class extends Neo.DrawToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 23 / 255.0;
@@ -837,7 +837,7 @@ Neo.BlurTool = class extends Neo.DrawToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 128 / 255.0;
@@ -861,7 +861,7 @@ Neo.DodgeTool = class extends Neo.DrawToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 128 / 255.0;
@@ -885,7 +885,7 @@ Neo.BurnTool = class extends Neo.DrawToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 128 / 255.0;
@@ -941,15 +941,15 @@ Neo.HandTool = class extends Neo.ToolBase {
     this.ticking = true;
 
     requestAnimationFrame(() => {
-      var dx = this.startX - this.latestX;
-      var dy = this.startY - this.latestY;
+      let dx = this.startX - this.latestX;
+      let dy = this.startY - this.latestY;
 
-      var ax = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
-      var ay = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
-      var barWidth = oe.destCanvas.width * ax;
-      var barHeight = oe.destCanvas.height * ay;
-      var scrollWidthInScreen = oe.destCanvas.width - barWidth - 2;
-      var scrollHeightInScreen = oe.destCanvas.height - barHeight - 2;
+      const ax = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
+      const ay = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
+      const barWidth = oe.destCanvas.width * ax;
+      const barHeight = oe.destCanvas.height * ay;
+      const scrollWidthInScreen = oe.destCanvas.width - barWidth - 2;
+      const scrollHeightInScreen = oe.destCanvas.height - barHeight - 2;
 
       dx *= oe.scrollWidth / scrollWidthInScreen;
       dy *= oe.scrollHeight / scrollHeightInScreen;
@@ -1075,10 +1075,10 @@ Neo.FillTool = class extends Neo.ToolBase {
 
   /** @param {Neo.Painter} oe */
   downHandler(oe) {
-    var x = Math.floor(oe.mouseX);
-    var y = Math.floor(oe.mouseY);
-    var layer = oe.current;
-    var color = oe.getColor();
+    const x = Math.floor(oe.mouseX);
+    const y = Math.floor(oe.mouseY);
+    const layer = oe.current;
+    const color = oe.getColor();
 
     oe._pushUndo();
     oe._actionMgr.floodFill(layer, x, y, color);
@@ -1184,11 +1184,11 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
     this.endX = Math.floor(this.endX);
     this.endY = Math.floor(this.endY);
 
-    var x = this.startX < this.endX ? this.startX : this.endX;
-    var y = this.startY < this.endY ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX) + 1;
-    var height = Math.abs(this.startY - this.endY) + 1;
-    var ctx = oe.canvasCtx[oe.current];
+    let x = this.startX < this.endX ? this.startX : this.endX;
+    let y = this.startY < this.endY ? this.startY : this.endY;
+    let width = Math.abs(this.startX - this.endX) + 1;
+    let height = Math.abs(this.startY - this.endY) + 1;
+    const ctx = oe.canvasCtx[oe.current];
 
     if (x < 0) x = 0;
     if (y < 0) y = 0;
@@ -1236,18 +1236,18 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   drawCursor(oe) {
-    var ctx = oe.destCanvasCtx;
+    const ctx = oe.destCanvasCtx;
 
     ctx.save();
     this.transformForZoom(oe);
 
-    var start = oe.getDestCanvasPosition(this.startX, this.startY, true);
-    var end = oe.getDestCanvasPosition(this.endX, this.endY, true);
+    const start = oe.getDestCanvasPosition(this.startX, this.startY, true);
+    const end = oe.getDestCanvasPosition(this.endX, this.endY, true);
 
-    var x = start.x < end.x ? start.x : end.x;
-    var y = start.y < end.y ? start.y : end.y;
-    var width = Math.abs(start.x - end.x) + oe.zoom;
-    var height = Math.abs(start.y - end.y) + oe.zoom;
+    const x = start.x < end.x ? start.x : end.x;
+    const y = start.y < end.y ? start.y : end.y;
+    const width = Math.abs(start.x - end.x) + oe.zoom;
+    const height = Math.abs(start.y - end.y) + oe.zoom;
 
     if (this.isEllipse) {
       oe.drawXOREllipse(ctx, x, y, width, height, this.isFill);
@@ -1258,7 +1258,7 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = this.defaultAlpha || 1.0;
@@ -1384,7 +1384,7 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 0.5;
@@ -1420,10 +1420,10 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
     if (this.startY >= oe.canvasHeight) this.startY = oe.canvasHeight - 1;
     if (this.endY >= oe.canvasHeight) this.endY = oe.canvasHeight - 1;
 
-    var x = this.startX < this.endX ? this.startX : this.endX;
-    var y = this.startY < this.endY ? this.startY : this.endY;
-    var width = Math.abs(this.startX - this.endX) + 1;
-    var height = Math.abs(this.startY - this.endY) + 1;
+    const x = this.startX < this.endX ? this.startX : this.endX;
+    const y = this.startY < this.endY ? this.startY : this.endY;
+    const width = Math.abs(this.startX - this.endX) + 1;
+    const height = Math.abs(this.startY - this.endY) + 1;
 
     if (width > 0 && height > 0) {
       oe._pushUndo();
@@ -1533,8 +1533,8 @@ Neo.PasteTool = class extends Neo.ToolBase {
   upHandler(oe) {
     oe._pushUndo();
 
-    var dx = oe.tempX;
-    var dy = oe.tempY;
+    const dx = oe.tempX;
+    const dy = oe.tempY;
     //  oe.paste(oe.current, this.x, this.y, this.width, this.height, dx, dy);
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.paste(this.x, this.y, this.width, this.height, dx, dy);
@@ -1544,8 +1544,8 @@ Neo.PasteTool = class extends Neo.ToolBase {
 
   /** @param {Neo.Painter} oe */
   moveHandler(oe) {
-    var dx = Math.floor(oe.mouseX - this.startX);
-    var dy = Math.floor(oe.mouseY - this.startY);
+    const dx = Math.floor(oe.mouseX - this.startX);
+    const dy = Math.floor(oe.mouseY - this.startY);
 
     this.latestDX = dx;
     this.latestDY = dy;
@@ -1566,7 +1566,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
    * @param {KeyboardEvent} e
    */
   keyDownHandler(e) {
-    var oe = Neo.painter;
+    const oe = Neo.painter;
 
     if (e.key == "Escape") {
       //Escでキャンセル
@@ -1575,28 +1575,28 @@ Neo.PasteTool = class extends Neo.ToolBase {
   }
 
   kill() {
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
 
   /** @param {Neo.Painter} oe */
   drawCursor(oe) {
-    var ctx = oe.destCanvasCtx;
+    const ctx = oe.destCanvasCtx;
 
     ctx.save();
     this.transformForZoom(oe);
 
-    var start = oe.getDestCanvasPosition(this.x, this.y, true);
-    var end = oe.getDestCanvasPosition(
+    const start = oe.getDestCanvasPosition(this.x, this.y, true);
+    const end = oe.getDestCanvasPosition(
       this.x + this.width,
       this.y + this.height,
       true,
     );
 
-    var x = start.x + oe.tempX * oe.zoom;
-    var y = start.y + oe.tempY * oe.zoom;
-    var width = Math.abs(start.x - end.x);
-    var height = Math.abs(start.y - end.y);
+    const x = start.x + oe.tempX * oe.zoom;
+    const y = start.y + oe.tempY * oe.zoom;
+    const width = Math.abs(start.x - end.x);
+    const height = Math.abs(start.y - end.y);
     oe.drawXORRect(ctx, x, y, width, height);
     ctx.restore();
   }
@@ -1744,14 +1744,14 @@ Neo.TextTool = class extends Neo.ToolBase {
     if (Neo.painter.inputText) {
       Neo.painter.updateInputText();
 
-      var rect = oe.container?.getBoundingClientRect();
+      const rect = oe.container?.getBoundingClientRect();
       if (!rect) {
         console.error("Rect not found for TextTool");
         return;
       }
-      var text = Neo.painter.inputText;
-      var x = oe.rawMouseX - rect.left - 5;
-      var y = oe.rawMouseY - rect.top - 5;
+      const text = Neo.painter.inputText;
+      const x = oe.rawMouseX - rect.left - 5;
+      const y = oe.rawMouseY - rect.top - 5;
 
       text.style.left = x + "px";
       text.style.top = y + "px";
@@ -1826,7 +1826,7 @@ Neo.TextTool = class extends Neo.ToolBase {
   }
 
   loadStates() {
-    var reserve = this.getReserve();
+    const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 1.0;

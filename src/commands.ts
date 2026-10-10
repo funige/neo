@@ -147,7 +147,7 @@ Neo.SubmitCommand = class extends Neo.CommandBase {
   }
   execute() {
     //基準ディレクトリパス（URL形式、末尾は "/"）
-    var baseURL = location.href.replace(/[^/]*$/, "");
+    const baseURL = location.href.replace(/[^/]*$/, "");
     this.data.submit(baseURL);
   }
 };
@@ -159,7 +159,7 @@ Neo.CopyrightCommand = class extends Neo.CommandBase {
     this.data = data;
   }
   execute() {
-    var url = "http://github.com/funige/neo/";
+    const url = "http://github.com/funige/neo/";
     if (
       confirm(
         Neo.translate(

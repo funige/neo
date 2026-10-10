@@ -61,7 +61,7 @@ Neo.ActionManager = class {
   push(...items: any[]) {
     if (!Neo.isAnimation) return;
 
-    var head = this._items[this._head - 1];
+    const head = this._items[this._head - 1];
     for (const item of items) {
       head.push(item);
     }
@@ -70,13 +70,13 @@ Neo.ActionManager = class {
   pushCurrent() {
     if (!Neo.isAnimation) return;
 
-    var oe = Neo.painter;
-    var head = this._items[this._head - 1];
+    const oe = Neo.painter;
+    const head = this._items[this._head - 1];
 
-    var color = oe._currentColor;
-    var mask = oe._currentMask;
-    var width = oe._currentWidth;
-    var type = oe._currentMaskType;
+    const color = oe._currentColor;
+    const mask = oe._currentMask;
+    const width = oe._currentWidth;
+    const type = oe._currentMaskType;
 
     head.push(color[0], color[1], color[2], color[3]);
     head.push(mask[0], mask[1], mask[2]);
@@ -90,7 +90,7 @@ Neo.ActionManager = class {
    * [2]~[5]: RGBAカラー、[6]~[8]: マスクカラー、[9]: ブラシ幅、[10]: マスクタイプ
    */
   getCurrent(item) {
-    var oe = Neo.painter;
+    const oe = Neo.painter;
 
     oe._currentColor = [item[2], item[3], item[4], item[5]];
     oe._currentMask = [item[6], item[7], item[8]];
@@ -99,7 +99,7 @@ Neo.ActionManager = class {
   }
 
   skip() {
-    for (var i = 0; i < this._items.length; i++) {
+    for (let i = 0; i < this._items.length; i++) {
       if (this._items[i][0] == "restore") {
         this._head = i;
       }
@@ -127,7 +127,7 @@ Neo.ActionManager = class {
       return;
     }
 
-    var item = this._items[this._head];
+    const item = this._items[this._head];
 
     if (!Neo.viewer && !Neo.painter.busySkipped) {
       Neo.painter._pushUndo(
@@ -144,7 +144,7 @@ Neo.ActionManager = class {
       //console.log("play", item[0], this._head + 1, this._items.length);
     }
 
-    var func;
+    let func;
     // restoreが存在するかどうか判定
     //古いPCHファイルにはrestoreが存在しないためアニメーションをスキップできない
     const hasRestore = this._items.some(
@@ -162,7 +162,7 @@ Neo.ActionManager = class {
     }
 
     const ref = this;
-    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
+    const wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
     /**@type {any}*/ (this)[func](item, function (/**@type {any}*/ result) {
       if (result) {
@@ -199,12 +199,12 @@ Neo.ActionManager = class {
       this.push("clearCanvas");
     }
 
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.canvasCtx[1].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -219,18 +219,18 @@ Neo.ActionManager = class {
     if (typeof layer != "object") {
       this.push("floodFill", layer, x, y, color);
     } else {
-      var item = layer;
+      const item = layer;
       layer = item[1];
       x = item[2];
       y = item[3];
       color = item[4];
     }
 
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     oe.doFloodFill(layer, x, y, color);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -238,21 +238,20 @@ Neo.ActionManager = class {
    * 全消し
    */
   eraseAll() {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    let layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       this.push("eraseAll", layer);
     } else {
-      var item = arguments[0];
+      const item = arguments[0];
       layer = item[1];
     }
 
-    var oe = Neo.painter;
     oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
   /**
@@ -262,8 +261,8 @@ Neo.ActionManager = class {
    * @param {number|null} [lineType] - 線の種類
    */
   freeHand(x0, y0, lineType) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x0 = Number(x0);
@@ -278,13 +277,13 @@ Neo.ActionManager = class {
     } else if (!Neo.viewer || this._prevSpeed <= 0) {
       this.freeHandFast(arguments[0], arguments[1]);
     } else {
-      var item = arguments[0];
+      const item = arguments[0];
 
       const layer = item[1];
       const lineType = item[11];
       this.getCurrent(item);
 
-      var i = this._index;
+      let i = this._index;
       if (i == 0) {
         i = 12;
       } else {
@@ -306,7 +305,7 @@ Neo.ActionManager = class {
         oe.prevLine = null;
       }
 
-      var callback = arguments[1];
+      const callback = arguments[1];
       if (callback && typeof callback == "function") {
         callback(result);
       }
@@ -320,8 +319,8 @@ Neo.ActionManager = class {
    * @param {number|null} [lineType] - 線の種類
    */
   freeHandFast(x0, y0, lineType?) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    let layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x0 = Number(x0);
@@ -334,19 +333,19 @@ Neo.ActionManager = class {
 
       oe.drawLine(oe.canvasCtx[layer], x0, y0, x0, y0, lineType);
     } else {
-      let x0, y0, x1, y1, lineType;
+      let x0, y0, x1, y1;
 
-      var item = arguments[0];
-      var length = item.length;
+      const item = arguments[0];
+      const length = item.length;
 
       layer = item[1];
       this.getCurrent(item);
 
-      lineType = item[11];
+      const lineType = item[11];
       x0 = item[12];
       y0 = item[13];
 
-      for (var i = 14; i + 1 < length; i += 2) {
+      for (let i = 14; i + 1 < length; i += 2) {
         x1 = x0;
         y1 = y0;
         x0 = item[i + 0];
@@ -357,7 +356,7 @@ Neo.ActionManager = class {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     }
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -371,9 +370,9 @@ Neo.ActionManager = class {
    */
   freeHandMove(x0, y0, x1, y1, lineType) {
     if (arguments.length > 1) {
-      var oe = Neo.painter;
-      var layer = oe.current;
-      var head = this._items[this._head - 1];
+      const oe = Neo.painter;
+      const layer = oe.current;
+      const head = this._items[this._head - 1];
       if (head && head.length == 0) {
         this.push("freeHand", layer);
         this.pushCurrent();
@@ -382,8 +381,8 @@ Neo.ActionManager = class {
         head.push(x0, y0);
 
         // 記録漏れがないか確認
-        var x = head[head.length - 4];
-        var y = head[head.length - 3];
+        const x = head[head.length - 4];
+        const y = head[head.length - 3];
         if (
           x1 != head[head.length - 4] ||
           y1 != head[head.length - 3] ||
@@ -407,8 +406,8 @@ Neo.ActionManager = class {
    * @param {number|null} [lineType] - 線の種類
    */
   line(x0, y0, x1, y1, lineType) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
     if (typeof arguments[0] != "object") {
       x0 = Number(x0);
       y0 = Number(y0);
@@ -440,7 +439,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -457,9 +456,9 @@ Neo.ActionManager = class {
    * @param {number} [lineType] - 線の種類
    */
   bezier(x0, y0, x1, y1, x2, y2, x3, y3, lineType) {
-    var oe = Neo.painter;
-    var layer = oe.current;
-    var isReplay = true;
+    const oe = Neo.painter;
+    const layer = oe.current;
+    let isReplay = true;
 
     if (typeof arguments[0] != "object") {
       x0 = Number(x0);
@@ -518,7 +517,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -531,8 +530,8 @@ Neo.ActionManager = class {
    * @param {number|null} [type] - 塗りつぶしの種類(四角楕円など)
    */
   fill(x, y, width, height, type) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -561,7 +560,7 @@ Neo.ActionManager = class {
 
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -573,8 +572,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - 反転する高さ
    */
   flipH(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -595,7 +594,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -607,8 +606,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - 反転する高さ
    */
   flipV(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -629,7 +628,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -641,8 +640,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - 結合する高さ
    */
   merge(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -663,7 +662,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -675,8 +674,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - ぼかす範囲の高さ
    */
   blurRect(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -697,7 +696,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -709,8 +708,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - 消去する高さ
    */
   eraseRect2(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -735,7 +734,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -748,8 +747,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - 消去する高さ
    */
   eraseRect(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -770,7 +769,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -783,8 +782,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - コピーする高さ
    */
   copy(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -805,7 +804,7 @@ Neo.ActionManager = class {
     }
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -819,8 +818,8 @@ Neo.ActionManager = class {
    * @param {number} [dy] - 貼り付け先のY座標
    */
   paste(x, y, width, height, dx, dy) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -846,7 +845,7 @@ Neo.ActionManager = class {
 
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -859,8 +858,8 @@ Neo.ActionManager = class {
    * @param {number} [height] - 変形する範囲の高さ
    */
   turn(x, y, width, height) {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       x = Number(x);
@@ -881,7 +880,7 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
@@ -900,8 +899,8 @@ Neo.ActionManager = class {
     size = String(size);
     family = String(family);
 
-    var oe = Neo.painter;
-    var layer = oe.current;
+    const oe = Neo.painter;
+    const layer = oe.current;
 
     if (typeof arguments[0] != "object") {
       const numX = Number(x);
@@ -937,14 +936,14 @@ Neo.ActionManager = class {
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 
   restore() {
-    var oe = Neo.painter;
-    var width = oe.canvasWidth;
-    var height = oe.canvasHeight;
+    const oe = Neo.painter;
+    const width = oe.canvasWidth;
+    const height = oe.canvasHeight;
 
     if (typeof arguments[0] != "object") {
       this.push("restore");
@@ -953,8 +952,8 @@ Neo.ActionManager = class {
       const _img1 = oe.canvas[1].toDataURL("image/png");
       this.push(_img0, _img1);
     } else {
-      var item = arguments[0];
-      var callback = arguments[1];
+      const item = arguments[0];
+      const callback = arguments[1];
 
       const img0 = new Image();
       const img1 = new Image();
@@ -975,7 +974,7 @@ Neo.ActionManager = class {
   }
 
   dummy() {
-    var callback = arguments[1];
+    const callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
 };
@@ -987,11 +986,11 @@ Neo.ActionManager = class {
 */
 /** @param {HTMLElement} applet */
 Neo.createViewer = function (applet) {
-  var neo = document.createElement("div");
+  const neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
 
-  var html =
+  const html =
     '<div id="neo-pageView" style="margin:auto;">' +
     '<div id="neo-container" style="visibility:visible;" class="o">' +
     '<div id="neo-painter" style="background-color:white;">' +
@@ -1016,7 +1015,7 @@ Neo.createViewer = function (applet) {
     return Neo.translate(str);
   });
 
-  var parent = applet.parentNode;
+  const parent = applet.parentNode;
   parent?.appendChild(neo);
   parent?.insertBefore(neo, applet);
 
@@ -1028,7 +1027,7 @@ Neo.createViewer = function (applet) {
     const tmp = document.querySelectorAll(".NEO");
 
     if (tmp.length > 1) {
-      for (var i = 1; i < tmp.length; i++) {
+      for (let i = 1; i < tmp.length; i++) {
         (tmp[i] as HTMLElement).style.display = "none";
       }
     }
@@ -1046,8 +1045,8 @@ Neo.createViewer = function (applet) {
 Neo.initViewer = function (pch) {
   const pageview = document.getElementById("neo-pageView");
   if (!pageview) return;
-  var pageWidth = Neo.config.applet_width;
-  var pageHeight = Neo.config.applet_height;
+  const pageWidth = Neo.config.applet_width;
+  const pageHeight = Neo.config.applet_height;
   pageview.style.width = pageWidth + "px";
   pageview.style.height = pageHeight + "px";
 
@@ -1064,10 +1063,10 @@ Neo.initViewer = function (pch) {
   Neo.container.style.backgroundColor = Neo.config.color_back;
   Neo.container.style.border = "0";
 
-  var dx = (pageWidth - Neo.config.width) / 2;
-  var dy = (pageHeight - Neo.config.height - 26) / 2;
+  const dx = (pageWidth - Neo.config.width) / 2;
+  const dy = (pageHeight - Neo.config.height - 26) / 2;
 
-  var painter = document.getElementById("neo-painter");
+  const painter = document.getElementById("neo-painter");
 
   Neo.viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
@@ -1083,7 +1082,7 @@ Neo.initViewer = function (pch) {
     Neo.container.style.paddingTop = Neo.viewerWrapperOnTop ? "26px" : "";
   }
 
-  var viewerButtonsWrapper = document.getElementById(
+  const viewerButtonsWrapper = document.getElementById(
     "neo-viewerButtonsWrapper",
   );
   if (viewerButtonsWrapper) {
@@ -1138,9 +1137,9 @@ Neo.initViewer = function (pch) {
     function (e) {
       e.preventDefault();
       if (Neo.painter._actionMgr.isMouseDown) {
-        var zoom = Neo.painter.zoom;
-        var x = Neo.painter.zoomX - e.movementX / zoom;
-        var y = Neo.painter.zoomY - e.movementY / zoom;
+        const zoom = Neo.painter.zoom;
+        const x = Neo.painter.zoomX - e.movementX / zoom;
+        const y = Neo.painter.zoomY - e.movementY / zoom;
         Neo.painter.setZoomPosition(x, y);
       }
     },
@@ -1175,7 +1174,7 @@ Neo.initViewer = function (pch) {
  */
 Neo.startViewer = function () {
   if (Neo.applet) {
-    var name = Neo.applet.getAttribute("name") || "pch";
+    const name = Neo.applet.getAttribute("name") || "pch";
     if (!(/** @type {any} */ (document)[name]))
       /** @type {any} */ (document)[name] = Neo;
     if (Neo.applet.parentNode) {
@@ -1184,8 +1183,8 @@ Neo.startViewer = function () {
   }
 
   Neo.styleSheet = Neo.getStyleSheet();
-  var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
-  var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
+  const lightBack = Neo.multColor(Neo.config.color_back, 1.3);
+  const darkBack = Neo.multColor(Neo.config.color_back, 0.7);
 
   Neo.addRule(".NEO #neo-viewerButtons", "color", Neo.config.color_text);
   Neo.addRule(
@@ -1332,7 +1331,7 @@ Neo.startViewer = function () {
       };
     }
 
-    var length = Neo.painter._actionMgr._items.length;
+    const length = Neo.painter._actionMgr._items.length;
     Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {
       length: length,
     });
@@ -1365,7 +1364,7 @@ Neo.getPCH = function (filename, callback) {
   fetch(filename)
     .then((response) => response.arrayBuffer())
     .then((buffer) => {
-      var pch = Neo.decodePCH(buffer);
+      const pch = Neo.decodePCH(buffer);
       if (pch) {
         if (callback) callback(pch);
       } else {
@@ -1388,9 +1387,9 @@ Neo.getPCH = function (filename, callback) {
  * * @example
  */
 Neo.decodePCH = function (rawdata) {
-  var byteArray = new Uint8Array(rawdata);
-  var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
-  var header = byteArray.subarray(0, 12);
+  const byteArray = new Uint8Array(rawdata);
+  const data = LZString.decompressFromUint8Array(byteArray.subarray(12));
+  const header = byteArray.subarray(0, 12);
   if (!data) {
     throw new Error("Failed to decompress data");
   }
@@ -1399,9 +1398,9 @@ Neo.decodePCH = function (rawdata) {
     header[1] == "E".charCodeAt(0) &&
     header[2] == "O".charCodeAt(0)
   ) {
-    var width = header[4] + header[5] * 0x100;
-    var height = header[6] + header[7] * 0x100;
-    var items = Neo.fixPCH(JSON.parse(data));
+    const width = header[4] + header[5] * 0x100;
+    const height = header[6] + header[7] * 0x100;
+    const items = Neo.fixPCH(JSON.parse(data));
     return {
       width: width,
       height: height,
@@ -1420,13 +1419,13 @@ Neo.decodePCH = function (rawdata) {
  * @returns {Array<string>} 修正済みの描画命令配列
  */
 Neo.fixPCH = function (items) {
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
 
-    var index = item.indexOf("eraseAll");
+    const index = item.indexOf("eraseAll");
     if (index > 0) {
-      var tmp = item.slice(index);
-      var tmp2 = item.slice(0, index);
+      const tmp = item.slice(index);
+      const tmp2 = item.slice(0, index);
       console.log("fix eraseAll", tmp2, tmp);
 
       items[i] = tmp2;

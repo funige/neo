@@ -68,7 +68,7 @@ Neo.Button = class {
     this.selected = false;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
     if (this.element) {
       /** @param {MouseEvent} e */
       this.element.onmousedown = function (e) {
@@ -323,7 +323,7 @@ Neo.ColorTip = class {
     this.selected = this.elementID == "neo-color1" ? true : false;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
     if (this.element) {
       /** @param {MouseEvent} e */
       this.element.onmousedown = function (e) {
@@ -361,7 +361,7 @@ Neo.ColorTip = class {
 
       this.element.className = "colorTipOff";
 
-      var index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
+      const index = parseInt(this.elementID.slice(9)) - 1; // "neo-color"なので9文字目
       this.element.style.left = index % 2 ? "0px" : "26px";
       this.element.style.top = Math.floor(index / 2) * 21 + "px";
 
@@ -382,8 +382,8 @@ Neo.ColorTip = class {
     if (Neo.painter.isUIPaused()) return;
     this.isMouseDown = true;
 
-    for (var i = 0; i < Neo.colorTips.length; i++) {
-      var colorTip = Neo.colorTips[i];
+    for (let i = 0; i < Neo.colorTips.length; i++) {
+      const colorTip = Neo.colorTips[i];
       if (this == colorTip) {
         switch (Neo.getModifier(e)) {
           case "shift":
@@ -465,8 +465,8 @@ Neo.ColorTip = class {
    * @returns {Neo.ColorTip|null}
    */
   static getCurrent() {
-    for (var i = 0; i < Neo.colorTips.length; i++) {
-      var colorTip = Neo.colorTips[i];
+    for (let i = 0; i < Neo.colorTips.length; i++) {
+      const colorTip = Neo.colorTips[i];
       if (colorTip.selected) return colorTip;
     }
     return null;
@@ -594,7 +594,7 @@ Neo.ToolTip = class {
 
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.params.type = this.element.id;
@@ -659,7 +659,7 @@ Neo.ToolTip = class {
           toolTip.setSelected(this === toolTip);
         }
       } else {
-        var length = this.toolStrings.length;
+        const length = this.toolStrings.length;
         if (Neo.getModifier(e) == "right") {
           this.mode--;
           if (this.mode < 0) this.mode = length - 1;
@@ -744,8 +744,8 @@ Neo.ToolTip = class {
       if (this.prevMode != this.mode) {
         this.prevMode = this.mode;
 
-        var img = new Image();
-        var ref = this;
+        const img = new Image();
+        const ref = this;
         img.onload = function () {
           if (!ref.canvas) {
             console.error("Canvas not found for ToolTip on image load.");
@@ -818,7 +818,7 @@ Neo.PenTip = class extends Neo.ToolTip {
   }
 
   update() {
-    for (var i = 0; i < this.tools.length; i++) {
+    for (let i = 0; i < this.tools.length; i++) {
       if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
@@ -879,7 +879,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
   }
 
   update() {
-    for (var i = 0; i < this.tools.length; i++) {
+    for (let i = 0; i < this.tools.length; i++) {
       if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
@@ -919,15 +919,15 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
       return;
     }
 
-    var imageData = ctx.getImageData(0, 0, 46, 18);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var c = Neo.painter.getColor() | 0xff000000;
-    var a = Math.floor(Neo.painter.alpha * 255);
-    var toneData = Neo.painter.getToneData(a);
+    const imageData = ctx.getImageData(0, 0, 46, 18);
+    const buf32 = new Uint32Array(imageData.data.buffer);
+    const buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    const c = Neo.painter.getColor() | 0xff000000;
+    const a = Math.floor(Neo.painter.alpha * 255);
+    const toneData = Neo.painter.getToneData(a);
 
-    for (var j = 0; j < 18; j++) {
-      for (var i = 0; i < 46; i++) {
+    for (let j = 0; j < 18; j++) {
+      for (let i = 0; i < 46; i++) {
         if (
           j >= 1 &&
           j < 12 &&
@@ -995,7 +995,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
   }
 
   update() {
-    for (var i = 0; i < this.tools.length; i++) {
+    for (let i = 0; i < this.tools.length; i++) {
       if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
@@ -1013,7 +1013,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
       console.error("EraserTip: Canvas element not found");
       return null;
     }
-    var ctx = this.canvas.getContext("2d", {
+    const ctx = this.canvas.getContext("2d", {
       willReadFrequently: true,
     });
     if (!ctx) {
@@ -1022,7 +1022,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
     }
 
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    var img = new Image();
+    const img = new Image();
 
     img.onload = function () {
       ctx?.drawImage(img, 0, 0);
@@ -1084,7 +1084,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
   }
 
   update() {
-    for (var i = 0; i < this.tools.length; i++) {
+    for (let i = 0; i < this.tools.length; i++) {
       if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
@@ -1160,7 +1160,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
   }
 
   update() {
-    for (var i = 0; i < this.tools.length; i++) {
+    for (let i = 0; i < this.tools.length; i++) {
       if (Neo.painter.tool.type == this.tools[i]) this.mode = i;
     }
 
@@ -1217,7 +1217,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     if (Neo.getModifier(e) == "right") {
       Neo.painter.maskColor = Neo.painter.foregroundColor;
     } else {
-      var length = this.toolStrings.length;
+      const length = this.toolStrings.length;
       this.mode++;
       if (this.mode >= length) this.mode = 0;
       Neo.painter.maskType = this.mode;
@@ -1242,7 +1242,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
   draw(color) {
     const c =
       typeof color === "string" ? color : Neo.painter.getColorString(color);
-    var ctx = this.canvas?.getContext("2d", {
+    const ctx = this.canvas?.getContext("2d", {
       willReadFrequently: true,
     });
     if (!ctx) {
@@ -1301,7 +1301,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
   _mouseDownHandler(e) {
     this.isMouseDown = true;
 
-    var length = this.toolStrings.length;
+    const length = this.toolStrings.length;
 
     if (Neo.getModifier(e) == "right") {
       this.mode--;
@@ -1459,10 +1459,10 @@ Neo.ColorSlider = class {
    * @param {number} y
    */
   shift(x, y) {
-    var value;
+    let value;
     if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
-      var v = Math.floor((x - 5) * 5.0);
-      var min = this.type == Neo.SLIDERTYPE_ALPHA ? 1 : 0;
+      const v = Math.floor((x - 5) * 5.0);
+      const min = this.type == Neo.SLIDERTYPE_ALPHA ? 1 : 0;
 
       value = Math.max(Math.min(v, 255), min);
       if (this.value > value || this.value == 255) {
@@ -1494,19 +1494,19 @@ Neo.ColorSlider = class {
    * @param {number} y
    */
   slide(x, y) {
-    var value;
+    let value;
     if (x >= 0 && x < 60 && y >= 0 && y <= 15) {
-      var v = Math.floor((x - 5) * 5.0);
+      const v = Math.floor((x - 5) * 5.0);
       value = Math.round(v / 5) * 5;
 
       this.value0 = value;
       this.x0 = x;
     } else {
-      var d = (x - this.x0) / 3.0;
+      const d = (x - this.x0) / 3.0;
       value = this.value0 + d;
     }
 
-    var min = this.type == Neo.SLIDERTYPE_ALPHA ? 1 : 0;
+    const min = this.type == Neo.SLIDERTYPE_ALPHA ? 1 : 0;
     this.value = Math.max(Math.min(value, 255), min);
 
     if (this.type == Neo.SLIDERTYPE_ALPHA) {
@@ -1514,12 +1514,12 @@ Neo.ColorSlider = class {
       this.update();
       Neo.updateUIColor(false, false);
     } else {
-      var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
-      var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
-      var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
-      var color = (r << 16) | (g << 8) | b;
+      const r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
+      const g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
+      const b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
+      const color = (r << 16) | (g << 8) | b;
 
-      var colorTip =
+      const colorTip =
         /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.getColorString(color));
@@ -1531,8 +1531,8 @@ Neo.ColorSlider = class {
   }
 
   update() {
-    var color = Neo.painter.getColor();
-    var alpha = Neo.painter.alpha * 255;
+    const color = Neo.painter.getColor();
+    const alpha = Neo.painter.alpha * 255;
 
     switch (this.type) {
       case Neo.SLIDERTYPE_RED:
@@ -1549,7 +1549,7 @@ Neo.ColorSlider = class {
         break;
     }
 
-    var width = (this.value * 49.0) / 255.0;
+    let width = (this.value * 49.0) / 255.0;
     width = Math.max(Math.min(48, width), 1);
     if (this.slider instanceof HTMLElement) {
       this.slider.style.width = width.toFixed(2) + "px";
@@ -1670,11 +1670,11 @@ Neo.SizeSlider = class {
    * @param {number} y
    */
   shift(x, y) {
-    var value0 = Neo.painter.lineWidth;
-    var value;
+    let value0 = Neo.painter.lineWidth;
+    let value;
 
     if (!Neo.painter.sliderTool.isAlt) {
-      var v = Math.floor(((y - 4) * 30.0) / 33.0);
+      const v = Math.floor(((y - 4) * 30.0) / 33.0);
 
       value = Math.max(Math.min(v, 30), 1);
       if (value0 > value || value0 == 30) {
@@ -1694,21 +1694,21 @@ Neo.SizeSlider = class {
    * @param {number} y - 相対Y座標(ブラシサイズの算出に使用)
    */
   slide(x, y) {
-    var value;
+    let value;
     if (!Neo.painter.sliderTool.isAlt) {
       if (x >= 0 && x < 48 && y >= 0 && y < 41) {
-        var v = Math.floor(((y - 4) * 30.0) / 33.0);
+        const v = Math.floor(((y - 4) * 30.0) / 33.0);
         value = v;
 
         this.value0 = value;
         this.y0 = y;
       } else {
-        var d = (y - this.y0) / 7.0;
+        const d = (y - this.y0) / 7.0;
         value = this.value0 + d;
       }
     } else {
       // Ctrl+Alt+ドラッグでサイズ変更するとき
-      var d = y - this.y0;
+      const d = y - this.y0;
       value = this.value0 + d;
     }
 
@@ -1724,7 +1724,7 @@ Neo.SizeSlider = class {
     value = Math.round(value);
     Neo.painter.lineWidth = Math.max(Math.min(30, value), 1);
 
-    var tool = Neo.painter.getCurrentTool();
+    const tool = Neo.painter.getCurrentTool();
     if (tool) {
       if (tool.type == Neo.Painter.TOOLTYPE_BRUSH) {
         Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
@@ -1739,7 +1739,7 @@ Neo.SizeSlider = class {
   update() {
     this.value = Neo.painter.lineWidth;
 
-    var height = (this.value * 33.0) / 30.0;
+    let height = (this.value * 33.0) / 30.0;
     height = Math.max(Math.min(34, height), 1);
     if (this.slider instanceof HTMLElement) {
       this.slider.style.height = height.toFixed(2) + "px";
@@ -1804,7 +1804,7 @@ Neo.LayerControl = class {
     this.elementID = elementID;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.element.onmousedown = function (e) {
@@ -1824,7 +1824,7 @@ Neo.LayerControl = class {
 
       this.element.className = "layerControl";
 
-      var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+      const layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
 
       this.element.innerHTML =
         "<div class='bg'></div><div class='label0'>" +
@@ -1861,10 +1861,10 @@ Neo.LayerControl = class {
   /** @param {MouseEvent|TouchEvent} e */
   _mouseDownHandler(e) {
     if (Neo.getModifier(e) == "right") {
-      var visible = Neo.painter.visible[Neo.painter.current];
+      const visible = Neo.painter.visible[Neo.painter.current];
       Neo.painter.visible[Neo.painter.current] = visible ? false : true;
     } else {
-      var current = Neo.painter.current;
+      const current = Neo.painter.current;
       Neo.painter.current = current ? 0 : 1;
     }
     Neo.painter.updateDestCanvas(
@@ -1935,7 +1935,7 @@ Neo.ReserveControl = class {
     this.params = params || {};
     this.elementID = elementID;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.element.onmousedown = function (e) {
@@ -1955,7 +1955,7 @@ Neo.ReserveControl = class {
 
       this.element.className = "reserve";
 
-      var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
+      const index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
       this.element.style.top = "1px";
       this.element.style.left = index * 15 + 2 + "px";
       this.reserve = Neo.clone(Neo.config.reserves[index]);
@@ -2086,9 +2086,9 @@ Neo.ScrollBarButton = class {
    */
   update(oe) {
     if (this.elementID == "neo-scrollH") {
-      var a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
-      var barWidth = Math.ceil(oe.destCanvas.width * a);
-      var barX = oe.scrollBarX * (oe.destCanvas.width - barWidth);
+      const a = oe.destCanvas.width / (oe.canvasWidth * oe.zoom);
+      const barWidth = Math.ceil(oe.destCanvas.width * a);
+      const barX = oe.scrollBarX * (oe.destCanvas.width - barWidth);
       if (!this.barButton) {
         console.error("Bar button element not found for " + this.elementID);
         return null;
@@ -2096,9 +2096,9 @@ Neo.ScrollBarButton = class {
       this.barButton.style.width = Math.ceil(barWidth) - 4 + "px";
       this.barButton.style.left = Math.floor(barX) + "px";
     } else {
-      var a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
-      var barHeight = Math.ceil(oe.destCanvas.height * a);
-      var barY = oe.scrollBarY * (oe.destCanvas.height - barHeight);
+      const a = oe.destCanvas.height / (oe.canvasHeight * oe.zoom);
+      const barHeight = Math.ceil(oe.destCanvas.height * a);
+      const barY = oe.scrollBarY * (oe.destCanvas.height - barHeight);
       if (!this.barButton) {
         console.error("Bar button element not found for " + this.elementID);
         return null;
@@ -2189,8 +2189,8 @@ Neo.ViewerButton = class extends Neo.Button {
 
   update() {
     if (this.elementID == "neo-viewerSpeed") {
-      var mode = Neo.painter._actionMgr.speedMode();
-      var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+      const mode = Neo.painter._actionMgr.speedMode();
+      const speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
       if (this.element) {
         this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
       }
@@ -2266,7 +2266,7 @@ Neo.ViewerBar = class {
     this.mark = this.length;
     this.seek = 0;
     if (this.element) {
-      var ref = this;
+      const ref = this;
       this.element.addEventListener(
         "pointerdown",
         function (e) {
@@ -2311,10 +2311,10 @@ Neo.ViewerBar = class {
     this.mark = Neo.painter._actionMgr._mark;
     this.seek = Neo.painter._actionMgr._head;
 
-    var markX = (this.mark / this.length) * this.width;
+    const markX = (this.mark / this.length) * this.width;
     this.markElement.style.left = markX + "px";
 
-    var seekX = (this.seek / this.length) * this.width;
+    const seekX = (this.seek / this.length) * this.width;
     this.seekElement.style.width = seekX + "px";
     this.textElement.innerHTML = this.seek + "/" + this.length;
   }

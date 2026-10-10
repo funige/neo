@@ -10,11 +10,16 @@
     "app": "electron .",
     "build": "sh build.sh",
     "check": "tsc --project tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings=0",
+    "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/!(lz-string).ts\" \"src/neo.css\" \"sample/*.html\" \"sample2/*.html\"",
     "dev": "sh build.sh watch"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
     "prettier": "^3.3.3",
-    "typescript": "^7.0.2"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1"
   }
 }

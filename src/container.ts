@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-var Neo: NeoInterface = {} as NeoInterface;
+const Neo: NeoInterface = {} as NeoInterface;
 
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore
@@ -184,7 +184,7 @@ Neo.extractBootConfig = function (targetName) {
 
 Neo.init = function () {
   //appletタグまたはそれに代わるdivタグのID
-  let applets = document.querySelectorAll(
+  const applets = document.querySelectorAll(
     "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch",
   );
 
@@ -211,7 +211,7 @@ Neo.init = function () {
           Neo.viewer = true;
           Neo.initConfig(applet);
 
-          var filename = Neo.getFilename();
+          const filename = Neo.getFilename();
           Neo.getPCH(filename, function (pch) {
             if (pch) {
               Neo.createViewer(applet);
@@ -273,8 +273,8 @@ Neo.init2 = function () {
   // 続きから描く
   Neo.storage = localStorage; //PCの時にもlocalStorageを使用
 
-  var filename = Neo.getFilename();
-  var message =
+  const filename = Neo.getFilename();
+  const message =
     !filename || filename.slice(-4).toLowerCase() != ".pch"
       ? "描きかけの画像があります。復元しますか？"
       : "描きかけの画像があります。動画の読み込みを中止して復元しますか？";
@@ -292,7 +292,7 @@ Neo.init2 = function () {
     storageTimestamp = null;
   }
   if (storageTimestamp && confirm(Neo.translate(message))) {
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     setTimeout(function () {
       oe.loadSession(function () {
         oe._pushUndo();
@@ -358,8 +358,8 @@ Neo.init2 = function () {
  */
 Neo.initConfig = function (applet) {
   if (applet) {
-    var appletWidth = applet.dataset.width || applet.getAttribute("width");
-    var appletHeight = applet.dataset.height || applet.getAttribute("height");
+    const appletWidth = applet.dataset.width || applet.getAttribute("width");
+    const appletHeight = applet.dataset.height || applet.getAttribute("height");
     if (appletWidth) Neo.config.applet_width = parseInt(appletWidth);
     if (appletHeight) Neo.config.applet_height = parseInt(appletHeight);
     let targetName;
@@ -395,7 +395,7 @@ Neo.initConfig = function (applet) {
         if (key === "image_height") Neo.config.height = parseInt(value);
       }
     }
-    var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
+    const emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
     Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
 
     if (Neo.viewer && !Neo.config.color_bar) {
@@ -494,18 +494,18 @@ Neo.fixConfig = function (value) {
  * @returns {CSSStyleSheet|null}
  */
 Neo.getStyleSheet = function () {
-  var style = document.createElement("style");
+  const style = document.createElement("style");
   document.head.appendChild(style);
   return style.sheet;
 };
 
 Neo.initSkin = function () {
   Neo.styleSheet = Neo.getStyleSheet();
-  var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
-  var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
-  var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
-  var darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
-  var bgImage = Neo.painter ? Neo.backgroundImage() : "";
+  const lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
+  const darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
+  const lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
+  const darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
+  const bgImage = Neo.painter ? Neo.backgroundImage() : "";
 
   Neo.addRule(
     ".NEO #neo-container",
@@ -735,9 +735,9 @@ Neo.initSkin = function () {
   );
 
   if (navigator.language.indexOf("ja") != 0) {
-    var labels = ["Fixed", "On", "Off"];
-    for (var i = 0; i < labels.length; i++) {
-      var selector = ".NEO .toolTip" + labels[i] + " .label";
+    const labels = ["Fixed", "On", "Off"];
+    for (let i = 0; i < labels.length; i++) {
+      const selector = ".NEO .toolTip" + labels[i] + " .label";
       Neo.addRule(selector, "letter-spacing", "0px !important");
     }
   }
@@ -789,7 +789,7 @@ Neo.addRule = function (
  */
 Neo.readStyles = function () {
   Neo.rules = [];
-  for (var i = 0; i < document.styleSheets.length; i++) {
+  for (let i = 0; i < document.styleSheets.length; i++) {
     Neo.readStyle(document.styleSheets[i]);
   }
 };
@@ -800,9 +800,9 @@ Neo.readStyles = function () {
  */
 Neo.readStyle = function (sheet) {
   try {
-    var rules = sheet.cssRules;
-    for (var i = 0; i < rules.length; i++) {
-      var rule = rules[i];
+    const rules = sheet.cssRules;
+    for (let i = 0; i < rules.length; i++) {
+      const rule = rules[i];
 
       if (rule instanceof CSSImportRule && rule.styleSheet) {
         Neo.readStyle(rule.styleSheet);
@@ -810,16 +810,16 @@ Neo.readStyle = function (sheet) {
       }
 
       if (rule instanceof CSSStyleRule) {
-        var selector = rule.selectorText;
+        let selector = rule.selectorText;
         if (selector) {
           // .NEOと、セレクタ名の前のドットを除去してセレクタ名を取り出す。
           selector = selector.replace(/^(.NEO\s+)?\./, "");
 
-          var css = rule.cssText || rule.style.cssText;
-          var result = css.match(/color:\s*(.*)\s*;/);
+          const css = rule.cssText || rule.style.cssText;
+          const result = css.match(/color:\s*(.*)\s*;/);
 
           if (result) {
-            var hex = Neo.colorNameToHex(result[1]);
+            const hex = Neo.colorNameToHex(result[1]);
             if (hex) {
               Neo.rules[selector] = hex;
             }
@@ -841,23 +841,23 @@ Neo.applyStyle = function (name, defaultColor) {
 };
 
 Neo.backgroundImage = function () {
-  var c1 = Neo.painter.getColor(Neo.config.color_bk) | 0xff000000;
-  var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 0xff000000;
-  var bgCanvas = document.createElement("canvas");
+  const c1 = Neo.painter.getColor(Neo.config.color_bk) | 0xff000000;
+  const c2 = Neo.painter.getColor(Neo.config.color_bk2) | 0xff000000;
+  const bgCanvas = document.createElement("canvas");
   bgCanvas.width = 16;
   bgCanvas.height = 16;
-  var ctx = bgCanvas.getContext("2d", {
+  const ctx = bgCanvas.getContext("2d", {
     willReadFrequently: true,
   });
   if (!ctx) {
     return "";
   }
-  var imageData = ctx.getImageData(0, 0, 16, 16);
-  var buf32 = new Uint32Array(imageData.data.buffer);
-  var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-  var index = 0;
-  for (var y = 0; y < 16; y++) {
-    for (var x = 0; x < 16; x++) {
+  const imageData = ctx.getImageData(0, 0, 16, 16);
+  const buf32 = new Uint32Array(imageData.data.buffer);
+  const buf8 = new Uint8ClampedArray(imageData.data.buffer);
+  let index = 0;
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) {
       buf32[index++] = x == 14 || y == 14 ? c2 : c1;
     }
   }
@@ -1047,7 +1047,7 @@ Neo.colorNameToHex = function (name) {
 };
 
 Neo.initComponents = function () {
-  var copyright = document.getElementById("neo-copyright");
+  const copyright = document.getElementById("neo-copyright");
   if (copyright) copyright.innerHTML += "v" + Neo.version;
 
   // ドラッグしたまま画面外に移動した時
@@ -1164,7 +1164,7 @@ Neo.initButtons = function () {
       : [];
 
   // colorTip
-  for (var i = 1; i <= 14; i++) {
+  for (let i = 1; i <= 14; i++) {
     new Neo.ColorTip().init("neo-color" + i, { index: i });
   }
 
@@ -1197,7 +1197,7 @@ Neo.initButtons = function () {
   });
 
   // reserveControl
-  for (var i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 3; i++) {
     new Neo.ReserveControl().init("neo-reserve" + i, { index: i });
   }
 
@@ -1220,7 +1220,7 @@ Neo.start = function (isApp = false) {
 
   Neo.isApp = isApp;
   if (Neo.applet) {
-    var name = Neo.applet.getAttribute("name") || "paintbbs";
+    const name = Neo.applet.getAttribute("name") || "paintbbs";
     Neo.applet.outerHTML = "";
     /** @type {any} */ (document)[name] = Neo;
 
@@ -1235,7 +1235,7 @@ Neo.start = function (isApp = false) {
 
     if (Neo.isApp) {
       // @ts-ignore
-      var ipc = require("electron").ipcRenderer;
+      const ipc = require("electron").ipcRenderer;
       ipc.sendToHost("neo-status", "ok");
     } else {
       //@ts-ignore
@@ -1257,12 +1257,12 @@ Neo.showWarning = function () {
   const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
   const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
 
-  var edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
-  var edgeVersion = 0; // 数値として初期化
+  const edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
+  let edgeVersion = 0; // 数値として初期化
   if (edgeMatch && edgeMatch.length > 1) {
     edgeVersion = parseInt(edgeMatch[1], 10);
   }
-  var str = "";
+  let str = "";
   if (futaba || samplebbs) {
     if (edgeVersion && edgeVersion < 15) {
       str = Neo.translate(
@@ -1276,7 +1276,7 @@ Neo.showWarning = function () {
     str += Neo.config.neo_warning;
   }
 
-  var warning = document.getElementById("neoWarning");
+  const warning = document.getElementById("neoWarning");
   if (!warning) {
     return;
   }
@@ -1296,7 +1296,7 @@ Neo.showWarning = function () {
  */
 
 Neo.updateUI = function () {
-  var current = Neo.painter.tool.getToolButton();
+  const current = Neo.painter.tool.getToolButton();
   for (let i = 0; i < Neo.toolButtons.length; i++) {
     //@ts-ignore
     const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
@@ -1339,7 +1339,7 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 
   // パレットを変更するとき
   if (updateColorTip) {
-    var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+    const colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
     if (colorTip) {
       colorTip.setColor(Neo.painter.foregroundColor);
     }
@@ -1390,17 +1390,17 @@ Neo.resizeCanvas = function () {
     return;
   }
 
-  var appletWidth = Neo.container.clientWidth;
-  var appletHeight = Neo.container.clientHeight;
+  const appletWidth = Neo.container.clientWidth;
+  const appletHeight = Neo.container.clientHeight;
 
-  var canvasWidth = Neo.painter.canvasWidth;
-  var canvasHeight = Neo.painter.canvasHeight;
+  const canvasWidth = Neo.painter.canvasWidth;
+  const canvasHeight = Neo.painter.canvasHeight;
 
-  var width0 = canvasWidth * Neo.painter.zoom;
-  var height0 = canvasHeight * Neo.painter.zoom;
+  const width0 = canvasWidth * Neo.painter.zoom;
+  const height0 = canvasHeight * Neo.painter.zoom;
 
-  var width = width0 < appletWidth - 100 ? width0 : appletWidth - 100;
-  var height = height0 < appletHeight - 120 ? height0 : appletHeight - 120;
+  let width = width0 < appletWidth - 100 ? width0 : appletWidth - 100;
+  let height = height0 < appletHeight - 120 ? height0 : appletHeight - 120;
 
   if (Neo.viewer) {
     width = canvasWidth;
@@ -1458,11 +1458,11 @@ Neo.resizeCanvas = function () {
 
   if (Neo.toolsWrapper) {
     const toolsWrapper = Neo.toolsWrapper;
-    var top = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
+    const top = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
     Neo.toolsWrapper.style.top = (top > 0 ? top : 0) + "px";
 
     if (top < 0) {
-      var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
+      const s = Neo.container.clientHeight / toolsWrapper.clientHeight;
       Neo.toolsWrapper.style.transform =
         "translate(0, " + top + "px) scale(1," + s + ")";
     } else {
@@ -1502,7 +1502,7 @@ Neo.clone = function (src) {
  * @returns {string} 8文字にゼロパディングされた文字列
  */
 Neo.getSizeString = function (len) {
-  var result = String(len);
+  let result = String(len);
   while (result.length < 8) {
     result = "0" + result;
   }
@@ -1543,11 +1543,11 @@ Neo.getAbsoluteURL = function (baseURL, url) {
  */
 Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   let url = Neo.getAbsoluteURL(baseURL, Neo.config.url_save);
-  var headerString = Neo.str_header || "";
+  let headerString = Neo.str_header || "";
   //@ts-ignore
   if (document["paintBBSCallback"]) {
     //@ts-ignore
-    var result = document["paintBBSCallback"]("check");
+    let result = document["paintBBSCallback"]("check");
     if (result == 0 || result == "false") {
       return;
     }
@@ -1560,13 +1560,13 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   }
   if (!headerString) headerString = Neo.config.send_header || "";
 
-  var imageType = Neo.config.send_header_image_type;
+  const imageType = Neo.config.send_header_image_type;
   if (imageType && imageType == "true") {
     headerString = "image_type=png&" + headerString;
   }
 
-  var count = Neo.painter.securityCount;
-  var timer = Date.now() - Neo.painter.securityTimer;
+  const count = Neo.painter.securityCount;
+  const timer = Date.now() - Neo.painter.securityTimer;
   if (Neo.config.send_header_count == "true") {
     headerString = "count=" + count + "&" + headerString;
   }
@@ -1576,7 +1576,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   //   console.log("header: " + headerString);
 
   if (Neo.config.neo_emulate_security_error == "true") {
-    var securityError = false;
+    let securityError = false;
     if (Neo.config.security_click) {
       if (count - parseInt(Neo.config.security_click || 0) < 0) {
         securityError = true;
@@ -1639,11 +1639,11 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
 
   //console.log("submit url=" + url + " header=" + headerString);
 
-  var header = new Blob([headerString]);
-  var headerLength = this.getSizeString(header.size);
-  var imgLength = this.getSizeString(blob.size);
+  const header = new Blob([headerString]);
+  const headerLength = this.getSizeString(header.size);
+  const imgLength = this.getSizeString(blob.size);
 
-  var array = [
+  const array = [
     "P", // PaintBBS
     headerLength,
     header,
@@ -1653,24 +1653,24 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   ];
 
   if (thumbnail) {
-    var thumbnailLength = this.getSizeString(thumbnail.size);
+    const thumbnailLength = this.getSizeString(thumbnail.size);
     array.push(thumbnailLength, thumbnail);
   }
   if (thumbnail2) {
-    var thumbnail2Length = this.getSizeString(thumbnail2.size);
+    const thumbnail2Length = this.getSizeString(thumbnail2.size);
     array.push(thumbnail2Length, thumbnail2);
   }
 
   const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
-  var subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
-  var body = new Blob(array, { type: "application/" + subtype });
+  const subtype = futaba ? "octet-binary" : "octet-stream"; // 念のため
+  const body = new Blob(array, { type: "application/" + subtype });
 
   /**
    * @param {string} path
    * @param {FormData|Blob} data
    */
   const postData = (path, data) => {
-    var errorMessage = path + "\n";
+    const errorMessage = path + "\n";
 
     const requestOptions: RequestInit = {
       method: "post",
@@ -1705,8 +1705,8 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
                 );
               }
             }
-            var exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
-            var responseURL = text.replace(/&amp;/g, "&");
+            let exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
+            const responseURL = text.replace(/&amp;/g, "&");
 
             // ふたばではresponseの文字列をそのままURLとして解釈する
             if (responseURL.match(/painttmp=/)) {
@@ -1799,8 +1799,8 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
 Neo.getColors = function () {
   // console.log("getColors");
   // console.log("defaultColors==", Neo.config.colors.join("\n"));
-  var array: string[] = [];
-  for (var i = 0; i < 14; i++) {
+  const array: string[] = [];
+  for (let i = 0; i < 14; i++) {
     array.push(Neo.colorTips[i].color);
   }
   return array.join("\n");
@@ -1813,9 +1813,9 @@ Neo.getColors = function () {
  */
 Neo.setColors = function (colors) {
   // console.log("setColors");
-  var array = colors.split("\n");
-  for (var i = 0; i < 14; i++) {
-    var color = array[i];
+  const array = colors.split("\n");
+  for (let i = 0; i < 14; i++) {
+    const color = array[i];
     Neo.config.colors[i] = color;
     Neo.colorTips[i].setColor(color);
   }
@@ -1837,7 +1837,7 @@ Neo.str_header = "";
  * @param {HTMLElement} applet
  */
 Neo.createContainer = function (applet) {
-  var neo = document.createElement("div");
+  const neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
 
@@ -1937,7 +1937,7 @@ Neo.createContainer = function (applet) {
     const tmp = document.querySelectorAll(".NEO");
 
     if (tmp.length > 1) {
-      for (var i = 1; i < tmp.length; i++) {
+      for (let i = 1; i < tmp.length; i++) {
         (tmp[i] as HTMLElement).style.display = "none";
       }
     }
@@ -1952,12 +1952,12 @@ Neo.createContainer = function (applet) {
 Neo.tintImage = function (ctx, color) {
   const c = Neo.painter.getColor(color) & 0xffffff;
 
-  var imageData = ctx.getImageData(0, 0, 46, 18);
-  var buf32 = new Uint32Array(imageData.data.buffer);
-  var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+  const imageData = ctx.getImageData(0, 0, 46, 18);
+  const buf32 = new Uint32Array(imageData.data.buffer);
+  const buf8 = new Uint8ClampedArray(imageData.data.buffer);
 
-  for (var i = 0; i < buf32.length; i++) {
-    var a = buf32[i] & 0xff000000;
+  for (let i = 0; i < buf32.length; i++) {
+    const a = buf32[i] & 0xff000000;
     if (a) {
       buf32[i] = (buf32[i] & a) | c;
     }
@@ -2014,7 +2014,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /** @param {TouchEvent} e */
   const touch_move_grid_control = function (e) {
     if (Neo.config.neo_disable_grid_touch_move) {
-      let screenwidth = Number(screen.width);
+      const screenwidth = Number(screen.width);
       if (
         e.touches.length === 1 &&
         (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)
