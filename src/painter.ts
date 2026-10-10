@@ -1,9 +1,10 @@
-// @ts-nocheck
 "use strict";
 
 Neo.CurrentToolType = 1;
 
 Neo.Painter = class {
+  [key: string]: any;
+
   static LINETYPE_NONE = 0;
   static LINETYPE_PEN = 1;
   static LINETYPE_ERASER = 2;
@@ -1253,7 +1254,7 @@ Neo.Painter = class {
    * @param {number} [h=canvasHeight] - 取得範囲の高さ
    * @param {boolean} [holdRedo=false] - リドゥ履歴を保持するかどうか
    */
-  _pushUndo(x, y, w, h, holdRedo = false) {
+  _pushUndo(x?, y?, w?, h?, holdRedo = false) {
     x = x === undefined ? 0 : x;
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
@@ -1285,7 +1286,7 @@ Neo.Painter = class {
    * @param {number} [w=canvasWidth] - 取得範囲の幅
    * @param {number} [h=canvasHeight] - 取得範囲の高さ
    */
-  _pushRedo(x, y, w, h) {
+  _pushRedo(x?, y?, w?, h?) {
     x = x === undefined ? 0 : x;
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
@@ -1475,7 +1476,7 @@ Neo.Painter = class {
    * @param {number|null} [imageHeight] - 出力画像の高さ（省略時はキャンバス高さ）
    * @returns {HTMLCanvasElement|null} 合成された画像データを持つCanvas要素
    */
-  getImage(imageWidth, imageHeight) {
+  getImage(imageWidth?, imageHeight?) {
     const canvasWidth = this.canvasWidth;
     const canvasHeight = this.canvasHeight;
     const width = imageWidth ?? canvasWidth;
@@ -4215,6 +4216,8 @@ Neo.Painter = class {
  * キャンバスの状態を保持するUndo/Redo用のクラス
  */
 Neo.UndoItem = class {
+  [key: string]: any;
+
   /**
    * @param {ImageData[]} [data]
    * @param {number} [x]
@@ -4245,6 +4248,8 @@ Neo.UndoItem = class {
  * ユーザーの操作履歴を安全に管理する。
  */
 Neo.UndoManager = class {
+  [key: string]: any;
+
   /**
    * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
    */

@@ -6,5 +6,11 @@ interface NeoInterface {
     // props: { [key: string]: any };
 }
 
-// 他のグローバル変数の宣言
-declare var LZString: any;
+interface Document {
+    neo: NeoInterface;
+}
+
+// lz-string の UMD ラッパーが参照する、任意の互換ランタイム。
+declare var define: any;
+declare var module: any;
+declare var angular: any;

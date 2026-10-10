@@ -1,6 +1,7 @@
-// @ts-nocheck
 "use strict";
 Neo.CommandBase = class {
+  [key: string]: any;
+
   constructor() {
     /** @type {any} */
     this.data = null;

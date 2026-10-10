@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use strict";
 /** @type {Object.<string, Object.<string, string>>} */
 Neo.dictionary = {

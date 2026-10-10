@@ -1,7 +1,8 @@
-// @ts-nocheck
 "use strict";
 
 Neo.ToolBase = class {
+  [key: string]: any;
+
   constructor() {
     this.startX = 0;
     this.startY = 0;

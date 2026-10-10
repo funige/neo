@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use strict";
 document.addEventListener("DOMContentLoaded", () => {
     if (Neo.init()) {
@@ -1348,7 +1347,6 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
      */
     const postData = (path, data) => {
         var errorMessage = path + "\n";
-        /** @type {RequestInit} */
         const requestOptions = {
             method: "post",
             body: data,
@@ -1718,7 +1716,6 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
-// @ts-nocheck
 "use strict";
 /** @type {Object.<string, Object.<string, string>>} */
 Neo.dictionary = {
@@ -1905,7 +1902,6 @@ Neo.translate = (function () {
     };
 })();
 
-// @ts-nocheck
 "use strict";
 Neo.CurrentToolType = 1;
 Neo.Painter = class {
@@ -5712,7 +5708,6 @@ window["__neodebug"] = () => {
     });
 };
 
-// @ts-nocheck
 "use strict";
 Neo.ToolBase = class {
     constructor() {
@@ -7276,7 +7271,6 @@ Neo.DummyTool = class extends Neo.ToolBase {
     rollOutHandler(oe) { }
 };
 
-// @ts-nocheck
 "use strict";
 Neo.CommandBase = class {
     constructor() {
@@ -7433,7 +7427,6 @@ Neo.CopyrightCommand = class extends Neo.CommandBase {
     }
 };
 
-// @ts-nocheck
 "use strict";
 /*
   -----------------------------------------------------------------------
@@ -7491,12 +7484,12 @@ Neo.ActionManager = class {
             this._head++;
         }
     }
-    push() {
+    push(...items) {
         if (!Neo.isAnimation)
             return;
         var head = this._items[this._head - 1];
-        for (var i = 0; i < arguments.length; i++) {
-            head.push(arguments[i]);
+        for (const item of items) {
+            head.push(item);
         }
     }
     pushCurrent() {
@@ -8677,7 +8670,6 @@ Neo.getLineCount = function () {
     return Neo.painter._actionMgr._items.length;
 };
 
-// @ts-nocheck
 "use strict";
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -10680,7 +10672,6 @@ Neo.ViewerBar = class {
 };
 
 "use strict";
-// @ts-nocheck
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
 // This work is free. You can redistribute it and/or modify it
 // under the terms of the WTFPL, Version 2

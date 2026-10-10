@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use strict";
 /*
   -----------------------------------------------------------------------
@@ -7,6 +6,8 @@
 */
 
 Neo.ActionManager = class {
+  [key: string]: any;
+
   constructor() {
     /** @type {Array<Array<any>>} */
     this._items = [];
@@ -61,12 +62,12 @@ Neo.ActionManager = class {
     }
   }
 
-  push() {
+  push(...items: any[]) {
     if (!Neo.isAnimation) return;
 
     var head = this._items[this._head - 1];
-    for (var i = 0; i < arguments.length; i++) {
-      head.push(arguments[i]);
+    for (const item of items) {
+      head.push(item);
     }
   }
 
@@ -322,7 +323,7 @@ Neo.ActionManager = class {
    * @param {number|null} [y0] - 開始Y座標
    * @param {number|null} [lineType] - 線の種類
    */
-  freeHandFast(x0, y0, lineType) {
+  freeHandFast(x0, y0, lineType?) {
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -1032,7 +1033,7 @@ Neo.createViewer = function (applet) {
 
     if (tmp.length > 1) {
       for (var i = 1; i < tmp.length; i++) {
-        tmp[i].style.display = "none";
+        (tmp[i] as HTMLElement).style.display = "none";
       }
     }
   }, 0);

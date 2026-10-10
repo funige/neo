@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use strict";
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
@@ -18,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-var Neo: NeoInterface = {};
+var Neo: NeoInterface = {} as NeoInterface;
 
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore
@@ -1669,8 +1668,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   const postData = (path, data) => {
     var errorMessage = path + "\n";
 
-    /** @type {RequestInit} */
-    const requestOptions = {
+    const requestOptions: RequestInit = {
       method: "post",
       body: data,
     };
@@ -1936,7 +1934,7 @@ Neo.createContainer = function (applet) {
 
     if (tmp.length > 1) {
       for (var i = 1; i < tmp.length; i++) {
-        tmp[i].style.display = "none";
+        (tmp[i] as HTMLElement).style.display = "none";
       }
     }
   }, 0);

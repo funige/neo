@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use strict";
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -24,6 +23,8 @@ Neo.getModifier = function (e) {
 */
 
 Neo.Button = class {
+  [key: string]: any;
+
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -50,7 +51,7 @@ Neo.Button = class {
    * @param {Object} [params]
    * @returns {Neo.Button|null}
    */
-  init(elementID, params = {}) {
+  init(elementID, params: any = {}) {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
@@ -197,7 +198,7 @@ Neo.RightButton = class extends Neo.Button {
    * @param {Object} [params]
    * @return {Neo.RightButton|null}
    */
-  init(elementID, params = {}) {
+  init(elementID, params: any = {}) {
     super.init(elementID, params);
     this.params.type = "right";
     return this;
@@ -253,7 +254,7 @@ Neo.FillButton = class extends Neo.Button {
    * @param {Object} [params]
    * @returns {Neo.FillButton|null}
    */
-  init(elementID, params = {}) {
+  init(elementID, params: any = {}) {
     super.init(elementID, params);
     this.params.type = "fill";
     return this;
@@ -270,6 +271,8 @@ Neo.FillButton = class extends Neo.Button {
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
 Neo.ColorTip = class {
+  [key: string]: any;
+
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -293,7 +296,7 @@ Neo.ColorTip = class {
    * @param {string} elementID
    * @param {any} [params]
    */
-  init(elementID, params = {}) {
+  init(elementID, params: any = {}) {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
@@ -461,6 +464,8 @@ Neo.ColorTip = class {
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
+  [key: string]: any;
+
   static bezier =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
   static blur =
@@ -1289,6 +1294,8 @@ Neo.DrawTip = class extends Neo.ToolTip {
 Neo.sliders = [];
 
 Neo.ColorSlider = class {
+  [key: string]: any;
+
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -1320,7 +1327,7 @@ Neo.ColorSlider = class {
    * @param {any} [params]
    * @returns {Neo.ColorSlider}
    */
-  init(elementID, params = {}) {
+  init(elementID, params: any = {}) {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
@@ -1506,6 +1513,8 @@ Neo.ColorSlider = class {
 */
 
 Neo.SizeSlider = class {
+  [key: string]: any;
+
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -1537,7 +1546,7 @@ Neo.SizeSlider = class {
    * @param {any} [params] - パラメータ
    * @returns {Neo.SizeSlider} - 初期化されたサイズスライダー
    */
-  init(elementID, params = {}) {
+  init(elementID, params: any = {}) {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
@@ -1683,6 +1692,8 @@ Neo.SizeSlider = class {
 */
 
 Neo.LayerControl = class {
+  [key: string]: any;
+
   constructor() {
     /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
     this.onmousedown = null;
@@ -1820,6 +1831,8 @@ Neo.LayerControl = class {
 Neo.reserveControls = [];
 
 Neo.ReserveControl = class {
+  [key: string]: any;
+
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -1945,6 +1958,8 @@ Neo.scrollH = null;
 Neo.scrollV = null;
 
 Neo.ScrollBarButton = class {
+  [key: string]: any;
+
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -2111,6 +2126,8 @@ Neo.ViewerButton = class extends Neo.Button {
 // update
 
 Neo.ViewerBar = class {
+  [key: string]: any;
+
   constructor() {
     /** @type {any} */
     this.params = null;
