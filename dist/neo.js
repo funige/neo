@@ -5600,6 +5600,11 @@ Neo.Painter = class {
  * キャンバスの状態を保持するUndo/Redo用のクラス
  */
 Neo.UndoItem = class {
+    data;
+    x;
+    y;
+    width;
+    height;
     /**
      * @param {ImageData[]} [data]
      * @param {number} [x]
@@ -5628,15 +5633,14 @@ Neo.UndoItem = class {
  * ユーザーの操作履歴を安全に管理する。
  */
 Neo.UndoManager = class {
+    _maxStep;
+    _undoItems = [];
+    _redoItems = [];
     /**
      * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
      */
     constructor(_maxStep) {
         this._maxStep = _maxStep;
-        /** @type {Neo.UndoItem[]} */
-        this._undoItems = [];
-        /** @type {Neo.UndoItem[]} */
-        this._redoItems = [];
     }
     /**
      * 新しい操作履歴（UndoItem）を登録し、履歴を管理する。
@@ -7273,9 +7277,9 @@ Neo.DummyTool = class extends Neo.ToolBase {
 
 "use strict";
 Neo.CommandBase = class {
+    data = null;
+    zoom_steps;
     constructor() {
-        /** @type {any} */
-        this.data = null;
         // ズームの許容値を配列で定義
         this.zoom_steps = Neo.config.neo_enable_zoom_out
             ? [
@@ -7434,17 +7438,17 @@ Neo.CopyrightCommand = class extends Neo.CommandBase {
   -----------------------------------------------------------------------
 */
 Neo.ActionManager = class {
+    _items = [];
+    _head = 0;
+    _index = 0;
+    _pause = false;
+    _mark = 0;
+    _speedTable = [-1, 0, 1, 11];
+    _prevSpeed = 0;
+    isMouseDown = false;
     constructor() {
-        /** @type {Array<Array<any>>} */
-        this._items = [];
-        this._head = 0;
-        this._index = 0;
-        this._pause = false;
-        this._mark = 0;
-        this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
         Neo.speed = parseInt(Neo.config.speed || 0);
         this._prevSpeed = Neo.speed;
-        this.isMouseDown = false;
     }
     speedMode() {
         if (Neo.speed < 0) {

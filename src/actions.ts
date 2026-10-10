@@ -6,22 +6,18 @@
 */
 
 Neo.ActionManager = class {
-  [key: string]: any;
+  _items: any[][] = [];
+  _head = 0;
+  _index = 0;
+  _pause = false;
+  _mark = 0;
+  _speedTable: number[] = [-1, 0, 1, 11];
+  _prevSpeed = 0;
+  isMouseDown = false;
 
   constructor() {
-    /** @type {Array<Array<any>>} */
-    this._items = [];
-    this._head = 0;
-    this._index = 0;
-
-    this._pause = false;
-    this._mark = 0;
-
-    this._speedTable = [-1, 0, 1, 11]; // [最, 早, 既, 鈍]
-
     Neo.speed = parseInt(Neo.config.speed || 0);
     this._prevSpeed = Neo.speed;
-    this.isMouseDown = false;
   }
   speedMode() {
     if (Neo.speed < 0) {

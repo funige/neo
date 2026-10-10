@@ -4216,7 +4216,11 @@ Neo.Painter = class {
  * キャンバスの状態を保持するUndo/Redo用のクラス
  */
 Neo.UndoItem = class {
-  [key: string]: any;
+  data: ImageData[];
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 
   /**
    * @param {ImageData[]} [data]
@@ -4248,17 +4252,15 @@ Neo.UndoItem = class {
  * ユーザーの操作履歴を安全に管理する。
  */
 Neo.UndoManager = class {
-  [key: string]: any;
+  _maxStep: number;
+  _undoItems: any[] = [];
+  _redoItems: any[] = [];
 
   /**
    * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
    */
   constructor(_maxStep) {
     this._maxStep = _maxStep;
-    /** @type {Neo.UndoItem[]} */
-    this._undoItems = [];
-    /** @type {Neo.UndoItem[]} */
-    this._redoItems = [];
   }
 
   /**

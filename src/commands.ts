@@ -1,11 +1,9 @@
 "use strict";
 Neo.CommandBase = class {
-  [key: string]: any;
+  data: any = null;
+  zoom_steps: number[];
 
   constructor() {
-    /** @type {any} */
-    this.data = null;
-
     // ズームの許容値を配列で定義
     this.zoom_steps = Neo.config.neo_enable_zoom_out
       ? [
