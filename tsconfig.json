@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "strict": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "noEmitOnError": true,
+    "rootDir": "src",
+    "outDir": ".tsbuild"
+  },
+  "files": [
+    "src/d.ts",
+    "src/container.ts",
+    "src/dictionary.ts",
+    "src/painter.ts",
+    "src/tools.ts",
+    "src/commands.ts",
+    "src/actions.ts",
+    "src/widgets.ts",
+    "src/lz-string.ts"
+  ]
+}

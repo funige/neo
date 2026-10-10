@@ -2,7 +2,7 @@
 #!/bin/sh
 set -eu
 
-JS_FILES="src/container.js src/dictionary.js src/painter.js src/tools.js src/commands.js src/actions.js src/widgets.js src/lz-string.js"
+JS_FILES="src/container.ts src/dictionary.ts src/painter.ts src/tools.ts src/commands.ts src/actions.ts src/widgets.ts src/lz-string.ts"
 CSS_FILES="src/neo.css"
 DEST="dist"
 
@@ -11,13 +11,16 @@ build() {
   VERSION=$(node -p "require('./package.json').version")
   mkdir -p "$DEST"
 
-  # JS: 結合(ファイルの間に改行を挟む。gulp-concat と同じ) + バージョン置換
+  # TypeScript: tsconfig.json の files 順にコンパイル済み JavaScript を連結する。
+  pnpm exec tsc --project tsconfig.json
   first=1
   for f in $JS_FILES; do
+    compiled=".tsbuild/${f#src/}"
+    compiled="${compiled%.ts}.js"
     [ "$first" = 0 ] && printf '\n'
-    cat "$f"
+    cat "$compiled"
     first=0
-  done | sed "s/PACKAGE_JSON_VERSION/$VERSION/g" > "$DEST/neo.js"
+  done | sed "s/PACKAGE_JSON_VERSION/$VERSION/g" | sed 's/[[:space:]]*$//' > "$DEST/neo.js"
   cp "$DEST/neo.js" "$DEST/$NAME-$VERSION.js"
 
   # CSS
@@ -38,7 +41,7 @@ build
 if [ "${1:-}" = "watch" ]; then
   last=""
   while true; do
-    now=$(cat $JS_FILES $CSS_FILES package.json | md5sum)
+    now=$(cat $JS_FILES $CSS_FILES package.json tsconfig.json | md5sum)
     if [ "$now" != "$last" ]; then
       [ -n "$last" ] && build
       last="$now"

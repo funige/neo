@@ -1,5 +1,5 @@
+// @ts-nocheck
 "use strict";
-//@ts-check
 /** @type {Object.<string, Object.<string, string>>} */
 Neo.dictionary = {
   ja: {},

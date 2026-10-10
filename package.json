@@ -8,10 +8,13 @@
   },
   "scripts": {
     "app": "electron .",
-    "format": "prettier --write \"src/!(lz-string).js\" \"src/neo.css\" \"sample/*.html\" \"sample2/*.html\"",
+    "build": "sh build.sh",
+    "check": "tsc --project tsconfig.json --noEmit",
+    "format": "prettier --write \"src/!(lz-string).ts\" \"src/neo.css\" \"sample/*.html\" \"sample2/*.html\"",
     "dev": "sh build.sh watch"
   },
   "devDependencies": {
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "typescript": "^7.0.2"
   }
 }

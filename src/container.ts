@@ -1,5 +1,5 @@
+// @ts-nocheck
 "use strict";
-//@ts-check
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-var Neo = {};
+var Neo: NeoInterface = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore

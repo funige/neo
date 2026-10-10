@@ -1,5 +1,5 @@
+// @ts-nocheck
 "use strict";
-//@ts-check
 
 Neo.CurrentToolType = 1;
 
