@@ -1335,7 +1335,7 @@ Neo.startViewer = function () {
       };
     }
 
-    var length = Neo.painter._actionMgr._items.length;
+    const length = Neo.painter._actionMgr._items.length;
     Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {
       length: length,
     });
@@ -1344,7 +1344,7 @@ Neo.startViewer = function () {
       if (viewerBar) {
         // バー幅の変化(画面リサイズやズーム)に合わせて、シーク位置とマークを再計算する
         new ResizeObserver(() => {
-          Neo.viewerBar.update();
+          Neo.viewerBar?.update();
         }).observe(viewerBar);
       }
     }
@@ -1368,7 +1368,7 @@ Neo.getPCH = function (filename, callback) {
   fetch(filename)
     .then((response) => response.arrayBuffer())
     .then((buffer) => {
-      var pch = Neo.decodePCH(buffer);
+      const pch = Neo.decodePCH(buffer);
       if (pch) {
         if (callback) callback(pch);
       } else {
@@ -1391,9 +1391,9 @@ Neo.getPCH = function (filename, callback) {
  * * @example
  */
 Neo.decodePCH = function (rawdata) {
-  var byteArray = new Uint8Array(rawdata);
-  var data = LZString.decompressFromUint8Array(byteArray.subarray(12));
-  var header = byteArray.subarray(0, 12);
+  const byteArray = new Uint8Array(rawdata);
+  const data = LZString.decompressFromUint8Array(byteArray.subarray(12));
+  const header = byteArray.subarray(0, 12);
   if (!data) {
     throw new Error("Failed to decompress data");
   }
@@ -1402,9 +1402,9 @@ Neo.decodePCH = function (rawdata) {
     header[1] == "E".charCodeAt(0) &&
     header[2] == "O".charCodeAt(0)
   ) {
-    var width = header[4] + header[5] * 0x100;
-    var height = header[6] + header[7] * 0x100;
-    var items = Neo.fixPCH(JSON.parse(data));
+    const width = header[4] + header[5] * 0x100;
+    const height = header[6] + header[7] * 0x100;
+    const items = Neo.fixPCH(JSON.parse(data));
     return {
       width: width,
       height: height,
