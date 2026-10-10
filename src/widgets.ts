@@ -23,7 +23,17 @@ Neo.getModifier = function (e) {
 */
 
 Neo.Button = class {
-  [key: string]: any;
+  element: HTMLElement | null;
+  params: any;
+  elementID: string;
+  selected: boolean;
+  isMouseDown: boolean;
+  disable: (wait?: number) => void;
+  enable: () => void;
+  onmousedown: ((button: any) => void) | null;
+  onmouseup: ((button: any) => void) | null;
+  onmouseover: ((button: any) => void) | null;
+  onmouseout: ((button: any) => void) | null;
 
   constructor() {
     /**@type {HTMLElement|null} */
@@ -271,7 +281,16 @@ Neo.FillButton = class extends Neo.Button {
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
 Neo.ColorTip = class {
-  [key: string]: any;
+  element: HTMLElement | null;
+  params: any;
+  elementID: string;
+  selected: boolean;
+  isMouseDown: boolean;
+  color: string;
+  onmousedown: ((colorTip: any) => void) | null;
+  onmouseup: ((colorTip: any) => void) | null;
+  onmouseover: ((colorTip: any) => void) | null;
+  onmouseout: ((colorTip: any) => void) | null;
 
   constructor() {
     /**@type {HTMLElement|null} */
@@ -464,7 +483,27 @@ Neo.ColorTip = class {
 Neo.toolButtons = [];
 
 Neo.ToolTip = class {
-  [key: string]: any;
+  toolStrings: string[];
+  element: HTMLElement | null;
+  params: any;
+  elementID: string;
+  mode: number;
+  isMouseDown: boolean;
+  onmousedown: ((toolTip: any) => void) | null;
+  onmouseup: ((toolTip: any) => void) | null;
+  onmouseover: ((toolTip: any) => void) | null;
+  onmouseout: ((toolTip: any) => void) | null;
+  selected: boolean;
+  isTool: boolean;
+  fixed: boolean;
+  prevMode: number;
+  tools: number[];
+  toolIcons: any[];
+  hasTintImage: boolean;
+  canvas: HTMLCanvasElement | null;
+  label: HTMLElement | null;
+  drawOnce: boolean;
+  img: HTMLImageElement | null;
 
   static bezier =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
@@ -1294,7 +1333,20 @@ Neo.DrawTip = class extends Neo.ToolTip {
 Neo.sliders = [];
 
 Neo.ColorSlider = class {
-  [key: string]: any;
+  selected: boolean;
+  toolStrings: string[];
+  type: number;
+  prefix: string;
+  value0: number;
+  x0: number;
+  element: Element | null;
+  elementID: string;
+  params: any;
+  value: number;
+  isMouseDown: boolean;
+  slider: Element | null;
+  label: Element | null;
+  hit: any;
 
   constructor() {
     this.selected = false;
@@ -1513,7 +1565,19 @@ Neo.ColorSlider = class {
 */
 
 Neo.SizeSlider = class {
-  [key: string]: any;
+  selected: boolean;
+  toolStrings: string[];
+  y0: number;
+  value0: number;
+  onmousedown: ((slider: any) => void) | null;
+  params: any;
+  element: Element | null;
+  elementID: string;
+  value: number;
+  isMouseDown: boolean;
+  slider: Element | null;
+  label: Element | null;
+  hit: Element | null;
 
   constructor() {
     this.selected = false;
@@ -1692,7 +1756,16 @@ Neo.SizeSlider = class {
 */
 
 Neo.LayerControl = class {
-  [key: string]: any;
+  onmousedown: ((control: any) => void) | null;
+  bg: HTMLElement | null;
+  label0: HTMLElement | null;
+  label1: HTMLElement | null;
+  line0: HTMLElement | null;
+  line1: HTMLElement | null;
+  element: HTMLElement | null;
+  params: any;
+  elementID: string;
+  isMouseDown: boolean;
 
   constructor() {
     /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
@@ -1831,7 +1904,11 @@ Neo.LayerControl = class {
 Neo.reserveControls = [];
 
 Neo.ReserveControl = class {
-  [key: string]: any;
+  element: HTMLElement | null;
+  elementID: string;
+  params: any;
+  reserve: any;
+  isMouseDown: boolean;
 
   constructor() {
     /** @type {HTMLElement|null} */
@@ -1958,7 +2035,10 @@ Neo.scrollH = null;
 Neo.scrollV = null;
 
 Neo.ScrollBarButton = class {
-  [key: string]: any;
+  element: HTMLElement | null;
+  elementID: string;
+  params: any;
+  barButton: HTMLElement | null;
 
   constructor() {
     /** @type {HTMLElement|null} */
@@ -2126,7 +2206,17 @@ Neo.ViewerButton = class extends Neo.Button {
 // update
 
 Neo.ViewerBar = class {
-  [key: string]: any;
+  params: any;
+  elementID: string;
+  isMouseDown: boolean;
+  element: HTMLElement | null;
+  seekElement: HTMLElement;
+  markElement: HTMLElement;
+  textElement: HTMLElement;
+  width: number;
+  length: number;
+  mark: number;
+  seek: number;
 
   constructor() {
     /** @type {any} */

@@ -1,7 +1,15 @@
 "use strict";
 
 Neo.ToolBase = class {
-  [key: string]: any;
+  startX: number;
+  startY: number;
+  isDrag: boolean;
+  isUpMove: boolean;
+  ticking: boolean;
+  type: number;
+  step: number;
+  reverse: boolean;
+  lineType: number;
 
   constructor() {
     this.startX = 0;

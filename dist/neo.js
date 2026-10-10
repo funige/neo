@@ -5811,6 +5811,15 @@ window["__neodebug"] = () => {
 
 "use strict";
 Neo.ToolBase = class {
+    startX;
+    startY;
+    isDrag;
+    isUpMove;
+    ticking;
+    type;
+    step;
+    reverse;
+    lineType;
     constructor() {
         this.startX = 0;
         this.startY = 0;
@@ -8793,6 +8802,17 @@ Neo.getModifier = function (e) {
   -------------------------------------------------------------------------
 */
 Neo.Button = class {
+    element;
+    params;
+    elementID;
+    selected;
+    isMouseDown;
+    disable;
+    enable;
+    onmousedown;
+    onmouseup;
+    onmouseover;
+    onmouseout;
     constructor() {
         /**@type {HTMLElement|null} */
         this.element = null;
@@ -9019,6 +9039,16 @@ Neo.FillButton = class extends Neo.Button {
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
 Neo.ColorTip = class {
+    element;
+    params;
+    elementID;
+    selected;
+    isMouseDown;
+    color;
+    onmousedown;
+    onmouseup;
+    onmouseover;
+    onmouseout;
     constructor() {
         /**@type {HTMLElement|null} */
         this.element = null;
@@ -9195,6 +9225,27 @@ Neo.ColorTip = class {
 /** @type {(Neo.FillButton|Neo.ToolTip)[]} */
 Neo.toolButtons = [];
 Neo.ToolTip = class {
+    toolStrings;
+    element;
+    params;
+    elementID;
+    mode;
+    isMouseDown;
+    onmousedown;
+    onmouseup;
+    onmouseover;
+    onmouseout;
+    selected;
+    isTool;
+    fixed;
+    prevMode;
+    tools;
+    toolIcons;
+    hasTintImage;
+    canvas;
+    label;
+    drawOnce;
+    img;
     static bezier = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
     static blur = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAASUlEQVRIx+3VMQ4AIAgEQeD/f8bWWBnJYUh2SgtgK82G8/MhzVKwxOtTLgIUx6tDout4laiPIICA0Qj4bXxAy0+8LZP9yACAJwsqkggS55eiZgAAAABJRU5ErkJggg==";
     static blurrect = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAX0lEQVRIx+2XQQ4AEAwEt+I7/v+8Org6lJKt6NzLjjYE8DAKtLpYoDeCCCC7tYUd3ru2qQOzDTyndhJzB6KSAmxSgM0fAlGuzBnmlziqxB8jFJkUYJMCbAQYPxt2kF06fvYKgjPBO/IAAAAASUVORK5CYII=";
@@ -9932,6 +9983,20 @@ Neo.DrawTip = class extends Neo.ToolTip {
 /** @type {(Neo.ColorSlider|Neo.SizeSlider)[]} */
 Neo.sliders = [];
 Neo.ColorSlider = class {
+    selected;
+    toolStrings;
+    type;
+    prefix;
+    value0;
+    x0;
+    element;
+    elementID;
+    params;
+    value;
+    isMouseDown;
+    slider;
+    label;
+    hit;
     constructor() {
         this.selected = false;
         /** @type {string[]} */
@@ -10133,6 +10198,19 @@ Neo.ColorSlider = class {
   -------------------------------------------------------------------------
 */
 Neo.SizeSlider = class {
+    selected;
+    toolStrings;
+    y0;
+    value0;
+    onmousedown;
+    params;
+    element;
+    elementID;
+    value;
+    isMouseDown;
+    slider;
+    label;
+    hit;
     constructor() {
         this.selected = false;
         /** @type {string[]} */
@@ -10297,6 +10375,16 @@ Neo.SizeSlider = class {
   -------------------------------------------------------------------------
 */
 Neo.LayerControl = class {
+    onmousedown;
+    bg;
+    label0;
+    label1;
+    line0;
+    line1;
+    element;
+    params;
+    elementID;
+    isMouseDown;
     constructor() {
         /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
         this.onmousedown = null;
@@ -10413,6 +10501,11 @@ Neo.LayerControl = class {
 /** @type {Neo.ReserveControl[]} */
 Neo.reserveControls = [];
 Neo.ReserveControl = class {
+    element;
+    elementID;
+    params;
+    reserve;
+    isMouseDown;
     constructor() {
         /** @type {HTMLElement|null} */
         this.element = null;
@@ -10524,6 +10617,10 @@ Neo.scrollH = null;
 /** @type {Neo.ScrollBarButton|null} */
 Neo.scrollV = null;
 Neo.ScrollBarButton = class {
+    element;
+    elementID;
+    params;
+    barButton;
     constructor() {
         /** @type {HTMLElement|null} */
         this.element = null;
@@ -10668,6 +10765,17 @@ Neo.ViewerButton = class extends Neo.Button {
 // length/mark/count
 // update
 Neo.ViewerBar = class {
+    params;
+    elementID;
+    isMouseDown;
+    element;
+    seekElement;
+    markElement;
+    textElement;
+    width;
+    length;
+    mark;
+    seek;
     constructor() {
         /** @type {any} */
         this.params = null;
