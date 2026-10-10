@@ -389,7 +389,7 @@ Neo.ActionManager = class {
           y1 != head[head.length - 3] ||
           lineType != head[11]
         ) {
-          console.log("eror in freeHandMove?", x, y, lineType, head);
+          console.log("error in freeHandMove?", x, y, lineType, head);
         }
       }
       oe.drawLine(oe.canvasCtx[layer], x0, y0, x1, y1, lineType);
