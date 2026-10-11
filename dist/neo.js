@@ -1,6 +1,10 @@
 "use strict";
+import { Commands } from "./commands.js";
+import { Painter } from "./painter.js";
 //@ts-check
 document.addEventListener("DOMContentLoaded", () => {
+  window.Neo = Neo;
+
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
       Neo.start();
@@ -20,9 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 var Neo = {};
 
-Neo.version = "1.7.33";
+Neo.version = "1.8.0";
 // @ts-ignore
-/** @type {Neo.Painter} */
+/** @type {Painter} */
 Neo.painter;
 
 Neo.fullScreen = false;
@@ -261,7 +265,7 @@ Neo.init2 = function () {
     Neo.center.style.minWidth = "397px";
   }
 
-  Neo.painter = new Neo.Painter();
+  Neo.painter = new Painter();
   Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
   Neo.container.oncontextmenu = function () {
@@ -1072,34 +1076,40 @@ Neo.initComponents = function () {
 };
 
 Neo.initButtons = function () {
+  const commands = new Neo.Commands();
   const neo_undo = new Neo.Button().init("neo-undo");
   if (neo_undo) {
     neo_undo.onmouseup = function () {
-      new Neo.UndoCommand(Neo.painter).execute();
+      commands.UndoCommand = new Neo.UndoCommand(Neo.painter);
+      commands.UndoCommand.execute();
     };
   }
   const neo_redo = new Neo.Button().init("neo-redo");
   if (neo_redo) {
     neo_redo.onmouseup = function () {
-      new Neo.RedoCommand(Neo.painter).execute();
+      commands.RedoCommand = new Neo.RedoCommand(Neo.painter);
+      commands.RedoCommand.execute();
     };
   }
   const neo_window = new Neo.Button().init("neo-window");
   if (neo_window) {
     neo_window.onmouseup = function () {
-      new Neo.WindowCommand(Neo.painter).execute();
+      commands.WindowCommand = new Neo.WindowCommand(Neo.painter);
+      commands.WindowCommand.execute();
     };
   }
   const neo_copyright = new Neo.Button().init("neo-copyright");
   if (neo_copyright) {
     neo_copyright.onmouseup = function () {
-      new Neo.CopyrightCommand(Neo.painter).execute();
+      commands.CopyrightCommand = new Neo.CopyrightCommand(Neo.painter);
+      commands.CopyrightCommand.execute();
     };
   }
   const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
   if (neo_zoomPlus) {
     neo_zoomPlus.onmouseup = function () {
-      new Neo.ZoomPlusCommand(Neo.painter).execute();
+      commands.ZoomPlusCommand = new Neo.ZoomPlusCommand(Neo.painter);
+      commands.ZoomPlusCommand.execute();
     };
   }
   const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
@@ -1115,7 +1125,8 @@ Neo.initButtons = function () {
   }
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton?.disable(5000);
-    new Neo.SubmitCommand(Neo.painter).execute();
+    commands.SubmitCommand = new Neo.SubmitCommand(Neo.painter);
+    commands.SubmitCommand.execute();
   };
 
   Neo.fillButton = new Neo.FillButton().init("neo-fill");
@@ -2077,10 +2088,13 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
+export { Neo };
+
 "use strict";
+import { Neo } from "./container.js";
 //@ts-check
 /** @type {Object.<string, Object.<string, string>>} */
-Neo.dictionary = {
+export const dictionary = {
   ja: {},
   en: {
     やり直し: "Redo",
@@ -2265,13 +2279,13 @@ Neo.dictionary = {
   },
 };
 
-Neo.translate = (function () {
+export const translate = (function () {
   var language =
     (window.navigator.languages && window.navigator.languages[0]) ||
     window.navigator.language;
 
   var lang = "en";
-  for (var key in Neo.dictionary) {
+  for (var key in dictionary) {
     if (language.indexOf(key) == 0) {
       lang = key;
       break;
@@ -2284,16 +2298,45 @@ Neo.translate = (function () {
     } else {
       if (lang != "ja") lang = "en";
     }
-    return Neo.dictionary[lang][string] || string;
+    return dictionary[lang][string] || string;
   };
 })();
 
 "use strict";
 //@ts-check
-
+import { Neo } from "./container.js";
+import { ActionManager } from "./actions.js";
+import {
+  ToolBase,
+  PenTool,
+  EraserTool,
+  HandTool,
+  FillTool,
+  EraseAllTool,
+  EraseRectTool,
+  CopyTool,
+  PasteTool,
+  MergeTool,
+  FlipHTool,
+  FlipVTool,
+  BrushTool,
+  TextTool,
+  ToneTool,
+  BlurTool,
+  DodgeTool,
+  BurnTool,
+  SliderTool,
+  DummyTool,
+  RectTool,
+  RectFillTool,
+  EllipseTool,
+  EllipseFillTool,
+  BlurRectTool,
+  TurnTool,
+} from "./tools.js";
 Neo.CurrentToolType = 1;
 
-Neo.Painter = class {
+export class Painter {
   static LINETYPE_NONE = 0;
   static LINETYPE_PEN = 1;
   static LINETYPE_ERASER = 2;
@@ -2348,8 +2391,8 @@ Neo.Painter = class {
 
   constructor() {
     this._undoMgr = new Neo.UndoManager(50);
-    /** @type {Neo.ActionManager} */
-    this._actionMgr = new Neo.ActionManager();
+    /** @type {ActionManager} */
+    this._actionMgr = new ActionManager();
     this.clipMouseX = 0;
     this.clipMouseY = 0;
     this.scrollBarX = 0;
@@ -2375,7 +2418,7 @@ Neo.Painter = class {
     /** @type {HTMLElement|null} */
     this.container = null;
 
-    this.tool = /** @type {Neo.ToolBase} */ ({});
+    this.tool = /** @type {ToolBase} */ ({});
     /** @type {HTMLElement|null} */
     this.inputText = null;
     /** @type {number[]|null} */
@@ -2461,58 +2504,33 @@ Neo.Painter = class {
     this.busySkipped = false;
 
     this.touchlength = 0;
-    /**@type {Neo.PenTool} */
     this.penTool;
-    /**@type {Neo.EraserTool} */
     this.eraserTool;
-    /**@type {Neo.HandTool} */
     this.handTool;
-    /**@type {Neo.FillTool} */
     this.fillTool;
-    /**@type {Neo.EraseAllTool} */
     this.eraseAllTool;
-    /**@type {Neo.EraseRectTool} */
     this.eraseRectTool;
 
-    /**@type {Neo.CopyTool} */
     this.copyTool;
-    /**@type {Neo.PasteTool} */
     this.pasteTool;
-    /**@type {Neo.MergeTool} */
     this.mergeTool;
-    /**@type {Neo.FlipHTool} */
     this.flipHTool;
-    /**@type {Neo.FlipVTool} */
     this.flipVTool;
 
-    /**@type {Neo.BrushTool} */
     this.brushTool;
-    /**@type {Neo.TextTool} */
     this.textTool;
-    /**@type {Neo.ToneTool} */
     this.toneTool;
-    /**@type {Neo.BlurTool} */
     this.blurTool;
-    /**@type {Neo.DodgeTool} */
     this.dodgeTool;
-    /**@type {Neo.BurnTool} */
     this.burnTool;
-    /**@type {Neo.SliderTool} */
     this.sliderTool;
-    /**@type {Neo.DummyTool} */
     this.dummyTool;
 
-    /**@type {Neo.RectTool} */
     this.rectTool;
-    /**@type {Neo.RectFillTool} */
     this.rectFillTool;
-    /**@type {Neo.EllipseTool} */
     this.ellipseTool;
-    /**@type {Neo.EllipseFillTool} */
     this.ellipseFillTool;
-    /**@type {Neo.BlurRectTool} */
     this.blurRectTool;
-    /**@type {Neo.TurnTool} */
     this.turnTool;
   }
 
@@ -2561,8 +2579,8 @@ Neo.Painter = class {
     if (this.tool && this.tool.kill) {
       this.tool.kill();
     }
-    this.tool = /**@type {Neo.ToolBase} */ (tool);
-    /**@type {Neo.ToolBase} */ (tool).init(this);
+    this.tool = /**@type {ToolBase} */ (tool);
+    /**@type {ToolBase} */ (tool).init(this);
     if (this.tool && this.tool.loadStates) this.tool.loadStates();
   }
 
@@ -2576,8 +2594,8 @@ Neo.Painter = class {
    */
   pushTool(tool) {
     this.toolStack.push(this.tool);
-    this.tool = /**@type {Neo.ToolBase} */ (tool);
-    /**@type {Neo.ToolBase} */ (tool).init(this);
+    this.tool = /**@type {ToolBase} */ (tool);
+    /**@type {ToolBase} */ (tool).init(this);
   }
 
   /**
@@ -2600,7 +2618,7 @@ Neo.Painter = class {
    * ツールがスライダー等の設定変更中である場合、スタックの最上位にある
    * 以前のツール（ペイントツール等）を優先的に返すことで、
    * 現在の操作文脈を正しく取得する。
-   * @returns {Neo.ToolBase|null} 現在のツールインスタンス、またはnull
+   * @returns {ToolBase|null} 現在のツールインスタンス、またはnull
    */
   getCurrentTool() {
     if (this.tool) {
@@ -2979,35 +2997,35 @@ Neo.Painter = class {
   }
 
   _initTools() {
-    this.penTool = new Neo.PenTool();
-    this.eraserTool = new Neo.EraserTool();
-    this.handTool = new Neo.HandTool();
-    this.fillTool = new Neo.FillTool();
-    this.eraseAllTool = new Neo.EraseAllTool();
-    this.eraseRectTool = new Neo.EraseRectTool();
+    this.penTool = new PenTool();
+    this.eraserTool = new EraserTool();
+    this.handTool = new HandTool();
+    this.fillTool = new FillTool();
+    this.eraseAllTool = new EraseAllTool();
+    this.eraseRectTool = new EraseRectTool();
 
-    this.copyTool = new Neo.CopyTool();
-    this.pasteTool = new Neo.PasteTool();
-    this.mergeTool = new Neo.MergeTool();
-    this.flipHTool = new Neo.FlipHTool();
-    this.flipVTool = new Neo.FlipVTool();
+    this.copyTool = new CopyTool();
+    this.pasteTool = new PasteTool();
+    this.mergeTool = new MergeTool();
+    this.flipHTool = new FlipHTool();
+    this.flipVTool = new FlipVTool();
 
-    this.brushTool = new Neo.BrushTool();
-    this.textTool = new Neo.TextTool();
-    this.toneTool = new Neo.ToneTool();
-    this.blurTool = new Neo.BlurTool();
-    this.dodgeTool = new Neo.DodgeTool();
-    this.burnTool = new Neo.BurnTool();
+    this.brushTool = new BrushTool();
+    this.textTool = new TextTool();
+    this.toneTool = new ToneTool();
+    this.blurTool = new BlurTool();
+    this.dodgeTool = new DodgeTool();
+    this.burnTool = new BurnTool();
 
-    this.rectTool = new Neo.RectTool();
-    this.rectFillTool = new Neo.RectFillTool();
-    this.ellipseTool = new Neo.EllipseTool();
-    this.ellipseFillTool = new Neo.EllipseFillTool();
-    this.blurRectTool = new Neo.BlurRectTool();
-    this.turnTool = new Neo.TurnTool();
+    this.rectTool = new RectTool();
+    this.rectFillTool = new RectFillTool();
+    this.ellipseTool = new EllipseTool();
+    this.ellipseFillTool = new EllipseFillTool();
+    this.blurRectTool = new BlurRectTool();
+    this.turnTool = new TurnTool();
 
-    this.sliderTool = new Neo.SliderTool();
-    this.dummyTool = new Neo.DummyTool();
+    this.sliderTool = new SliderTool();
+    this.dummyTool = new DummyTool();
   }
 
   hideInputText() {
@@ -6501,12 +6519,12 @@ Neo.Painter = class {
   isDirty() {
     return this.dirty;
   }
-};
+}
 
 /**
  * キャンバスの状態を保持するUndo/Redo用のクラス
  */
-Neo.UndoItem = class {
+export class UndoItem {
   /**
    * @param {ImageData[]} [data]
    * @param {number} [x]
@@ -6521,7 +6539,7 @@ Neo.UndoItem = class {
     this.width = width;
     this.height = height;
   }
-};
+}
 
 /*
    -------------------------------------------------------------------------
@@ -6536,15 +6554,15 @@ Neo.UndoItem = class {
  * 最大ステップ数（_maxStep）を設定することで、メモリの肥大化を抑制しつつ
  * ユーザーの操作履歴を安全に管理する。
  */
-Neo.UndoManager = class {
+export class UndoManager {
   /**
    * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
    */
   constructor(_maxStep) {
     this._maxStep = _maxStep;
-    /** @type {Neo.UndoItem[]} */
+    /** @type {UndoItem[]} */
     this._undoItems = [];
-    /** @type {Neo.UndoItem[]} */
+    /** @type {UndoItem[]} */
     this._redoItems = [];
   }
 
@@ -6555,7 +6573,7 @@ Neo.UndoManager = class {
    * 2. 最大ステップ数を超えた場合、最も古い履歴を削除してメモリを解放する。
    * 3. 新しい操作が行われた場合、それ以降の「やり直し（Redo）」履歴をクリアし、
    * 操作の分岐点を明確にする。
-   * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
+   * @param {UndoItem} undoItem - 保存するキャンバスの状態データ
    * @param {boolean} holdRedo - Redo履歴を保持するかどうか
    * @returns {void}
    */
@@ -6580,7 +6598,7 @@ Neo.UndoManager = class {
    * @description
    * Undo操作によってスタックから取り出された状態を Redo 履歴に保存して
    * Undoした状態からRedoできるようにする。
-   * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
+   * @param {UndoItem} undoItem - 保存するキャンバスの状態データ
    */
   pushRedo(undoItem) {
     this._redoItems.push(undoItem);
@@ -6589,7 +6607,7 @@ Neo.UndoManager = class {
   popRedo() {
     return this._redoItems.pop();
   }
-};
+}
 /**
  * カラーピッカーで色をセット
  * @param {string} color - <input type="color">で取得した色
@@ -6626,7 +6644,7 @@ window["__neodebug"] = () => {
 "use strict";
 //@ts-check
 
-Neo.ToolBase = class {
+export class ToolBase {
   constructor() {
     this.startX = 0;
     this.startY = 0;
@@ -6782,7 +6800,7 @@ Neo.ToolBase = class {
       reserve.size = Neo.painter.lineWidth;
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -6790,7 +6808,7 @@ Neo.ToolBase = class {
   -------------------------------------------------------------------------
 */
 
-Neo.DrawToolBase = class extends Neo.ToolBase {
+export class DrawToolBase extends ToolBase {
   constructor() {
     super();
     this.x0 = 0;
@@ -7018,12 +7036,14 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     var y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
 
-    if (!(
-      x > -r &&
-      y > -r &&
-      x < oe.destCanvas.width + r &&
-      y < oe.destCanvas.height + r
-    ))
+    if (
+      !(
+        x > -r &&
+        y > -r &&
+        x < oe.destCanvas.width + r &&
+        y < oe.destCanvas.height + r
+      )
+    )
       return;
 
     var ctx = oe.destCanvasCtx;
@@ -7344,7 +7364,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     );
     ctx.restore();
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7352,7 +7372,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.PenTool = class extends Neo.DrawToolBase {
+export class PenTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7368,7 +7388,7 @@ Neo.PenTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7376,7 +7396,7 @@ Neo.PenTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BrushTool = class extends Neo.DrawToolBase {
+export class BrushTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7397,7 +7417,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
     var alpha = 241 - Math.floor(Neo.painter.lineWidth / 2) * 6;
     return alpha / 255.0;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7405,7 +7425,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.ToneTool = class extends Neo.DrawToolBase {
+export class ToneTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7421,7 +7441,7 @@ Neo.ToneTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7429,14 +7449,14 @@ Neo.ToneTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EraserTool = class extends Neo.DrawToolBase {
+export class EraserTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ERASER;
     this.lineType = Neo.Painter.LINETYPE_ERASER;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7444,7 +7464,7 @@ Neo.EraserTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BlurTool = class extends Neo.DrawToolBase {
+export class BlurTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7460,7 +7480,7 @@ Neo.BlurTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7468,7 +7488,7 @@ Neo.BlurTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.DodgeTool = class extends Neo.DrawToolBase {
+export class DodgeTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7484,7 +7504,7 @@ Neo.DodgeTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7492,7 +7512,7 @@ Neo.DodgeTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BurnTool = class extends Neo.DrawToolBase {
+export class BurnTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7508,7 +7528,7 @@ Neo.BurnTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7516,7 +7536,7 @@ Neo.BurnTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.HandTool = class extends Neo.ToolBase {
+export class HandTool extends ToolBase {
   constructor() {
     super();
     this.latestX = 0;
@@ -7589,7 +7609,7 @@ Neo.HandTool = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOutHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7597,7 +7617,7 @@ Neo.HandTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.SliderTool = class extends Neo.ToolBase {
+export class SliderTool extends ToolBase {
   constructor() {
     super();
     this.target = /**@type {any} **/ (null);
@@ -7673,7 +7693,7 @@ Neo.SliderTool = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOutHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7681,7 +7701,7 @@ Neo.SliderTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.FillTool = class extends Neo.ToolBase {
+export class FillTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7713,7 +7733,7 @@ Neo.FillTool = class extends Neo.ToolBase {
   upMoveHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOverHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7721,7 +7741,7 @@ Neo.FillTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EraseAllTool = class extends Neo.ToolBase {
+export class EraseAllTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7749,7 +7769,7 @@ Neo.EraseAllTool = class extends Neo.ToolBase {
   upMoveHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOverHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7757,7 +7777,7 @@ Neo.EraseAllTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EffectToolBase = class extends Neo.ToolBase {
+export class EffectToolBase extends ToolBase {
   constructor() {
     super();
     this.startX = 0;
@@ -7881,7 +7901,7 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7889,7 +7909,7 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EraseRectTool = class extends Neo.EffectToolBase {
+export class EraseRectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7911,7 +7931,7 @@ Neo.EraseRectTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.eraseRect2(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7919,7 +7939,7 @@ Neo.EraseRectTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.FlipHTool = class extends Neo.EffectToolBase {
+export class FlipHTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7940,7 +7960,7 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.flipH(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7948,7 +7968,7 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.FlipVTool = class extends Neo.EffectToolBase {
+export class FlipVTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -7969,7 +7989,7 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.flipV(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -7977,7 +7997,7 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BlurRectTool = class extends Neo.EffectToolBase {
+export class BlurRectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8007,7 +8027,7 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8015,7 +8035,7 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.TurnTool = class extends Neo.EffectToolBase {
+export class TurnTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8051,7 +8071,7 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }, 10);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8059,7 +8079,7 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.MergeTool = class extends Neo.EffectToolBase {
+export class MergeTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8080,7 +8100,7 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.merge(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8088,7 +8108,7 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.CopyTool = class extends Neo.EffectToolBase {
+export class CopyTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8113,7 +8133,7 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
     oe.pasteTool.width = width;
     oe.pasteTool.height = height;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8121,7 +8141,7 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.PasteTool = class extends Neo.ToolBase {
+export class PasteTool extends ToolBase {
   constructor() {
     super();
     this.x = 0;
@@ -8216,7 +8236,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
     oe.drawXORRect(ctx, x, y, width, height);
     ctx.restore();
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8224,7 +8244,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.RectTool = class extends Neo.EffectToolBase {
+export class RectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8246,7 +8266,7 @@ Neo.RectTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8254,7 +8274,7 @@ Neo.RectTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.RectFillTool = class extends Neo.EffectToolBase {
+export class RectFillTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8275,7 +8295,7 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8283,7 +8303,7 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EllipseTool = class extends Neo.EffectToolBase {
+export class EllipseTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8305,7 +8325,7 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8313,7 +8333,7 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EllipseFillTool = class extends Neo.EffectToolBase {
+export class EllipseFillTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8336,7 +8356,7 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8344,7 +8364,7 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.TextTool = class extends Neo.ToolBase {
+export class TextTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8449,7 +8469,7 @@ Neo.TextTool = class extends Neo.ToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -8457,7 +8477,7 @@ Neo.TextTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.DummyTool = class extends Neo.ToolBase {
+export class DummyTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -8479,184 +8499,192 @@ Neo.DummyTool = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOutHandler(oe) {}
-};
+}
 
 "use strict";
 //@ts-check
-Neo.CommandBase = class {
+import { Neo } from "./container.js";
+import { Painter } from "./painter.js";
+export class Commands {
   constructor() {
-    /** @type {any} */
-    this.data = null;
+    this.CommandBase = class {
+      constructor() {
+        /** @type {any} */
+        this.data = null;
 
-    // ズームの許容値を配列で定義
-    this.zoom_steps = Neo.config.neo_enable_zoom_out
-      ? [
-          0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
-          10.0, 11.0, 12.0,
-        ]
-      : [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 11.0, 12.0];
-  }
-  execute() {}
-};
+        // ズームの許容値を配列で定義
+        this.zoom_steps = Neo.config.neo_enable_zoom_out
+          ? [
+              0.2, 0.4, 0.6, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0,
+              8.0, 10.0, 11.0, 12.0,
+            ]
+          : [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 11.0, 12.0];
+      }
+      execute() {}
+    };
 
-/*
+    /*
   ---------------------------------------------------
     ZOOM
   ---------------------------------------------------
 */
-/**
- * @property {number} zoom - 現在のズーム値
- * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
- */
-Neo.ZoomPlusCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-
-  execute() {
-    const steps = this.zoom_steps;
-    // 現在のズームに最も近い（または一致する）インデックスを探す
-    let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
-    if (currentIndex === -1) currentIndex = steps.length - 1;
-
-    // 完全に一致しない場合の調整（現在値より大きい最初のステップを採用、または次のインデックスへ）
-    if (
-      steps[currentIndex] === this.data.zoom &&
-      currentIndex < steps.length - 1
-    ) {
-      currentIndex++;
-    } else if (steps[currentIndex] > this.data.zoom) {
-      // そのまま現在のcurrentIndexのステップを採用
-    } else if (currentIndex < steps.length - 1) {
-      currentIndex++;
-    }
-
-    if (currentIndex < steps.length) {
-      this.data.setZoom(steps[currentIndex]);
-    }
-
-    // console.log(this.data.zoom);
-    Neo.resizeCanvas();
-    // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
-    // Neo.painter.updateDestCanvas();
-  }
-};
-
-/**
- * @property {number} zoom - 現在のズーム値
- * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
- */
-Neo.ZoomMinusCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-
-  execute() {
-    const steps = this.zoom_steps;
-    let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
-
-    if (currentIndex > 0) {
-      if (steps[currentIndex] === this.data.zoom) {
-        currentIndex--;
-      } else {
-        // 現在値がステップの間にいる場合は、下のステップに落とす
-        currentIndex = Math.max(0, currentIndex - 1);
+    /**
+     * @property {number} zoom - 現在のズーム値
+     * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
+     */
+    this.ZoomPlusCommand = class extends Neo.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
       }
-      this.data.setZoom(steps[currentIndex]);
-    }
 
-    // console.log(this.data.zoom);
-    Neo.resizeCanvas();
-  }
-};
+      execute() {
+        const steps = this.zoom_steps;
+        // 現在のズームに最も近い（または一致する）インデックスを探す
+        let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
+        if (currentIndex === -1) currentIndex = steps.length - 1;
 
-/*
+        // 完全に一致しない場合の調整（現在値より大きい最初のステップを採用、または次のインデックスへ）
+        if (
+          steps[currentIndex] === this.data.zoom &&
+          currentIndex < steps.length - 1
+        ) {
+          currentIndex++;
+        } else if (steps[currentIndex] > this.data.zoom) {
+          // そのまま現在のcurrentIndexのステップを採用
+        } else if (currentIndex < steps.length - 1) {
+          currentIndex++;
+        }
+
+        if (currentIndex < steps.length) {
+          this.data.setZoom(steps[currentIndex]);
+        }
+
+        // console.log(this.data.zoom);
+        Neo.resizeCanvas();
+        // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
+        // Neo.painter.updateDestCanvas();
+      }
+    };
+
+    /**
+     * @property {number} zoom - 現在のズーム値
+     * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
+     */
+    this.ZoomMinusCommand = class extends this.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
+      }
+
+      execute() {
+        const steps = this.zoom_steps;
+        let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
+
+        if (currentIndex > 0) {
+          if (steps[currentIndex] === this.data.zoom) {
+            currentIndex--;
+          } else {
+            // 現在値がステップの間にいる場合は、下のステップに落とす
+            currentIndex = Math.max(0, currentIndex - 1);
+          }
+          this.data.setZoom(steps[currentIndex]);
+        }
+
+        // console.log(this.data.zoom);
+        Neo.resizeCanvas();
+      }
+    };
+
+    /*
   ---------------------------------------------------
     UNDO
   ---------------------------------------------------
 */
-Neo.UndoCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-  execute() {
-    this.data.cancelCopy();
-    this.data.undo();
-  }
-};
-
-Neo.RedoCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-  execute() {
-    this.data.redo();
-  }
-};
-
-Neo.WindowCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-  execute() {
-    if (Neo.fullScreen) {
-      if (confirm(Neo.translate("ページビュー？"))) {
-        Neo.fullScreen = false;
-        Neo.updateWindow();
+    this.UndoCommand = class extends this.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
       }
-    } else {
-      if (confirm(Neo.translate("ウィンドウビュー？"))) {
-        Neo.fullScreen = true;
-        Neo.updateWindow();
+      execute() {
+        this.data.cancelCopy();
+        this.data.undo();
       }
-    }
-  }
-};
+    };
 
-Neo.SubmitCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
-  }
-  execute() {
-    //基準ディレクトリパス（URL形式、末尾は "/"）
-    var baseURL = location.href.replace(/[^/]*$/, "");
-    this.data.submit(baseURL);
-  }
-};
+    this.RedoCommand = class extends this.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
+      }
+      execute() {
+        this.data.redo();
+      }
+    };
 
-Neo.CopyrightCommand = class extends Neo.CommandBase {
-  /** @param {Neo.Painter} data */
-  constructor(data) {
-    super();
-    this.data = data;
+    this.WindowCommand = class extends this.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
+      }
+      execute() {
+        if (Neo.fullScreen) {
+          if (confirm(Neo.translate("ページビュー？"))) {
+            Neo.fullScreen = false;
+            Neo.updateWindow();
+          }
+        } else {
+          if (confirm(Neo.translate("ウィンドウビュー？"))) {
+            Neo.fullScreen = true;
+            Neo.updateWindow();
+          }
+        }
+      }
+    };
+
+    this.SubmitCommand = class extends this.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
+      }
+      execute() {
+        //基準ディレクトリパス（URL形式、末尾は "/"）
+        var baseURL = location.href.replace(/[^/]*$/, "");
+        this.data.submit(baseURL);
+      }
+    };
+
+    this.CopyrightCommand = class extends this.CommandBase {
+      /** @param {Painter} data */
+      constructor(data) {
+        super();
+        this.data = data;
+      }
+      execute() {
+        var url = "http://github.com/funige/neo/";
+        if (
+          confirm(
+            Neo.translate(
+              "PaintBBS NEOは、お絵かきしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？",
+            ) + "\n",
+          )
+        ) {
+          Neo.openURL(url);
+        }
+      }
+    };
   }
-  execute() {
-    var url = "http://github.com/funige/neo/";
-    if (
-      confirm(
-        Neo.translate(
-          "PaintBBS NEOは、お絵かきしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？",
-        ) + "\n",
-      )
-    ) {
-      Neo.openURL(url);
-    }
-  }
-};
+}
 
 "use strict";
+import { Neo } from "./container.js";
+import { translate } from "./dictionary.js";
 //@ts-check
 /*
   -----------------------------------------------------------------------
@@ -8664,7 +8692,7 @@ Neo.CopyrightCommand = class extends Neo.CommandBase {
   -----------------------------------------------------------------------
 */
 
-Neo.ActionManager = class {
+export class ActionManager {
   constructor() {
     /** @type {Array<Array<any>>} */
     this._items = [];
@@ -9639,7 +9667,7 @@ Neo.ActionManager = class {
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
-};
+}
 
 /*
   -----------------------------------------------------------------------
@@ -9674,7 +9702,7 @@ Neo.createViewer = function (applet) {
     "</div>";
 
   neo.innerHTML = html.replace(/\[(.*?)\]/g, function (match, str) {
-    return Neo.translate(str);
+    return translate(str);
   });
 
   var parent = applet.parentNode;
@@ -10148,6 +10176,7 @@ Neo.getLineCount = function () {
 };
 
 "use strict";
+import { Neo } from "./container.js";
 //@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -10172,7 +10201,7 @@ Neo.getModifier = function (e) {
   -------------------------------------------------------------------------
 */
 
-Neo.Button = class {
+export class Button {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -10185,19 +10214,19 @@ Neo.Button = class {
     this.disable = function (wait) {};
     this.enable = function () {};
 
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmousedown = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseup = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseover = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseout = null;
   }
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Button|null}
+   * @returns {Button|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -10281,7 +10310,7 @@ Neo.Button = class {
 
     if (this.params.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
-        const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+        const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
       }
       Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -10324,7 +10353,7 @@ Neo.Button = class {
   }
 
   update() {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -10332,7 +10361,7 @@ Neo.Button = class {
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton = class extends Neo.Button {
+export class RightButton extends Button {
   constructor() {
     super();
     /** @type {any} */
@@ -10344,7 +10373,7 @@ Neo.RightButton = class extends Neo.Button {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @return {Neo.RightButton|null}
+   * @return {RightButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
@@ -10384,7 +10413,7 @@ Neo.RightButton = class extends Neo.Button {
     const right = Neo.rightButton;
     right?.setSelected(false);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -10392,7 +10421,7 @@ Neo.RightButton = class extends Neo.Button {
   -------------------------------------------------------------------------
 */
 
-Neo.FillButton = class extends Neo.Button {
+export class FillButton extends Neo.Button {
   constructor() {
     super();
   }
@@ -10400,14 +10429,14 @@ Neo.FillButton = class extends Neo.Button {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.FillButton|null}
+   * @returns {FillButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
     this.params.type = "fill";
     return this;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -10415,10 +10444,9 @@ Neo.FillButton = class extends Neo.Button {
   -------------------------------------------------------------------------
 */
 
-/** @typedef {Neo.ColorTip} ColorTip */
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
-Neo.ColorTip = class {
+export class ColorTip {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -10428,13 +10456,13 @@ Neo.ColorTip = class {
     this.selected = false;
     this.isMouseDown = false;
     this.color = "";
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmousedown = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseup = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseover = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseout = null;
   }
 
@@ -10589,7 +10617,7 @@ Neo.ColorTip = class {
     this.element.style.backgroundColor = color;
   }
   /**
-   * @returns {Neo.ColorTip|null}
+   * @returns {ColorTip|null}
    */
   static getCurrent() {
     for (var i = 0; i < Neo.colorTips.length; i++) {
@@ -10598,7 +10626,7 @@ Neo.ColorTip = class {
     }
     return null;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -10606,10 +10634,10 @@ Neo.ColorTip = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {(Neo.FillButton|Neo.ToolTip)[]} */
+/** @type {(FillButton|ToolTip)[]} */
 Neo.toolButtons = [];
 
-Neo.ToolTip = class {
+export class ToolTip {
   static bezier =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
   static blur =
@@ -10659,13 +10687,13 @@ Neo.ToolTip = class {
     this.elementID = "";
     this.mode = 0;
     this.isMouseDown = false;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmousedown = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseup = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseover = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseout = null;
     this.selected = false;
     this.isTool = false;
@@ -10687,7 +10715,7 @@ Neo.ToolTip = class {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ToolTip|null}
+   * @returns {ToolTip|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -10758,7 +10786,7 @@ Neo.ToolTip = class {
     if (this.isTool) {
       if (this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+          const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
           toolTip.setSelected(this === toolTip);
         }
       } else {
@@ -10877,7 +10905,7 @@ Neo.ToolTip = class {
     ctx.drawImage(img, x, y);
     Neo.tintImage(ctx, c);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -10885,7 +10913,7 @@ Neo.ToolTip = class {
   -------------------------------------------------------------------------
 */
 
-Neo.PenTip = class extends Neo.ToolTip {
+export class PenTip extends ToolTip {
   constructor() {
     super();
     this.isTool = true;
@@ -10907,7 +10935,7 @@ Neo.PenTip = class extends Neo.ToolTip {
    * 鉛筆･水彩･テキスト
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.PenTip|null}
+   * @returns {PenTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -10930,7 +10958,7 @@ Neo.PenTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -10938,7 +10966,7 @@ Neo.PenTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.Pen2Tip = class extends Neo.ToolTip {
+export class Pen2Tip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -10966,7 +10994,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
    * トーン･ぼかし･覆い焼き･焼き込み
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Pen2Tip|null}
+   * @returns {Pen2Tip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -11049,7 +11077,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
 
     this.prevMode = this.mode;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11057,7 +11085,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.EraserTip = class extends Neo.ToolTip {
+export class EraserTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -11082,7 +11110,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
    * 消しペン･消し四角･全消し
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.EraserTip|null}
+   * @returns {EraserTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -11132,7 +11160,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
     };
     img.src = Neo.ToolTip.eraser;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11140,7 +11168,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.EffectTip = class extends Neo.ToolTip {
+export class EffectTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -11171,7 +11199,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
    * 四角･線四角･楕円･線楕円
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.EffectTip|null}
+   * @returns {EffectTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -11196,7 +11224,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11204,7 +11232,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.Effect2Tip = class extends Neo.ToolTip {
+export class Effect2Tip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -11241,7 +11269,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
    * コピー･レイヤー結合･角取り･左右反転･上下反転･傾け
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Effect2Tip|null}
+   * @returns {Effect2Tip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -11272,7 +11300,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11280,11 +11308,11 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.MaskTip = class extends Neo.ToolTip {
+export class MaskTip extends ToolTip {
   constructor() {
     super();
     this.isMouseDown = false;
-    /** @type {((MaskTip: Neo.MaskTip) => void) | null} */
+    /** @type {((MaskTip: MaskTip) => void) | null} */
     this.onmousedown = null;
     /** @type {HTMLCanvasElement|null} */
     this.canvas = null;
@@ -11297,7 +11325,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
    * 通常･マスク･逆マスク･加算･逆加算
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.MaskTip|null}
+   * @returns {MaskTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -11360,7 +11388,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     ctx.fillStyle = c;
     ctx.fillRect(1, 1, 43, 9);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11368,7 +11396,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.DrawTip = class extends Neo.ToolTip {
+export class DrawTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -11386,7 +11414,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
    * 手書き･直線･BZ曲線
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.DrawTip|null}
+   * @returns {DrawTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -11426,7 +11454,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11434,10 +11462,10 @@ Neo.DrawTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-/** @type {(Neo.ColorSlider|Neo.SizeSlider)[]} */
+/** @type {(ColorSlider|SizeSlider)[]} */
 Neo.sliders = [];
 
-Neo.ColorSlider = class {
+export class ColorSlider {
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -11467,7 +11495,7 @@ Neo.ColorSlider = class {
    * カラースライダーを初期化
    * @param {string} elementID
    * @param {any} [params]
-   * @returns {Neo.ColorSlider}
+   * @returns {ColorSlider}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -11646,7 +11674,7 @@ Neo.ColorSlider = class {
       this.label.innerHTML = this.prefix + this.value.toFixed(0);
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11654,7 +11682,7 @@ Neo.ColorSlider = class {
   -------------------------------------------------------------------------
 */
 
-Neo.SizeSlider = class {
+export class SizeSlider {
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -11684,7 +11712,7 @@ Neo.SizeSlider = class {
    * サイズスライダーを初期化
    * @param {string} elementID - 要素のID
    * @param {any} [params] - パラメータ
-   * @returns {Neo.SizeSlider} - 初期化されたサイズスライダー
+   * @returns {SizeSlider} - 初期化されたサイズスライダー
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -11823,7 +11851,7 @@ Neo.SizeSlider = class {
       this.slider.style.backgroundColor = Neo.painter.foregroundColor;
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -11831,9 +11859,9 @@ Neo.SizeSlider = class {
   -------------------------------------------------------------------------
 */
 
-Neo.LayerControl = class {
+export class LayerControl {
   constructor() {
-    /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
+    /** @type {((LayerControl: LayerControl) => void) | null} */
     this.onmousedown = null;
     /** @type {HTMLElement|null}*/
     this.bg = null;
@@ -11859,7 +11887,7 @@ Neo.LayerControl = class {
    * レイヤーコントローラーを初期化
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.LayerControl|null}
+   * @returns {LayerControl|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -11958,17 +11986,17 @@ Neo.LayerControl = class {
       this.line1.style.display = Neo.painter.visible[1] ? "none" : "block";
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
     ReserveControl
   -------------------------------------------------------------------------
 */
-/** @type {Neo.ReserveControl[]} */
+/** @type {ReserveControl[]} */
 Neo.reserveControls = [];
 
-Neo.ReserveControl = class {
+export class ReserveControl {
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -11985,7 +12013,7 @@ Neo.ReserveControl = class {
    * リバースコントローラーを初期化
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ReserveControl|null}
+   * @returns {ReserveControl|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -12080,7 +12108,7 @@ Neo.ReserveControl = class {
     }
     this.element.style.backgroundColor = this.reserve.color;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -12088,12 +12116,12 @@ Neo.ReserveControl = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {Neo.ScrollBarButton|null} */
+/** @type {ScrollBarButton|null} */
 Neo.scrollH = null;
-/** @type {Neo.ScrollBarButton|null} */
+/** @type {ScrollBarButton|null} */
 Neo.scrollV = null;
 
-Neo.ScrollBarButton = class {
+export class ScrollBarButton {
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -12108,7 +12136,7 @@ Neo.ScrollBarButton = class {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
+   * @returns {ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -12133,7 +12161,7 @@ Neo.ScrollBarButton = class {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @returns {void|null} 更新成功時は void、失敗時は null
    */
   update(oe) {
@@ -12159,14 +12187,14 @@ Neo.ScrollBarButton = class {
       this.barButton.style.top = Math.floor(barY) + "px";
     }
   }
-};
+}
 /*
   -------------------------------------------------------------------------
     ViewerButton
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton = class extends Neo.Button {
+export class ViewerButton extends Button {
   static speedStrings = ["最", "早", "既", "鈍"];
   static minus =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";
@@ -12195,7 +12223,7 @@ Neo.ViewerButton = class extends Neo.Button {
    *
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ViewerButton|null}
+   * @returns {ViewerButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
@@ -12248,7 +12276,7 @@ Neo.ViewerButton = class extends Neo.Button {
       }
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -12259,7 +12287,7 @@ Neo.ViewerButton = class extends Neo.Button {
 // length/mark/count
 // update
 
-Neo.ViewerBar = class {
+export class ViewerBar {
   constructor() {
     /** @type {any} */
     this.params = null;
@@ -12282,7 +12310,7 @@ Neo.ViewerBar = class {
    *
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ViewerBar}
+   * @returns {ViewerBar}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -12380,7 +12408,7 @@ Neo.ViewerBar = class {
 
     Neo.painter.onmark();
   }
-};
+}
 
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
 // This work is free. You can redistribute it and/or modify it

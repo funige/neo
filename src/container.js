@@ -1,7 +1,10 @@
 "use strict";
 import { Commands } from "./commands.js";
+import { Painter } from "./painter.js";
 //@ts-check
 document.addEventListener("DOMContentLoaded", () => {
+  window.Neo = Neo;
+
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
       Neo.start();
@@ -23,7 +26,7 @@ var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore
-/** @type {Neo.Painter} */
+/** @type {Painter} */
 Neo.painter;
 
 Neo.fullScreen = false;
@@ -262,7 +265,7 @@ Neo.init2 = function () {
     Neo.center.style.minWidth = "397px";
   }
 
-  Neo.painter = new Neo.Painter();
+  Neo.painter = new Painter();
   Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
   Neo.container.oncontextmenu = function () {
