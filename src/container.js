@@ -1,4 +1,5 @@
 "use strict";
+import { Commands } from "./commands.js";
 //@ts-check
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
@@ -1072,34 +1073,40 @@ Neo.initComponents = function () {
 };
 
 Neo.initButtons = function () {
+  const commands = new Neo.Commands();
   const neo_undo = new Neo.Button().init("neo-undo");
   if (neo_undo) {
     neo_undo.onmouseup = function () {
-      new Neo.UndoCommand(Neo.painter).execute();
+      commands.UndoCommand = new Neo.UndoCommand(Neo.painter);
+      commands.UndoCommand.execute();
     };
   }
   const neo_redo = new Neo.Button().init("neo-redo");
   if (neo_redo) {
     neo_redo.onmouseup = function () {
-      new Neo.RedoCommand(Neo.painter).execute();
+      commands.RedoCommand = new Neo.RedoCommand(Neo.painter);
+      commands.RedoCommand.execute();
     };
   }
   const neo_window = new Neo.Button().init("neo-window");
   if (neo_window) {
     neo_window.onmouseup = function () {
-      new Neo.WindowCommand(Neo.painter).execute();
+      commands.WindowCommand = new Neo.WindowCommand(Neo.painter);
+      commands.WindowCommand.execute();
     };
   }
   const neo_copyright = new Neo.Button().init("neo-copyright");
   if (neo_copyright) {
     neo_copyright.onmouseup = function () {
-      new Neo.CopyrightCommand(Neo.painter).execute();
+      commands.CopyrightCommand = new Neo.CopyrightCommand(Neo.painter);
+      commands.CopyrightCommand.execute();
     };
   }
   const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
   if (neo_zoomPlus) {
     neo_zoomPlus.onmouseup = function () {
-      new Neo.ZoomPlusCommand(Neo.painter).execute();
+      commands.ZoomPlusCommand = new Neo.ZoomPlusCommand(Neo.painter);
+      commands.ZoomPlusCommand.execute();
     };
   }
   const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
@@ -1115,7 +1122,8 @@ Neo.initButtons = function () {
   }
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton?.disable(5000);
-    new Neo.SubmitCommand(Neo.painter).execute();
+    commands.SubmitCommand = new Neo.SubmitCommand(Neo.painter);
+    commands.SubmitCommand.execute();
   };
 
   Neo.fillButton = new Neo.FillButton().init("neo-fill");
@@ -2076,3 +2084,5 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  *
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
+
+export { Neo };

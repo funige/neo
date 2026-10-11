@@ -1,4 +1,6 @@
 "use strict";
+import { Neo } from "./container.js";
+import { translate } from "./dictionary.js";
 //@ts-check
 /*
   -----------------------------------------------------------------------
@@ -6,7 +8,7 @@
   -----------------------------------------------------------------------
 */
 
-Neo.ActionManager = class {
+export class ActionManager {
   constructor() {
     /** @type {Array<Array<any>>} */
     this._items = [];
@@ -981,7 +983,7 @@ Neo.ActionManager = class {
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
-};
+}
 
 /*
   -----------------------------------------------------------------------
@@ -1016,7 +1018,7 @@ Neo.createViewer = function (applet) {
     "</div>";
 
   neo.innerHTML = html.replace(/\[(.*?)\]/g, function (match, str) {
-    return Neo.translate(str);
+    return translate(str);
   });
 
   var parent = applet.parentNode;

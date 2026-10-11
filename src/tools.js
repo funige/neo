@@ -1,7 +1,7 @@
 "use strict";
 //@ts-check
 
-Neo.ToolBase = class {
+export class ToolBase {
   constructor() {
     this.startX = 0;
     this.startY = 0;
@@ -157,7 +157,7 @@ Neo.ToolBase = class {
       reserve.size = Neo.painter.lineWidth;
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -165,7 +165,7 @@ Neo.ToolBase = class {
   -------------------------------------------------------------------------
 */
 
-Neo.DrawToolBase = class extends Neo.ToolBase {
+export class DrawToolBase extends ToolBase {
   constructor() {
     super();
     this.x0 = 0;
@@ -393,12 +393,14 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     var y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
 
-    if (!(
-      x > -r &&
-      y > -r &&
-      x < oe.destCanvas.width + r &&
-      y < oe.destCanvas.height + r
-    ))
+    if (
+      !(
+        x > -r &&
+        y > -r &&
+        x < oe.destCanvas.width + r &&
+        y < oe.destCanvas.height + r
+      )
+    )
       return;
 
     var ctx = oe.destCanvasCtx;
@@ -719,7 +721,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
     );
     ctx.restore();
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -727,7 +729,7 @@ Neo.DrawToolBase = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.PenTool = class extends Neo.DrawToolBase {
+export class PenTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -743,7 +745,7 @@ Neo.PenTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -751,7 +753,7 @@ Neo.PenTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BrushTool = class extends Neo.DrawToolBase {
+export class BrushTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -772,7 +774,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
     var alpha = 241 - Math.floor(Neo.painter.lineWidth / 2) * 6;
     return alpha / 255.0;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -780,7 +782,7 @@ Neo.BrushTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.ToneTool = class extends Neo.DrawToolBase {
+export class ToneTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -796,7 +798,7 @@ Neo.ToneTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -804,14 +806,14 @@ Neo.ToneTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EraserTool = class extends Neo.DrawToolBase {
+export class EraserTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
     this.type = Neo.Painter.TOOLTYPE_ERASER;
     this.lineType = Neo.Painter.LINETYPE_ERASER;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -819,7 +821,7 @@ Neo.EraserTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BlurTool = class extends Neo.DrawToolBase {
+export class BlurTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -835,7 +837,7 @@ Neo.BlurTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -843,7 +845,7 @@ Neo.BlurTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.DodgeTool = class extends Neo.DrawToolBase {
+export class DodgeTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -859,7 +861,7 @@ Neo.DodgeTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -867,7 +869,7 @@ Neo.DodgeTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BurnTool = class extends Neo.DrawToolBase {
+export class BurnTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -883,7 +885,7 @@ Neo.BurnTool = class extends Neo.DrawToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -891,7 +893,7 @@ Neo.BurnTool = class extends Neo.DrawToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.HandTool = class extends Neo.ToolBase {
+export class HandTool extends ToolBase {
   constructor() {
     super();
     this.latestX = 0;
@@ -964,7 +966,7 @@ Neo.HandTool = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOutHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -972,7 +974,7 @@ Neo.HandTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.SliderTool = class extends Neo.ToolBase {
+export class SliderTool extends ToolBase {
   constructor() {
     super();
     this.target = /**@type {any} **/ (null);
@@ -1048,7 +1050,7 @@ Neo.SliderTool = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOutHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1056,7 +1058,7 @@ Neo.SliderTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.FillTool = class extends Neo.ToolBase {
+export class FillTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1088,7 +1090,7 @@ Neo.FillTool = class extends Neo.ToolBase {
   upMoveHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOverHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1096,7 +1098,7 @@ Neo.FillTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EraseAllTool = class extends Neo.ToolBase {
+export class EraseAllTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1124,7 +1126,7 @@ Neo.EraseAllTool = class extends Neo.ToolBase {
   upMoveHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOverHandler(oe) {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1132,7 +1134,7 @@ Neo.EraseAllTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EffectToolBase = class extends Neo.ToolBase {
+export class EffectToolBase extends ToolBase {
   constructor() {
     super();
     this.startX = 0;
@@ -1256,7 +1258,7 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1264,7 +1266,7 @@ Neo.EffectToolBase = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EraseRectTool = class extends Neo.EffectToolBase {
+export class EraseRectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1286,7 +1288,7 @@ Neo.EraseRectTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.eraseRect2(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1294,7 +1296,7 @@ Neo.EraseRectTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.FlipHTool = class extends Neo.EffectToolBase {
+export class FlipHTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1315,7 +1317,7 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.flipH(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1323,7 +1325,7 @@ Neo.FlipHTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.FlipVTool = class extends Neo.EffectToolBase {
+export class FlipVTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1344,7 +1346,7 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.flipV(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1352,7 +1354,7 @@ Neo.FlipVTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.BlurRectTool = class extends Neo.EffectToolBase {
+export class BlurRectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1382,7 +1384,7 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1390,7 +1392,7 @@ Neo.BlurRectTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.TurnTool = class extends Neo.EffectToolBase {
+export class TurnTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1426,7 +1428,7 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }, 10);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1434,7 +1436,7 @@ Neo.TurnTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.MergeTool = class extends Neo.EffectToolBase {
+export class MergeTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1455,7 +1457,7 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.merge(x, y, width, height);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1463,7 +1465,7 @@ Neo.MergeTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.CopyTool = class extends Neo.EffectToolBase {
+export class CopyTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1488,7 +1490,7 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
     oe.pasteTool.width = width;
     oe.pasteTool.height = height;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1496,7 +1498,7 @@ Neo.CopyTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.PasteTool = class extends Neo.ToolBase {
+export class PasteTool extends ToolBase {
   constructor() {
     super();
     this.x = 0;
@@ -1591,7 +1593,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
     oe.drawXORRect(ctx, x, y, width, height);
     ctx.restore();
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1599,7 +1601,7 @@ Neo.PasteTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.RectTool = class extends Neo.EffectToolBase {
+export class RectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1621,7 +1623,7 @@ Neo.RectTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1629,7 +1631,7 @@ Neo.RectTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.RectFillTool = class extends Neo.EffectToolBase {
+export class RectFillTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1650,7 +1652,7 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1658,7 +1660,7 @@ Neo.RectFillTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EllipseTool = class extends Neo.EffectToolBase {
+export class EllipseTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1680,7 +1682,7 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1688,7 +1690,7 @@ Neo.EllipseTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.EllipseFillTool = class extends Neo.EffectToolBase {
+export class EllipseFillTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1711,7 +1713,7 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.fill(x, y, width, height, this.type);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1719,7 +1721,7 @@ Neo.EllipseFillTool = class extends Neo.EffectToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.TextTool = class extends Neo.ToolBase {
+export class TextTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1824,7 +1826,7 @@ Neo.TextTool = class extends Neo.ToolBase {
       Neo.updateUI();
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1832,7 +1834,7 @@ Neo.TextTool = class extends Neo.ToolBase {
   -------------------------------------------------------------------------
 */
 
-Neo.DummyTool = class extends Neo.ToolBase {
+export class DummyTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
@@ -1854,4 +1856,4 @@ Neo.DummyTool = class extends Neo.ToolBase {
   rollOverHandler(oe) {}
   /** @param {Neo.Painter} oe */
   rollOutHandler(oe) {}
-};
+}

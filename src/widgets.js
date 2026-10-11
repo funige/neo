@@ -1,4 +1,5 @@
 "use strict";
+import { Neo } from "./container.js";
 //@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -23,7 +24,7 @@ Neo.getModifier = function (e) {
   -------------------------------------------------------------------------
 */
 
-Neo.Button = class {
+export class Button {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -36,19 +37,19 @@ Neo.Button = class {
     this.disable = function (wait) {};
     this.enable = function () {};
 
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmousedown = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseup = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseover = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseout = null;
   }
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Button|null}
+   * @returns {Button|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -132,7 +133,7 @@ Neo.Button = class {
 
     if (this.params.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
-        const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+        const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
       }
       Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
@@ -175,7 +176,7 @@ Neo.Button = class {
   }
 
   update() {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -183,7 +184,7 @@ Neo.Button = class {
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton = class extends Neo.Button {
+export class RightButton extends Button {
   constructor() {
     super();
     /** @type {any} */
@@ -195,7 +196,7 @@ Neo.RightButton = class extends Neo.Button {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @return {Neo.RightButton|null}
+   * @return {RightButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
@@ -235,7 +236,7 @@ Neo.RightButton = class extends Neo.Button {
     const right = Neo.rightButton;
     right?.setSelected(false);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -243,7 +244,7 @@ Neo.RightButton = class extends Neo.Button {
   -------------------------------------------------------------------------
 */
 
-Neo.FillButton = class extends Neo.Button {
+export class FillButton extends Neo.Button {
   constructor() {
     super();
   }
@@ -251,14 +252,14 @@ Neo.FillButton = class extends Neo.Button {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.FillButton|null}
+   * @returns {FillButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
     this.params.type = "fill";
     return this;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -266,10 +267,9 @@ Neo.FillButton = class extends Neo.Button {
   -------------------------------------------------------------------------
 */
 
-/** @typedef {Neo.ColorTip} ColorTip */
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
-Neo.ColorTip = class {
+export class ColorTip {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -279,13 +279,13 @@ Neo.ColorTip = class {
     this.selected = false;
     this.isMouseDown = false;
     this.color = "";
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmousedown = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseup = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseover = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseout = null;
   }
 
@@ -440,7 +440,7 @@ Neo.ColorTip = class {
     this.element.style.backgroundColor = color;
   }
   /**
-   * @returns {Neo.ColorTip|null}
+   * @returns {ColorTip|null}
    */
   static getCurrent() {
     for (var i = 0; i < Neo.colorTips.length; i++) {
@@ -449,7 +449,7 @@ Neo.ColorTip = class {
     }
     return null;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -457,10 +457,10 @@ Neo.ColorTip = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {(Neo.FillButton|Neo.ToolTip)[]} */
+/** @type {(FillButton|ToolTip)[]} */
 Neo.toolButtons = [];
 
-Neo.ToolTip = class {
+export class ToolTip {
   static bezier =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
   static blur =
@@ -510,13 +510,13 @@ Neo.ToolTip = class {
     this.elementID = "";
     this.mode = 0;
     this.isMouseDown = false;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmousedown = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseup = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseover = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseout = null;
     this.selected = false;
     this.isTool = false;
@@ -538,7 +538,7 @@ Neo.ToolTip = class {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ToolTip|null}
+   * @returns {ToolTip|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -609,7 +609,7 @@ Neo.ToolTip = class {
     if (this.isTool) {
       if (this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+          const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
           toolTip.setSelected(this === toolTip);
         }
       } else {
@@ -728,7 +728,7 @@ Neo.ToolTip = class {
     ctx.drawImage(img, x, y);
     Neo.tintImage(ctx, c);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -736,7 +736,7 @@ Neo.ToolTip = class {
   -------------------------------------------------------------------------
 */
 
-Neo.PenTip = class extends Neo.ToolTip {
+export class PenTip extends ToolTip {
   constructor() {
     super();
     this.isTool = true;
@@ -758,7 +758,7 @@ Neo.PenTip = class extends Neo.ToolTip {
    * 鉛筆･水彩･テキスト
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.PenTip|null}
+   * @returns {PenTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -781,7 +781,7 @@ Neo.PenTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -789,7 +789,7 @@ Neo.PenTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.Pen2Tip = class extends Neo.ToolTip {
+export class Pen2Tip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -817,7 +817,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
    * トーン･ぼかし･覆い焼き･焼き込み
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Pen2Tip|null}
+   * @returns {Pen2Tip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -900,7 +900,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
 
     this.prevMode = this.mode;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -908,7 +908,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.EraserTip = class extends Neo.ToolTip {
+export class EraserTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -933,7 +933,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
    * 消しペン･消し四角･全消し
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.EraserTip|null}
+   * @returns {EraserTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -983,7 +983,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
     };
     img.src = Neo.ToolTip.eraser;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -991,7 +991,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.EffectTip = class extends Neo.ToolTip {
+export class EffectTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -1022,7 +1022,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
    * 四角･線四角･楕円･線楕円
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.EffectTip|null}
+   * @returns {EffectTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -1047,7 +1047,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1055,7 +1055,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.Effect2Tip = class extends Neo.ToolTip {
+export class Effect2Tip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -1092,7 +1092,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
    * コピー･レイヤー結合･角取り･左右反転･上下反転･傾け
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Effect2Tip|null}
+   * @returns {Effect2Tip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -1123,7 +1123,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1131,11 +1131,11 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.MaskTip = class extends Neo.ToolTip {
+export class MaskTip extends ToolTip {
   constructor() {
     super();
     this.isMouseDown = false;
-    /** @type {((MaskTip: Neo.MaskTip) => void) | null} */
+    /** @type {((MaskTip: MaskTip) => void) | null} */
     this.onmousedown = null;
     /** @type {HTMLCanvasElement|null} */
     this.canvas = null;
@@ -1148,7 +1148,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
    * 通常･マスク･逆マスク･加算･逆加算
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.MaskTip|null}
+   * @returns {MaskTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -1211,7 +1211,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     ctx.fillStyle = c;
     ctx.fillRect(1, 1, 43, 9);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1219,7 +1219,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.DrawTip = class extends Neo.ToolTip {
+export class DrawTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -1237,7 +1237,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
    * 手書き･直線･BZ曲線
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.DrawTip|null}
+   * @returns {DrawTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
@@ -1277,7 +1277,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1285,10 +1285,10 @@ Neo.DrawTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-/** @type {(Neo.ColorSlider|Neo.SizeSlider)[]} */
+/** @type {(ColorSlider|SizeSlider)[]} */
 Neo.sliders = [];
 
-Neo.ColorSlider = class {
+export class ColorSlider {
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -1318,7 +1318,7 @@ Neo.ColorSlider = class {
    * カラースライダーを初期化
    * @param {string} elementID
    * @param {any} [params]
-   * @returns {Neo.ColorSlider}
+   * @returns {ColorSlider}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1497,7 +1497,7 @@ Neo.ColorSlider = class {
       this.label.innerHTML = this.prefix + this.value.toFixed(0);
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1505,7 +1505,7 @@ Neo.ColorSlider = class {
   -------------------------------------------------------------------------
 */
 
-Neo.SizeSlider = class {
+export class SizeSlider {
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -1535,7 +1535,7 @@ Neo.SizeSlider = class {
    * サイズスライダーを初期化
    * @param {string} elementID - 要素のID
    * @param {any} [params] - パラメータ
-   * @returns {Neo.SizeSlider} - 初期化されたサイズスライダー
+   * @returns {SizeSlider} - 初期化されたサイズスライダー
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1674,7 +1674,7 @@ Neo.SizeSlider = class {
       this.slider.style.backgroundColor = Neo.painter.foregroundColor;
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1682,9 +1682,9 @@ Neo.SizeSlider = class {
   -------------------------------------------------------------------------
 */
 
-Neo.LayerControl = class {
+export class LayerControl {
   constructor() {
-    /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
+    /** @type {((LayerControl: LayerControl) => void) | null} */
     this.onmousedown = null;
     /** @type {HTMLElement|null}*/
     this.bg = null;
@@ -1710,7 +1710,7 @@ Neo.LayerControl = class {
    * レイヤーコントローラーを初期化
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.LayerControl|null}
+   * @returns {LayerControl|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1809,17 +1809,17 @@ Neo.LayerControl = class {
       this.line1.style.display = Neo.painter.visible[1] ? "none" : "block";
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
     ReserveControl
   -------------------------------------------------------------------------
 */
-/** @type {Neo.ReserveControl[]} */
+/** @type {ReserveControl[]} */
 Neo.reserveControls = [];
 
-Neo.ReserveControl = class {
+export class ReserveControl {
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -1836,7 +1836,7 @@ Neo.ReserveControl = class {
    * リバースコントローラーを初期化
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ReserveControl|null}
+   * @returns {ReserveControl|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1931,7 +1931,7 @@ Neo.ReserveControl = class {
     }
     this.element.style.backgroundColor = this.reserve.color;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1939,12 +1939,12 @@ Neo.ReserveControl = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {Neo.ScrollBarButton|null} */
+/** @type {ScrollBarButton|null} */
 Neo.scrollH = null;
-/** @type {Neo.ScrollBarButton|null} */
+/** @type {ScrollBarButton|null} */
 Neo.scrollV = null;
 
-Neo.ScrollBarButton = class {
+export class ScrollBarButton {
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -1959,7 +1959,7 @@ Neo.ScrollBarButton = class {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
+   * @returns {ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1984,7 +1984,7 @@ Neo.ScrollBarButton = class {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @returns {void|null} 更新成功時は void、失敗時は null
    */
   update(oe) {
@@ -2010,14 +2010,14 @@ Neo.ScrollBarButton = class {
       this.barButton.style.top = Math.floor(barY) + "px";
     }
   }
-};
+}
 /*
   -------------------------------------------------------------------------
     ViewerButton
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton = class extends Neo.Button {
+export class ViewerButton extends Button {
   static speedStrings = ["最", "早", "既", "鈍"];
   static minus =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";
@@ -2046,7 +2046,7 @@ Neo.ViewerButton = class extends Neo.Button {
    *
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ViewerButton|null}
+   * @returns {ViewerButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
@@ -2099,7 +2099,7 @@ Neo.ViewerButton = class extends Neo.Button {
       }
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -2110,7 +2110,7 @@ Neo.ViewerButton = class extends Neo.Button {
 // length/mark/count
 // update
 
-Neo.ViewerBar = class {
+export class ViewerBar {
   constructor() {
     /** @type {any} */
     this.params = null;
@@ -2133,7 +2133,7 @@ Neo.ViewerBar = class {
    *
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ViewerBar}
+   * @returns {ViewerBar}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -2231,4 +2231,4 @@ Neo.ViewerBar = class {
 
     Neo.painter.onmark();
   }
-};
+}

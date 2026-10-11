@@ -1,9 +1,38 @@
 "use strict";
 //@ts-check
-
+import { Neo } from "./container.js";
+import { ActionManager } from "./actions.js";
+import {
+  ToolBase,
+  PenTool,
+  EraserTool,
+  HandTool,
+  FillTool,
+  EraseAllTool,
+  EraseRectTool,
+  CopyTool,
+  PasteTool,
+  MergeTool,
+  FlipHTool,
+  FlipVTool,
+  BrushTool,
+  TextTool,
+  ToneTool,
+  BlurTool,
+  DodgeTool,
+  BurnTool,
+  SliderTool,
+  DummyTool,
+  RectTool,
+  RectFillTool,
+  EllipseTool,
+  EllipseFillTool,
+  BlurRectTool,
+  TurnTool,
+} from "./tools.js";
 Neo.CurrentToolType = 1;
 
-Neo.Painter = class {
+export class Painter {
   static LINETYPE_NONE = 0;
   static LINETYPE_PEN = 1;
   static LINETYPE_ERASER = 2;
@@ -58,8 +87,8 @@ Neo.Painter = class {
 
   constructor() {
     this._undoMgr = new Neo.UndoManager(50);
-    /** @type {Neo.ActionManager} */
-    this._actionMgr = new Neo.ActionManager();
+    /** @type {ActionManager} */
+    this._actionMgr = new ActionManager();
     this.clipMouseX = 0;
     this.clipMouseY = 0;
     this.scrollBarX = 0;
@@ -85,7 +114,7 @@ Neo.Painter = class {
     /** @type {HTMLElement|null} */
     this.container = null;
 
-    this.tool = /** @type {Neo.ToolBase} */ ({});
+    this.tool = /** @type {ToolBase} */ ({});
     /** @type {HTMLElement|null} */
     this.inputText = null;
     /** @type {number[]|null} */
@@ -171,58 +200,33 @@ Neo.Painter = class {
     this.busySkipped = false;
 
     this.touchlength = 0;
-    /**@type {Neo.PenTool} */
     this.penTool;
-    /**@type {Neo.EraserTool} */
     this.eraserTool;
-    /**@type {Neo.HandTool} */
     this.handTool;
-    /**@type {Neo.FillTool} */
     this.fillTool;
-    /**@type {Neo.EraseAllTool} */
     this.eraseAllTool;
-    /**@type {Neo.EraseRectTool} */
     this.eraseRectTool;
 
-    /**@type {Neo.CopyTool} */
     this.copyTool;
-    /**@type {Neo.PasteTool} */
     this.pasteTool;
-    /**@type {Neo.MergeTool} */
     this.mergeTool;
-    /**@type {Neo.FlipHTool} */
     this.flipHTool;
-    /**@type {Neo.FlipVTool} */
     this.flipVTool;
 
-    /**@type {Neo.BrushTool} */
     this.brushTool;
-    /**@type {Neo.TextTool} */
     this.textTool;
-    /**@type {Neo.ToneTool} */
     this.toneTool;
-    /**@type {Neo.BlurTool} */
     this.blurTool;
-    /**@type {Neo.DodgeTool} */
     this.dodgeTool;
-    /**@type {Neo.BurnTool} */
     this.burnTool;
-    /**@type {Neo.SliderTool} */
     this.sliderTool;
-    /**@type {Neo.DummyTool} */
     this.dummyTool;
 
-    /**@type {Neo.RectTool} */
     this.rectTool;
-    /**@type {Neo.RectFillTool} */
     this.rectFillTool;
-    /**@type {Neo.EllipseTool} */
     this.ellipseTool;
-    /**@type {Neo.EllipseFillTool} */
     this.ellipseFillTool;
-    /**@type {Neo.BlurRectTool} */
     this.blurRectTool;
-    /**@type {Neo.TurnTool} */
     this.turnTool;
   }
 
@@ -271,8 +275,8 @@ Neo.Painter = class {
     if (this.tool && this.tool.kill) {
       this.tool.kill();
     }
-    this.tool = /**@type {Neo.ToolBase} */ (tool);
-    /**@type {Neo.ToolBase} */ (tool).init(this);
+    this.tool = /**@type {ToolBase} */ (tool);
+    /**@type {ToolBase} */ (tool).init(this);
     if (this.tool && this.tool.loadStates) this.tool.loadStates();
   }
 
@@ -286,8 +290,8 @@ Neo.Painter = class {
    */
   pushTool(tool) {
     this.toolStack.push(this.tool);
-    this.tool = /**@type {Neo.ToolBase} */ (tool);
-    /**@type {Neo.ToolBase} */ (tool).init(this);
+    this.tool = /**@type {ToolBase} */ (tool);
+    /**@type {ToolBase} */ (tool).init(this);
   }
 
   /**
@@ -310,7 +314,7 @@ Neo.Painter = class {
    * ツールがスライダー等の設定変更中である場合、スタックの最上位にある
    * 以前のツール（ペイントツール等）を優先的に返すことで、
    * 現在の操作文脈を正しく取得する。
-   * @returns {Neo.ToolBase|null} 現在のツールインスタンス、またはnull
+   * @returns {ToolBase|null} 現在のツールインスタンス、またはnull
    */
   getCurrentTool() {
     if (this.tool) {
@@ -689,35 +693,35 @@ Neo.Painter = class {
   }
 
   _initTools() {
-    this.penTool = new Neo.PenTool();
-    this.eraserTool = new Neo.EraserTool();
-    this.handTool = new Neo.HandTool();
-    this.fillTool = new Neo.FillTool();
-    this.eraseAllTool = new Neo.EraseAllTool();
-    this.eraseRectTool = new Neo.EraseRectTool();
+    this.penTool = new PenTool();
+    this.eraserTool = new EraserTool();
+    this.handTool = new HandTool();
+    this.fillTool = new FillTool();
+    this.eraseAllTool = new EraseAllTool();
+    this.eraseRectTool = new EraseRectTool();
 
-    this.copyTool = new Neo.CopyTool();
-    this.pasteTool = new Neo.PasteTool();
-    this.mergeTool = new Neo.MergeTool();
-    this.flipHTool = new Neo.FlipHTool();
-    this.flipVTool = new Neo.FlipVTool();
+    this.copyTool = new CopyTool();
+    this.pasteTool = new PasteTool();
+    this.mergeTool = new MergeTool();
+    this.flipHTool = new FlipHTool();
+    this.flipVTool = new FlipVTool();
 
-    this.brushTool = new Neo.BrushTool();
-    this.textTool = new Neo.TextTool();
-    this.toneTool = new Neo.ToneTool();
-    this.blurTool = new Neo.BlurTool();
-    this.dodgeTool = new Neo.DodgeTool();
-    this.burnTool = new Neo.BurnTool();
+    this.brushTool = new BrushTool();
+    this.textTool = new TextTool();
+    this.toneTool = new ToneTool();
+    this.blurTool = new BlurTool();
+    this.dodgeTool = new DodgeTool();
+    this.burnTool = new BurnTool();
 
-    this.rectTool = new Neo.RectTool();
-    this.rectFillTool = new Neo.RectFillTool();
-    this.ellipseTool = new Neo.EllipseTool();
-    this.ellipseFillTool = new Neo.EllipseFillTool();
-    this.blurRectTool = new Neo.BlurRectTool();
-    this.turnTool = new Neo.TurnTool();
+    this.rectTool = new RectTool();
+    this.rectFillTool = new RectFillTool();
+    this.ellipseTool = new EllipseTool();
+    this.ellipseFillTool = new EllipseFillTool();
+    this.blurRectTool = new BlurRectTool();
+    this.turnTool = new TurnTool();
 
-    this.sliderTool = new Neo.SliderTool();
-    this.dummyTool = new Neo.DummyTool();
+    this.sliderTool = new SliderTool();
+    this.dummyTool = new DummyTool();
   }
 
   hideInputText() {
@@ -4211,12 +4215,12 @@ Neo.Painter = class {
   isDirty() {
     return this.dirty;
   }
-};
+}
 
 /**
  * キャンバスの状態を保持するUndo/Redo用のクラス
  */
-Neo.UndoItem = class {
+export class UndoItem {
   /**
    * @param {ImageData[]} [data]
    * @param {number} [x]
@@ -4231,7 +4235,7 @@ Neo.UndoItem = class {
     this.width = width;
     this.height = height;
   }
-};
+}
 
 /*
    -------------------------------------------------------------------------
@@ -4246,15 +4250,15 @@ Neo.UndoItem = class {
  * 最大ステップ数（_maxStep）を設定することで、メモリの肥大化を抑制しつつ
  * ユーザーの操作履歴を安全に管理する。
  */
-Neo.UndoManager = class {
+export class UndoManager {
   /**
    * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
    */
   constructor(_maxStep) {
     this._maxStep = _maxStep;
-    /** @type {Neo.UndoItem[]} */
+    /** @type {UndoItem[]} */
     this._undoItems = [];
-    /** @type {Neo.UndoItem[]} */
+    /** @type {UndoItem[]} */
     this._redoItems = [];
   }
 
@@ -4265,7 +4269,7 @@ Neo.UndoManager = class {
    * 2. 最大ステップ数を超えた場合、最も古い履歴を削除してメモリを解放する。
    * 3. 新しい操作が行われた場合、それ以降の「やり直し（Redo）」履歴をクリアし、
    * 操作の分岐点を明確にする。
-   * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
+   * @param {UndoItem} undoItem - 保存するキャンバスの状態データ
    * @param {boolean} holdRedo - Redo履歴を保持するかどうか
    * @returns {void}
    */
@@ -4290,7 +4294,7 @@ Neo.UndoManager = class {
    * @description
    * Undo操作によってスタックから取り出された状態を Redo 履歴に保存して
    * Undoした状態からRedoできるようにする。
-   * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
+   * @param {UndoItem} undoItem - 保存するキャンバスの状態データ
    */
   pushRedo(undoItem) {
     this._redoItems.push(undoItem);
@@ -4299,7 +4303,7 @@ Neo.UndoManager = class {
   popRedo() {
     return this._redoItems.pop();
   }
-};
+}
 /**
  * カラーピッカーで色をセット
  * @param {string} color - <input type="color">で取得した色
