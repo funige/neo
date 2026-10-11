@@ -30,8 +30,7 @@ import {
   BlurRectTool,
   TurnTool,
 } from "./tools.js";
-import { LZString } from "./lz-string.js";
-
+import LZString from "lz-string";
 Neo.CurrentToolType = 1;
 
 export class Painter {
@@ -322,7 +321,7 @@ export class Painter {
     if (this.tool) {
       var tool = this.tool;
       // スライダー操作中はスタックから直前のツールを参照する
-      if (tool && tool.type == Neo.Painter.TOOLTYPE_SLIDER) {
+      if (tool && tool.type == Painter.TOOLTYPE_SLIDER) {
         var stack = this.toolStack;
         if (stack.length > 0) {
           tool = stack[stack.length - 1];
@@ -337,80 +336,80 @@ export class Painter {
    * ツールタイプに基づいてアクティブなツールを切り替える。
    * @description
    * ツールタイプ（ID）から対応するインスタンスを特定し、セットする。
-   * @param {number|string} toolType - Neo.Painter.TOOLTYPE_xxx で定義されたツールID
+   * @param {number|string} toolType - Painter.TOOLTYPE_xxx で定義されたツールID
    */
   setToolByType(toolType) {
     switch (parseInt(String(toolType))) {
-      case Neo.Painter.TOOLTYPE_PEN:
+      case Painter.TOOLTYPE_PEN:
         this.setTool(this.penTool);
         break;
-      case Neo.Painter.TOOLTYPE_ERASER:
+      case Painter.TOOLTYPE_ERASER:
         this.setTool(this.eraserTool);
         break;
-      case Neo.Painter.TOOLTYPE_HAND:
+      case Painter.TOOLTYPE_HAND:
         this.setTool(this.handTool);
         break;
-      case Neo.Painter.TOOLTYPE_FILL:
+      case Painter.TOOLTYPE_FILL:
         this.setTool(this.fillTool);
         break;
-      case Neo.Painter.TOOLTYPE_ERASEALL:
+      case Painter.TOOLTYPE_ERASEALL:
         this.setTool(this.eraseAllTool);
         break;
-      case Neo.Painter.TOOLTYPE_ERASERECT:
+      case Painter.TOOLTYPE_ERASERECT:
         this.setTool(this.eraseRectTool);
         break;
 
-      case Neo.Painter.TOOLTYPE_COPY:
+      case Painter.TOOLTYPE_COPY:
         this.setTool(this.copyTool);
         break;
-      case Neo.Painter.TOOLTYPE_PASTE:
+      case Painter.TOOLTYPE_PASTE:
         this.setTool(this.pasteTool);
         break;
-      case Neo.Painter.TOOLTYPE_MERGE:
+      case Painter.TOOLTYPE_MERGE:
         this.setTool(this.mergeTool);
         break;
-      case Neo.Painter.TOOLTYPE_FLIP_H:
+      case Painter.TOOLTYPE_FLIP_H:
         this.setTool(this.flipHTool);
         break;
-      case Neo.Painter.TOOLTYPE_FLIP_V:
+      case Painter.TOOLTYPE_FLIP_V:
         this.setTool(this.flipVTool);
         break;
 
-      case Neo.Painter.TOOLTYPE_BRUSH:
+      case Painter.TOOLTYPE_BRUSH:
         this.setTool(this.brushTool);
         break;
-      case Neo.Painter.TOOLTYPE_TEXT:
+      case Painter.TOOLTYPE_TEXT:
         this.setTool(this.textTool);
         break;
-      case Neo.Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_TONE:
         this.setTool(this.toneTool);
         break;
-      case Neo.Painter.TOOLTYPE_BLUR:
+      case Painter.TOOLTYPE_BLUR:
         this.setTool(this.blurTool);
         break;
-      case Neo.Painter.TOOLTYPE_DODGE:
+      case Painter.TOOLTYPE_DODGE:
         this.setTool(this.dodgeTool);
         break;
-      case Neo.Painter.TOOLTYPE_BURN:
+      case Painter.TOOLTYPE_BURN:
         this.setTool(this.burnTool);
         break;
 
-      case Neo.Painter.TOOLTYPE_RECT:
+      case Painter.TOOLTYPE_RECT:
         this.setTool(this.rectTool);
         break;
-      case Neo.Painter.TOOLTYPE_RECTFILL:
+      case Painter.TOOLTYPE_RECTFILL:
         this.setTool(this.rectFillTool);
         break;
-      case Neo.Painter.TOOLTYPE_ELLIPSE:
+      case Painter.TOOLTYPE_ELLIPSE:
         this.setTool(this.ellipseTool);
         break;
-      case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+      case Painter.TOOLTYPE_ELLIPSEFILL:
         this.setTool(this.ellipseFillTool);
         break;
-      case Neo.Painter.TOOLTYPE_BLURRECT:
+      case Painter.TOOLTYPE_BLURRECT:
         this.setTool(this.blurRectTool);
         break;
-      case Neo.Painter.TOOLTYPE_TURN:
+      case Painter.TOOLTYPE_TURN:
         this.setTool(this.turnTool);
         break;
 
@@ -755,9 +754,9 @@ export class Painter {
 
   cancelCopy() {
     if (!this.isCopyActive) return;
-    if (Neo.CurrentToolType !== Neo.Painter.TOOLTYPE_PASTE) return;
+    if (Neo.CurrentToolType !== Painter.TOOLTYPE_PASTE) return;
     this.popTool();
-    this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+    this.setToolByType(Painter.TOOLTYPE_COPY);
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
   }
 
@@ -847,11 +846,11 @@ export class Painter {
       if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
       if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
       //鉛筆
-      if (key == "b") this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
+      if (key == "b") this.setToolByType(Painter.TOOLTYPE_PEN);
       //水彩
-      if (key == "w") this.setToolByType(Neo.Painter.TOOLTYPE_BRUSH);
+      if (key == "w") this.setToolByType(Painter.TOOLTYPE_BRUSH);
       //消しゴム
-      if (key == "e") this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
+      if (key == "e") this.setToolByType(Painter.TOOLTYPE_ERASER);
       //全消し
       if (
         document.activeElement != this.inputText &&
@@ -955,7 +954,7 @@ export class Painter {
     }
 
     if (
-      Neo.CurrentToolType === Neo.Painter.TOOLTYPE_PASTE &&
+      Neo.CurrentToolType === Painter.TOOLTYPE_PASTE &&
       this.isCopyActive &&
       this.isMouseDownRight
     ) {
@@ -964,7 +963,7 @@ export class Painter {
       return;
     }
     if (
-      this.drawType == Neo.Painter.DRAWTYPE_BEZIER &&
+      this.drawType == Painter.DRAWTYPE_BEZIER &&
       this.isBezierActive &&
       this.isMouseDownRight
     ) {
@@ -974,7 +973,7 @@ export class Painter {
       }
       return;
     }
-    if (this.drawType != Neo.Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
+    if (this.drawType != Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
       if (this.tool.cancelBezier) {
         this.tool.cancelBezier();
       }
@@ -1124,13 +1123,13 @@ export class Painter {
     const freeHandMode = this.drawType === 0;
 
     const toolTypes = [
-      Neo.Painter.TOOLTYPE_PEN,
-      Neo.Painter.TOOLTYPE_ERASER,
-      Neo.Painter.TOOLTYPE_BRUSH,
-      Neo.Painter.TOOLTYPE_TONE,
-      Neo.Painter.TOOLTYPE_BLUR,
-      Neo.Painter.TOOLTYPE_DODGE,
-      Neo.Painter.TOOLTYPE_BURN,
+      Painter.TOOLTYPE_PEN,
+      Painter.TOOLTYPE_ERASER,
+      Painter.TOOLTYPE_BRUSH,
+      Painter.TOOLTYPE_TONE,
+      Painter.TOOLTYPE_BLUR,
+      Painter.TOOLTYPE_DODGE,
+      Painter.TOOLTYPE_BURN,
     ];
 
     const isDrawTool = freeHandMode && toolTypes.includes(Neo.CurrentToolType);
@@ -1602,7 +1601,9 @@ export class Painter {
         return null;
       }
       const jsonString = JSON.stringify(this._actionMgr._items);
-      const data = LZString.compressToUint8Array(jsonString);
+      const compressed = LZString.compressToUint8Array(jsonString);
+      const data = new Uint8Array(new ArrayBuffer(compressed.byteLength));
+      data.set(compressed);
 
       var magic = "NEO ";
       var w = this.canvasWidth;
@@ -1974,7 +1975,7 @@ export class Painter {
     let a1 = this._currentColor[3] / 255.0; //this.alpha;
 
     switch (type) {
-      case Neo.Painter.ALPHATYPE_PEN:
+      case Painter.ALPHATYPE_PEN:
         if (a1 > 0.5) {
           a1 = 1.0 / 16 + ((a1 - 0.5) * 30.0) / 16;
         } else {
@@ -1983,12 +1984,12 @@ export class Painter {
         a1 = Math.min(1, Math.max(0, a1));
         break;
 
-      case Neo.Painter.ALPHATYPE_FILL:
+      case Painter.ALPHATYPE_FILL:
         a1 = -0.00056 * a1 + 0.0042 / (1.0 - a1) - 0.0042;
         a1 = Math.min(1.0, Math.max(0, a1 * 10));
         break;
 
-      case Neo.Painter.ALPHATYPE_BRUSH:
+      case Painter.ALPHATYPE_BRUSH:
         a1 = -0.00056 * a1 + 0.0042 / (1.0 - a1) - 0.0042;
         a1 = Math.min(1.0, Math.max(0, a1));
         break;
@@ -2061,23 +2062,23 @@ export class Painter {
     //TODO
     //いろいろ試したのですが半透明で描画するときの加算・逆加算を再現する方法がわかりません。
     //とりあえず単純に無視しています。
-    if (type == Neo.Painter.MASKTYPE_ADD || type == Neo.Painter.MASKTYPE_SUB) {
+    if (type == Painter.MASKTYPE_ADD || type == Painter.MASKTYPE_SUB) {
       if (this._currentColor[3] < 250) {
-        type = Neo.Painter.MASKTYPE_NONE;
+        type = Painter.MASKTYPE_NONE;
       }
     }
 
     switch (type) {
-      case Neo.Painter.MASKTYPE_NONE:
+      case Painter.MASKTYPE_NONE:
         return;
 
-      case Neo.Painter.MASKTYPE_NORMAL:
+      case Painter.MASKTYPE_NORMAL:
         return r0 == r && g0 == g && b0 == b ? true : false;
 
-      case Neo.Painter.MASKTYPE_REVERSE:
+      case Painter.MASKTYPE_REVERSE:
         return r0 != r || g0 != g || b0 != b ? true : false;
 
-      case Neo.Painter.MASKTYPE_ADD:
+      case Painter.MASKTYPE_ADD:
         if (a0 > 0) {
           var sort = this.sortColor(r0, g0, b0);
           for (var i = 0; i < 3; i++) {
@@ -2089,7 +2090,7 @@ export class Painter {
           return false;
         }
 
-      case Neo.Painter.MASKTYPE_SUB:
+      case Painter.MASKTYPE_SUB:
         if (a0 > 0) {
           var sort = this.sortColor(r0, g0, b0);
           for (var i = 0; i < 3; i++) {
@@ -2121,31 +2122,31 @@ export class Painter {
     const y = y0 - top;
 
     switch (type) {
-      case Neo.Painter.LINETYPE_PEN:
+      case Painter.LINETYPE_PEN:
         this.setPenPoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_BRUSH:
+      case Painter.LINETYPE_BRUSH:
         this.setBrushPoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_TONE:
+      case Painter.LINETYPE_TONE:
         this.setTonePoint(buf8, bufWidth, x, y, x0, y0);
         break;
 
-      case Neo.Painter.LINETYPE_ERASER:
+      case Painter.LINETYPE_ERASER:
         this.setEraserPoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_BLUR:
+      case Painter.LINETYPE_BLUR:
         this.setBlurPoint(buf8, bufWidth, x, y, x0, y0);
         break;
 
-      case Neo.Painter.LINETYPE_DODGE:
+      case Painter.LINETYPE_DODGE:
         this.setDodgePoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_BURN:
+      case Painter.LINETYPE_BURN:
         this.setBurnPoint(buf8, bufWidth, x, y);
         break;
 
@@ -2175,7 +2176,7 @@ export class Painter {
     var r1 = this._currentColor[0];
     var g1 = this._currentColor[1];
     var b1 = this._currentColor[2];
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_PEN);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_PEN);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2240,7 +2241,7 @@ export class Painter {
     const r1 = this._currentColor[0];
     const g1 = this._currentColor[1];
     const b1 = this._currentColor[2];
-    const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    const a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2385,7 +2386,7 @@ export class Painter {
     var shapeIndex = 0;
     var height = buf8.length / (width * 4);
 
-    //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    //  var a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     //  var a1 = this.alpha / 12;
     var a1 = this._currentColor[3] / 255.0 / 12;
     if (a1 == 0) return;
@@ -2453,7 +2454,7 @@ export class Painter {
     var shape = this._roundData[d];
     var shapeIndex = 0;
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2518,7 +2519,7 @@ export class Painter {
     var shape = this._roundData[d];
     var shapeIndex = 0;
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2666,7 +2667,7 @@ export class Painter {
         var oAlpha = ref._currentColor[3];
 
         if (isPreview) {
-          ref._currentMaskType = Neo.Painter.MASKTYPE_NONE;
+          ref._currentMaskType = Painter.MASKTYPE_NONE;
           ref._currentColor[3] = 255;
         }
 
@@ -3393,12 +3394,12 @@ export class Painter {
       //透明色を右クリックでスポイトした時に消しゴム化する。
       //v2.16より古いバージョンではレイヤー1でスポイトした色が透明の時は消しゴムに切り換わる。
       if (a == 0 && (result == 0xffffff || this.getEmulationMode() < 2.16)) {
-        this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
+        this.setToolByType(Painter.TOOLTYPE_ERASER);
       } else {
         // v2.16以後の新しいバージョンでは
         // レイヤー0に色がある時は消しゴム化しない。
         if (Neo.eraserTip?.selected) {
-          this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
+          this.setToolByType(Painter.TOOLTYPE_PEN);
         }
       }
     }
@@ -3654,13 +3655,13 @@ export class Painter {
    */
   getMaskFunc(type) {
     switch (type) {
-      case Neo.Painter.TOOLTYPE_RECT:
+      case Painter.TOOLTYPE_RECT:
         return this.rectMask;
-      case Neo.Painter.TOOLTYPE_RECTFILL:
+      case Painter.TOOLTYPE_RECTFILL:
         return this.rectFillMask;
-      case Neo.Painter.TOOLTYPE_ELLIPSE:
+      case Painter.TOOLTYPE_ELLIPSE:
         return this.ellipseMask;
-      case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+      case Painter.TOOLTYPE_ELLIPSEFILL:
         return this.ellipseFillMask;
     }
     return null;
@@ -3690,14 +3691,14 @@ export class Painter {
     var r1 = this._currentColor[0];
     var g1 = this._currentColor[1];
     var b1 = this._currentColor[2];
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_FILL);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_FILL);
 
     for (var j = 0; j < height; j++) {
       for (var i = 0; i < width; i++) {
         if (maskFunc && maskFunc.call(this, i, j, width, height)) {
           //なぜか加算逆加算は適用されない
           if (
-            this._currentMaskType >= Neo.Painter.MASKTYPE_ADD ||
+            this._currentMaskType >= Painter.MASKTYPE_ADD ||
             !this.isMasked(buf8, index)
           ) {
             const r0 = buf8[index + 0];
@@ -3900,8 +3901,8 @@ export class Painter {
       this.tool.upHandler(this);
 
       //      switch (this.tool.type) {
-      //      case Neo.Painter.TOOLTYPE_HAND:
-      //      case Neo.Painter.TOOLTYPE_SLIDER:
+      //      case Painter.TOOLTYPE_HAND:
+      //      case Painter.TOOLTYPE_SLIDER:
       //          this.isMouseDown = false;
       //          this.tool.upHandler(this);
       //      }
@@ -4097,7 +4098,7 @@ export class Painter {
    * @returns {boolean} - Bzで操作中ならtrueが返る
    */
   isUIPaused() {
-    if (this.drawType == Neo.Painter.DRAWTYPE_BEZIER) {
+    if (this.drawType == Painter.DRAWTYPE_BEZIER) {
       if (this.tool.step && this.tool.step > 0) {
         return true;
       }

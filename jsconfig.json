@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "ignoreDeprecations": "6.0",
-    "module": "None",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "allowJs": true,
-    "checkJs": true, // JSファイルのチェックを有効化
-    "noImplicitAny": false, // 型が不明な場合にanyを許容する
-    // "noUnusedLocals": false // 未使用変数の警告を消す
+    "checkJs": true,
+    "noImplicitAny": false
   },
-    "files": [
+  "files": [
     "src/container.js",
     "src/dictionary.js",
     "src/painter.js",
@@ -15,18 +15,18 @@
     "src/commands.js",
     "src/actions.js",
     "src/widgets.js",
-    "src/lz-string.js"
+    "src/main.js"
   ],
   "include": [
     "src/*.*",
     "dist/neo.js"
   ],
   "exclude": [
-      "node_modules",
-      "**/node_modules/*",
-      "Design/*",
-      "docs/*",
-      "dist/PaintBBS*",
-      ".git"
-    ]
+    "node_modules",
+    "**/node_modules/*",
+    "Design/*",
+    "docs/*",
+    "dist/PaintBBS*",
+    ".git"
+  ]
 }

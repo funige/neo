@@ -137,7 +137,7 @@ export class Button {
         const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
       }
-      Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
+      Neo.painter.setToolByType(Painter.TOOLTYPE_FILL);
     }
 
     if (this.onmousedown) this.onmousedown(this);
@@ -745,9 +745,9 @@ export class PenTip extends ToolTip {
     this.toolStrings = [];
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_PEN,
-      Neo.Painter.TOOLTYPE_BRUSH,
-      Neo.Painter.TOOLTYPE_TEXT,
+      Painter.TOOLTYPE_PEN,
+      Painter.TOOLTYPE_BRUSH,
+      Painter.TOOLTYPE_TEXT,
     ];
 
     this.hasTintImage = true;
@@ -798,10 +798,10 @@ export class Pen2Tip extends ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_TONE,
-      Neo.Painter.TOOLTYPE_BLUR,
-      Neo.Painter.TOOLTYPE_DODGE,
-      Neo.Painter.TOOLTYPE_BURN,
+      Painter.TOOLTYPE_TONE,
+      Painter.TOOLTYPE_BLUR,
+      Painter.TOOLTYPE_DODGE,
+      Painter.TOOLTYPE_BURN,
     ];
 
     this.hasTintImage = true;
@@ -839,16 +839,16 @@ export class Pen2Tip extends ToolTip {
     }
 
     switch (this.tools[this.mode]) {
-      case Neo.Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_TONE:
         // this.drawTone(Neo.painter.foregroundColor);
         this.drawTone();
         break;
 
-      case Neo.Painter.TOOLTYPE_DODGE:
+      case Painter.TOOLTYPE_DODGE:
         this.draw(0xffc0c0c0);
         break;
 
-      case Neo.Painter.TOOLTYPE_BURN:
+      case Painter.TOOLTYPE_BURN:
         this.draw(0xff404040);
         break;
 
@@ -924,9 +924,9 @@ export class EraserTip extends ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_ERASER,
-      Neo.Painter.TOOLTYPE_ERASERECT,
-      Neo.Painter.TOOLTYPE_ERASEALL,
+      Painter.TOOLTYPE_ERASER,
+      Painter.TOOLTYPE_ERASERECT,
+      Painter.TOOLTYPE_ERASEALL,
     ];
   }
 
@@ -1004,10 +1004,10 @@ export class EffectTip extends ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_RECTFILL,
-      Neo.Painter.TOOLTYPE_RECT,
-      Neo.Painter.TOOLTYPE_ELLIPSEFILL,
-      Neo.Painter.TOOLTYPE_ELLIPSE,
+      Painter.TOOLTYPE_RECTFILL,
+      Painter.TOOLTYPE_RECT,
+      Painter.TOOLTYPE_ELLIPSEFILL,
+      Painter.TOOLTYPE_ELLIPSE,
     ];
 
     this.hasTintImage = true;
@@ -1070,12 +1070,12 @@ export class Effect2Tip extends ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_COPY,
-      Neo.Painter.TOOLTYPE_MERGE,
-      Neo.Painter.TOOLTYPE_BLURRECT,
-      Neo.Painter.TOOLTYPE_FLIP_H,
-      Neo.Painter.TOOLTYPE_FLIP_V,
-      Neo.Painter.TOOLTYPE_TURN,
+      Painter.TOOLTYPE_COPY,
+      Painter.TOOLTYPE_MERGE,
+      Painter.TOOLTYPE_BLURRECT,
+      Painter.TOOLTYPE_FLIP_H,
+      Painter.TOOLTYPE_FLIP_V,
+      Painter.TOOLTYPE_TURN,
     ];
 
     this.hasTintImage = true;
@@ -1652,10 +1652,10 @@ export class SizeSlider {
 
     var tool = Neo.painter.getCurrentTool();
     if (tool) {
-      if (tool.type == Neo.Painter.TOOLTYPE_BRUSH) {
+      if (tool.type == Painter.TOOLTYPE_BRUSH) {
         Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
         Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
-      } else if (tool.type == Neo.Painter.TOOLTYPE_TEXT) {
+      } else if (tool.type == Painter.TOOLTYPE_TEXT) {
         Neo.painter.updateInputText();
       }
     }
@@ -1788,7 +1788,7 @@ export class LayerControl {
       Neo.painter.canvasWidth,
       Neo.painter.canvasHeight,
     );
-    if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
+    if (Neo.painter.tool.type == Painter.TOOLTYPE_PASTE) {
       Neo.painter.pasteTool.drawCursor(Neo.painter);
     }
     this.update();
@@ -1898,9 +1898,9 @@ export class ReserveControl {
     Neo.painter.alpha = this.reserve.alpha;
 
     switch (this.reserve.tool) {
-      case Neo.Painter.TOOLTYPE_PEN:
-      case Neo.Painter.TOOLTYPE_BRUSH:
-      case Neo.Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_PEN:
+      case Painter.TOOLTYPE_BRUSH:
+      case Painter.TOOLTYPE_TONE:
         Neo.painter.drawType = this.reserve.drawType;
     }
     Neo.updateUI();

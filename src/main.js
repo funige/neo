@@ -1,4 +1,3 @@
-import "./lz-string.js";
 import { Neo } from "./neo.js";
 import { translate } from "./dictionary.js";
 import * as PainterMod from "./painter.js";

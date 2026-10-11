@@ -1,7 +1,7 @@
 "use strict";
 //@ts-check
 import { Neo } from "./neo.js";
-/** @typedef {import('./painter.js').Painter} Painter */
+import { Painter } from "./painter.js";
 import { ToolTip, FillButton } from "./widgets.js";
 
 export class ToolBase {
@@ -15,7 +15,7 @@ export class ToolBase {
     this.type = 0;
     this.step = 0;
     this.reverse = false;
-    this.lineType = Neo.Painter.LINETYPE_NONE;
+    this.lineType = Painter.LINETYPE_NONE;
   }
 
   /** @param {Painter} oe * */
@@ -59,38 +59,39 @@ export class ToolBase {
    * @returns {ToolTip|FillButton|null}
    */
   getToolButton() {
+    /** @type {Painter} */
     switch (this.type) {
-      case Neo.Painter.TOOLTYPE_PEN:
-      case Neo.Painter.TOOLTYPE_BRUSH:
-      case Neo.Painter.TOOLTYPE_TEXT:
+      case Painter.TOOLTYPE_PEN:
+      case Painter.TOOLTYPE_BRUSH:
+      case Painter.TOOLTYPE_TEXT:
         return Neo.penTip;
 
-      case Neo.Painter.TOOLTYPE_TONE:
-      case Neo.Painter.TOOLTYPE_BLUR:
-      case Neo.Painter.TOOLTYPE_DODGE:
-      case Neo.Painter.TOOLTYPE_BURN:
+      case Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_BLUR:
+      case Painter.TOOLTYPE_DODGE:
+      case Painter.TOOLTYPE_BURN:
         return Neo.pen2Tip;
 
-      case Neo.Painter.TOOLTYPE_RECT:
-      case Neo.Painter.TOOLTYPE_RECTFILL:
-      case Neo.Painter.TOOLTYPE_ELLIPSE:
-      case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+      case Painter.TOOLTYPE_RECT:
+      case Painter.TOOLTYPE_RECTFILL:
+      case Painter.TOOLTYPE_ELLIPSE:
+      case Painter.TOOLTYPE_ELLIPSEFILL:
         return Neo.effectTip;
 
-      case Neo.Painter.TOOLTYPE_COPY:
-      case Neo.Painter.TOOLTYPE_MERGE:
-      case Neo.Painter.TOOLTYPE_BLURRECT:
-      case Neo.Painter.TOOLTYPE_FLIP_H:
-      case Neo.Painter.TOOLTYPE_FLIP_V:
-      case Neo.Painter.TOOLTYPE_TURN:
+      case Painter.TOOLTYPE_COPY:
+      case Painter.TOOLTYPE_MERGE:
+      case Painter.TOOLTYPE_BLURRECT:
+      case Painter.TOOLTYPE_FLIP_H:
+      case Painter.TOOLTYPE_FLIP_V:
+      case Painter.TOOLTYPE_TURN:
         return Neo.effect2Tip;
 
-      case Neo.Painter.TOOLTYPE_ERASER:
-      case Neo.Painter.TOOLTYPE_ERASEALL:
-      case Neo.Painter.TOOLTYPE_ERASERECT:
+      case Painter.TOOLTYPE_ERASER:
+      case Painter.TOOLTYPE_ERASEALL:
+      case Painter.TOOLTYPE_ERASERECT:
         return Neo.eraserTip;
 
-      case Neo.Painter.TOOLTYPE_FILL:
+      case Painter.TOOLTYPE_FILL:
         return Neo.fillButton;
     }
     return null;
@@ -115,30 +116,30 @@ export class ToolBase {
    */
   getReserve() {
     switch (this.type) {
-      case Neo.Painter.TOOLTYPE_ERASER:
+      case Painter.TOOLTYPE_ERASER:
         return Neo.reserveEraser;
 
-      case Neo.Painter.TOOLTYPE_PEN:
-      case Neo.Painter.TOOLTYPE_BRUSH:
-      case Neo.Painter.TOOLTYPE_TONE:
-      case Neo.Painter.TOOLTYPE_ERASERECT:
-      case Neo.Painter.TOOLTYPE_ERASEALL:
-      case Neo.Painter.TOOLTYPE_COPY:
-      case Neo.Painter.TOOLTYPE_MERGE:
-      case Neo.Painter.TOOLTYPE_FLIP_H:
-      case Neo.Painter.TOOLTYPE_FLIP_V:
+      case Painter.TOOLTYPE_PEN:
+      case Painter.TOOLTYPE_BRUSH:
+      case Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_ERASERECT:
+      case Painter.TOOLTYPE_ERASEALL:
+      case Painter.TOOLTYPE_COPY:
+      case Painter.TOOLTYPE_MERGE:
+      case Painter.TOOLTYPE_FLIP_H:
+      case Painter.TOOLTYPE_FLIP_V:
 
-      case Neo.Painter.TOOLTYPE_DODGE:
-      case Neo.Painter.TOOLTYPE_BURN:
-      case Neo.Painter.TOOLTYPE_BLUR:
-      case Neo.Painter.TOOLTYPE_BLURRECT:
+      case Painter.TOOLTYPE_DODGE:
+      case Painter.TOOLTYPE_BURN:
+      case Painter.TOOLTYPE_BLUR:
+      case Painter.TOOLTYPE_BLURRECT:
 
-      case Neo.Painter.TOOLTYPE_TEXT:
-      case Neo.Painter.TOOLTYPE_TURN:
-      case Neo.Painter.TOOLTYPE_RECT:
-      case Neo.Painter.TOOLTYPE_RECTFILL:
-      case Neo.Painter.TOOLTYPE_ELLIPSE:
-      case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+      case Painter.TOOLTYPE_TEXT:
+      case Painter.TOOLTYPE_TURN:
+      case Painter.TOOLTYPE_RECT:
+      case Painter.TOOLTYPE_RECTFILL:
+      case Painter.TOOLTYPE_ELLIPSE:
+      case Painter.TOOLTYPE_ELLIPSEFILL:
         return Neo.reservePen;
     }
     return null;
@@ -195,13 +196,13 @@ export class DrawToolBase extends ToolBase {
   /** @param {Painter} oe */
   downHandler(oe) {
     switch (oe.drawType) {
-      case Neo.Painter.DRAWTYPE_FREEHAND:
+      case Painter.DRAWTYPE_FREEHAND:
         this.freeHandDownHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_LINE:
+      case Painter.DRAWTYPE_LINE:
         this.lineDownHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_BEZIER:
+      case Painter.DRAWTYPE_BEZIER:
         this.bezierDownHandler(oe);
         break;
     }
@@ -210,13 +211,13 @@ export class DrawToolBase extends ToolBase {
   /** @param {Painter} oe */
   upHandler(oe) {
     switch (oe.drawType) {
-      case Neo.Painter.DRAWTYPE_FREEHAND:
+      case Painter.DRAWTYPE_FREEHAND:
         this.freeHandUpHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_LINE:
+      case Painter.DRAWTYPE_LINE:
         this.lineUpHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_BEZIER:
+      case Painter.DRAWTYPE_BEZIER:
         this.bezierUpHandler(oe);
         break;
     }
@@ -225,13 +226,13 @@ export class DrawToolBase extends ToolBase {
   /** @param {Painter} oe */
   moveHandler(oe) {
     switch (oe.drawType) {
-      case Neo.Painter.DRAWTYPE_FREEHAND:
+      case Painter.DRAWTYPE_FREEHAND:
         this.freeHandMoveHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_LINE:
+      case Painter.DRAWTYPE_LINE:
         this.lineMoveHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_BEZIER:
+      case Painter.DRAWTYPE_BEZIER:
         this.bezierMoveHandler(oe);
         break;
     }
@@ -240,13 +241,13 @@ export class DrawToolBase extends ToolBase {
   /** @param {Painter} oe */
   upMoveHandler(oe) {
     switch (oe.drawType) {
-      case Neo.Painter.DRAWTYPE_FREEHAND:
+      case Painter.DRAWTYPE_FREEHAND:
         this.freeHandUpMoveHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_LINE:
+      case Painter.DRAWTYPE_LINE:
         this.lineUpMoveHandler(oe);
         break;
-      case Neo.Painter.DRAWTYPE_BEZIER:
+      case Painter.DRAWTYPE_BEZIER:
         this.bezierUpMoveHandler(oe);
         break;
     }
@@ -256,7 +257,7 @@ export class DrawToolBase extends ToolBase {
    */
   keyDownHandler(e) {
     switch (Neo.painter.drawType) {
-      case Neo.Painter.DRAWTYPE_BEZIER:
+      case Painter.DRAWTYPE_BEZIER:
         //Bz曲線をエスケープキーでキャンセル
         this.bezierKeyDownHandler(e);
         break;
@@ -293,7 +294,7 @@ export class DrawToolBase extends ToolBase {
     oe.prepareDrawing();
     this.isUpMove = false;
     var ctx = oe.canvasCtx[oe.current];
-    if (oe.alpha >= 1 || this.lineType != Neo.Painter.LINETYPE_BRUSH) {
+    if (oe.alpha >= 1 || this.lineType != Painter.LINETYPE_BRUSH) {
       var x0 = Math.floor(oe.mouseX);
       var y0 = Math.floor(oe.mouseY);
       oe._actionMgr.freeHand(x0, y0, this.lineType);
@@ -409,7 +410,7 @@ export class DrawToolBase extends ToolBase {
     this.transformForZoom(oe);
 
     /** @type {number} */
-    var c = this.type == Neo.Painter.TOOLTYPE_ERASER ? 0x0000ff : 0xffff7f;
+    var c = this.type == Painter.TOOLTYPE_ERASER ? 0x0000ff : 0xffff7f;
     oe.drawXOREllipse(ctx, x - r, y - r, r * 2, r * 2, false, c);
 
     ctx.restore();
@@ -643,7 +644,7 @@ export class DrawToolBase extends ToolBase {
       y,
       this.x3,
       this.y3,
-      Neo.Painter.LINETYPE_PEN, //this.lineType,
+      Painter.LINETYPE_PEN, //this.lineType,
       false,
       true,
     );
@@ -701,7 +702,7 @@ export class DrawToolBase extends ToolBase {
       y,
       this.x3,
       this.y3,
-      Neo.Painter.LINETYPE_PEN, //this.lineType,
+      Painter.LINETYPE_PEN, //this.lineType,
       false,
       true,
     );
@@ -734,8 +735,8 @@ export class PenTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_PEN;
-    this.lineType = Neo.Painter.LINETYPE_PEN;
+    this.type = Painter.TOOLTYPE_PEN;
+    this.lineType = Painter.LINETYPE_PEN;
   }
 
   loadStates() {
@@ -758,8 +759,8 @@ export class BrushTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_BRUSH;
-    this.lineType = Neo.Painter.LINETYPE_BRUSH;
+    this.type = Painter.TOOLTYPE_BRUSH;
+    this.lineType = Painter.LINETYPE_BRUSH;
   }
 
   loadStates() {
@@ -787,8 +788,8 @@ export class ToneTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_TONE;
-    this.lineType = Neo.Painter.LINETYPE_TONE;
+    this.type = Painter.TOOLTYPE_TONE;
+    this.lineType = Painter.LINETYPE_TONE;
   }
 
   loadStates() {
@@ -811,8 +812,8 @@ export class EraserTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_ERASER;
-    this.lineType = Neo.Painter.LINETYPE_ERASER;
+    this.type = Painter.TOOLTYPE_ERASER;
+    this.lineType = Painter.LINETYPE_ERASER;
   }
 }
 
@@ -826,8 +827,8 @@ export class BlurTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_BLUR;
-    this.lineType = Neo.Painter.LINETYPE_BLUR;
+    this.type = Painter.TOOLTYPE_BLUR;
+    this.lineType = Painter.LINETYPE_BLUR;
   }
 
   loadStates() {
@@ -850,8 +851,8 @@ export class DodgeTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_DODGE;
-    this.lineType = Neo.Painter.LINETYPE_DODGE;
+    this.type = Painter.TOOLTYPE_DODGE;
+    this.lineType = Painter.LINETYPE_DODGE;
   }
 
   loadStates() {
@@ -874,8 +875,8 @@ export class BurnTool extends DrawToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_BURN;
-    this.lineType = Neo.Painter.LINETYPE_BURN;
+    this.type = Painter.TOOLTYPE_BURN;
+    this.lineType = Painter.LINETYPE_BURN;
   }
 
   loadStates() {
@@ -902,7 +903,7 @@ export class HandTool extends ToolBase {
     this.startX = 0;
     this.startY = 0;
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_HAND;
+    this.type = Painter.TOOLTYPE_HAND;
     this.isUpMove = false;
     this.reverse = false;
   }
@@ -980,7 +981,7 @@ export class SliderTool extends ToolBase {
     super();
     this.target = /**@type {any} **/ (null);
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_SLIDER;
+    this.type = Painter.TOOLTYPE_SLIDER;
     this.isUpMove = false;
     this.isAlt = false;
   }
@@ -1063,7 +1064,7 @@ export class FillTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_FILL;
+    this.type = Painter.TOOLTYPE_FILL;
     this.isUpMove = false;
   }
 
@@ -1103,7 +1104,7 @@ export class EraseAllTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_ERASEALL;
+    this.type = Painter.TOOLTYPE_ERASEALL;
     this.isUpMove = false;
   }
 
@@ -1195,7 +1196,7 @@ export class EffectToolBase extends ToolBase {
       this.doEffect(oe, x, y, width, height);
     }
 
-    if (Neo.CurrentToolType != Neo.Painter.TOOLTYPE_PASTE) {
+    if (Neo.CurrentToolType != Painter.TOOLTYPE_PASTE) {
       setTimeout(() => {
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
       }, 10);
@@ -1215,7 +1216,7 @@ export class EffectToolBase extends ToolBase {
       this.endY = this.latestY;
 
       //ペーストの時はカーソルを描画しない
-      if (oe.tool.type != Neo.Painter.TOOLTYPE_PASTE) {
+      if (oe.tool.type != Painter.TOOLTYPE_PASTE) {
         oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
         this.drawCursor(oe);
       }
@@ -1271,7 +1272,7 @@ export class EraseRectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_ERASERECT;
+    this.type = Painter.TOOLTYPE_ERASERECT;
   }
 
   /**
@@ -1301,7 +1302,7 @@ export class FlipHTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_FLIP_H;
+    this.type = Painter.TOOLTYPE_FLIP_H;
   }
 
   /**
@@ -1330,7 +1331,7 @@ export class FlipVTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_FLIP_V;
+    this.type = Painter.TOOLTYPE_FLIP_V;
   }
 
   /**
@@ -1359,7 +1360,7 @@ export class BlurRectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_BLURRECT;
+    this.type = Painter.TOOLTYPE_BLURRECT;
   }
 
   /**
@@ -1397,7 +1398,7 @@ export class TurnTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_TURN;
+    this.type = Painter.TOOLTYPE_TURN;
   }
 
   /** @param {Painter} oe */
@@ -1441,7 +1442,7 @@ export class MergeTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_MERGE;
+    this.type = Painter.TOOLTYPE_MERGE;
   }
 
   /**
@@ -1470,7 +1471,7 @@ export class CopyTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_COPY;
+    this.type = Painter.TOOLTYPE_COPY;
   }
 
   /**
@@ -1485,7 +1486,7 @@ export class CopyTool extends EffectToolBase {
     oe.isCopyActive = true;
     //  oe.copy(oe.current, x, y, width, height);
     oe._actionMgr.copy(x, y, width, height);
-    oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE); // ツールをPasteToolに切り替える
+    oe.setToolByType(Painter.TOOLTYPE_PASTE); // ツールをPasteToolに切り替える
     if (oe.pasteTool) {
       oe.pasteTool.x = x; // 切り替わったインスタンスに座標を設定
       oe.pasteTool.y = y;
@@ -1513,7 +1514,7 @@ export class PasteTool extends ToolBase {
     this.latestDX = 0;
     this.latestDY = 0;
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_PASTE;
+    this.type = Painter.TOOLTYPE_PASTE;
   }
 
   /** @param {Painter} oe */
@@ -1535,7 +1536,7 @@ export class PasteTool extends ToolBase {
     //  oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     oe._actionMgr.paste(this.x, this.y, this.width, this.height, dx, dy);
 
-    oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+    oe.setToolByType(Painter.TOOLTYPE_COPY);
   }
 
   /** @param {Painter} oe */
@@ -1608,7 +1609,7 @@ export class RectTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_RECT;
+    this.type = Painter.TOOLTYPE_RECT;
   }
 
   /**
@@ -1638,7 +1639,7 @@ export class RectFillTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_RECTFILL;
+    this.type = Painter.TOOLTYPE_RECTFILL;
     this.isFill = true;
   }
   /**
@@ -1667,7 +1668,7 @@ export class EllipseTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_ELLIPSE;
+    this.type = Painter.TOOLTYPE_ELLIPSE;
     this.isEllipse = true;
   }
 
@@ -1697,7 +1698,7 @@ export class EllipseFillTool extends EffectToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_ELLIPSEFILL;
+    this.type = Painter.TOOLTYPE_ELLIPSEFILL;
     this.isEllipse = true;
     this.isFill = true;
   }
@@ -1728,7 +1729,7 @@ export class TextTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_TEXT;
+    this.type = Painter.TOOLTYPE_TEXT;
     this.isUpMove = false;
   }
 
@@ -1841,7 +1842,7 @@ export class DummyTool extends ToolBase {
   constructor() {
     super();
     /** @type {number} */
-    this.type = Neo.Painter.TOOLTYPE_NONE;
+    this.type = Painter.TOOLTYPE_NONE;
     this.isUpMove = false;
   }
 

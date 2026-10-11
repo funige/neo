@@ -1,8 +1,9 @@
 "use strict";
 //@ts-check
-import { Neo } from "./neo.js";
+import { Neo } from "./container.js";
 import { translate } from "./dictionary.js";
-import { LZString } from "./lz-string.js";
+import LZString from "lz-string";
+/** @typedef {import('./painter.js').Painter} Painter */
 /*
   -----------------------------------------------------------------------
     Action Manager
@@ -76,6 +77,7 @@ export class ActionManager {
   pushCurrent() {
     if (!Neo.isAnimation) return;
 
+    /** @type {Painter} */
     var oe = Neo.painter;
     var head = this._items[this._head - 1];
 
@@ -96,6 +98,7 @@ export class ActionManager {
    * [2]~[5]: RGBAカラー、[6]~[8]: マスクカラー、[9]: ブラシ幅、[10]: マスクタイプ
    */
   getCurrent(item) {
+    /** @type {Painter} */
     var oe = Neo.painter;
 
     oe._currentColor = [item[2], item[3], item[4], item[5]];
@@ -120,12 +123,14 @@ export class ActionManager {
       return;
     }
 
+    /** @type {Painter} */
+    const painter = Neo.painter;
     if (this._head >= this._items.length || this._head >= this._mark) {
-      Neo.painter.dirty = false;
-      Neo.painter.busy = false;
+      painter.dirty = false;
+      painter.busy = false;
 
-      if (Neo.painter.busySkipped) {
-        Neo.painter.busySkipped = false;
+      if (painter.busySkipped) {
+        painter.busySkipped = false;
         console.log("animation skipped");
       } else {
         console.log("animation finished");
@@ -135,14 +140,8 @@ export class ActionManager {
 
     var item = this._items[this._head];
 
-    if (!Neo.viewer && !Neo.painter.busySkipped) {
-      Neo.painter._pushUndo(
-        0,
-        0,
-        Neo.painter.canvasWidth,
-        Neo.painter.canvasHeight,
-        true,
-      );
+    if (!Neo.viewer && !painter.busySkipped) {
+      painter._pushUndo(0, 0, painter.canvasWidth, painter.canvasHeight, true);
     }
 
     if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
@@ -156,7 +155,7 @@ export class ActionManager {
     const hasRestore = this._items.some(
       (/**@type {any}**/ item) => item[0] === "restore",
     );
-    if (Neo.painter.busySkipped && hasRestore) {
+    if (painter.busySkipped && hasRestore) {
       // アニメーションをスキップする時はrestoreのみを関数として扱う
       func =
         item[0] && /**@type {any}**/ (this)[item[0]] && item[0] === "restore"
@@ -173,7 +172,7 @@ export class ActionManager {
     /**@type {any}*/ (this)[func](item, function (/**@type {any}*/ result) {
       if (result) {
         if (
-          Neo.painter.busySkipped &&
+          painter.busySkipped &&
           ref._head < ref._mark - 2 &&
           ref._mark - 2 >= 0 &&
           ref._items[ref._mark - 1][0] == "restore"
@@ -187,7 +186,7 @@ export class ActionManager {
       }
 
       setTimeout(function () {
-        Neo.painter._actionMgr.play();
+        painter._actionMgr.play();
       }, wait);
     });
   }
@@ -204,11 +203,21 @@ export class ActionManager {
     if (typeof arguments[0] != "object") {
       this.push("clearCanvas");
     }
-
-    var oe = Neo.painter;
-    oe.canvasCtx[0].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.canvasCtx[1].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+    /** @type {Painter} */
+    var painter = Neo.painter;
+    painter.canvasCtx[0].clearRect(
+      0,
+      0,
+      painter.canvasWidth,
+      painter.canvasHeight,
+    );
+    painter.canvasCtx[1].clearRect(
+      0,
+      0,
+      painter.canvasWidth,
+      painter.canvasHeight,
+    );
+    painter.updateDestCanvas(0, 0, painter.canvasWidth, painter.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -232,9 +241,10 @@ export class ActionManager {
       color = item[4];
     }
 
-    var oe = Neo.painter;
-    oe.doFloodFill(layer, x, y, color);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+    /** @type {Painter} */
+    const painter = Neo.painter;
+    painter.doFloodFill(layer, x, y, color);
+    painter.updateDestCanvas(0, 0, painter.canvasWidth, painter.canvasHeight);
 
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
@@ -244,8 +254,9 @@ export class ActionManager {
    * 全消し
    */
   eraseAll() {
-    var oe = Neo.painter;
-    var layer = oe.current;
+    /** @type {Painter} */
+    const painter = Neo.painter;
+    let layer = painter.current;
 
     if (typeof arguments[0] != "object") {
       this.push("eraseAll", layer);
@@ -254,6 +265,7 @@ export class ActionManager {
       layer = item[1];
     }
 
+    /** @type {Painter} */
     var oe = Neo.painter;
     oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -268,6 +280,7 @@ export class ActionManager {
    * @param {number|null} [lineType] - 線の種類
    */
   freeHand(x0, y0, lineType) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -326,6 +339,7 @@ export class ActionManager {
    * @param {number|null} [lineType] - 線の種類
    */
   freeHandFast(x0, y0, lineType) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -377,6 +391,7 @@ export class ActionManager {
    */
   freeHandMove(x0, y0, x1, y1, lineType) {
     if (arguments.length > 1) {
+      /** @type {Painter} */
       var oe = Neo.painter;
       var layer = oe.current;
       var head = this._items[this._head - 1];
@@ -413,6 +428,7 @@ export class ActionManager {
    * @param {number|null} [lineType] - 線の種類
    */
   line(x0, y0, x1, y1, lineType) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
     if (typeof arguments[0] != "object") {
@@ -463,6 +479,7 @@ export class ActionManager {
    * @param {number} [lineType] - 線の種類
    */
   bezier(x0, y0, x1, y1, x2, y2, x3, y3, lineType) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
     var isReplay = true;
@@ -537,6 +554,7 @@ export class ActionManager {
    * @param {number|null} [type] - 塗りつぶしの種類(四角楕円など)
    */
   fill(x, y, width, height, type) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -579,6 +597,7 @@ export class ActionManager {
    * @param {number} [height] - 反転する高さ
    */
   flipH(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -613,6 +632,7 @@ export class ActionManager {
    * @param {number} [height] - 反転する高さ
    */
   flipV(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -647,6 +667,7 @@ export class ActionManager {
    * @param {number} [height] - 結合する高さ
    */
   merge(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -681,6 +702,7 @@ export class ActionManager {
    * @param {number} [height] - ぼかす範囲の高さ
    */
   blurRect(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -715,6 +737,7 @@ export class ActionManager {
    * @param {number} [height] - 消去する高さ
    */
   eraseRect2(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -754,6 +777,7 @@ export class ActionManager {
    * @param {number} [height] - 消去する高さ
    */
   eraseRect(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -789,6 +813,7 @@ export class ActionManager {
    * @param {number} [height] - コピーする高さ
    */
   copy(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -825,6 +850,7 @@ export class ActionManager {
    * @param {number} [dy] - 貼り付け先のY座標
    */
   paste(x, y, width, height, dx, dy) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -865,6 +891,7 @@ export class ActionManager {
    * @param {number} [height] - 変形する範囲の高さ
    */
   turn(x, y, width, height) {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -906,6 +933,7 @@ export class ActionManager {
     size = String(size);
     family = String(family);
 
+    /** @type {Painter} */
     var oe = Neo.painter;
     var layer = oe.current;
 
@@ -948,6 +976,7 @@ export class ActionManager {
   }
 
   restore() {
+    /** @type {Painter} */
     var oe = Neo.painter;
     var width = oe.canvasWidth;
     var height = oe.canvasHeight;
@@ -981,6 +1010,8 @@ export class ActionManager {
   }
 
   dummy() {
+    /** @type {Painter} */
+    var oe = Neo.painter;
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }
@@ -1117,17 +1148,19 @@ Neo.initViewer = function (pch) {
   Neo.canvas.style.height = Neo.config.height + "px";
 
   Neo.painter = new Neo.Painter();
-  Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
+  /** @type {Painter} */
+  const neo_painter = Neo.painter;
+  neo_painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
   Neo.container.oncontextmenu = function () {
     return false;
   };
 
-  Neo.painter._actionMgr.isMouseDown = false;
+  neo_painter._actionMgr.isMouseDown = false;
   painter?.addEventListener(
     "pointerdown",
     function () {
-      Neo.painter._actionMgr.isMouseDown = true;
+      neo_painter._actionMgr.isMouseDown = true;
     },
     false,
   );
@@ -1143,11 +1176,11 @@ Neo.initViewer = function (pch) {
     "pointermove",
     function (e) {
       e.preventDefault();
-      if (Neo.painter._actionMgr.isMouseDown) {
-        var zoom = Neo.painter.zoom;
-        var x = Neo.painter.zoomX - e.movementX / zoom;
-        var y = Neo.painter.zoomY - e.movementY / zoom;
-        Neo.painter.setZoomPosition(x, y);
+      if (neo_painter._actionMgr.isMouseDown) {
+        var zoom = neo_painter.zoom;
+        var x = neo_painter.zoomX - e.movementX / zoom;
+        var y = neo_painter.zoomY - e.movementY / zoom;
+        neo_painter.setZoomPosition(x, y);
       }
     },
     { passive: false, capture: false },
@@ -1155,7 +1188,7 @@ Neo.initViewer = function (pch) {
   document.addEventListener(
     "pointerup",
     function () {
-      Neo.painter._actionMgr.isMouseDown = false;
+      neo_painter._actionMgr.isMouseDown = false;
       if (Neo.viewerBar) {
         Neo.viewerBar.isMouseDown = false;
       }
@@ -1165,10 +1198,10 @@ Neo.initViewer = function (pch) {
 
   if (pch && pch.data && pch.data.length > 0) {
     //Neo.config.pch_file) {
-    Neo.painter._actionMgr._items = pch.data;
+    neo_painter._actionMgr._items = pch.data;
     Neo.startViewer();
     setTimeout(() => {
-      Neo.painter.play();
+      neo_painter.play();
     }, 50);
   }
 };
@@ -1180,8 +1213,6 @@ Neo.initViewer = function (pch) {
  * 3. プレイヤーコントロール(ボタン類)の生成と機能バインディング。
  */
 Neo.startViewer = function () {
-  const commands = new Neo.Commands();
-
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "pch";
     if (!(/** @type {any} */ (document)[name]))

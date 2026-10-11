@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./neo.js";
+import { Neo } from "./container.js";
 import { Painter } from "./painter.js";
 export class Commands {
   constructor() {
