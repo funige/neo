@@ -82,7 +82,7 @@ export class ActionManager {
     if (!Neo.isAnimation) return;
 
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var head = this._items[this._head - 1];
 
     var color = oe._currentColor;
@@ -103,7 +103,7 @@ export class ActionManager {
    */
   getCurrent(item) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
 
     oe._currentColor = [item[2], item[3], item[4], item[5]];
     oe._currentMask = [item[6], item[7], item[8]];
@@ -270,7 +270,7 @@ export class ActionManager {
     }
 
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -285,7 +285,7 @@ export class ActionManager {
    */
   freeHand(x0, y0, lineType) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -344,7 +344,7 @@ export class ActionManager {
    */
   freeHandFast(x0, y0, lineType) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -396,7 +396,7 @@ export class ActionManager {
   freeHandMove(x0, y0, x1, y1, lineType) {
     if (arguments.length > 1) {
       /** @type {Painter} */
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       var head = this._items[this._head - 1];
       if (head && head.length == 0) {
@@ -433,7 +433,7 @@ export class ActionManager {
    */
   line(x0, y0, x1, y1, lineType) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
     if (typeof arguments[0] != "object") {
       x0 = Number(x0);
@@ -484,7 +484,7 @@ export class ActionManager {
    */
   bezier(x0, y0, x1, y1, x2, y2, x3, y3, lineType) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
     var isReplay = true;
 
@@ -559,7 +559,7 @@ export class ActionManager {
    */
   fill(x, y, width, height, type) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -602,7 +602,7 @@ export class ActionManager {
    */
   flipH(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -637,7 +637,7 @@ export class ActionManager {
    */
   flipV(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -672,7 +672,7 @@ export class ActionManager {
    */
   merge(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -707,7 +707,7 @@ export class ActionManager {
    */
   blurRect(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -742,7 +742,7 @@ export class ActionManager {
    */
   eraseRect2(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -782,7 +782,7 @@ export class ActionManager {
    */
   eraseRect(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -818,7 +818,7 @@ export class ActionManager {
    */
   copy(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -855,7 +855,7 @@ export class ActionManager {
    */
   paste(x, y, width, height, dx, dy) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -896,7 +896,7 @@ export class ActionManager {
    */
   turn(x, y, width, height) {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -938,7 +938,7 @@ export class ActionManager {
     family = String(family);
 
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var layer = oe.current;
 
     if (typeof arguments[0] != "object") {
@@ -981,7 +981,7 @@ export class ActionManager {
 
   restore() {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var width = oe.canvasWidth;
     var height = oe.canvasHeight;
 
@@ -1015,7 +1015,7 @@ export class ActionManager {
 
   dummy() {
     /** @type {Painter} */
-    var oe = Neo.painter;
+    const oe = Neo.painter;
     var callback = arguments[1];
     if (callback && typeof callback == "function") callback(true);
   }

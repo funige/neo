@@ -59,7 +59,7 @@ export class Button {
     this.selected = false;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
     if (this.element) {
       /** @param {MouseEvent} e */
       this.element.onmousedown = function (e) {
@@ -302,7 +302,7 @@ export class ColorTip {
     this.selected = this.elementID == "neo-color1" ? true : false;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
     if (this.element) {
       /** @param {MouseEvent} e */
       this.element.onmousedown = function (e) {
@@ -372,13 +372,6 @@ export class ColorTip {
             this.setColor(Neo.painter.foregroundColor);
             break;
         }
-
-        //          if (e.shiftKey) {
-        //              this.setColor(Neo.config.colors[this.params.index - 1]);
-        //          } else if (e.button == 2 || e.ctrlKey || e.altKey ||
-        //                     Neo.painter.virtualRight) {
-        //              this.setColor(Neo.painter.foregroundColor);
-        //          }
       }
       colorTip.setSelected(this === colorTip);
     }
@@ -444,8 +437,7 @@ export class ColorTip {
    * @returns {ColorTip|null}
    */
   static getCurrent() {
-    for (var i = 0; i < Neo.colorTips.length; i++) {
-      var colorTip = Neo.colorTips[i];
+    for (const colorTip of Neo.colorTips) {
       if (colorTip.selected) return colorTip;
     }
     return null;
@@ -549,7 +541,7 @@ export class ToolTip {
 
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.params.type = this.element.id;
@@ -700,7 +692,7 @@ export class ToolTip {
         this.prevMode = this.mode;
 
         var img = new Image();
-        var ref = this;
+        const ref = this;
         img.onload = function () {
           if (!ref.canvas) {
             console.error("Canvas not found for ToolTip on image load.");
@@ -1719,7 +1711,7 @@ export class LayerControl {
     this.elementID = elementID;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.element.onmousedown = function (e) {
@@ -1844,7 +1836,7 @@ export class ReserveControl {
     this.params = params || {};
     this.elementID = elementID;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.element.onmousedown = function (e) {
@@ -2165,7 +2157,7 @@ export class ViewerBar {
     this.mark = this.length;
     this.seek = 0;
     if (this.element) {
-      var ref = this;
+      const ref = this;
       this.element.addEventListener(
         "pointerdown",
         function (e) {

@@ -1305,7 +1305,9 @@ Neo.resizeCanvas = function () {
   width = Math.floor(width / 2) * 2;
   height = Math.floor(height / 2) * 2;
 
+  /** @type {number} */
   Neo.painter.destWidth = width;
+  /** @type {number} */
   Neo.painter.destHeight = height;
 
   const destCanvas = Neo.painter.destCanvas;
@@ -1345,7 +1347,8 @@ Neo.resizeCanvas = function () {
     Neo.canvas.style.height = height + "px";
   }
 
-  const tools = Neo.tools ?? "";
+  /** @type {HTMLElement |null} */
+  const tools = Neo.tools || null;
   if (tools) {
     tools.style.touchAction = "none";
     tools.style.pointerEvents = "auto";

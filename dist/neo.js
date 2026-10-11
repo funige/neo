@@ -661,7 +661,7 @@
       this.elementID = elementID;
       this.selected = false;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -857,7 +857,7 @@
       this.elementID = elementID;
       this.selected = this.elementID == "neo-color1" ? true : false;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -977,8 +977,7 @@
      * @returns {ColorTip|null}
      */
     static getCurrent() {
-      for (var i = 0; i < Neo.colorTips.length; i++) {
-        var colorTip = Neo.colorTips[i];
+      for (const colorTip of Neo.colorTips) {
         if (colorTip.selected) return colorTip;
       }
       return null;
@@ -1018,7 +1017,7 @@
       this.elementID = elementID;
       this.mode = 0;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.params.type = this.element.id;
         this.element.onmousedown = function(e) {
@@ -1154,7 +1153,7 @@
         if (this.prevMode != this.mode) {
           this.prevMode = this.mode;
           var img = new Image();
-          var ref = this;
+          const ref = this;
           img.onload = function() {
             if (!ref.canvas) {
               console.error("Canvas not found for ToolTip on image load.");
@@ -1978,7 +1977,7 @@
       this.params = params || {};
       this.elementID = elementID;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -2070,7 +2069,7 @@
       this.element = document.getElementById(elementID);
       this.params = params || {};
       this.elementID = elementID;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -2315,7 +2314,7 @@
       this.mark = this.length;
       this.seek = 0;
       if (this.element) {
-        var ref = this;
+        const ref = this;
         this.element.addEventListener(
           "pointerdown",
           function(e) {
@@ -2430,7 +2429,7 @@
     }
     pushCurrent() {
       if (!Neo.isAnimation) return;
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var head = this._items[this._head - 1];
       var color = oe._currentColor;
       var mask = oe._currentMask;
@@ -2447,7 +2446,7 @@
      * [2]~[5]: RGBAカラー、[6]~[8]: マスクカラー、[9]: ブラシ幅、[10]: マスクタイプ
      */
     getCurrent(item) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       oe._currentColor = [item[2], item[3], item[4], item[5]];
       oe._currentMask = [item[6], item[7], item[8]];
       oe._currentWidth = item[9];
@@ -2577,7 +2576,7 @@
         var item = arguments[0];
         layer = item[1];
       }
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
       var callback = arguments[1];
@@ -2590,7 +2589,7 @@
      * @param {number|null} [lineType] - 線の種類
      */
     freeHand(x0, y0, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x0 = Number(x0);
@@ -2637,7 +2636,7 @@
      * @param {number|null} [lineType] - 線の種類
      */
     freeHandFast(x0, y0, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x0 = Number(x0);
@@ -2679,7 +2678,7 @@
      */
     freeHandMove(x0, y0, x1, y1, lineType) {
       if (arguments.length > 1) {
-        var oe = Neo.painter;
+        const oe = Neo.painter;
         var layer = oe.current;
         var head = this._items[this._head - 1];
         if (head && head.length == 0) {
@@ -2708,7 +2707,7 @@
      * @param {number|null} [lineType] - 線の種類
      */
     line(x0, y0, x1, y1, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x0 = Number(x0);
@@ -2750,7 +2749,7 @@
      * @param {number} [lineType] - 線の種類
      */
     bezier(x0, y0, x1, y1, x2, y2, x3, y3, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       var isReplay = true;
       if (typeof arguments[0] != "object") {
@@ -2820,7 +2819,7 @@
      * @param {number|null} [type] - 塗りつぶしの種類(四角楕円など)
      */
     fill(x, y, width, height, type) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -2855,7 +2854,7 @@
      * @param {number} [height] - 反転する高さ
      */
     flipH(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -2885,7 +2884,7 @@
      * @param {number} [height] - 反転する高さ
      */
     flipV(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -2915,7 +2914,7 @@
      * @param {number} [height] - 結合する高さ
      */
     merge(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -2945,7 +2944,7 @@
      * @param {number} [height] - ぼかす範囲の高さ
      */
     blurRect(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -2975,7 +2974,7 @@
      * @param {number} [height] - 消去する高さ
      */
     eraseRect2(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -3009,7 +3008,7 @@
      * @param {number} [height] - 消去する高さ
      */
     eraseRect(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -3040,7 +3039,7 @@
      * @param {number} [height] - コピーする高さ
      */
     copy(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -3071,7 +3070,7 @@
      * @param {number} [dy] - 貼り付け先のY座標
      */
     paste(x, y, width, height, dx, dy) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -3106,7 +3105,7 @@
      * @param {number} [height] - 変形する範囲の高さ
      */
     turn(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -3142,7 +3141,7 @@
       string = String(string);
       size = String(size);
       family = String(family);
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         const numX = Number(x);
@@ -3178,7 +3177,7 @@
       if (callback && typeof callback == "function") callback(true);
     }
     restore() {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var width = oe.canvasWidth;
       var height = oe.canvasHeight;
       if (typeof arguments[0] != "object") {
@@ -3206,7 +3205,7 @@
       }
     }
     dummy() {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var callback = arguments[1];
       if (callback && typeof callback == "function") callback(true);
     }
@@ -9691,7 +9690,6 @@
     );
   };
   Neo.resizeCanvas = function() {
-    var _a;
     if (!Neo.container) {
       console.error("resizeCanvas: Container element not found");
       return;
@@ -9742,7 +9740,7 @@
       Neo.canvas.style.width = width + "px";
       Neo.canvas.style.height = height + "px";
     }
-    const tools = (_a = Neo.tools) != null ? _a : "";
+    const tools = Neo.tools || null;
     if (tools) {
       tools.style.touchAction = "none";
       tools.style.pointerEvents = "auto";
