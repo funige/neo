@@ -2,6 +2,7 @@
 //@ts-check
 import { Neo } from "./neo.js";
 import { ActionManager } from "./actions.js";
+import { Commands } from "./commands.js";
 import {
   ToolBase,
   PenTool,
@@ -87,7 +88,7 @@ export class Painter {
   static TOOLTYPE_TURN = 25;
 
   constructor() {
-    this._undoMgr = new Neo.UndoManager(50);
+    this._undoMgr = new UndoManager(50);
     /** @type {ActionManager} */
     this._actionMgr = new ActionManager();
     this.clipMouseX = 0;
@@ -843,8 +844,9 @@ export class Painter {
       }
     }
     if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-      if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
-      if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
+      const commands = new Commands();
+      if (key == "+") new commands.ZoomPlusCommand(this).execute(); // +
+      if (key == "-") new commands.ZoomMinusCommand(this).execute(); // -
       //鉛筆
       if (key == "b") this.setToolByType(Painter.TOOLTYPE_PEN);
       //水彩
@@ -1273,7 +1275,7 @@ export class Painter {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new Neo.UndoItem();
+    var undoItem = new UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -1305,7 +1307,7 @@ export class Painter {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new Neo.UndoItem();
+    var undoItem = new UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;

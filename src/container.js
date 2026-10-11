@@ -3,6 +3,24 @@
 import { Neo } from "./neo.js";
 import { Commands } from "./commands.js";
 import { Painter } from "./painter.js";
+import { Button } from "./widgets.js";
+import {
+  FillButton,
+  RightButton,
+  PenTip,
+  Pen2Tip,
+  EffectTip,
+  Effect2Tip,
+  EraserTip,
+  DrawTip,
+  MaskTip,
+  ColorTip,
+  ReserveControl,
+  LayerControl,
+  ScrollBarButton,
+  SizeSlider,
+  ColorSlider,
+} from "./widgets.js";
 //@ts-check
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
@@ -21,128 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   );
 });
-
-Neo.version = "PACKAGE_JSON_VERSION";
-// @ts-ignore
-/** @type {Painter} */
-Neo.painter;
-
-Neo.fullScreen = false;
-Neo.uploaded = false;
-Neo.viewer = false;
-/**@type  {HTMLElement|null} */
-Neo.container = null;
-/**@type {HTMLElement|null} */
-Neo.center = null;
-/**@type {HTMLElement|null} */
-Neo.canvas = null;
-/**@type {HTMLElement|null} */
-Neo.toolsWrapper = null;
-/**@type {HTMLElement|null} */
-Neo.tools = null;
-Neo.toolSide = false;
-/**@type {HTMLElement|null} */
-Neo.applet = null;
-Neo.isAnimation = false;
-Neo.viewerWrapperOnTop = false;
-Neo.storage = localStorage;
-Neo.updateUI = function () {};
-Neo.stabilize_level = 0;
-/** @type {CSSStyleSheet|null}*/
-Neo.styleSheet = null;
-/** @type {any} **/
-Neo.rules = [];
-/** @type {any} **/
-Neo.config = {
-  width: 300,
-  height: 300,
-
-  colors: [
-    "#000000",
-    "#FFFFFF",
-    "#B47575",
-    "#888888",
-    "#FA9696",
-    "#C096C0",
-    "#FFB6FF",
-    "#8080FF",
-    "#25C7C9",
-    "#E7E58D",
-    "#E7962D",
-    "#99CB7B",
-    "#FCECE2",
-    "#F9DDCF",
-  ],
-};
-
-Neo.reservePen =
-  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
-Neo.reserveEraser =
-  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
-//@ts-ignore
-/**@type {Neo.Button|null} */
-Neo.submitButton = null;
-//@ts-ignore
-/**@type {Neo.FillButton|null} */
-Neo.fillButton = null;
-//@ts-ignore
-/**@type {Neo.RightButton|null} */
-Neo.rightButton = null;
-// toolTip
-//@ts-ignore
-/**@type {Neo.PenTip|null} */
-Neo.penTip = null;
-//@ts-ignore
-/**@type {Neo.Pen2Tip|null} */
-Neo.pen2Tip = null;
-//@ts-ignore
-/**@type {Neo.EffectTip|null} */
-Neo.effectTip = null;
-//@ts-ignore
-/**@type {Neo.Effect2Tip|null} */
-Neo.effect2Tip = null;
-//@ts-ignore
-/**@type {Neo.EraserTip|null} */
-Neo.eraserTip = null;
-//@ts-ignore
-/**@type {Neo.DrawTip|null} */
-Neo.drawTip = null;
-//@ts-ignore
-/**@type {Neo.MaskTip|null} */
-Neo.maskTip = null;
-
-Neo.isApp = false;
-// @ts-ignore
-/**@type {Neo.ViewerBar|null} */
-Neo.viewerBar = null;
-// @ts-ignore
-/**@type {Neo.ViewerButton|null} */
-Neo.viewerPlay = null;
-// @ts-ignore
-/**@type {Neo.ViewerButton|null} */
-Neo.viewerStop = null;
-// @ts-ignore
-/**@type {Neo.ViewerButton|null} */
-Neo.viewerSpeed = null;
-Neo.speed = 0;
-/**@type {object|null} */
-Neo.params = null;
-/**@type {object|null} */
-Neo.param = null;
-// @ts-ignore
-/**@type {Neo.SizeSlider|null} */
-Neo.sizeslider = null;
-Neo.SLIDERTYPE_RED = 0;
-Neo.SLIDERTYPE_GREEN = 1;
-Neo.SLIDERTYPE_BLUE = 2;
-Neo.SLIDERTYPE_ALPHA = 3;
-Neo.SLIDERTYPE_SIZE = 4;
-
-/**
- *  @type {any} *
- *  @note ライブコネクト
- */
-(document).neo = Neo;
 
 /**
  * 起動設定（paramの中身）を抽出する
@@ -295,14 +191,13 @@ Neo.init2 = function () {
     storageTimestamp = null;
   }
   if (storageTimestamp && confirm(Neo.translate(message))) {
-    var oe = Neo.painter;
     setTimeout(function () {
-      oe.loadSession(function () {
-        oe._pushUndo();
-        oe._actionMgr.restore();
+      Neo.painter.loadSession(function () {
+        Neo.painter._pushUndo();
+        Neo.painter._actionMgr.restore();
         //復元時にサイズが違うキャンバスで開き直した時に画像が切り取られないようにするため
         //復元処理の直後はデータが変更されていない事にする
-        oe.dirty = false;
+        Neo.painter.dirty = false;
       });
     }, 1);
   } else {
@@ -1075,49 +970,49 @@ Neo.initComponents = function () {
 
 Neo.initButtons = function () {
   const commands = new Commands();
-  const neo_undo = new Neo.Button().init("neo-undo");
+  const neo_undo = new Button().init("neo-undo");
   if (neo_undo) {
     neo_undo.onmouseup = function () {
       const UndoCommand = new commands.UndoCommand(Neo.painter);
       UndoCommand.execute();
     };
   }
-  const neo_redo = new Neo.Button().init("neo-redo");
+  const neo_redo = new Button().init("neo-redo");
   if (neo_redo) {
     neo_redo.onmouseup = function () {
       const RedoCommand = new commands.RedoCommand(Neo.painter);
       RedoCommand.execute();
     };
   }
-  const neo_window = new Neo.Button().init("neo-window");
+  const neo_window = new Button().init("neo-window");
   if (neo_window) {
     neo_window.onmouseup = function () {
       const WindowCommand = new commands.WindowCommand(Neo.painter);
       WindowCommand.execute();
     };
   }
-  const neo_copyright = new Neo.Button().init("neo-copyright");
+  const neo_copyright = new Button().init("neo-copyright");
   if (neo_copyright) {
     neo_copyright.onmouseup = function () {
       const CopyrightCommand = new commands.CopyrightCommand(Neo.painter);
       CopyrightCommand.execute();
     };
   }
-  const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
+  const neo_zoomPlus = new Button().init("neo-zoomPlus");
   if (neo_zoomPlus) {
     neo_zoomPlus.onmouseup = function () {
       const ZoomPlusCommand = new commands.ZoomPlusCommand(Neo.painter);
       ZoomPlusCommand.execute();
     };
   }
-  const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
+  const neo_zoomMinus = new Button().init("neo-zoomMinus");
   if (neo_zoomMinus) {
     neo_zoomMinus.onmouseup = function () {
       const ZoomMinusCommand = new commands.ZoomMinusCommand(Neo.painter);
       ZoomMinusCommand.execute();
     };
   }
-  Neo.submitButton = new Neo.Button().init("neo-submit");
+  Neo.submitButton = new Button().init("neo-submit");
   if (!Neo.submitButton) {
     console.error("initButtons: SubmitButton not found");
     return;
@@ -1128,8 +1023,8 @@ Neo.initButtons = function () {
     SubmitCommand.execute();
   };
 
-  Neo.fillButton = new Neo.FillButton().init("neo-fill");
-  Neo.rightButton = new Neo.RightButton().init("neo-right");
+  Neo.fillButton = new FillButton().init("neo-fill");
+  Neo.rightButton = new RightButton().init("neo-right");
   if (!Neo.rightButton) {
     console.error("initButtons: RightButton not found");
     return;
@@ -1142,13 +1037,13 @@ Neo.initButtons = function () {
   }
 
   // toolTip
-  Neo.penTip = new Neo.PenTip().init("neo-pen");
-  Neo.pen2Tip = new Neo.Pen2Tip().init("neo-pen2");
-  Neo.effectTip = new Neo.EffectTip().init("neo-effect");
-  Neo.effect2Tip = new Neo.Effect2Tip().init("neo-effect2");
-  Neo.eraserTip = new Neo.EraserTip().init("neo-eraser");
-  Neo.drawTip = new Neo.DrawTip().init("neo-draw");
-  Neo.maskTip = new Neo.MaskTip().init("neo-mask");
+  Neo.penTip = new PenTip().init("neo-pen");
+  Neo.pen2Tip = new Pen2Tip().init("neo-pen2");
+  Neo.effectTip = new EffectTip().init("neo-effect");
+  Neo.effect2Tip = new Effect2Tip().init("neo-effect2");
+  Neo.eraserTip = new EraserTip().init("neo-eraser");
+  Neo.drawTip = new DrawTip().init("neo-draw");
+  Neo.maskTip = new MaskTip().init("neo-mask");
 
   Neo.toolButtons =
     Neo.fillButton &&
@@ -1171,45 +1066,39 @@ Neo.initButtons = function () {
 
   // colorTip
   for (var i = 1; i <= 14; i++) {
-    new Neo.ColorTip().init("neo-color" + i, { index: i });
+    new ColorTip().init("neo-color" + i, { index: i });
   }
 
   // colorSlider
-  Neo.sliders[Neo.SLIDERTYPE_RED] = new Neo.ColorSlider().init(
-    "neo-sliderRed",
-    {
-      type: Neo.SLIDERTYPE_RED,
-    },
-  );
-  Neo.sliders[Neo.SLIDERTYPE_GREEN] = new Neo.ColorSlider().init(
+  Neo.sliders[Neo.SLIDERTYPE_RED] = new ColorSlider().init("neo-sliderRed", {
+    type: Neo.SLIDERTYPE_RED,
+  });
+  Neo.sliders[Neo.SLIDERTYPE_GREEN] = new ColorSlider().init(
     "neo-sliderGreen",
     { type: Neo.SLIDERTYPE_GREEN },
   );
-  Neo.sliders[Neo.SLIDERTYPE_BLUE] = new Neo.ColorSlider().init(
-    "neo-sliderBlue",
-    {
-      type: Neo.SLIDERTYPE_BLUE,
-    },
-  );
-  Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new Neo.ColorSlider().init(
+  Neo.sliders[Neo.SLIDERTYPE_BLUE] = new ColorSlider().init("neo-sliderBlue", {
+    type: Neo.SLIDERTYPE_BLUE,
+  });
+  Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new ColorSlider().init(
     "neo-sliderAlpha",
     { type: Neo.SLIDERTYPE_ALPHA },
   );
 
   // sizeSlider
-  Neo.sizeslider = new Neo.SizeSlider();
+  Neo.sizeslider = new SizeSlider();
   Neo.sliders[Neo.SLIDERTYPE_SIZE] = Neo.sizeslider.init("neo-sliderSize", {
     type: Neo.SLIDERTYPE_SIZE,
   });
 
   // reserveControl
   for (var i = 1; i <= 3; i++) {
-    new Neo.ReserveControl().init("neo-reserve" + i, { index: i });
+    new ReserveControl().init("neo-reserve" + i, { index: i });
   }
 
-  new Neo.LayerControl().init("neo-layerControl");
-  new Neo.ScrollBarButton().init("neo-scrollH");
-  new Neo.ScrollBarButton().init("neo-scrollV");
+  new LayerControl().init("neo-layerControl");
+  new ScrollBarButton().init("neo-scrollH");
+  new ScrollBarButton().init("neo-scrollV");
 };
 
 /**
@@ -1830,7 +1719,8 @@ Neo.setColors = function (colors) {
 };
 
 Neo.pExit = function () {
-  new Neo.SubmitCommand(Neo.painter).execute();
+  const commands = new Commands();
+  new commands.SubmitCommand(Neo.painter).execute();
 };
 
 Neo.str_header = "";

@@ -3,7 +3,11 @@
 import { Neo } from "./container.js";
 import { translate } from "./dictionary.js";
 import LZString from "lz-string";
-/** @typedef {import('./painter.js').Painter} Painter */
+import { Painter } from "./painter.js";
+import { ViewerButton } from "./widgets.js";
+import { Commands } from "./commands.js";
+import { ViewerBar } from "./widgets.js";
+
 /*
   -----------------------------------------------------------------------
     Action Manager
@@ -1147,20 +1151,19 @@ Neo.initViewer = function (pch) {
   Neo.canvas.style.width = Neo.config.width + "px";
   Neo.canvas.style.height = Neo.config.height + "px";
 
-  Neo.painter = new Neo.Painter();
   /** @type {Painter} */
-  const neo_painter = Neo.painter;
-  neo_painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
+  Neo.painter = new Painter();
+  Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
   Neo.container.oncontextmenu = function () {
     return false;
   };
 
-  neo_painter._actionMgr.isMouseDown = false;
+  Neo.painter._actionMgr.isMouseDown = false;
   painter?.addEventListener(
     "pointerdown",
     function () {
-      neo_painter._actionMgr.isMouseDown = true;
+      Neo.painter._actionMgr.isMouseDown = true;
     },
     false,
   );
@@ -1176,11 +1179,11 @@ Neo.initViewer = function (pch) {
     "pointermove",
     function (e) {
       e.preventDefault();
-      if (neo_painter._actionMgr.isMouseDown) {
-        var zoom = neo_painter.zoom;
-        var x = neo_painter.zoomX - e.movementX / zoom;
-        var y = neo_painter.zoomY - e.movementY / zoom;
-        neo_painter.setZoomPosition(x, y);
+      if (Neo.painter._actionMgr.isMouseDown) {
+        var zoom = Neo.painter.zoom;
+        var x = Neo.painter.zoomX - e.movementX / zoom;
+        var y = Neo.painter.zoomY - e.movementY / zoom;
+        Neo.painter.setZoomPosition(x, y);
       }
     },
     { passive: false, capture: false },
@@ -1188,7 +1191,7 @@ Neo.initViewer = function (pch) {
   document.addEventListener(
     "pointerup",
     function () {
-      neo_painter._actionMgr.isMouseDown = false;
+      Neo.painter._actionMgr.isMouseDown = false;
       if (Neo.viewerBar) {
         Neo.viewerBar.isMouseDown = false;
       }
@@ -1198,10 +1201,10 @@ Neo.initViewer = function (pch) {
 
   if (pch && pch.data && pch.data.length > 0) {
     //Neo.config.pch_file) {
-    neo_painter._actionMgr._items = pch.data;
+    Neo.painter._actionMgr._items = pch.data;
     Neo.startViewer();
     setTimeout(() => {
-      neo_painter.play();
+      Neo.painter.play();
     }, 50);
   }
 };
@@ -1324,7 +1327,7 @@ Neo.startViewer = function () {
   }
 
   setTimeout(function () {
-    Neo.viewerPlay = new Neo.ViewerButton().init("neo-viewerPlay");
+    Neo.viewerPlay = new ViewerButton().init("neo-viewerPlay");
     if (!Neo.viewerPlay) {
       console.error("startViewer: ViewerPlay not found");
       return;
@@ -1333,7 +1336,7 @@ Neo.startViewer = function () {
     Neo.viewerPlay.onmouseup = function () {
       Neo.painter.onplay();
     };
-    Neo.viewerStop = new Neo.ViewerButton().init("neo-viewerStop");
+    Neo.viewerStop = new ViewerButton().init("neo-viewerStop");
     if (!Neo.viewerStop) {
       console.error("startViewer: ViewerStop not found");
       return;
@@ -1342,7 +1345,7 @@ Neo.startViewer = function () {
     Neo.viewerStop.onmouseup = function () {
       Neo.painter.onstop();
     };
-    Neo.viewerSpeed = new Neo.ViewerButton().init("neo-viewerSpeed");
+    Neo.viewerSpeed = new ViewerButton().init("neo-viewerSpeed");
     if (!Neo.viewerSpeed) {
       console.error("startViewer: ViewerSpeed not found");
       return;
@@ -1352,27 +1355,29 @@ Neo.startViewer = function () {
       Neo.painter.onspeed();
       this.update();
     };
-    const neo_viewerRewind = new Neo.ViewerButton().init("neo-viewerRewind");
+    const neo_viewerRewind = new ViewerButton().init("neo-viewerRewind");
     if (neo_viewerRewind) {
       neo_viewerRewind.onmouseup = function () {
         Neo.painter.onrewind();
       };
     }
-    const neo_viewerPlus = new Neo.ViewerButton().init("neo-viewerPlus");
+    const commands = new Commands();
+
+    const neo_viewerPlus = new ViewerButton().init("neo-viewerPlus");
     if (neo_viewerPlus) {
       neo_viewerPlus.onmouseup = function () {
-        new Neo.ZoomPlusCommand(Neo.painter).execute();
+        new commands.ZoomPlusCommand(Neo.painter).execute();
       };
     }
-    const neo_viewerMinus = new Neo.ViewerButton().init("neo-viewerMinus");
+    const neo_viewerMinus = new ViewerButton().init("neo-viewerMinus");
     if (neo_viewerMinus) {
       neo_viewerMinus.onmouseup = function () {
-        new Neo.ZoomMinusCommand(Neo.painter).execute();
+        new commands.ZoomMinusCommand(Neo.painter).execute();
       };
     }
 
     const length = Neo.painter._actionMgr._items.length;
-    Neo.viewerBar = new Neo.ViewerBar().init("neo-viewerBar", {
+    Neo.viewerBar = new ViewerBar().init("neo-viewerBar", {
       length: length,
     });
     if (Neo.config.neo_viewer_max_width_100 && Neo.viewerBar) {

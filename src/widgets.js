@@ -1,5 +1,5 @@
 "use strict";
-import { Neo } from "./neo.js";
+import { Neo } from "./container.js";
 import { Painter } from "./painter.js";
 //@ts-check
 /**
