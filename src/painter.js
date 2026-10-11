@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./neo.js";
+import { Neo } from "./container.js";
 import { ActionManager } from "./actions.js";
 import { Commands } from "./commands.js";
 import {
