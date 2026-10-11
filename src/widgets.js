@@ -1,5 +1,6 @@
 "use strict";
-import { Neo } from "./container.js";
+import { Neo } from "./neo.js";
+import { Painter } from "./painter.js";
 //@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -244,7 +245,7 @@ export class RightButton extends Button {
   -------------------------------------------------------------------------
 */
 
-export class FillButton extends Neo.Button {
+export class FillButton extends Button {
   constructor() {
     super();
   }

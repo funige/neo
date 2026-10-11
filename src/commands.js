@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./container.js";
+import { Neo } from "./neo.js";
 import { Painter } from "./painter.js";
 export class Commands {
   constructor() {
@@ -29,7 +29,7 @@ export class Commands {
      * @property {number} zoom - 現在のズーム値
      * @property {(newZoom: number) => void} setZoom - ズーム値を設定するメソッド
      */
-    this.ZoomPlusCommand = class extends Neo.CommandBase {
+    this.ZoomPlusCommand = class extends this.CommandBase {
       /** @param {Painter} data */
       constructor(data) {
         super();

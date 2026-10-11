@@ -1,5 +1,8 @@
 "use strict";
 //@ts-check
+import { Neo } from "./neo.js";
+import { Painter } from "./painter.js";
+import { ToolTip, FillButton } from "./widgets.js";
 
 export class ToolBase {
   constructor() {
@@ -15,33 +18,33 @@ export class ToolBase {
     this.lineType = Neo.Painter.LINETYPE_NONE;
   }
 
-  /** @param {Neo.Painter} oe * */
+  /** @param {Painter} oe * */
   init(oe) {}
   kill() {}
 
-  /** @param {Neo.Painter} oe * */
+  /** @param {Painter} oe * */
   downHandler(oe) {
     this.startX = oe.mouseX;
     this.startY = oe.mouseY;
   }
 
-  /** @param {Neo.Painter} oe * */
+  /** @param {Painter} oe * */
   upHandler(oe) {}
 
-  /** @param {Neo.Painter} oe * */
+  /** @param {Painter} oe * */
   moveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
   /** @param {KeyboardEvent} e */
   keyDownHandler(e) {}
   /** @param {KeyboardEvent} e */
   keyUpHandler(e) {}
   cancelBezier() {}
-  /** @param {Neo.Painter} oe * */
+  /** @param {Painter} oe * */
   transformForZoom(oe) {
     var ctx = oe.destCanvasCtx;
     ctx.translate(oe.canvasWidth * 0.5, oe.canvasHeight * 0.5);
@@ -53,7 +56,7 @@ export class ToolBase {
     return this.type;
   }
   /**
-   * @returns {Neo.ToolTip|Neo.FillButton|null}
+   * @returns {ToolTip|FillButton|null}
    */
   getToolButton() {
     switch (this.type) {
@@ -189,7 +192,7 @@ export class DrawToolBase extends ToolBase {
     this.isUpMove = true;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     switch (oe.drawType) {
       case Neo.Painter.DRAWTYPE_FREEHAND:
@@ -204,7 +207,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {
     switch (oe.drawType) {
       case Neo.Painter.DRAWTYPE_FREEHAND:
@@ -219,7 +222,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {
     switch (oe.drawType) {
       case Neo.Painter.DRAWTYPE_FREEHAND:
@@ -234,7 +237,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {
     switch (oe.drawType) {
       case Neo.Painter.DRAWTYPE_FREEHAND:
@@ -260,9 +263,9 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {
     if (!oe.isMouseDown && !oe.isMouseDownRight) {
       oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -281,7 +284,7 @@ export class DrawToolBase extends ToolBase {
 
   /**
    * FreeHand (手書き)
-   *  @param {Neo.Painter} oe
+   *  @param {Painter} oe
    * */
   freeHandDownHandler(oe) {
     //Register undo first;
@@ -313,7 +316,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   freeHandUpHandler(oe) {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -329,7 +332,7 @@ export class DrawToolBase extends ToolBase {
     oe.prevLine = null;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   freeHandMoveHandler(oe) {
     var ctx = oe.canvasCtx[oe.current];
     var x0 = Math.floor(oe.mouseX);
@@ -359,7 +362,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   freeHandUpMoveHandler(oe) {
     this.isUpMove = true;
 
@@ -376,7 +379,7 @@ export class DrawToolBase extends ToolBase {
     this.drawCursor(oe);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   drawCursor(oe) {
     if (oe.zoom < 0.5) {
       //0.2倍時にカーソルのゴミが出るため
@@ -393,14 +396,12 @@ export class DrawToolBase extends ToolBase {
     var y = (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
     var r = d * 0.5 * oe.zoom;
 
-    if (
-      !(
-        x > -r &&
-        y > -r &&
-        x < oe.destCanvas.width + r &&
-        y < oe.destCanvas.height + r
-      )
-    )
+    if (!(
+      x > -r &&
+      y > -r &&
+      x < oe.destCanvas.width + r &&
+      y < oe.destCanvas.height + r
+    ))
       return;
 
     var ctx = oe.destCanvasCtx;
@@ -417,7 +418,7 @@ export class DrawToolBase extends ToolBase {
 
   /**
    * Line (直線)
-   *  @param {Neo.Painter} oe
+   *  @param {Painter} oe
    * */
   lineDownHandler(oe) {
     this.isUpMove = false;
@@ -426,7 +427,7 @@ export class DrawToolBase extends ToolBase {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   lineUpHandler(oe) {
     if (this.isUpMove == false) {
       this.isUpMove = true;
@@ -447,17 +448,17 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   lineMoveHandler(oe) {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     this.drawLineCursor(oe);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   lineUpMoveHandler(oe) {}
 
   /**
-   *  @param {Neo.Painter} oe
+   *  @param {Painter} oe
    *  @param {number} [mx]
    *  @param {number} [my]
    * */
@@ -487,7 +488,7 @@ export class DrawToolBase extends ToolBase {
 
   /**
    *  Bezier (BZ曲線)
-   *  @param {Neo.Painter} oe
+   *  @param {Painter} oe
    * */
   bezierDownHandler(oe) {
     oe.isBezierActive = true;
@@ -509,7 +510,7 @@ export class DrawToolBase extends ToolBase {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   bezierUpHandler(oe) {
     if (this.isUpMove == false) {
       this.isUpMove = true;
@@ -562,7 +563,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   bezierMoveHandler(oe) {
     switch (this.step) {
       case 0:
@@ -583,7 +584,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   bezierUpMoveHandler(oe) {
     if (this.step === 3) {
       //Bz確定時はそのままmove
@@ -610,7 +611,7 @@ export class DrawToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   drawBezierCursor1(oe) {
     var ctx = oe.destCanvasCtx;
 
@@ -665,7 +666,7 @@ export class DrawToolBase extends ToolBase {
     ctx.restore();
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   drawBezierCursor2(oe) {
     var ctx = oe.destCanvasCtx;
 
@@ -906,7 +907,7 @@ export class HandTool extends ToolBase {
     this.reverse = false;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -916,13 +917,13 @@ export class HandTool extends ToolBase {
     this.startY = oe.rawMouseY;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {
     this.isDrag = false;
     oe.popTool();
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {
     if (!this.isDrag) return;
 
@@ -960,11 +961,11 @@ export class HandTool extends ToolBase {
       this.ticking = false;
     });
   }
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
 }
 
@@ -984,7 +985,7 @@ export class SliderTool extends ToolBase {
     this.isAlt = false;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     if (!oe.isShiftDown) this.isDrag = true;
 
@@ -1005,7 +1006,7 @@ export class SliderTool extends ToolBase {
     );
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {
     this.isDrag = false;
     oe.popTool();
@@ -1025,7 +1026,7 @@ export class SliderTool extends ToolBase {
     );
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {
     if (this.isDrag) {
       if (!this.target) {
@@ -1044,11 +1045,11 @@ export class SliderTool extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
 }
 
@@ -1066,7 +1067,7 @@ export class FillTool extends ToolBase {
     this.isUpMove = false;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     var x = Math.floor(oe.mouseX);
     var y = Math.floor(oe.mouseY);
@@ -1078,17 +1079,17 @@ export class FillTool extends ToolBase {
     //oe.doFloodFill(layer, x, y, color);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {}
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {}
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
 }
 
@@ -1106,7 +1107,7 @@ export class EraseAllTool extends ToolBase {
     this.isUpMove = false;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     oe._pushUndo();
     oe._actionMgr.eraseAll();
@@ -1116,15 +1117,15 @@ export class EraseAllTool extends ToolBase {
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);*/
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
 }
 
@@ -1150,7 +1151,7 @@ export class EffectToolBase extends ToolBase {
     this.defaultAlpha = 0;
   }
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {number} x
    * @param {number} y
    * @param {number} width
@@ -1158,7 +1159,7 @@ export class EffectToolBase extends ToolBase {
    */
   doEffect(oe, x, y, width, height) {}
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     this.isUpMove = false;
     this.ticking = false;
@@ -1167,7 +1168,7 @@ export class EffectToolBase extends ToolBase {
     this.startY = this.endY = oe.clipMouseY;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {
     if (this.isUpMove) return;
     this.isUpMove = true;
@@ -1201,7 +1202,7 @@ export class EffectToolBase extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {
     this.latestX = oe.clipMouseX;
     this.latestY = oe.clipMouseY;
@@ -1221,13 +1222,13 @@ export class EffectToolBase extends ToolBase {
       this.ticking = false;
     });
   }
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   drawCursor(oe) {
     var ctx = oe.destCanvasCtx;
 
@@ -1276,7 +1277,7 @@ export class EraseRectTool extends EffectToolBase {
   /**
    * 矩形消去ツールの実行
    * @description
-   * @param {Neo.Painter} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
+   * @param {Painter} oe - PaintBBS NEOのメインインスタンス (Neo.painter)
    * @param {number} x - 開始X座標
    * @param {number} y - 開始Y座標
    * @param {number} width - 消去する幅
@@ -1304,7 +1305,7 @@ export class FlipHTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1333,7 +1334,7 @@ export class FlipVTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1362,7 +1363,7 @@ export class BlurRectTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1399,7 +1400,7 @@ export class TurnTool extends EffectToolBase {
     this.type = Neo.Painter.TOOLTYPE_TURN;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   doEffect(oe) {
     this.isUpMove = true;
 
@@ -1444,7 +1445,7 @@ export class MergeTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1473,7 +1474,7 @@ export class CopyTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1485,10 +1486,12 @@ export class CopyTool extends EffectToolBase {
     //  oe.copy(oe.current, x, y, width, height);
     oe._actionMgr.copy(x, y, width, height);
     oe.setToolByType(Neo.Painter.TOOLTYPE_PASTE); // ツールをPasteToolに切り替える
-    oe.pasteTool.x = x; // 切り替わったインスタンスに座標を設定
-    oe.pasteTool.y = y;
-    oe.pasteTool.width = width;
-    oe.pasteTool.height = height;
+    if (oe.pasteTool) {
+      oe.pasteTool.x = x; // 切り替わったインスタンスに座標を設定
+      oe.pasteTool.y = y;
+      oe.pasteTool.width = width;
+      oe.pasteTool.height = height;
+    }
   }
 }
 
@@ -1513,7 +1516,7 @@ export class PasteTool extends ToolBase {
     this.type = Neo.Painter.TOOLTYPE_PASTE;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     this.ticking = false;
     oe.isCopyActive = false;
@@ -1522,7 +1525,7 @@ export class PasteTool extends ToolBase {
     this.drawCursor(oe);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {
     oe._pushUndo();
 
@@ -1535,7 +1538,7 @@ export class PasteTool extends ToolBase {
     oe.setToolByType(Neo.Painter.TOOLTYPE_COPY);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {
     var dx = Math.floor(oe.mouseX - this.startX);
     var dy = Math.floor(oe.mouseY - this.startY);
@@ -1572,7 +1575,7 @@ export class PasteTool extends ToolBase {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   drawCursor(oe) {
     var ctx = oe.destCanvasCtx;
 
@@ -1609,7 +1612,7 @@ export class RectTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1639,7 +1642,7 @@ export class RectFillTool extends EffectToolBase {
     this.isFill = true;
   }
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1669,7 +1672,7 @@ export class EllipseTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1700,7 +1703,7 @@ export class EllipseFillTool extends EffectToolBase {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @param {Number} x
    * @param {Number} y
    * @param {Number} width
@@ -1729,7 +1732,7 @@ export class TextTool extends ToolBase {
     this.isUpMove = false;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {
     this.startX = oe.mouseX;
     this.startY = oe.mouseY;
@@ -1753,15 +1756,15 @@ export class TextTool extends ToolBase {
     }
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
 
   /**
@@ -1842,18 +1845,18 @@ export class DummyTool extends ToolBase {
     this.isUpMove = false;
   }
 
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   downHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upHandler(oe) {
     oe.popTool();
   }
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   moveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   upMoveHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOverHandler(oe) {}
-  /** @param {Neo.Painter} oe */
+  /** @param {Painter} oe */
   rollOutHandler(oe) {}
 }

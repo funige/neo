@@ -8,7 +8,8 @@
     />
     <title>NEO Test 2</title>
     <link rel="stylesheet" href="../dist/neo.css" />
-    <script type="module" src="../src/container.js" charset="UTF-8"></script>
+    <script src="../src/lz-string.js"></script>
+    <script type="module" src="../src/main.js" charset="UTF-8"></script>
     <link
       rel="stylesheet"
       href="./library/reinvented-color-wheel/reinvented-color-wheel.min.css"
@@ -47,7 +48,7 @@
           <input type="submit" value="RELOAD">
         </form>
       `;
-
+    document.addEventListener("DOMContentLoaded", function () {
       Neo.params = {
         paintbbs: {
           image_width: `${w}`,
@@ -62,7 +63,7 @@
           neo_color_picker_id: "neo-colorPicker",
         },
       };
-
+    });
       const appletdummy = document.getElementById("appletdummy");
       appletdummy.insertAdjacentHTML("afterbegin", html);
 

@@ -1,7 +1,8 @@
 "use strict";
-import { Neo } from "./container.js";
-import { translate } from "./dictionary.js";
 //@ts-check
+import { Neo } from "./neo.js";
+import { translate } from "./dictionary.js";
+
 /*
   -----------------------------------------------------------------------
     Action Manager
@@ -1179,6 +1180,8 @@ Neo.initViewer = function (pch) {
  * 3. プレイヤーコントロール(ボタン類)の生成と機能バインディング。
  */
 Neo.startViewer = function () {
+  const commands = new Neo.Commands();
+
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "pch";
     if (!(/** @type {any} */ (document)[name]))

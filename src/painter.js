@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./container.js";
+import { Neo } from "./neo.js";
 import { ActionManager } from "./actions.js";
 import {
   ToolBase,
@@ -30,6 +30,7 @@ import {
   BlurRectTool,
   TurnTool,
 } from "./tools.js";
+
 Neo.CurrentToolType = 1;
 
 export class Painter {
@@ -264,13 +265,13 @@ export class Painter {
 
     //テキストツール以外のツールに切り替えるときは、テキストツールを終了する
     if (tool !== this.textTool) {
-      this.textTool.kill();
+      this.textTool?.kill();
     }
     if (this.tool && this.tool.cancelBezier) {
       this.tool.cancelBezier();
     }
     if (tool !== this.pasteTool) {
-      this.pasteTool.kill();
+      this.pasteTool?.kill();
     }
     if (this.tool && this.tool.kill) {
       this.tool.kill();
@@ -995,21 +996,29 @@ export class Painter {
         /** @type {BarElement} */ (e.target)["data-bar"]
       ) {
         this.pushTool(this.handTool);
-        this.handTool.reverse = false;
+        if (this.handTool) {
+          this.handTool.reverse = false;
+        }
       } else if (this.isSpaceDown && document.activeElement != this.inputText) {
         this.pushTool(this.handTool);
-        this.handTool.reverse = true;
+        if (this.handTool) {
+          this.handTool.reverse = true;
+        }
       } else if (
         e.target instanceof HTMLElement &&
         /** @type {any} */ (e.target)["data-slider"] != undefined
       ) {
         this.pushTool(this.sliderTool);
-        this.sliderTool.target = e.target;
-        this.sliderTool.isAlt = false;
+        if (this.sliderTool) {
+          this.sliderTool.target = e.target;
+          this.sliderTool.isAlt = false;
+        }
       } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
         this.pushTool(this.sliderTool);
-        this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.sliderTool.isAlt = true;
+        if (this.sliderTool) {
+          this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
+          this.sliderTool.isAlt = true;
+        }
       } else if (e.target instanceof HTMLElement && this.isWidget(e.target)) {
         // UI操作時のツール切り替え（dummyToolへの差し替え）
         this.isMouseDown = false;

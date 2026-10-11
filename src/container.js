@@ -1,10 +1,10 @@
 "use strict";
+
+import { Neo } from "./neo.js";
 import { Commands } from "./commands.js";
 import { Painter } from "./painter.js";
 //@ts-check
 document.addEventListener("DOMContentLoaded", () => {
-  window.Neo = Neo;
-
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
       Neo.start();
@@ -21,8 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   );
 });
-
-var Neo = {};
 
 Neo.version = "PACKAGE_JSON_VERSION";
 // @ts-ignore
@@ -1076,46 +1074,47 @@ Neo.initComponents = function () {
 };
 
 Neo.initButtons = function () {
-  const commands = new Neo.Commands();
+  const commands = new Commands();
   const neo_undo = new Neo.Button().init("neo-undo");
   if (neo_undo) {
     neo_undo.onmouseup = function () {
-      commands.UndoCommand = new Neo.UndoCommand(Neo.painter);
-      commands.UndoCommand.execute();
+      const UndoCommand = new commands.UndoCommand(Neo.painter);
+      UndoCommand.execute();
     };
   }
   const neo_redo = new Neo.Button().init("neo-redo");
   if (neo_redo) {
     neo_redo.onmouseup = function () {
-      commands.RedoCommand = new Neo.RedoCommand(Neo.painter);
-      commands.RedoCommand.execute();
+      const RedoCommand = new commands.RedoCommand(Neo.painter);
+      RedoCommand.execute();
     };
   }
   const neo_window = new Neo.Button().init("neo-window");
   if (neo_window) {
     neo_window.onmouseup = function () {
-      commands.WindowCommand = new Neo.WindowCommand(Neo.painter);
-      commands.WindowCommand.execute();
+      const WindowCommand = new commands.WindowCommand(Neo.painter);
+      WindowCommand.execute();
     };
   }
   const neo_copyright = new Neo.Button().init("neo-copyright");
   if (neo_copyright) {
     neo_copyright.onmouseup = function () {
-      commands.CopyrightCommand = new Neo.CopyrightCommand(Neo.painter);
-      commands.CopyrightCommand.execute();
+      const CopyrightCommand = new commands.CopyrightCommand(Neo.painter);
+      CopyrightCommand.execute();
     };
   }
   const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
   if (neo_zoomPlus) {
     neo_zoomPlus.onmouseup = function () {
-      commands.ZoomPlusCommand = new Neo.ZoomPlusCommand(Neo.painter);
-      commands.ZoomPlusCommand.execute();
+      const ZoomPlusCommand = new commands.ZoomPlusCommand(Neo.painter);
+      ZoomPlusCommand.execute();
     };
   }
   const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
   if (neo_zoomMinus) {
     neo_zoomMinus.onmouseup = function () {
-      new Neo.ZoomMinusCommand(Neo.painter).execute();
+      const ZoomMinusCommand = new commands.ZoomMinusCommand(Neo.painter);
+      ZoomMinusCommand.execute();
     };
   }
   Neo.submitButton = new Neo.Button().init("neo-submit");
@@ -1125,8 +1124,8 @@ Neo.initButtons = function () {
   }
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton?.disable(5000);
-    commands.SubmitCommand = new Neo.SubmitCommand(Neo.painter);
-    commands.SubmitCommand.execute();
+    const SubmitCommand = new commands.SubmitCommand(Neo.painter);
+    SubmitCommand.execute();
   };
 
   Neo.fillButton = new Neo.FillButton().init("neo-fill");
@@ -2087,5 +2086,4 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  *
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
-
 export { Neo };
