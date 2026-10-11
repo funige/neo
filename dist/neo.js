@@ -512,7 +512,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.0 Beta1";
+  Neo.version = "1.8.0";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -582,12 +582,6 @@
   Neo.SLIDERTYPE_SIZE = 4;
   document.neo = Neo;
 
-  // src/commands.js
-  var commands_exports = {};
-  __export(commands_exports, {
-    Commands: () => Commands
-  });
-
   // src/painter.js
   var painter_exports = {};
   __export(painter_exports, {
@@ -596,12 +590,334 @@
     UndoManager: () => UndoManager
   });
 
-  // src/actions.js
-  var actions_exports = {};
-  __export(actions_exports, {
-    ActionManager: () => ActionManager
+  // src/commands.js
+  var commands_exports = {};
+  __export(commands_exports, {
+    Commands: () => Commands
   });
-  var import_lz_string = __toESM(require_lz_string());
+
+  // src/dictionary.js
+  var dictionary = {
+    ja: {},
+    en: {
+      \u3084\u308A\u76F4\u3057: "Redo",
+      \u5143\u306B\u623B\u3059: "Undo",
+      \u5857\u308A\u6F70\u3057: "Paint",
+      \u7A93: "F&nbsp;",
+      \u6295\u7A3F: "Send",
+      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "(C)shi-chan PaintBBS NEO",
+      \u925B\u7B46: "Solid",
+      \u6C34\u5F69: "WaterC",
+      \uFF83\uFF77\uFF7D\uFF84: "Text",
+      \u30C8\u30FC\u30F3: "Tone",
+      \u307C\u304B\u3057: "ShadeOff",
+      \u8986\u3044\u713C\u304D: "HLight",
+      \u713C\u304D\u8FBC\u307F: "Dark",
+      \u6D88\u3057\u30DA\u30F3: "White",
+      \u6D88\u3057\u56DB\u89D2: "WhiteRect",
+      \u5168\u6D88\u3057: "Clear",
+      \u56DB\u89D2: "Rect",
+      \u7DDA\u56DB\u89D2: "LineRect",
+      \u6955\u5186: "Oval",
+      \u7DDA\u6955\u5186: "LineOval",
+      \u30B3\u30D4\u30FC: "Copy",
+      \uFF9A\uFF72\uFF94\u7D50\u5408: "lay-unif",
+      \u89D2\u53D6\u308A: "Antialias",
+      \u5DE6\u53F3\u53CD\u8EE2: "reverseL",
+      \u4E0A\u4E0B\u53CD\u8EE2: "reverseU",
+      \u50BE\u3051: "lie",
+      \u901A\u5E38: "Normal",
+      \u30DE\u30B9\u30AF: "Mask",
+      \u9006\uFF8F\uFF7D\uFF78: "ReMask",
+      \u52A0\u7B97: "And",
+      \u9006\u52A0\u7B97: "Div",
+      \u624B\u66F8\u304D: "FreeLine",
+      \u76F4\u7DDA: "Straight",
+      BZ\u66F2\u7DDA: "Bezie",
+      "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "Page view?",
+      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "Window view?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Restore session?",
+      \u53F3: "Right Click",
+      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
+      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "This browser may fail to send your picture.<br>",
+      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Discard animation data and restore session?",
+      \u6700: "Mx",
+      \u65E9: "H",
+      \u65E2: "M",
+      \u920D: "L",
+      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "Please push send button again.",
+      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "HTTP status code",
+      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "Layer information will not be saved.\nAre you sure you want to continue?"
+    },
+    enx: {
+      \u3084\u308A\u76F4\u3057: "Redo",
+      \u5143\u306B\u623B\u3059: "Undo",
+      \u5857\u308A\u6F70\u3057: "Fill",
+      \u7A93: "Float",
+      \u6295\u7A3F: "Send",
+      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
+      \u925B\u7B46: "Solid",
+      \u6C34\u5F69: "WaterCo",
+      \uFF83\uFF77\uFF7D\uFF84: "Text",
+      \u30C8\u30FC\u30F3: "Halftone",
+      \u307C\u304B\u3057: "Blur",
+      \u8986\u3044\u713C\u304D: "Light",
+      \u713C\u304D\u8FBC\u307F: "Dark",
+      \u6D88\u3057\u30DA\u30F3: "White",
+      \u6D88\u3057\u56DB\u89D2: "WhiteRe",
+      \u5168\u6D88\u3057: "Clear",
+      \u56DB\u89D2: "Rect",
+      \u7DDA\u56DB\u89D2: "LineRect",
+      \u6955\u5186: "Oval",
+      \u7DDA\u6955\u5186: "LineOval",
+      \u30B3\u30D4\u30FC: "Copy",
+      \uFF9A\uFF72\uFF94\u7D50\u5408: "layerUnit",
+      \u89D2\u53D6\u308A: "antiAlias",
+      \u5DE6\u53F3\u53CD\u8EE2: "flipHorita",
+      \u4E0A\u4E0B\u53CD\u8EE2: "flipVertic",
+      \u50BE\u3051: "rotate",
+      \u901A\u5E38: "Normal",
+      \u30DE\u30B9\u30AF: "Mask",
+      \u9006\uFF8F\uFF7D\uFF78: "ReMask",
+      \u52A0\u7B97: "And",
+      \u9006\u52A0\u7B97: "Divide",
+      \u624B\u66F8\u304D: "Freehan",
+      \u76F4\u7DDA: "Line",
+      BZ\u66F2\u7DDA: "Bezier",
+      Layer0: "LayerBG",
+      Layer1: "LayerFG",
+      "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "Page view?",
+      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "Window view?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Restore session?",
+      \u53F3: "Right Click",
+      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
+      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "This browser may fail to send your picture.<br>",
+      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "Send this picture and end session?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Discard animation data and restore session?",
+      \u6700: "Mx",
+      \u65E9: "H",
+      \u65E2: "M",
+      \u920D: "L",
+      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "Failed to upload image. please try again.",
+      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "HTTP status code",
+      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "Layer information will not be saved.\nAre you sure you want to continue?"
+    },
+    es: {
+      \u3084\u308A\u76F4\u3057: "Rehacer",
+      \u5143\u306B\u623B\u3059: "Deshacer",
+      \u5857\u308A\u6F70\u3057: "Llenar",
+      \u7A93: "Ventana",
+      \u6295\u7A3F: "Enviar",
+      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
+      \u925B\u7B46: "L\xE1piz",
+      \u6C34\u5F69: "Acuarela",
+      \uFF83\uFF77\uFF7D\uFF84: "Texto",
+      \u30C8\u30FC\u30F3: "Tono",
+      \u307C\u304B\u3057: "Gradaci\xF3n",
+      \u8986\u3044\u713C\u304D: "Sobreexp.",
+      \u713C\u304D\u8FBC\u307F: "Quemar",
+      \u6D88\u3057\u30DA\u30F3: "Goma",
+      \u6D88\u3057\u56DB\u89D2: "GomaRect",
+      \u5168\u6D88\u3057: "Borrar",
+      \u56DB\u89D2: "Rect",
+      \u7DDA\u56DB\u89D2: "L\xEDneaRect",
+      \u6955\u5186: "\xD3valo",
+      \u7DDA\u6955\u5186: "L\xEDnea\xD3valo",
+      \u30B3\u30D4\u30FC: "Copiar",
+      \uFF9A\uFF72\uFF94\u7D50\u5408: "UnirCapa",
+      \u89D2\u53D6\u308A: "Antialias",
+      \u5DE6\u53F3\u53CD\u8EE2: "Inv.Izq/Der",
+      \u4E0A\u4E0B\u53CD\u8EE2: "Inv.Arr/Aba",
+      \u50BE\u3051: "Inclinar",
+      \u901A\u5E38: "Normal",
+      \u30DE\u30B9\u30AF: "Masc.",
+      \u9006\uFF8F\uFF7D\uFF78: "Masc.Inv",
+      \u52A0\u7B97: "Adici\xF3n",
+      \u9006\u52A0\u7B97: "Subtrac",
+      \u624B\u66F8\u304D: "Libre",
+      \u76F4\u7DDA: "L\xEDnea",
+      BZ\u66F2\u7DDA: "Curva",
+      Layer0: "Capa0",
+      Layer1: "Capa1",
+      "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "\xBFVista de p\xE1gina?",
+      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "\xBFVista de ventana?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "\xBFRestaurar sesi\xF3n anterior?",
+      \u53F3: "Clic derecho",
+      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO es una versi\xF3n para HTML5 de Oekaki Shi-BBS PaintBBS (\xA9 2000-2004 shi-chan). \xBFMostrar la p\xE1gina del proyecto?",
+      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "Este navegador podr\xEDa no enviar su imagen.<br>",
+      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "\xBFEnviar esta imagen y finalizar sesi\xF3n?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "\xBFDesechar datos de animaci\xF3n y restaurar sesi\xF3n?",
+      \u6700: "Mx",
+      \u65E9: "H",
+      \u65E2: "M",
+      \u920D: "L",
+      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "No se pudo cargar la imagen. por favor, int\xE9ntalo de nuevo.",
+      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "C\xF3digo de estado HTTP",
+      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "La informaci\xF3n de las capas no se guardar\xE1.\n\xBFEst\xE1 seguro de que desea continuar?"
+    }
+  };
+  var translate = (function() {
+    var language = window.navigator.languages && window.navigator.languages[0] || window.navigator.language;
+    var lang = "en";
+    for (var key in dictionary) {
+      if (language.indexOf(key) == 0) {
+        lang = key;
+        break;
+      }
+    }
+    return function(string) {
+      if (Neo.config.neo_alt_translation) {
+        if (lang == "en") lang = "enx";
+      } else {
+        if (lang != "ja") lang = "en";
+      }
+      return dictionary[lang][string] || string;
+    };
+  })();
+
+  // src/commands.js
+  var Commands = class {
+    constructor() {
+      this.CommandBase = class {
+        constructor() {
+          this.data = null;
+          this.zoom_steps = Neo.config.neo_enable_zoom_out ? [
+            0.2,
+            0.4,
+            0.6,
+            0.8,
+            1,
+            1.5,
+            2,
+            2.5,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            10,
+            11,
+            12
+          ] : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12];
+        }
+        execute() {
+        }
+      };
+      this.ZoomPlusCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          const steps = this.zoom_steps;
+          let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
+          if (currentIndex === -1) currentIndex = steps.length - 1;
+          if (steps[currentIndex] === this.data.zoom && currentIndex < steps.length - 1) {
+            currentIndex++;
+          } else if (steps[currentIndex] > this.data.zoom) {
+          } else if (currentIndex < steps.length - 1) {
+            currentIndex++;
+          }
+          if (currentIndex < steps.length) {
+            this.data.setZoom(steps[currentIndex]);
+          }
+          Neo.resizeCanvas();
+        }
+      };
+      this.ZoomMinusCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          const steps = this.zoom_steps;
+          let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
+          if (currentIndex > 0) {
+            if (steps[currentIndex] === this.data.zoom) {
+              currentIndex--;
+            } else {
+              currentIndex = Math.max(0, currentIndex - 1);
+            }
+            this.data.setZoom(steps[currentIndex]);
+          }
+          Neo.resizeCanvas();
+        }
+      };
+      this.UndoCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          this.data.cancelCopy();
+          this.data.undo();
+        }
+      };
+      this.RedoCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          this.data.redo();
+        }
+      };
+      this.WindowCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          if (Neo.fullScreen) {
+            if (confirm(translate("\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F"))) {
+              Neo.fullScreen = false;
+              Neo.updateWindow();
+            }
+          } else {
+            if (confirm(translate("\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F"))) {
+              Neo.fullScreen = true;
+              Neo.updateWindow();
+            }
+          }
+        }
+      };
+      this.SubmitCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          var baseURL = location.href.replace(/[^/]*$/, "");
+          this.data.submit(baseURL);
+        }
+      };
+      this.CopyrightCommand = class extends this.CommandBase {
+        /** @param {Painter} data */
+        constructor(data) {
+          super();
+          this.data = data;
+        }
+        execute() {
+          var url = "http://github.com/funige/neo/";
+          if (confirm(
+            translate(
+              "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F"
+            ) + "\n"
+          )) {
+            Neo.openURL(url);
+          }
+        }
+      };
+    }
+  };
 
   // src/widgets.js
   var widgets_exports = {};
@@ -1224,9 +1540,9 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u925B\u7B46"),
-        Neo.translate("\u6C34\u5F69"),
-        Neo.translate("\uFF83\uFF77\uFF7D\uFF84")
+        translate("\u925B\u7B46"),
+        translate("\u6C34\u5F69"),
+        translate("\uFF83\uFF77\uFF7D\uFF84")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1269,10 +1585,10 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u30C8\u30FC\u30F3"),
-        Neo.translate("\u307C\u304B\u3057"),
-        Neo.translate("\u8986\u3044\u713C\u304D"),
-        Neo.translate("\u713C\u304D\u8FBC\u307F")
+        translate("\u30C8\u30FC\u30F3"),
+        translate("\u307C\u304B\u3057"),
+        translate("\u8986\u3044\u713C\u304D"),
+        translate("\u713C\u304D\u8FBC\u307F")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1355,9 +1671,9 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u6D88\u3057\u30DA\u30F3"),
-        Neo.translate("\u6D88\u3057\u56DB\u89D2"),
-        Neo.translate("\u5168\u6D88\u3057")
+        translate("\u6D88\u3057\u30DA\u30F3"),
+        translate("\u6D88\u3057\u56DB\u89D2"),
+        translate("\u5168\u6D88\u3057")
       ];
       this.drawOnce = false;
       this.isTool = true;
@@ -1425,10 +1741,10 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u56DB\u89D2"),
-        Neo.translate("\u7DDA\u56DB\u89D2"),
-        Neo.translate("\u6955\u5186"),
-        Neo.translate("\u7DDA\u6955\u5186")
+        translate("\u56DB\u89D2"),
+        translate("\u7DDA\u56DB\u89D2"),
+        translate("\u6955\u5186"),
+        translate("\u7DDA\u6955\u5186")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1479,12 +1795,12 @@
     init(elementID, params = {}) {
       var _a;
       this.toolStrings = [
-        Neo.translate("\u30B3\u30D4\u30FC"),
-        Neo.translate("\uFF9A\uFF72\uFF94\u7D50\u5408"),
-        Neo.translate("\u89D2\u53D6\u308A"),
-        Neo.translate("\u5DE6\u53F3\u53CD\u8EE2"),
-        Neo.translate("\u4E0A\u4E0B\u53CD\u8EE2"),
-        Neo.translate("\u50BE\u3051")
+        translate("\u30B3\u30D4\u30FC"),
+        translate("\uFF9A\uFF72\uFF94\u7D50\u5408"),
+        translate("\u89D2\u53D6\u308A"),
+        translate("\u5DE6\u53F3\u53CD\u8EE2"),
+        translate("\u4E0A\u4E0B\u53CD\u8EE2"),
+        translate("\u50BE\u3051")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1520,11 +1836,11 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u901A\u5E38"),
-        Neo.translate("\u30DE\u30B9\u30AF"),
-        Neo.translate("\u9006\uFF8F\uFF7D\uFF78"),
-        Neo.translate("\u52A0\u7B97"),
-        Neo.translate("\u9006\u52A0\u7B97")
+        translate("\u901A\u5E38"),
+        translate("\u30DE\u30B9\u30AF"),
+        translate("\u9006\uFF8F\uFF7D\uFF78"),
+        translate("\u52A0\u7B97"),
+        translate("\u9006\u52A0\u7B97")
       ];
       this.fixed = true;
       super.init(elementID, params);
@@ -1594,9 +1910,9 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u624B\u66F8\u304D"),
-        Neo.translate("\u76F4\u7DDA"),
-        Neo.translate("BZ\u66F2\u7DDA")
+        translate("\u624B\u66F8\u304D"),
+        translate("\u76F4\u7DDA"),
+        translate("BZ\u66F2\u7DDA")
       ];
       this.fixed = true;
       super.init(elementID, params);
@@ -1994,7 +2310,7 @@
           { passive: false, capture: true }
         );
         this.element.className = "layerControl";
-        var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+        var layerStrings = [translate("Layer0"), translate("Layer1")];
         this.element.innerHTML = "<div class='bg'></div><div class='label0'>" + layerStrings[0] + "</div><div class='label1'>" + layerStrings[1] + "</div><div class='line1'></div><div class='line0'></div>";
         this.bg = this.element.querySelector(".bg");
         this.label0 = this.element.querySelector(".label0");
@@ -2258,7 +2574,7 @@
     update() {
       if (this.elementID == "neo-viewerSpeed") {
         var mode = Neo.painter._actionMgr.speedMode();
-        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+        var speedString = translate(Neo.ViewerButton.speedStrings[mode]);
         if (this.element) {
           this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
         }
@@ -2375,7 +2691,1441 @@
     }
   };
 
+  // src/container.js
+  document.addEventListener("DOMContentLoaded", () => {
+    if (Neo.init()) {
+      if (!navigator.userAgent.match("Electron")) {
+        Neo.start();
+      }
+    }
+    document.addEventListener(
+      "dblclick",
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      {
+        passive: false
+      }
+    );
+  });
+  Neo.extractBootConfig = function(targetName) {
+    Neo.params = Neo.params || Neo.param;
+    if (Neo.params && typeof Neo.params === "object" && Object.keys(Neo.params).length > 0) {
+      const params2 = Neo.params;
+      return params2[targetName] ? __spreadValues({}, params2[targetName]) : {};
+    }
+    const applet = `applet[name="${targetName}"], applet-dummy[name="${targetName}"], .neo-applet-${targetName}`;
+    const node = document.querySelector(applet);
+    if (!node) return {};
+    const config = {};
+    const params = node.querySelectorAll("param");
+    for (const param of params) {
+      const key = param.getAttribute("name");
+      const val = param.getAttribute("value");
+      if (key) {
+        config[key] = Neo.fixConfig(String(val));
+      }
+    }
+    return config;
+  };
+  Neo.init = function() {
+    let applets = document.querySelectorAll(
+      "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch"
+    );
+    for (const applet of applets) {
+      if (applet instanceof HTMLElement) {
+        let name = applet.getAttribute("name");
+        if (!name) {
+          for (const className of applet.classList) {
+            if (className.startsWith("neo-applet-")) {
+              name = className.replace("neo-applet-", "");
+              break;
+            }
+          }
+        }
+        if (name == "paintbbs" || name == "pch") {
+          Neo.applet = applet;
+          if (name == "paintbbs") {
+            Neo.initConfig(applet);
+            Neo.createContainer(applet);
+            Neo.init2();
+          } else {
+            Neo.viewer = true;
+            Neo.initConfig(applet);
+            var filename = Neo.getFilename();
+            Neo.getPCH(filename, function(pch) {
+              if (pch) {
+                Neo.createViewer(applet);
+                Neo.config.width = pch.width;
+                Neo.config.height = pch.height;
+                Neo.initViewer(pch);
+              }
+            });
+          }
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+  Neo.init2 = function() {
+    const pageview = document.getElementById("neo-pageView");
+    if (!pageview) return;
+    pageview.style.width = Neo.config.applet_width + "px";
+    pageview.style.height = Neo.config.applet_height + "px";
+    Neo.canvas = document.getElementById("neo-canvas");
+    if (!Neo.canvas) {
+      console.error("initViewer: Canvas element not found");
+      return;
+    }
+    Neo.container = document.getElementById("neo-container");
+    if (!Neo.container) {
+      console.error("init2: Container element not found");
+      return;
+    }
+    Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
+    Neo.tools = document.getElementById("neo-tools");
+    Neo.center = document.getElementById("neo-center");
+    if (Neo.center && Neo.container && Neo.container.clientWidth && Neo.container.clientWidth >= 400 && Neo.config.neo_disable_neo_center_min_width != "true") {
+      Neo.center.style.minWidth = "397px";
+    }
+    Neo.painter = new Painter();
+    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
+    Neo.container.oncontextmenu = function() {
+      return false;
+    };
+    Neo.isAnimation = Neo.config.thumbnail_type == "animation";
+    Neo.storage = localStorage;
+    var filename = Neo.getFilename();
+    var message = !filename || filename.slice(-4).toLowerCase() != ".pch" ? "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F" : "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F";
+    let storageTimestamp = Neo.storage.getItem("timestamp");
+    const nowTimestamp = Date.now();
+    if (Number.isInteger(Number(storageTimestamp)) && nowTimestamp - Number(storageTimestamp) > 3 * 86400 * 1e3) {
+      Neo.painter.clearSession();
+      storageTimestamp = null;
+    }
+    if (storageTimestamp && confirm(translate(message))) {
+      setTimeout(function() {
+        Neo.painter.loadSession(function() {
+          Neo.painter._pushUndo();
+          Neo.painter._actionMgr.restore();
+          Neo.painter.dirty = false;
+        });
+      }, 1);
+    } else {
+      Neo.painter.clearSession();
+      if (filename) {
+        if (filename.slice(-4).toLowerCase() == ".pch") {
+          Neo.painter.loadAnimation(filename);
+        } else {
+          Neo.painter.loadImage(filename);
+        }
+      }
+    }
+    window.addEventListener(
+      // "pagehide",
+      "beforeunload",
+      //ブラウザを終了した時にも復元データを保存
+      function(e) {
+        if (!Neo.uploaded && Neo.painter.isDirty()) {
+          Neo.painter.saveSession();
+        } else if (Neo.uploaded) {
+          Neo.painter.clearSession();
+        }
+      },
+      false
+    );
+    const originalTitle = document.title;
+    document.addEventListener("visibilitychange", () => {
+      if (Neo.config.neo_visibility_change_title_rewrite === "true") {
+        if (document.visibilityState === "visible") {
+          document.title = originalTitle;
+        } else if (document.visibilityState === "hidden") {
+          setTimeout(() => {
+            if (document.visibilityState === "hidden" && document.title === originalTitle) {
+              document.title = `${originalTitle} *`;
+            }
+          }, 3e3);
+        }
+      }
+    });
+  };
+  Neo.initConfig = function(applet) {
+    if (applet) {
+      var appletWidth = applet.dataset.width || applet.getAttribute("width");
+      var appletHeight = applet.dataset.height || applet.getAttribute("height");
+      if (appletWidth) Neo.config.applet_width = parseInt(appletWidth);
+      if (appletHeight) Neo.config.applet_height = parseInt(appletHeight);
+      let targetName;
+      if (applet instanceof HTMLElement) {
+        targetName = applet.getAttribute("name");
+        if (!targetName) {
+          for (const className of applet.classList) {
+            if (className.startsWith("neo-applet-")) {
+              targetName = className.replace("neo-applet-", "");
+              break;
+            }
+          }
+        }
+      }
+      if (!targetName) {
+        targetName = "paintbbs";
+      }
+      const params = Neo.extractBootConfig(targetName);
+      if (params) {
+        for (const key in params) {
+          const value = String(params[key]);
+          Neo.config[key] = Neo.fixConfig(value);
+          if (key === "image_width") Neo.config.width = parseInt(value);
+          if (key === "image_height") Neo.config.height = parseInt(value);
+        }
+      }
+      var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
+      Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
+      if (Neo.viewer && !Neo.config.color_bar) {
+        Neo.config.color_bar = "#eeeeff";
+      }
+      Neo.readStyles();
+      Neo.applyStyle("color_bk", "#ccccff");
+      Neo.applyStyle("color_bk2", "#bbbbff");
+      Neo.applyStyle("color_tool_icon", "#e8dfae");
+      Neo.applyStyle("color_icon", "#ccccff");
+      Neo.applyStyle("color_iconselect", "#ffaaaa");
+      Neo.applyStyle("color_text", "#666699");
+      Neo.applyStyle("color_bar", "#6f6fae");
+      Neo.applyStyle("tool_color_button", "#e8dfae");
+      Neo.applyStyle("tool_color_button2", "#f8daaa");
+      Neo.applyStyle("tool_color_text", "#773333");
+      Neo.applyStyle("tool_color_bar", "#ddddff");
+      Neo.applyStyle("tool_color_frame", "#000000");
+      if (Neo.viewer) {
+        Neo.applyStyle("color_back", "#ccccff");
+        Neo.applyStyle("color_bar_select", "#407675");
+      }
+      if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
+      if (Neo.config.neo_tool_side == "left" || Neo.config.neo_tool_side == "true") {
+        Neo.toolSide = true;
+      }
+    }
+    Neo.config.reserves = [
+      {
+        size: 1,
+        color: "#000000",
+        alpha: 1,
+        tool: Neo.Painter.TOOLTYPE_PEN,
+        drawType: Neo.Painter.DRAWTYPE_FREEHAND
+      },
+      {
+        size: 5,
+        color: "#FFFFFF",
+        alpha: 1,
+        tool: Neo.Painter.TOOLTYPE_ERASER,
+        drawType: Neo.Painter.DRAWTYPE_FREEHAND
+      },
+      {
+        size: 10,
+        color: "#FFFFFF",
+        alpha: 1,
+        tool: Neo.Painter.TOOLTYPE_ERASER,
+        drawType: Neo.Painter.DRAWTYPE_FREEHAND
+      }
+    ];
+    Neo.reservePen = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
+    Neo.clone(Neo.config.reserves[0]);
+    Neo.reserveEraser = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
+    Neo.clone(Neo.config.reserves[1]);
+  };
+  Neo.fixConfig = function(value) {
+    if (value.match(/^#[0-9a-fA-F]{5}$/)) {
+      value = "#0" + value.slice(1);
+    }
+    if (value.toLocaleLowerCase() === "true" || value.toLocaleLowerCase() === "false") {
+      return value.toLocaleLowerCase();
+    }
+    return value;
+  };
+  Neo.getStyleSheet = function() {
+    var style = document.createElement("style");
+    document.head.appendChild(style);
+    return style.sheet;
+  };
+  Neo.initSkin = function() {
+    Neo.styleSheet = Neo.getStyleSheet();
+    var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
+    var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
+    var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
+    var darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
+    var bgImage = Neo.painter ? Neo.backgroundImage() : "";
+    Neo.addRule(
+      ".NEO #neo-container",
+      "background-image",
+      "url(" + bgImage + ")"
+    );
+    Neo.addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .sizeSlider .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(
+      ".NEO .layerControl .label1",
+      "color",
+      Neo.config.tool_color_text
+    );
+    Neo.addRule(
+      ".NEO .layerControl .label0",
+      "color",
+      Neo.config.tool_color_text
+    );
+    Neo.addRule(".NEO .toolTipOn .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO .toolTipOff .label", "color", Neo.config.tool_color_text);
+    Neo.addRule(".NEO #neo-toolSet", "background-color", Neo.config.color_bk);
+    Neo.addRule(".NEO #neo-tools", "color", Neo.config.tool_color_text);
+    Neo.addRule(
+      ".NEO .layerControl .bg",
+      "border-bottom",
+      "1px solid " + Neo.config.tool_color_text
+    );
+    Neo.addRule(".NEO .buttonOn", "color", Neo.config.color_text);
+    Neo.addRule(".NEO .buttonOff", "color", Neo.config.color_text);
+    Neo.addRule(".NEO .buttonOff", "background-color", Neo.config.color_icon);
+    Neo.addRule(
+      ".NEO .buttonOff",
+      "border-top",
+      "1px solid ",
+      Neo.config.color_icon
+    );
+    Neo.addRule(
+      ".NEO .buttonOff",
+      "border-left",
+      "1px solid ",
+      Neo.config.color_icon
+    );
+    Neo.addRule(
+      ".NEO .buttonOff",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.color_icon + ", 0 0 0 2px " + Neo.config.color_frame
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:hover",
+      "background-color",
+      Neo.config.color_icon
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:hover",
+      "border-top",
+      "1px solid " + lightBorder
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:hover",
+      "border-left",
+      "1px solid " + lightBorder
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:hover",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:active, .NEO .buttonOn",
+      "background-color",
+      darkBorder
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:active, .NEO .buttonOn",
+      "border-top",
+      "1px solid " + darkBorder
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:active, .NEO .buttonOn",
+      "border-left",
+      "1px solid " + darkBorder
+    );
+    Neo.addRule(
+      ".NEO .buttonOff:active, .NEO .buttonOn",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame
+    );
+    Neo.addRule(
+      ".NEO #neo-canvas",
+      "border",
+      "1px solid " + Neo.config.color_frame
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH, .NEO #neo-scrollV",
+      "background-color",
+      Neo.config.color_icon
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH, .NEO #neo-scrollV",
+      "box-shadow",
+      "0 0 0 1px white, 0 0 0 2px " + Neo.config.color_frame
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
+      "background-color",
+      Neo.config.color_bar
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.color_icon
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div:hover, .NEO #neo-scrollV div:hover",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.color_iconselect
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
+      "border-top",
+      "1px solid " + lightBar
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
+      "border-left",
+      "1px solid " + lightBar
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
+      "border-right",
+      "1px solid " + darkBar
+    );
+    Neo.addRule(
+      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
+      "border-bottom",
+      "1px solid " + darkBar
+    );
+    Neo.addRule(
+      ".NEO .toolTipOn",
+      "background-color",
+      Neo.multColor(Neo.config.tool_color_button, 0.7)
+    );
+    Neo.addRule(
+      ".NEO .toolTipOff",
+      "background-color",
+      Neo.config.tool_color_button
+    );
+    Neo.addRule(
+      ".NEO .toolTipFixed",
+      "background-color",
+      Neo.config.tool_color_button2
+    );
+    Neo.addRule(
+      ".NEO .colorSlider, .NEO .sizeSlider",
+      "background-color",
+      Neo.config.tool_color_bar
+    );
+    Neo.addRule(
+      ".NEO .reserveControl",
+      "background-color",
+      Neo.config.tool_color_bar
+    );
+    Neo.addRule(
+      ".NEO .reserveControl",
+      "background-color",
+      Neo.config.tool_color_bar
+    );
+    Neo.addRule(
+      ".NEO .layerControl",
+      "background-color",
+      Neo.config.tool_color_bar
+    );
+    Neo.addRule(
+      ".NEO .colorTipOn, .NEO .colorTipOff",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.tool_color_frame
+    );
+    Neo.addRule(
+      ".NEO .toolTipOn, .NEO .toolTipOff",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.tool_color_frame
+    );
+    Neo.addRule(
+      ".NEO .toolTipFixed",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.tool_color_frame
+    );
+    Neo.addRule(
+      ".NEO .colorSlider, .NEO .sizeSlider",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.tool_color_frame
+    );
+    Neo.addRule(
+      ".NEO .reserveControl",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.tool_color_frame
+    );
+    Neo.addRule(
+      ".NEO .layerControl",
+      "box-shadow",
+      "0 0 0 1px " + Neo.config.tool_color_frame
+    );
+    Neo.addRule(
+      ".NEO .reserveControl .reserve",
+      "border",
+      "1px solid " + Neo.config.tool_color_frame
+    );
+    if (navigator.language.indexOf("ja") != 0) {
+      var labels = ["Fixed", "On", "Off"];
+      for (var i = 0; i < labels.length; i++) {
+        var selector = ".NEO .toolTip" + labels[i] + " .label";
+        Neo.addRule(selector, "letter-spacing", "0px !important");
+      }
+    }
+    Neo.setToolSide(Neo.toolSide);
+  };
+  Neo.addRule = function(selector, styleName, value, sheet = null) {
+    if (!sheet) {
+      sheet = Neo.styleSheet;
+    }
+    if (!sheet) {
+      throw new Error("Neo.addRule: Stylesheet is undefined.");
+    }
+    try {
+      if (sheet == null ? void 0 : sheet.insertRule) {
+        sheet.insertRule(
+          selector + " { " + styleName + ": " + value + "; }",
+          sheet.cssRules.length
+        );
+      }
+    } catch (e) {
+      console.error(
+        "Neo.addRule: Failed to insert rule for '" + selector + "'.",
+        e
+      );
+    }
+  };
+  Neo.readStyles = function() {
+    Neo.rules = [];
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      Neo.readStyle(document.styleSheets[i]);
+    }
+  };
+  Neo.readStyle = function(sheet) {
+    try {
+      var rules = sheet.cssRules;
+      for (var i = 0; i < rules.length; i++) {
+        var rule = rules[i];
+        if (rule instanceof CSSImportRule && rule.styleSheet) {
+          Neo.readStyle(rule.styleSheet);
+          continue;
+        }
+        if (rule instanceof CSSStyleRule) {
+          var selector = rule.selectorText;
+          if (selector) {
+            selector = selector.replace(/^(.NEO\s+)?\./, "");
+            var css = rule.cssText || rule.style.cssText;
+            var result = css.match(/color:\s*(.*)\s*;/);
+            if (result) {
+              var hex = Neo.colorNameToHex(result[1]);
+              if (hex) {
+                Neo.rules[selector] = hex;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+    }
+  };
+  Neo.applyStyle = function(name, defaultColor) {
+    if (Neo.config[name] == void 0) {
+      Neo.config[name] = Neo.rules[name] || defaultColor;
+    }
+  };
+  Neo.backgroundImage = function() {
+    var c1 = Neo.painter.getColor(Neo.config.color_bk) | 4278190080;
+    var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 4278190080;
+    var bgCanvas = document.createElement("canvas");
+    bgCanvas.width = 16;
+    bgCanvas.height = 16;
+    var ctx = bgCanvas.getContext("2d", {
+      willReadFrequently: true
+    });
+    if (!ctx) {
+      return "";
+    }
+    var imageData = ctx.getImageData(0, 0, 16, 16);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    var index = 0;
+    for (var y = 0; y < 16; y++) {
+      for (var x = 0; x < 16; x++) {
+        buf32[index++] = x == 14 || y == 14 ? c2 : c1;
+      }
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+    return bgCanvas.toDataURL("image/png");
+  };
+  Neo.multColor = function(c, scale) {
+    const rNum = Math.round(parseInt(c.slice(1, 3), 16) * scale);
+    const gNum = Math.round(parseInt(c.slice(3, 5), 16) * scale);
+    const bNum = Math.round(parseInt(c.slice(5, 7), 16) * scale);
+    const r = ("0" + Math.min(Math.max(rNum, 0), 255).toString(16)).slice(-2);
+    const g = ("0" + Math.min(Math.max(gNum, 0), 255).toString(16)).slice(-2);
+    const b = ("0" + Math.min(Math.max(bNum, 0), 255).toString(16)).slice(-2);
+    return "#" + r + g + b;
+  };
+  Neo.colorNameToHex = function(name) {
+    const colors = {
+      aliceblue: "#f0f8ff",
+      antiquewhite: "#faebd7",
+      aqua: "#00ffff",
+      aquamarine: "#7fffd4",
+      azure: "#f0ffff",
+      beige: "#f5f5dc",
+      bisque: "#ffe4c4",
+      black: "#000000",
+      blanchedalmond: "#ffebcd",
+      blue: "#0000ff",
+      blueviolet: "#8a2be2",
+      brown: "#a52a2a",
+      burlywood: "#deb887",
+      cadetblue: "#5f9ea0",
+      chartreuse: "#7fff00",
+      chocolate: "#d2691e",
+      coral: "#ff7f50",
+      cornflowerblue: "#6495ed",
+      cornsilk: "#fff8dc",
+      crimson: "#dc143c",
+      cyan: "#00ffff",
+      darkblue: "#00008b",
+      darkcyan: "#008b8b",
+      darkgoldenrod: "#b8860b",
+      darkgray: "#a9a9a9",
+      darkgreen: "#006400",
+      darkkhaki: "#bdb76b",
+      darkmagenta: "#8b008b",
+      darkolivegreen: "#556b2f",
+      darkorange: "#ff8c00",
+      darkorchid: "#9932cc",
+      darkred: "#8b0000",
+      darksalmon: "#e9967a",
+      darkseagreen: "#8fbc8f",
+      darkslateblue: "#483d8b",
+      darkslategray: "#2f4f4f",
+      darkturquoise: "#00ced1",
+      darkviolet: "#9400d3",
+      deeppink: "#ff1493",
+      deepskyblue: "#00bfff",
+      dimgray: "#696969",
+      dodgerblue: "#1e90ff",
+      firebrick: "#b22222",
+      floralwhite: "#fffaf0",
+      forestgreen: "#228b22",
+      fuchsia: "#ff00ff",
+      gainsboro: "#dcdcdc",
+      ghostwhite: "#f8f8ff",
+      gold: "#ffd700",
+      goldenrod: "#daa520",
+      gray: "#808080",
+      green: "#008000",
+      greenyellow: "#adff2f",
+      honeydew: "#f0fff0",
+      hotpink: "#ff69b4",
+      indianred: "#cd5c5c",
+      indigo: "#4b0082",
+      ivory: "#fffff0",
+      khaki: "#f0e68c",
+      lavender: "#e6e6fa",
+      lavenderblush: "#fff0f5",
+      lawngreen: "#7cfc00",
+      lemonchiffon: "#fffacd",
+      lightblue: "#add8e6",
+      lightcoral: "#f08080",
+      lightcyan: "#e0ffff",
+      lightgoldenrodyellow: "#fafad2",
+      lightgrey: "#d3d3d3",
+      lightgreen: "#90ee90",
+      lightpink: "#ffb6c1",
+      lightsalmon: "#ffa07a",
+      lightseagreen: "#20b2aa",
+      lightskyblue: "#87cefa",
+      lightslategray: "#778899",
+      lightsteelblue: "#b0c4de",
+      lightyellow: "#ffffe0",
+      lime: "#00ff00",
+      limegreen: "#32cd32",
+      linen: "#faf0e6",
+      magenta: "#ff00ff",
+      maroon: "#800000",
+      mediumaquamarine: "#66cdaa",
+      mediumblue: "#0000cd",
+      mediumorchid: "#ba55d3",
+      mediumpurple: "#9370d8",
+      mediumseagreen: "#3cb371",
+      mediumslateblue: "#7b68ee",
+      mediumspringgreen: "#00fa9a",
+      mediumturquoise: "#48d1cc",
+      mediumvioletred: "#c71585",
+      midnightblue: "#191970",
+      mintcream: "#f5fffa",
+      mistyrose: "#ffe4e1",
+      moccasin: "#ffe4b5",
+      navajowhite: "#ffdead",
+      navy: "#000080",
+      oldlace: "#fdf5e6",
+      olive: "#808000",
+      olivedrab: "#6b8e23",
+      orange: "#ffa500",
+      orangered: "#ff4500",
+      orchid: "#da70d6",
+      palegoldenrod: "#eee8aa",
+      palegreen: "#98fb98",
+      paleturquoise: "#afeeee",
+      palevioletred: "#d87093",
+      papayawhip: "#ffefd5",
+      peachpuff: "#ffdab9",
+      peru: "#cd853f",
+      pink: "#ffc0cb",
+      plum: "#dda0dd",
+      powderblue: "#b0e0e6",
+      purple: "#800080",
+      rebeccapurple: "#663399",
+      red: "#ff0000",
+      rosybrown: "#bc8f8f",
+      royalblue: "#4169e1",
+      saddlebrown: "#8b4513",
+      salmon: "#fa8072",
+      sandybrown: "#f4a460",
+      seagreen: "#2e8b57",
+      seashell: "#fff5ee",
+      sienna: "#a0522d",
+      silver: "#c0c0c0",
+      skyblue: "#87ceeb",
+      slateblue: "#6a5acd",
+      slategray: "#708090",
+      snow: "#fffafa",
+      springgreen: "#00ff7f",
+      steelblue: "#4682b4",
+      tan: "#d2b48c",
+      teal: "#008080",
+      thistle: "#d8bfd8",
+      tomato: "#ff6347",
+      turquoise: "#40e0d0",
+      violet: "#ee82ee",
+      wheat: "#f5deb3",
+      white: "#ffffff",
+      whitesmoke: "#f5f5f5",
+      yellow: "#ffff00",
+      yellowgreen: "#9acd32"
+    };
+    const rgb = name.toLowerCase().match(/rgb\((.*),(.*),(.*)\)/);
+    if (rgb) {
+      const r = ("0" + parseInt(rgb[1]).toString(16)).slice(-2);
+      const g = ("0" + parseInt(rgb[2]).toString(16)).slice(-2);
+      const b = ("0" + parseInt(rgb[3]).toString(16)).slice(-2);
+      return "#" + r + g + b;
+    }
+    if (typeof colors[name.toLowerCase()] != "undefined") {
+      return colors[name.toLowerCase()];
+    }
+    return false;
+  };
+  Neo.initComponents = function() {
+    var copyright = document.getElementById("neo-copyright");
+    if (copyright) copyright.innerHTML += "v" + Neo.version;
+    document.addEventListener(
+      "mouseup",
+      function(e) {
+        if (Neo.painter && e.target instanceof Element && !Neo.painter.isContainer(e.target)) {
+          Neo.painter.cancelTool();
+        }
+      },
+      false
+    );
+    Neo.showWarning();
+    if (Neo.styleSheet) {
+      Neo.addRule("*", "user-select", "none");
+      Neo.addRule("*", "-webkit-user-select", "none");
+      Neo.addRule("*", "-ms-user-select", "none");
+    }
+  };
+  Neo.initButtons = function() {
+    const commands = new Commands();
+    const neo_undo = new Button().init("neo-undo");
+    if (neo_undo) {
+      neo_undo.onmouseup = function() {
+        const UndoCommand = new commands.UndoCommand(Neo.painter);
+        UndoCommand.execute();
+      };
+    }
+    const neo_redo = new Button().init("neo-redo");
+    if (neo_redo) {
+      neo_redo.onmouseup = function() {
+        const RedoCommand = new commands.RedoCommand(Neo.painter);
+        RedoCommand.execute();
+      };
+    }
+    const neo_window = new Button().init("neo-window");
+    if (neo_window) {
+      neo_window.onmouseup = function() {
+        const WindowCommand = new commands.WindowCommand(Neo.painter);
+        WindowCommand.execute();
+      };
+    }
+    const neo_copyright = new Button().init("neo-copyright");
+    if (neo_copyright) {
+      neo_copyright.onmouseup = function() {
+        const CopyrightCommand = new commands.CopyrightCommand(Neo.painter);
+        CopyrightCommand.execute();
+      };
+    }
+    const neo_zoomPlus = new Button().init("neo-zoomPlus");
+    if (neo_zoomPlus) {
+      neo_zoomPlus.onmouseup = function() {
+        const ZoomPlusCommand = new commands.ZoomPlusCommand(Neo.painter);
+        ZoomPlusCommand.execute();
+      };
+    }
+    const neo_zoomMinus = new Button().init("neo-zoomMinus");
+    if (neo_zoomMinus) {
+      neo_zoomMinus.onmouseup = function() {
+        const ZoomMinusCommand = new commands.ZoomMinusCommand(Neo.painter);
+        ZoomMinusCommand.execute();
+      };
+    }
+    Neo.submitButton = new Button().init("neo-submit");
+    if (!Neo.submitButton) {
+      console.error("initButtons: SubmitButton not found");
+      return;
+    }
+    Neo.submitButton.onmouseup = function() {
+      var _a;
+      (_a = Neo.submitButton) == null ? void 0 : _a.disable(5e3);
+      const SubmitCommand = new commands.SubmitCommand(Neo.painter);
+      SubmitCommand.execute();
+    };
+    Neo.fillButton = new FillButton().init("neo-fill");
+    Neo.rightButton = new RightButton().init("neo-right");
+    if (!Neo.rightButton) {
+      console.error("initButtons: RightButton not found");
+      return;
+    }
+    if (Neo.isMobile() || Neo.config.neo_show_right_button == "true") {
+      if (Neo.rightButton.element) {
+        Neo.rightButton.element.style.display = "block";
+      }
+    }
+    Neo.penTip = new PenTip().init("neo-pen");
+    Neo.pen2Tip = new Pen2Tip().init("neo-pen2");
+    Neo.effectTip = new EffectTip().init("neo-effect");
+    Neo.effect2Tip = new Effect2Tip().init("neo-effect2");
+    Neo.eraserTip = new EraserTip().init("neo-eraser");
+    Neo.drawTip = new DrawTip().init("neo-draw");
+    Neo.maskTip = new MaskTip().init("neo-mask");
+    Neo.toolButtons = Neo.fillButton && Neo.penTip && Neo.pen2Tip && Neo.effectTip && Neo.effect2Tip && Neo.drawTip && Neo.eraserTip ? [
+      Neo.fillButton,
+      Neo.penTip,
+      Neo.pen2Tip,
+      Neo.effectTip,
+      Neo.effect2Tip,
+      Neo.drawTip,
+      Neo.eraserTip
+    ] : [];
+    for (var i = 1; i <= 14; i++) {
+      new ColorTip().init("neo-color" + i, { index: i });
+    }
+    Neo.sliders[Neo.SLIDERTYPE_RED] = new ColorSlider().init("neo-sliderRed", {
+      type: Neo.SLIDERTYPE_RED
+    });
+    Neo.sliders[Neo.SLIDERTYPE_GREEN] = new ColorSlider().init(
+      "neo-sliderGreen",
+      { type: Neo.SLIDERTYPE_GREEN }
+    );
+    Neo.sliders[Neo.SLIDERTYPE_BLUE] = new ColorSlider().init("neo-sliderBlue", {
+      type: Neo.SLIDERTYPE_BLUE
+    });
+    Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new ColorSlider().init(
+      "neo-sliderAlpha",
+      { type: Neo.SLIDERTYPE_ALPHA }
+    );
+    Neo.sizeslider = new SizeSlider();
+    Neo.sliders[Neo.SLIDERTYPE_SIZE] = Neo.sizeslider.init("neo-sliderSize", {
+      type: Neo.SLIDERTYPE_SIZE
+    });
+    for (var i = 1; i <= 3; i++) {
+      new ReserveControl().init("neo-reserve" + i, { index: i });
+    }
+    new LayerControl().init("neo-layerControl");
+    new ScrollBarButton().init("neo-scrollH");
+    new ScrollBarButton().init("neo-scrollV");
+  };
+  Neo.start = function(isApp = false) {
+    if (Neo.viewer) return;
+    Neo.initSkin();
+    Neo.initComponents();
+    Neo.initButtons();
+    Neo.isApp = isApp;
+    if (Neo.applet) {
+      var name = Neo.applet.getAttribute("name") || "paintbbs";
+      Neo.applet.outerHTML = "";
+      document[name] = Neo;
+      Neo.resizeCanvas();
+      if (!Neo.container) {
+        console.error("start: Container element not found");
+        return;
+      }
+      Neo.container.style.visibility = "visible";
+      if (Neo.isApp) {
+        var ipc = __require("electron").ipcRenderer;
+        ipc.sendToHost("neo-status", "ok");
+      } else {
+        if (document["paintBBSCallback"]) {
+          document["paintBBSCallback"]("start");
+        }
+      }
+    }
+  };
+  Neo.isMobile = function() {
+    if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
+    if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
+    return false;
+  };
+  Neo.showWarning = function() {
+    const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);
+    const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
+    var edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
+    var edgeVersion = 0;
+    if (edgeMatch && edgeMatch.length > 1) {
+      edgeVersion = parseInt(edgeMatch[1], 10);
+    }
+    var str = "";
+    if (futaba || samplebbs) {
+      if (edgeVersion && edgeVersion < 15) {
+        str = translate("\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>");
+      }
+    }
+    if (Neo.config.neo_warning) {
+      str += Neo.config.neo_warning;
+    }
+    var warning = document.getElementById("neoWarning");
+    if (!warning) {
+      return;
+    }
+    warning.innerHTML = str;
+    setTimeout(function() {
+      if (!warning) {
+        return;
+      }
+      warning.style.opacity = "0";
+    }, 15e3);
+  };
+  Neo.updateUI = function() {
+    var current = Neo.painter.tool.getToolButton();
+    for (let i = 0; i < Neo.toolButtons.length; i++) {
+      const toolTip = (
+        /** @type {Neo.ToolTip} */
+        Neo.toolButtons[i]
+      );
+      if (current) {
+        if (current == toolTip) {
+          toolTip.setSelected(true);
+          toolTip.update();
+        } else {
+          toolTip.setSelected(false);
+        }
+      }
+    }
+    if (Neo.drawTip) {
+      Neo.drawTip.update();
+    }
+    Neo.updateUIColor(true, false);
+  };
+  Neo.updateUIColor = function(updateSlider, updateColorTip) {
+    for (let i = 0; i < Neo.toolButtons.length; i++) {
+      const toolTip = (
+        /** @type {Neo.ToolTip} */
+        Neo.toolButtons[i]
+      );
+      toolTip.update();
+    }
+    if (updateSlider) {
+      for (let i = 0; i < Neo.sliders.length; i++) {
+        const slider = (
+          /** @type {Neo.ColorSlider|Neo.SizeSlider} */
+          Neo.sliders[i]
+        );
+        slider.update();
+      }
+    }
+    if (updateColorTip) {
+      var colorTip = (
+        /** @type {Neo.ColorTip|null} **/
+        Neo.ColorTip.getCurrent()
+      );
+      if (colorTip) {
+        colorTip.setColor(Neo.painter.foregroundColor);
+      }
+    }
+  };
+  Neo.updateWindow = function() {
+    const windowView = document.getElementById("neo-windowView");
+    const pageView = document.getElementById("neo-pageView");
+    if (!Neo.container) {
+      console.error("updateWindow: Container element not found");
+      return;
+    }
+    if (Neo.fullScreen) {
+      if (!windowView) return;
+      windowView.style.display = "block";
+      windowView.appendChild(Neo.container);
+    } else {
+      if (windowView) {
+        windowView.style.display = "none";
+      }
+      if (pageView) {
+        pageView.appendChild(Neo.container);
+      }
+    }
+    Neo.resizeCanvas();
+    document.dispatchEvent(
+      new CustomEvent("neo:fullscreenchange", {
+        detail: { fullscreen: Neo.fullScreen }
+      })
+    );
+  };
+  Neo.resizeCanvas = function() {
+    if (!Neo.container) {
+      console.error("resizeCanvas: Container element not found");
+      return;
+    }
+    var appletWidth = Neo.container.clientWidth;
+    var appletHeight = Neo.container.clientHeight;
+    var canvasWidth = Neo.painter.canvasWidth;
+    var canvasHeight = Neo.painter.canvasHeight;
+    var width0 = canvasWidth * Neo.painter.zoom;
+    var height0 = canvasHeight * Neo.painter.zoom;
+    var width = width0 < appletWidth - 100 ? width0 : appletWidth - 100;
+    var height = height0 < appletHeight - 120 ? height0 : appletHeight - 120;
+    if (Neo.viewer) {
+      width = canvasWidth;
+      height = canvasHeight;
+    }
+    width = Math.floor(width / 2) * 2;
+    height = Math.floor(height / 2) * 2;
+    Neo.painter.destWidth = width;
+    Neo.painter.destHeight = height;
+    const destCanvas = Neo.painter.destCanvas;
+    destCanvas.width = width;
+    destCanvas.height = height;
+    const destctx = destCanvas.getContext("2d", {
+      willReadFrequently: true
+    });
+    if (!destctx) {
+      console.error("resizeCanvas: Failed to get 2d context");
+      return;
+    }
+    Neo.painter.destCanvasCtx = destctx;
+    const ctx = Neo.painter.destCanvasCtx;
+    if (Neo.painter.zoom < 1) {
+      ctx.imageSmoothingEnabled = true;
+      destCanvas.style.imageRendering = "smooth";
+      if (Neo.painter.zoom < 0.5 && "imageSmoothingQuality" in ctx) {
+        ctx.imageSmoothingQuality = "high";
+      }
+    } else {
+      ctx.imageSmoothingEnabled = false;
+      destCanvas.style.imageRendering = "pixelated";
+    }
+    destCanvas.style.touchAction = "none";
+    destCanvas.style.pointerEvents = "auto";
+    if (Neo.canvas) {
+      Neo.canvas.style.touchAction = "none";
+      Neo.canvas.style.pointerEvents = "auto";
+      Neo.canvas.style.width = width + "px";
+      Neo.canvas.style.height = height + "px";
+    }
+    const tools = Neo.tools || null;
+    if (tools) {
+      tools.style.touchAction = "none";
+      tools.style.pointerEvents = "auto";
+    }
+    if (Neo.toolsWrapper) {
+      const toolsWrapper = Neo.toolsWrapper;
+      var top = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
+      Neo.toolsWrapper.style.top = (top > 0 ? top : 0) + "px";
+      if (top < 0) {
+        var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
+        Neo.toolsWrapper.style.transform = "translate(0, " + top + "px) scale(1," + s + ")";
+      } else {
+        Neo.toolsWrapper.style.transform = "";
+      }
+    }
+    Neo.painter.setZoom(Neo.painter.zoom);
+    Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
+  };
+  Neo.clone = function(src) {
+    const dst = {};
+    for (const k in src) {
+      dst[k] = src[k];
+    }
+    return dst;
+  };
+  Neo.getSizeString = function(len) {
+    var result = String(len);
+    while (result.length < 8) {
+      result = "0" + result;
+    }
+    return result;
+  };
+  Neo.openURL = function(url) {
+    if (Neo.isApp) {
+      __require("electron").shell.openExternal(url);
+    } else {
+      window.open(url, "_blank");
+    }
+  };
+  Neo.getAbsoluteURL = function(baseURL, url) {
+    if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
+      return url;
+    } else {
+      return baseURL + url;
+    }
+  };
+  Neo.submit = function(baseURL, blob, thumbnail, thumbnail2) {
+    var _a;
+    let url = Neo.getAbsoluteURL(baseURL, Neo.config.url_save);
+    var headerString = Neo.str_header || "";
+    if (document["paintBBSCallback"]) {
+      var result = document["paintBBSCallback"]("check");
+      if (result == 0 || result == "false") {
+        return;
+      }
+      result = document["paintBBSCallback"]("header");
+      if (result && typeof result == "string") {
+        headerString = result;
+      }
+    }
+    if (!headerString) headerString = Neo.config.send_header || "";
+    var imageType = Neo.config.send_header_image_type;
+    if (imageType && imageType == "true") {
+      headerString = "image_type=png&" + headerString;
+    }
+    var count = Neo.painter.securityCount;
+    var timer = Date.now() - Neo.painter.securityTimer;
+    if (Neo.config.send_header_count == "true") {
+      headerString = "count=" + count + "&" + headerString;
+    }
+    if (Neo.config.send_header_timer == "true") {
+      headerString = "timer=" + timer + "&" + headerString;
+    }
+    if (Neo.config.neo_emulate_security_error == "true") {
+      var securityError = false;
+      if (Neo.config.security_click) {
+        if (count - parseInt(Neo.config.security_click || 0) < 0) {
+          securityError = true;
+        }
+      }
+      if (Neo.config.security_timer) {
+        if (timer - parseInt(Neo.config.security_timer || 0) * 1e3 < 0) {
+          securityError = true;
+        }
+      }
+      if (securityError && Neo.config.security_url) {
+        if (Neo.config.security_post == "true") {
+          url = Neo.config.security_url;
+        } else {
+          location.href = Neo.config.security_url;
+          return;
+        }
+      }
+    }
+    if (thumbnail2) {
+      const thumbnailSize = thumbnail2.size;
+      if (!isNaN(Neo.config.animation_max) && Number(Neo.config.animation_max)) {
+        const maxSize = Number(Neo.config.animation_max) * 1024;
+        if (maxSize < thumbnailSize) {
+          thumbnail2 = null;
+        }
+      }
+    }
+    let formData = null;
+    if (Neo.config.neo_send_with_formdata == "true") {
+      formData = new FormData();
+      formData.append("header", headerString);
+      formData.append("picture", blob, "blob");
+      let thumbnail_size = 0;
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail, "blob");
+        thumbnail_size = thumbnail.size;
+      }
+      if (thumbnail2) {
+        if (isNaN(Neo.config.neo_max_pch) || //0,-1の場合は無制限
+        Number(Neo.config.neo_max_pch) <= 0 || Number(Neo.config.neo_max_pch) * 1024 * 1024 > headerString.length + blob.size + thumbnail_size + thumbnail2.size) {
+          formData.append("pch", thumbnail2, "blob");
+        } else {
+          thumbnail2 = null;
+        }
+      }
+    }
+    var header = new Blob([headerString]);
+    var headerLength = this.getSizeString(header.size);
+    var imgLength = this.getSizeString(blob.size);
+    var array = [
+      "P",
+      // PaintBBS
+      headerLength,
+      header,
+      imgLength,
+      "\r\n",
+      blob
+    ];
+    if (thumbnail) {
+      var thumbnailLength = this.getSizeString(thumbnail.size);
+      array.push(thumbnailLength, thumbnail);
+    }
+    if (thumbnail2) {
+      var thumbnail2Length = this.getSizeString(thumbnail2.size);
+      array.push(thumbnail2Length, thumbnail2);
+    }
+    const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);
+    var subtype = futaba ? "octet-binary" : "octet-stream";
+    var body = new Blob(array, { type: "application/" + subtype });
+    const postData = (path, data2) => {
+      var errorMessage = path + "\n";
+      const requestOptions = {
+        method: "post",
+        body: data2
+      };
+      if (!futaba) {
+        requestOptions.mode = "same-origin";
+        requestOptions.headers = {
+          "X-Requested-With": "PaintBBS"
+        };
+      }
+      fetch(path, requestOptions).then((response) => {
+        var _a2;
+        if (response.ok) {
+          response.text().then((text) => {
+            var _a3, _b;
+            console.log(text);
+            if (text.match(/^error\n/m)) {
+              (_a3 = Neo.submitButton) == null ? void 0 : _a3.enable();
+              return alert(text.replace(/^error\n/m, ""));
+            }
+            if (Neo.config.neo_validate_exact_ok_text_in_response === "true") {
+              if (text !== "ok") {
+                (_b = Neo.submitButton) == null ? void 0 : _b.enable();
+                return alert(
+                  errorMessage + translate(
+                    "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002"
+                  )
+                );
+              }
+            }
+            var exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
+            var responseURL = text.replace(/&amp;/g, "&");
+            if (responseURL.match(/painttmp=/)) {
+              exitURL = responseURL;
+            }
+            if (responseURL.match(/^URL:/)) {
+              exitURL = responseURL.replace(/^URL:/, "");
+            }
+            Neo.uploaded = true;
+            if (typeof Neo.handleExit === "function") {
+              return Neo.handleExit();
+            }
+            return location.href = exitURL;
+          });
+        } else {
+          (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
+          const response_status = response.status;
+          let httpErrorMessag = "";
+          switch (response_status) {
+            case 400:
+              httpErrorMessag = "Bad Request";
+              break;
+            case 401:
+              httpErrorMessag = "Unauthorized";
+              break;
+            case 403:
+              httpErrorMessag = "Forbidden";
+              break;
+            case 404:
+              httpErrorMessag = "Not Found";
+              break;
+            case 500:
+              httpErrorMessag = "Internal Server Error";
+              break;
+            case 502:
+              httpErrorMessag = "Bad Gateway";
+              break;
+            case 503:
+              httpErrorMessag = "Service Unavailable";
+              break;
+            default:
+              httpErrorMessag = "Unknown Error";
+              break;
+          }
+          return alert(
+            `${translate("HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9")} ${response_status} : ${httpErrorMessag}
+${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")}`
+          );
+        }
+      }).catch((error) => {
+        var _a2;
+        (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
+        return alert(
+          errorMessage + translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")
+        );
+      });
+    };
+    if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
+      const isConfirmed = window.confirm(
+        translate("\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?")
+      );
+      if (!isConfirmed) {
+        (_a = Neo.submitButton) == null ? void 0 : _a.enable();
+        console.log("\u4E2D\u6B62\u3057\u307E\u3057\u305F\u3002");
+        return;
+      }
+    }
+    const data = Neo.config.neo_send_with_formdata === "true" ? formData : body;
+    if (data) {
+      postData(url, data);
+    } else {
+      console.error("failed to post data");
+    }
+  };
+  Neo.getColors = function() {
+    var array = [];
+    for (var i = 0; i < 14; i++) {
+      array.push(Neo.colorTips[i].color);
+    }
+    return array.join("\n");
+  };
+  Neo.setColors = function(colors) {
+    var array = colors.split("\n");
+    for (var i = 0; i < 14; i++) {
+      var color = array[i];
+      Neo.config.colors[i] = color;
+      Neo.colorTips[i].setColor(color);
+    }
+  };
+  Neo.pExit = function() {
+    const commands = new Commands();
+    new commands.SubmitCommand(Neo.painter).execute();
+  };
+  Neo.str_header = "";
+  Neo.createContainer = function(applet) {
+    var neo = document.createElement("div");
+    neo.className = "NEO";
+    neo.id = "NEO";
+    const html = '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;"><div id="neo-container" style="visibility:hidden;" class="o"><div id="neo-center" class="o"><div id="neo-painterContainer" class="o"><div id="neo-painterWrapper" class="o"><div id="neo-upper" class="o"><div id="neo-redo">[\u3084\u308A\u76F4\u3057]</div> <div id="neo-undo">[\u5143\u306B\u623B\u3059]</div> <div id="neo-fill">[\u5857\u308A\u6F70\u3057]</div> <div id="neo-right" style="display:none;">[\u53F3]</div> </div><div id="neo-painter"><div id="neo-canvas"><div id="neo-scrollH"></div><div id="neo-scrollV"></div><div id="neo-zoomPlusWrapper"><div id="neo-zoomPlus">+</div></div><div id="neo-zoomMinusWrapper"><div id="neo-zoomMinus">-</div></div><div id="neoWarning"></div></div></div><div id="neo-lower" class="o"></div></div><div id="neo-toolsWrapper"><div id="neo-tools"><div id="neo-toolSet"><div id="neo-pen"></div><div id="neo-pen2"></div><div id="neo-effect"></div><div id="neo-effect2"></div><div id="neo-eraser"></div><div id="neo-draw"></div><div id="neo-mask"></div><div class="colorTips"><div id="neo-color2"></div><div id="neo-color1"></div><br><div id="neo-color4"></div><div id="neo-color3"></div><br><div id="neo-color6"></div><div id="neo-color5"></div><br><div id="neo-color8"></div><div id="neo-color7"></div><br><div id="neo-color10"></div><div id="neo-color9"></div><br><div id="neo-color12"></div><div id="neo-color11"></div><br><div id="neo-color14"></div><div id="neo-color13"></div></div><div id="neo-sliderRed"></div><div id="neo-sliderGreen"></div><div id="neo-sliderBlue"></div><div id="neo-sliderAlpha"></div><div id="neo-sliderSize"></div><div class="reserveControl" style="margin-top:4px;"><div id="neo-reserve1"></div><div id="neo-reserve2"></div><div id="neo-reserve3"></div></div><div id="neo-layerControl" style="margin-top:6px;"></div></div></div></div></div></div><div id="neo-headerButtons"><div id="neo-window">[\u7A93]</div></div><div id="neo-footerButtons"><div id="neo-submit">[\u6295\u7A3F]</div> <div id="neo-copyright">[(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO]</div> </div></div></div><div id="neo-windowView" style="display: none;"></div>';
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+      return translate(str);
+    });
+    const parent = applet.parentNode;
+    if (!parent) {
+      console.error("Failed to create container.");
+      return;
+    }
+    parent.appendChild(neo);
+    parent.insertBefore(neo, applet);
+    setTimeout(function() {
+      const tmp = document.querySelectorAll(".NEO");
+      if (tmp.length > 1) {
+        for (var i = 1; i < tmp.length; i++) {
+          tmp[i].style.display = "none";
+        }
+      }
+    }, 0);
+  };
+  Neo.tintImage = function(ctx, color) {
+    const c = Neo.painter.getColor(color) & 16777215;
+    var imageData = ctx.getImageData(0, 0, 46, 18);
+    var buf32 = new Uint32Array(imageData.data.buffer);
+    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
+    for (var i = 0; i < buf32.length; i++) {
+      var a = buf32[i] & 4278190080;
+      if (a) {
+        buf32[i] = buf32[i] & a | c;
+      }
+    }
+    imageData.data.set(buf8);
+    ctx.putImageData(imageData, 0, 0);
+  };
+  Neo.setToolSide = function(htmlConfiguredSide) {
+    let side;
+    if (htmlConfiguredSide === "left") {
+      side = true;
+    } else if (htmlConfiguredSide === "right") {
+      side = false;
+    } else {
+      side = htmlConfiguredSide;
+    }
+    Neo.toolSide = !!side;
+    if (!Neo.toolSide) {
+      Neo.addRule(".NEO #neo-toolsWrapper", "right", "-3px");
+      Neo.addRule(".NEO #neo-toolsWrapper", "left", "auto");
+      Neo.addRule(".NEO #neo-painterWrapper", "padding", "0 55px 0 0 !important");
+      Neo.addRule(".NEO #neo-upper", "padding-right", "75px !important");
+    } else {
+      Neo.addRule(".NEO #neo-toolsWrapper", "right", "auto");
+      Neo.addRule(".NEO #neo-toolsWrapper", "left", "-1px");
+      Neo.addRule(".NEO #neo-painterWrapper", "padding", "0 0 0 55px !important");
+      Neo.addRule(".NEO #neo-upper", "padding-right", "20px !important");
+    }
+  };
+  document.addEventListener("DOMContentLoaded", () => {
+    let elementNeo_touchMoveListenerAdded = false;
+    const isPinchZooming = function() {
+      if ("visualViewport" in window && window.visualViewport) {
+        return window.visualViewport.scale > 1;
+      } else {
+        return document.documentElement.clientWidth > window.innerWidth;
+      }
+    };
+    const touch_move_grid_control = function(e) {
+      if (Neo.config.neo_disable_grid_touch_move) {
+        let screenwidth = Number(screen.width);
+        if (e.touches.length === 1 && (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)) {
+          if (typeof e.cancelable !== "boolean" || e.cancelable) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+      }
+    };
+    const elementNeo = document.getElementById("NEO");
+    const add_touch_move_grid_control = function() {
+      if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
+        if (!elementNeo_touchMoveListenerAdded) {
+          elementNeo == null ? void 0 : elementNeo.addEventListener("touchmove", touch_move_grid_control, {
+            passive: false
+          });
+          elementNeo_touchMoveListenerAdded = true;
+        }
+      }
+    };
+    elementNeo == null ? void 0 : elementNeo.addEventListener("touchmove", function(e) {
+      if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
+        add_touch_move_grid_control();
+        if (isPinchZooming()) {
+          elementNeo.removeEventListener("touchmove", touch_move_grid_control);
+          elementNeo_touchMoveListenerAdded = false;
+        }
+      }
+    });
+    add_touch_move_grid_control();
+  });
+  Neo.setStabilizeLevel = function(htmlConfig) {
+    let level = parseInt(String(htmlConfig));
+    if (isNaN(level) || level < 0) {
+      level = 0;
+    } else if (level > 5) {
+      level = 5;
+    }
+    Neo.stabilize_level = level;
+  };
+  Neo.setStabilizLevel = Neo.setStabilizeLevel;
+
   // src/actions.js
+  var actions_exports = {};
+  __export(actions_exports, {
+    ActionManager: () => ActionManager
+  });
+  var import_lz_string = __toESM(require_lz_string());
   var ActionManager = class {
     constructor() {
       this._items = [];
@@ -8551,1762 +10301,7 @@
     });
   };
 
-  // src/commands.js
-  var Commands = class {
-    constructor() {
-      this.CommandBase = class {
-        constructor() {
-          this.data = null;
-          this.zoom_steps = Neo.config.neo_enable_zoom_out ? [
-            0.2,
-            0.4,
-            0.6,
-            0.8,
-            1,
-            1.5,
-            2,
-            2.5,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            10,
-            11,
-            12
-          ] : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12];
-        }
-        execute() {
-        }
-      };
-      this.ZoomPlusCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          const steps = this.zoom_steps;
-          let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
-          if (currentIndex === -1) currentIndex = steps.length - 1;
-          if (steps[currentIndex] === this.data.zoom && currentIndex < steps.length - 1) {
-            currentIndex++;
-          } else if (steps[currentIndex] > this.data.zoom) {
-          } else if (currentIndex < steps.length - 1) {
-            currentIndex++;
-          }
-          if (currentIndex < steps.length) {
-            this.data.setZoom(steps[currentIndex]);
-          }
-          Neo.resizeCanvas();
-        }
-      };
-      this.ZoomMinusCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          const steps = this.zoom_steps;
-          let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
-          if (currentIndex > 0) {
-            if (steps[currentIndex] === this.data.zoom) {
-              currentIndex--;
-            } else {
-              currentIndex = Math.max(0, currentIndex - 1);
-            }
-            this.data.setZoom(steps[currentIndex]);
-          }
-          Neo.resizeCanvas();
-        }
-      };
-      this.UndoCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          this.data.cancelCopy();
-          this.data.undo();
-        }
-      };
-      this.RedoCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          this.data.redo();
-        }
-      };
-      this.WindowCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          if (Neo.fullScreen) {
-            if (confirm(Neo.translate("\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F"))) {
-              Neo.fullScreen = false;
-              Neo.updateWindow();
-            }
-          } else {
-            if (confirm(Neo.translate("\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F"))) {
-              Neo.fullScreen = true;
-              Neo.updateWindow();
-            }
-          }
-        }
-      };
-      this.SubmitCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          var baseURL = location.href.replace(/[^/]*$/, "");
-          this.data.submit(baseURL);
-        }
-      };
-      this.CopyrightCommand = class extends this.CommandBase {
-        /** @param {Painter} data */
-        constructor(data) {
-          super();
-          this.data = data;
-        }
-        execute() {
-          var url = "http://github.com/funige/neo/";
-          if (confirm(
-            Neo.translate(
-              "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F"
-            ) + "\n"
-          )) {
-            Neo.openURL(url);
-          }
-        }
-      };
-    }
-  };
-
-  // src/container.js
-  document.addEventListener("DOMContentLoaded", () => {
-    if (Neo.init()) {
-      if (!navigator.userAgent.match("Electron")) {
-        Neo.start();
-      }
-    }
-    document.addEventListener(
-      "dblclick",
-      (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      },
-      {
-        passive: false
-      }
-    );
-  });
-  Neo.extractBootConfig = function(targetName) {
-    Neo.params = Neo.params || Neo.param;
-    if (Neo.params && typeof Neo.params === "object" && Object.keys(Neo.params).length > 0) {
-      const params2 = Neo.params;
-      return params2[targetName] ? __spreadValues({}, params2[targetName]) : {};
-    }
-    const applet = `applet[name="${targetName}"], applet-dummy[name="${targetName}"], .neo-applet-${targetName}`;
-    const node = document.querySelector(applet);
-    if (!node) return {};
-    const config = {};
-    const params = node.querySelectorAll("param");
-    for (const param of params) {
-      const key = param.getAttribute("name");
-      const val = param.getAttribute("value");
-      if (key) {
-        config[key] = Neo.fixConfig(String(val));
-      }
-    }
-    return config;
-  };
-  Neo.init = function() {
-    let applets = document.querySelectorAll(
-      "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch"
-    );
-    for (const applet of applets) {
-      if (applet instanceof HTMLElement) {
-        let name = applet.getAttribute("name");
-        if (!name) {
-          for (const className of applet.classList) {
-            if (className.startsWith("neo-applet-")) {
-              name = className.replace("neo-applet-", "");
-              break;
-            }
-          }
-        }
-        if (name == "paintbbs" || name == "pch") {
-          Neo.applet = applet;
-          if (name == "paintbbs") {
-            Neo.initConfig(applet);
-            Neo.createContainer(applet);
-            Neo.init2();
-          } else {
-            Neo.viewer = true;
-            Neo.initConfig(applet);
-            var filename = Neo.getFilename();
-            Neo.getPCH(filename, function(pch) {
-              if (pch) {
-                Neo.createViewer(applet);
-                Neo.config.width = pch.width;
-                Neo.config.height = pch.height;
-                Neo.initViewer(pch);
-              }
-            });
-          }
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-  Neo.init2 = function() {
-    const pageview = document.getElementById("neo-pageView");
-    if (!pageview) return;
-    pageview.style.width = Neo.config.applet_width + "px";
-    pageview.style.height = Neo.config.applet_height + "px";
-    Neo.canvas = document.getElementById("neo-canvas");
-    if (!Neo.canvas) {
-      console.error("initViewer: Canvas element not found");
-      return;
-    }
-    Neo.container = document.getElementById("neo-container");
-    if (!Neo.container) {
-      console.error("init2: Container element not found");
-      return;
-    }
-    Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
-    Neo.tools = document.getElementById("neo-tools");
-    Neo.center = document.getElementById("neo-center");
-    if (Neo.center && Neo.container && Neo.container.clientWidth && Neo.container.clientWidth >= 400 && Neo.config.neo_disable_neo_center_min_width != "true") {
-      Neo.center.style.minWidth = "397px";
-    }
-    Neo.painter = new Painter();
-    Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-    Neo.container.oncontextmenu = function() {
-      return false;
-    };
-    Neo.isAnimation = Neo.config.thumbnail_type == "animation";
-    Neo.storage = localStorage;
-    var filename = Neo.getFilename();
-    var message = !filename || filename.slice(-4).toLowerCase() != ".pch" ? "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F" : "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F";
-    let storageTimestamp = Neo.storage.getItem("timestamp");
-    const nowTimestamp = Date.now();
-    if (Number.isInteger(Number(storageTimestamp)) && nowTimestamp - Number(storageTimestamp) > 3 * 86400 * 1e3) {
-      Neo.painter.clearSession();
-      storageTimestamp = null;
-    }
-    if (storageTimestamp && confirm(Neo.translate(message))) {
-      setTimeout(function() {
-        Neo.painter.loadSession(function() {
-          Neo.painter._pushUndo();
-          Neo.painter._actionMgr.restore();
-          Neo.painter.dirty = false;
-        });
-      }, 1);
-    } else {
-      Neo.painter.clearSession();
-      if (filename) {
-        if (filename.slice(-4).toLowerCase() == ".pch") {
-          Neo.painter.loadAnimation(filename);
-        } else {
-          Neo.painter.loadImage(filename);
-        }
-      }
-    }
-    window.addEventListener(
-      // "pagehide",
-      "beforeunload",
-      //ブラウザを終了した時にも復元データを保存
-      function(e) {
-        if (!Neo.uploaded && Neo.painter.isDirty()) {
-          Neo.painter.saveSession();
-        } else if (Neo.uploaded) {
-          Neo.painter.clearSession();
-        }
-      },
-      false
-    );
-    const originalTitle = document.title;
-    document.addEventListener("visibilitychange", () => {
-      if (Neo.config.neo_visibility_change_title_rewrite === "true") {
-        if (document.visibilityState === "visible") {
-          document.title = originalTitle;
-        } else if (document.visibilityState === "hidden") {
-          setTimeout(() => {
-            if (document.visibilityState === "hidden" && document.title === originalTitle) {
-              document.title = `${originalTitle} *`;
-            }
-          }, 3e3);
-        }
-      }
-    });
-  };
-  Neo.initConfig = function(applet) {
-    if (applet) {
-      var appletWidth = applet.dataset.width || applet.getAttribute("width");
-      var appletHeight = applet.dataset.height || applet.getAttribute("height");
-      if (appletWidth) Neo.config.applet_width = parseInt(appletWidth);
-      if (appletHeight) Neo.config.applet_height = parseInt(appletHeight);
-      let targetName;
-      if (applet instanceof HTMLElement) {
-        targetName = applet.getAttribute("name");
-        if (!targetName) {
-          for (const className of applet.classList) {
-            if (className.startsWith("neo-applet-")) {
-              targetName = className.replace("neo-applet-", "");
-              break;
-            }
-          }
-        }
-      }
-      if (!targetName) {
-        targetName = "paintbbs";
-      }
-      const params = Neo.extractBootConfig(targetName);
-      if (params) {
-        for (const key in params) {
-          const value = String(params[key]);
-          Neo.config[key] = Neo.fixConfig(value);
-          if (key === "image_width") Neo.config.width = parseInt(value);
-          if (key === "image_height") Neo.config.height = parseInt(value);
-        }
-      }
-      var emulationMode = Neo.config.neo_emulation_mode || "2.22_8x";
-      Neo.config.neo_alt_translation = emulationMode.slice(-1).match(/x/i);
-      if (Neo.viewer && !Neo.config.color_bar) {
-        Neo.config.color_bar = "#eeeeff";
-      }
-      Neo.readStyles();
-      Neo.applyStyle("color_bk", "#ccccff");
-      Neo.applyStyle("color_bk2", "#bbbbff");
-      Neo.applyStyle("color_tool_icon", "#e8dfae");
-      Neo.applyStyle("color_icon", "#ccccff");
-      Neo.applyStyle("color_iconselect", "#ffaaaa");
-      Neo.applyStyle("color_text", "#666699");
-      Neo.applyStyle("color_bar", "#6f6fae");
-      Neo.applyStyle("tool_color_button", "#e8dfae");
-      Neo.applyStyle("tool_color_button2", "#f8daaa");
-      Neo.applyStyle("tool_color_text", "#773333");
-      Neo.applyStyle("tool_color_bar", "#ddddff");
-      Neo.applyStyle("tool_color_frame", "#000000");
-      if (Neo.viewer) {
-        Neo.applyStyle("color_back", "#ccccff");
-        Neo.applyStyle("color_bar_select", "#407675");
-      }
-      if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
-      if (Neo.config.neo_tool_side == "left" || Neo.config.neo_tool_side == "true") {
-        Neo.toolSide = true;
-      }
-    }
-    Neo.config.reserves = [
-      {
-        size: 1,
-        color: "#000000",
-        alpha: 1,
-        tool: Neo.Painter.TOOLTYPE_PEN,
-        drawType: Neo.Painter.DRAWTYPE_FREEHAND
-      },
-      {
-        size: 5,
-        color: "#FFFFFF",
-        alpha: 1,
-        tool: Neo.Painter.TOOLTYPE_ERASER,
-        drawType: Neo.Painter.DRAWTYPE_FREEHAND
-      },
-      {
-        size: 10,
-        color: "#FFFFFF",
-        alpha: 1,
-        tool: Neo.Painter.TOOLTYPE_ERASER,
-        drawType: Neo.Painter.DRAWTYPE_FREEHAND
-      }
-    ];
-    Neo.reservePen = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-    Neo.clone(Neo.config.reserves[0]);
-    Neo.reserveEraser = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-    Neo.clone(Neo.config.reserves[1]);
-  };
-  Neo.fixConfig = function(value) {
-    if (value.match(/^#[0-9a-fA-F]{5}$/)) {
-      value = "#0" + value.slice(1);
-    }
-    if (value.toLocaleLowerCase() === "true" || value.toLocaleLowerCase() === "false") {
-      return value.toLocaleLowerCase();
-    }
-    return value;
-  };
-  Neo.getStyleSheet = function() {
-    var style = document.createElement("style");
-    document.head.appendChild(style);
-    return style.sheet;
-  };
-  Neo.initSkin = function() {
-    Neo.styleSheet = Neo.getStyleSheet();
-    var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
-    var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
-    var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
-    var darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
-    var bgImage = Neo.painter ? Neo.backgroundImage() : "";
-    Neo.addRule(
-      ".NEO #neo-container",
-      "background-image",
-      "url(" + bgImage + ")"
-    );
-    Neo.addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
-    Neo.addRule(".NEO .sizeSlider .label", "color", Neo.config.tool_color_text);
-    Neo.addRule(
-      ".NEO .layerControl .label1",
-      "color",
-      Neo.config.tool_color_text
-    );
-    Neo.addRule(
-      ".NEO .layerControl .label0",
-      "color",
-      Neo.config.tool_color_text
-    );
-    Neo.addRule(".NEO .toolTipOn .label", "color", Neo.config.tool_color_text);
-    Neo.addRule(".NEO .toolTipOff .label", "color", Neo.config.tool_color_text);
-    Neo.addRule(".NEO #neo-toolSet", "background-color", Neo.config.color_bk);
-    Neo.addRule(".NEO #neo-tools", "color", Neo.config.tool_color_text);
-    Neo.addRule(
-      ".NEO .layerControl .bg",
-      "border-bottom",
-      "1px solid " + Neo.config.tool_color_text
-    );
-    Neo.addRule(".NEO .buttonOn", "color", Neo.config.color_text);
-    Neo.addRule(".NEO .buttonOff", "color", Neo.config.color_text);
-    Neo.addRule(".NEO .buttonOff", "background-color", Neo.config.color_icon);
-    Neo.addRule(
-      ".NEO .buttonOff",
-      "border-top",
-      "1px solid ",
-      Neo.config.color_icon
-    );
-    Neo.addRule(
-      ".NEO .buttonOff",
-      "border-left",
-      "1px solid ",
-      Neo.config.color_icon
-    );
-    Neo.addRule(
-      ".NEO .buttonOff",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.color_icon + ", 0 0 0 2px " + Neo.config.color_frame
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:hover",
-      "background-color",
-      Neo.config.color_icon
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:hover",
-      "border-top",
-      "1px solid " + lightBorder
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:hover",
-      "border-left",
-      "1px solid " + lightBorder
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:hover",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:active, .NEO .buttonOn",
-      "background-color",
-      darkBorder
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:active, .NEO .buttonOn",
-      "border-top",
-      "1px solid " + darkBorder
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:active, .NEO .buttonOn",
-      "border-left",
-      "1px solid " + darkBorder
-    );
-    Neo.addRule(
-      ".NEO .buttonOff:active, .NEO .buttonOn",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame
-    );
-    Neo.addRule(
-      ".NEO #neo-canvas",
-      "border",
-      "1px solid " + Neo.config.color_frame
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH, .NEO #neo-scrollV",
-      "background-color",
-      Neo.config.color_icon
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH, .NEO #neo-scrollV",
-      "box-shadow",
-      "0 0 0 1px white, 0 0 0 2px " + Neo.config.color_frame
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
-      "background-color",
-      Neo.config.color_bar
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.color_icon
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div:hover, .NEO #neo-scrollV div:hover",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.color_iconselect
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
-      "border-top",
-      "1px solid " + lightBar
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
-      "border-left",
-      "1px solid " + lightBar
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
-      "border-right",
-      "1px solid " + darkBar
-    );
-    Neo.addRule(
-      ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
-      "border-bottom",
-      "1px solid " + darkBar
-    );
-    Neo.addRule(
-      ".NEO .toolTipOn",
-      "background-color",
-      Neo.multColor(Neo.config.tool_color_button, 0.7)
-    );
-    Neo.addRule(
-      ".NEO .toolTipOff",
-      "background-color",
-      Neo.config.tool_color_button
-    );
-    Neo.addRule(
-      ".NEO .toolTipFixed",
-      "background-color",
-      Neo.config.tool_color_button2
-    );
-    Neo.addRule(
-      ".NEO .colorSlider, .NEO .sizeSlider",
-      "background-color",
-      Neo.config.tool_color_bar
-    );
-    Neo.addRule(
-      ".NEO .reserveControl",
-      "background-color",
-      Neo.config.tool_color_bar
-    );
-    Neo.addRule(
-      ".NEO .reserveControl",
-      "background-color",
-      Neo.config.tool_color_bar
-    );
-    Neo.addRule(
-      ".NEO .layerControl",
-      "background-color",
-      Neo.config.tool_color_bar
-    );
-    Neo.addRule(
-      ".NEO .colorTipOn, .NEO .colorTipOff",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
-    );
-    Neo.addRule(
-      ".NEO .toolTipOn, .NEO .toolTipOff",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
-    );
-    Neo.addRule(
-      ".NEO .toolTipFixed",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
-    );
-    Neo.addRule(
-      ".NEO .colorSlider, .NEO .sizeSlider",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
-    );
-    Neo.addRule(
-      ".NEO .reserveControl",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
-    );
-    Neo.addRule(
-      ".NEO .layerControl",
-      "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
-    );
-    Neo.addRule(
-      ".NEO .reserveControl .reserve",
-      "border",
-      "1px solid " + Neo.config.tool_color_frame
-    );
-    if (navigator.language.indexOf("ja") != 0) {
-      var labels = ["Fixed", "On", "Off"];
-      for (var i = 0; i < labels.length; i++) {
-        var selector = ".NEO .toolTip" + labels[i] + " .label";
-        Neo.addRule(selector, "letter-spacing", "0px !important");
-      }
-    }
-    Neo.setToolSide(Neo.toolSide);
-  };
-  Neo.addRule = function(selector, styleName, value, sheet = null) {
-    if (!sheet) {
-      sheet = Neo.styleSheet;
-    }
-    if (!sheet) {
-      throw new Error("Neo.addRule: Stylesheet is undefined.");
-    }
-    try {
-      if (sheet == null ? void 0 : sheet.insertRule) {
-        sheet.insertRule(
-          selector + " { " + styleName + ": " + value + "; }",
-          sheet.cssRules.length
-        );
-      }
-    } catch (e) {
-      console.error(
-        "Neo.addRule: Failed to insert rule for '" + selector + "'.",
-        e
-      );
-    }
-  };
-  Neo.readStyles = function() {
-    Neo.rules = [];
-    for (var i = 0; i < document.styleSheets.length; i++) {
-      Neo.readStyle(document.styleSheets[i]);
-    }
-  };
-  Neo.readStyle = function(sheet) {
-    try {
-      var rules = sheet.cssRules;
-      for (var i = 0; i < rules.length; i++) {
-        var rule = rules[i];
-        if (rule instanceof CSSImportRule && rule.styleSheet) {
-          Neo.readStyle(rule.styleSheet);
-          continue;
-        }
-        if (rule instanceof CSSStyleRule) {
-          var selector = rule.selectorText;
-          if (selector) {
-            selector = selector.replace(/^(.NEO\s+)?\./, "");
-            var css = rule.cssText || rule.style.cssText;
-            var result = css.match(/color:\s*(.*)\s*;/);
-            if (result) {
-              var hex = Neo.colorNameToHex(result[1]);
-              if (hex) {
-                Neo.rules[selector] = hex;
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {
-    }
-  };
-  Neo.applyStyle = function(name, defaultColor) {
-    if (Neo.config[name] == void 0) {
-      Neo.config[name] = Neo.rules[name] || defaultColor;
-    }
-  };
-  Neo.backgroundImage = function() {
-    var c1 = Neo.painter.getColor(Neo.config.color_bk) | 4278190080;
-    var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 4278190080;
-    var bgCanvas = document.createElement("canvas");
-    bgCanvas.width = 16;
-    bgCanvas.height = 16;
-    var ctx = bgCanvas.getContext("2d", {
-      willReadFrequently: true
-    });
-    if (!ctx) {
-      return "";
-    }
-    var imageData = ctx.getImageData(0, 0, 16, 16);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    var index = 0;
-    for (var y = 0; y < 16; y++) {
-      for (var x = 0; x < 16; x++) {
-        buf32[index++] = x == 14 || y == 14 ? c2 : c1;
-      }
-    }
-    imageData.data.set(buf8);
-    ctx.putImageData(imageData, 0, 0);
-    return bgCanvas.toDataURL("image/png");
-  };
-  Neo.multColor = function(c, scale) {
-    const rNum = Math.round(parseInt(c.slice(1, 3), 16) * scale);
-    const gNum = Math.round(parseInt(c.slice(3, 5), 16) * scale);
-    const bNum = Math.round(parseInt(c.slice(5, 7), 16) * scale);
-    const r = ("0" + Math.min(Math.max(rNum, 0), 255).toString(16)).slice(-2);
-    const g = ("0" + Math.min(Math.max(gNum, 0), 255).toString(16)).slice(-2);
-    const b = ("0" + Math.min(Math.max(bNum, 0), 255).toString(16)).slice(-2);
-    return "#" + r + g + b;
-  };
-  Neo.colorNameToHex = function(name) {
-    const colors = {
-      aliceblue: "#f0f8ff",
-      antiquewhite: "#faebd7",
-      aqua: "#00ffff",
-      aquamarine: "#7fffd4",
-      azure: "#f0ffff",
-      beige: "#f5f5dc",
-      bisque: "#ffe4c4",
-      black: "#000000",
-      blanchedalmond: "#ffebcd",
-      blue: "#0000ff",
-      blueviolet: "#8a2be2",
-      brown: "#a52a2a",
-      burlywood: "#deb887",
-      cadetblue: "#5f9ea0",
-      chartreuse: "#7fff00",
-      chocolate: "#d2691e",
-      coral: "#ff7f50",
-      cornflowerblue: "#6495ed",
-      cornsilk: "#fff8dc",
-      crimson: "#dc143c",
-      cyan: "#00ffff",
-      darkblue: "#00008b",
-      darkcyan: "#008b8b",
-      darkgoldenrod: "#b8860b",
-      darkgray: "#a9a9a9",
-      darkgreen: "#006400",
-      darkkhaki: "#bdb76b",
-      darkmagenta: "#8b008b",
-      darkolivegreen: "#556b2f",
-      darkorange: "#ff8c00",
-      darkorchid: "#9932cc",
-      darkred: "#8b0000",
-      darksalmon: "#e9967a",
-      darkseagreen: "#8fbc8f",
-      darkslateblue: "#483d8b",
-      darkslategray: "#2f4f4f",
-      darkturquoise: "#00ced1",
-      darkviolet: "#9400d3",
-      deeppink: "#ff1493",
-      deepskyblue: "#00bfff",
-      dimgray: "#696969",
-      dodgerblue: "#1e90ff",
-      firebrick: "#b22222",
-      floralwhite: "#fffaf0",
-      forestgreen: "#228b22",
-      fuchsia: "#ff00ff",
-      gainsboro: "#dcdcdc",
-      ghostwhite: "#f8f8ff",
-      gold: "#ffd700",
-      goldenrod: "#daa520",
-      gray: "#808080",
-      green: "#008000",
-      greenyellow: "#adff2f",
-      honeydew: "#f0fff0",
-      hotpink: "#ff69b4",
-      indianred: "#cd5c5c",
-      indigo: "#4b0082",
-      ivory: "#fffff0",
-      khaki: "#f0e68c",
-      lavender: "#e6e6fa",
-      lavenderblush: "#fff0f5",
-      lawngreen: "#7cfc00",
-      lemonchiffon: "#fffacd",
-      lightblue: "#add8e6",
-      lightcoral: "#f08080",
-      lightcyan: "#e0ffff",
-      lightgoldenrodyellow: "#fafad2",
-      lightgrey: "#d3d3d3",
-      lightgreen: "#90ee90",
-      lightpink: "#ffb6c1",
-      lightsalmon: "#ffa07a",
-      lightseagreen: "#20b2aa",
-      lightskyblue: "#87cefa",
-      lightslategray: "#778899",
-      lightsteelblue: "#b0c4de",
-      lightyellow: "#ffffe0",
-      lime: "#00ff00",
-      limegreen: "#32cd32",
-      linen: "#faf0e6",
-      magenta: "#ff00ff",
-      maroon: "#800000",
-      mediumaquamarine: "#66cdaa",
-      mediumblue: "#0000cd",
-      mediumorchid: "#ba55d3",
-      mediumpurple: "#9370d8",
-      mediumseagreen: "#3cb371",
-      mediumslateblue: "#7b68ee",
-      mediumspringgreen: "#00fa9a",
-      mediumturquoise: "#48d1cc",
-      mediumvioletred: "#c71585",
-      midnightblue: "#191970",
-      mintcream: "#f5fffa",
-      mistyrose: "#ffe4e1",
-      moccasin: "#ffe4b5",
-      navajowhite: "#ffdead",
-      navy: "#000080",
-      oldlace: "#fdf5e6",
-      olive: "#808000",
-      olivedrab: "#6b8e23",
-      orange: "#ffa500",
-      orangered: "#ff4500",
-      orchid: "#da70d6",
-      palegoldenrod: "#eee8aa",
-      palegreen: "#98fb98",
-      paleturquoise: "#afeeee",
-      palevioletred: "#d87093",
-      papayawhip: "#ffefd5",
-      peachpuff: "#ffdab9",
-      peru: "#cd853f",
-      pink: "#ffc0cb",
-      plum: "#dda0dd",
-      powderblue: "#b0e0e6",
-      purple: "#800080",
-      rebeccapurple: "#663399",
-      red: "#ff0000",
-      rosybrown: "#bc8f8f",
-      royalblue: "#4169e1",
-      saddlebrown: "#8b4513",
-      salmon: "#fa8072",
-      sandybrown: "#f4a460",
-      seagreen: "#2e8b57",
-      seashell: "#fff5ee",
-      sienna: "#a0522d",
-      silver: "#c0c0c0",
-      skyblue: "#87ceeb",
-      slateblue: "#6a5acd",
-      slategray: "#708090",
-      snow: "#fffafa",
-      springgreen: "#00ff7f",
-      steelblue: "#4682b4",
-      tan: "#d2b48c",
-      teal: "#008080",
-      thistle: "#d8bfd8",
-      tomato: "#ff6347",
-      turquoise: "#40e0d0",
-      violet: "#ee82ee",
-      wheat: "#f5deb3",
-      white: "#ffffff",
-      whitesmoke: "#f5f5f5",
-      yellow: "#ffff00",
-      yellowgreen: "#9acd32"
-    };
-    const rgb = name.toLowerCase().match(/rgb\((.*),(.*),(.*)\)/);
-    if (rgb) {
-      const r = ("0" + parseInt(rgb[1]).toString(16)).slice(-2);
-      const g = ("0" + parseInt(rgb[2]).toString(16)).slice(-2);
-      const b = ("0" + parseInt(rgb[3]).toString(16)).slice(-2);
-      return "#" + r + g + b;
-    }
-    if (typeof colors[name.toLowerCase()] != "undefined") {
-      return colors[name.toLowerCase()];
-    }
-    return false;
-  };
-  Neo.initComponents = function() {
-    var copyright = document.getElementById("neo-copyright");
-    if (copyright) copyright.innerHTML += "v" + Neo.version;
-    document.addEventListener(
-      "mouseup",
-      function(e) {
-        if (Neo.painter && e.target instanceof Element && !Neo.painter.isContainer(e.target)) {
-          Neo.painter.cancelTool();
-        }
-      },
-      false
-    );
-    Neo.showWarning();
-    if (Neo.styleSheet) {
-      Neo.addRule("*", "user-select", "none");
-      Neo.addRule("*", "-webkit-user-select", "none");
-      Neo.addRule("*", "-ms-user-select", "none");
-    }
-  };
-  Neo.initButtons = function() {
-    const commands = new Commands();
-    const neo_undo = new Button().init("neo-undo");
-    if (neo_undo) {
-      neo_undo.onmouseup = function() {
-        const UndoCommand = new commands.UndoCommand(Neo.painter);
-        UndoCommand.execute();
-      };
-    }
-    const neo_redo = new Button().init("neo-redo");
-    if (neo_redo) {
-      neo_redo.onmouseup = function() {
-        const RedoCommand = new commands.RedoCommand(Neo.painter);
-        RedoCommand.execute();
-      };
-    }
-    const neo_window = new Button().init("neo-window");
-    if (neo_window) {
-      neo_window.onmouseup = function() {
-        const WindowCommand = new commands.WindowCommand(Neo.painter);
-        WindowCommand.execute();
-      };
-    }
-    const neo_copyright = new Button().init("neo-copyright");
-    if (neo_copyright) {
-      neo_copyright.onmouseup = function() {
-        const CopyrightCommand = new commands.CopyrightCommand(Neo.painter);
-        CopyrightCommand.execute();
-      };
-    }
-    const neo_zoomPlus = new Button().init("neo-zoomPlus");
-    if (neo_zoomPlus) {
-      neo_zoomPlus.onmouseup = function() {
-        const ZoomPlusCommand = new commands.ZoomPlusCommand(Neo.painter);
-        ZoomPlusCommand.execute();
-      };
-    }
-    const neo_zoomMinus = new Button().init("neo-zoomMinus");
-    if (neo_zoomMinus) {
-      neo_zoomMinus.onmouseup = function() {
-        const ZoomMinusCommand = new commands.ZoomMinusCommand(Neo.painter);
-        ZoomMinusCommand.execute();
-      };
-    }
-    Neo.submitButton = new Button().init("neo-submit");
-    if (!Neo.submitButton) {
-      console.error("initButtons: SubmitButton not found");
-      return;
-    }
-    Neo.submitButton.onmouseup = function() {
-      var _a;
-      (_a = Neo.submitButton) == null ? void 0 : _a.disable(5e3);
-      const SubmitCommand = new commands.SubmitCommand(Neo.painter);
-      SubmitCommand.execute();
-    };
-    Neo.fillButton = new FillButton().init("neo-fill");
-    Neo.rightButton = new RightButton().init("neo-right");
-    if (!Neo.rightButton) {
-      console.error("initButtons: RightButton not found");
-      return;
-    }
-    if (Neo.isMobile() || Neo.config.neo_show_right_button == "true") {
-      if (Neo.rightButton.element) {
-        Neo.rightButton.element.style.display = "block";
-      }
-    }
-    Neo.penTip = new PenTip().init("neo-pen");
-    Neo.pen2Tip = new Pen2Tip().init("neo-pen2");
-    Neo.effectTip = new EffectTip().init("neo-effect");
-    Neo.effect2Tip = new Effect2Tip().init("neo-effect2");
-    Neo.eraserTip = new EraserTip().init("neo-eraser");
-    Neo.drawTip = new DrawTip().init("neo-draw");
-    Neo.maskTip = new MaskTip().init("neo-mask");
-    Neo.toolButtons = Neo.fillButton && Neo.penTip && Neo.pen2Tip && Neo.effectTip && Neo.effect2Tip && Neo.drawTip && Neo.eraserTip ? [
-      Neo.fillButton,
-      Neo.penTip,
-      Neo.pen2Tip,
-      Neo.effectTip,
-      Neo.effect2Tip,
-      Neo.drawTip,
-      Neo.eraserTip
-    ] : [];
-    for (var i = 1; i <= 14; i++) {
-      new ColorTip().init("neo-color" + i, { index: i });
-    }
-    Neo.sliders[Neo.SLIDERTYPE_RED] = new ColorSlider().init("neo-sliderRed", {
-      type: Neo.SLIDERTYPE_RED
-    });
-    Neo.sliders[Neo.SLIDERTYPE_GREEN] = new ColorSlider().init(
-      "neo-sliderGreen",
-      { type: Neo.SLIDERTYPE_GREEN }
-    );
-    Neo.sliders[Neo.SLIDERTYPE_BLUE] = new ColorSlider().init("neo-sliderBlue", {
-      type: Neo.SLIDERTYPE_BLUE
-    });
-    Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new ColorSlider().init(
-      "neo-sliderAlpha",
-      { type: Neo.SLIDERTYPE_ALPHA }
-    );
-    Neo.sizeslider = new SizeSlider();
-    Neo.sliders[Neo.SLIDERTYPE_SIZE] = Neo.sizeslider.init("neo-sliderSize", {
-      type: Neo.SLIDERTYPE_SIZE
-    });
-    for (var i = 1; i <= 3; i++) {
-      new ReserveControl().init("neo-reserve" + i, { index: i });
-    }
-    new LayerControl().init("neo-layerControl");
-    new ScrollBarButton().init("neo-scrollH");
-    new ScrollBarButton().init("neo-scrollV");
-  };
-  Neo.start = function(isApp = false) {
-    if (Neo.viewer) return;
-    Neo.initSkin();
-    Neo.initComponents();
-    Neo.initButtons();
-    Neo.isApp = isApp;
-    if (Neo.applet) {
-      var name = Neo.applet.getAttribute("name") || "paintbbs";
-      Neo.applet.outerHTML = "";
-      document[name] = Neo;
-      Neo.resizeCanvas();
-      if (!Neo.container) {
-        console.error("start: Container element not found");
-        return;
-      }
-      Neo.container.style.visibility = "visible";
-      if (Neo.isApp) {
-        var ipc = __require("electron").ipcRenderer;
-        ipc.sendToHost("neo-status", "ok");
-      } else {
-        if (document["paintBBSCallback"]) {
-          document["paintBBSCallback"]("start");
-        }
-      }
-    }
-  };
-  Neo.isMobile = function() {
-    if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
-    if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
-    return false;
-  };
-  Neo.showWarning = function() {
-    const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);
-    const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
-    var edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
-    var edgeVersion = 0;
-    if (edgeMatch && edgeMatch.length > 1) {
-      edgeVersion = parseInt(edgeMatch[1], 10);
-    }
-    var str = "";
-    if (futaba || samplebbs) {
-      if (edgeVersion && edgeVersion < 15) {
-        str = Neo.translate(
-          "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>"
-        );
-      }
-    }
-    if (Neo.config.neo_warning) {
-      str += Neo.config.neo_warning;
-    }
-    var warning = document.getElementById("neoWarning");
-    if (!warning) {
-      return;
-    }
-    warning.innerHTML = str;
-    setTimeout(function() {
-      if (!warning) {
-        return;
-      }
-      warning.style.opacity = "0";
-    }, 15e3);
-  };
-  Neo.updateUI = function() {
-    var current = Neo.painter.tool.getToolButton();
-    for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
-        /** @type {Neo.ToolTip} */
-        Neo.toolButtons[i]
-      );
-      if (current) {
-        if (current == toolTip) {
-          toolTip.setSelected(true);
-          toolTip.update();
-        } else {
-          toolTip.setSelected(false);
-        }
-      }
-    }
-    if (Neo.drawTip) {
-      Neo.drawTip.update();
-    }
-    Neo.updateUIColor(true, false);
-  };
-  Neo.updateUIColor = function(updateSlider, updateColorTip) {
-    for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
-        /** @type {Neo.ToolTip} */
-        Neo.toolButtons[i]
-      );
-      toolTip.update();
-    }
-    if (updateSlider) {
-      for (let i = 0; i < Neo.sliders.length; i++) {
-        const slider = (
-          /** @type {Neo.ColorSlider|Neo.SizeSlider} */
-          Neo.sliders[i]
-        );
-        slider.update();
-      }
-    }
-    if (updateColorTip) {
-      var colorTip = (
-        /** @type {Neo.ColorTip|null} **/
-        Neo.ColorTip.getCurrent()
-      );
-      if (colorTip) {
-        colorTip.setColor(Neo.painter.foregroundColor);
-      }
-    }
-  };
-  Neo.updateWindow = function() {
-    const windowView = document.getElementById("neo-windowView");
-    const pageView = document.getElementById("neo-pageView");
-    if (!Neo.container) {
-      console.error("updateWindow: Container element not found");
-      return;
-    }
-    if (Neo.fullScreen) {
-      if (!windowView) return;
-      windowView.style.display = "block";
-      windowView.appendChild(Neo.container);
-    } else {
-      if (windowView) {
-        windowView.style.display = "none";
-      }
-      if (pageView) {
-        pageView.appendChild(Neo.container);
-      }
-    }
-    Neo.resizeCanvas();
-    document.dispatchEvent(
-      new CustomEvent("neo:fullscreenchange", {
-        detail: { fullscreen: Neo.fullScreen }
-      })
-    );
-  };
-  Neo.resizeCanvas = function() {
-    if (!Neo.container) {
-      console.error("resizeCanvas: Container element not found");
-      return;
-    }
-    var appletWidth = Neo.container.clientWidth;
-    var appletHeight = Neo.container.clientHeight;
-    var canvasWidth = Neo.painter.canvasWidth;
-    var canvasHeight = Neo.painter.canvasHeight;
-    var width0 = canvasWidth * Neo.painter.zoom;
-    var height0 = canvasHeight * Neo.painter.zoom;
-    var width = width0 < appletWidth - 100 ? width0 : appletWidth - 100;
-    var height = height0 < appletHeight - 120 ? height0 : appletHeight - 120;
-    if (Neo.viewer) {
-      width = canvasWidth;
-      height = canvasHeight;
-    }
-    width = Math.floor(width / 2) * 2;
-    height = Math.floor(height / 2) * 2;
-    Neo.painter.destWidth = width;
-    Neo.painter.destHeight = height;
-    const destCanvas = Neo.painter.destCanvas;
-    destCanvas.width = width;
-    destCanvas.height = height;
-    const destctx = destCanvas.getContext("2d", {
-      willReadFrequently: true
-    });
-    if (!destctx) {
-      console.error("resizeCanvas: Failed to get 2d context");
-      return;
-    }
-    Neo.painter.destCanvasCtx = destctx;
-    const ctx = Neo.painter.destCanvasCtx;
-    if (Neo.painter.zoom < 1) {
-      ctx.imageSmoothingEnabled = true;
-      destCanvas.style.imageRendering = "smooth";
-      if (Neo.painter.zoom < 0.5 && "imageSmoothingQuality" in ctx) {
-        ctx.imageSmoothingQuality = "high";
-      }
-    } else {
-      ctx.imageSmoothingEnabled = false;
-      destCanvas.style.imageRendering = "pixelated";
-    }
-    destCanvas.style.touchAction = "none";
-    destCanvas.style.pointerEvents = "auto";
-    if (Neo.canvas) {
-      Neo.canvas.style.touchAction = "none";
-      Neo.canvas.style.pointerEvents = "auto";
-      Neo.canvas.style.width = width + "px";
-      Neo.canvas.style.height = height + "px";
-    }
-    const tools = Neo.tools || null;
-    if (tools) {
-      tools.style.touchAction = "none";
-      tools.style.pointerEvents = "auto";
-    }
-    if (Neo.toolsWrapper) {
-      const toolsWrapper = Neo.toolsWrapper;
-      var top = (Neo.container.clientHeight - toolsWrapper.clientHeight) / 2;
-      Neo.toolsWrapper.style.top = (top > 0 ? top : 0) + "px";
-      if (top < 0) {
-        var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
-        Neo.toolsWrapper.style.transform = "translate(0, " + top + "px) scale(1," + s + ")";
-      } else {
-        Neo.toolsWrapper.style.transform = "";
-      }
-    }
-    Neo.painter.setZoom(Neo.painter.zoom);
-    Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
-  };
-  Neo.clone = function(src) {
-    const dst = {};
-    for (const k in src) {
-      dst[k] = src[k];
-    }
-    return dst;
-  };
-  Neo.getSizeString = function(len) {
-    var result = String(len);
-    while (result.length < 8) {
-      result = "0" + result;
-    }
-    return result;
-  };
-  Neo.openURL = function(url) {
-    if (Neo.isApp) {
-      __require("electron").shell.openExternal(url);
-    } else {
-      window.open(url, "_blank");
-    }
-  };
-  Neo.getAbsoluteURL = function(baseURL, url) {
-    if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
-      return url;
-    } else {
-      return baseURL + url;
-    }
-  };
-  Neo.submit = function(baseURL, blob, thumbnail, thumbnail2) {
-    var _a;
-    let url = Neo.getAbsoluteURL(baseURL, Neo.config.url_save);
-    var headerString = Neo.str_header || "";
-    if (document["paintBBSCallback"]) {
-      var result = document["paintBBSCallback"]("check");
-      if (result == 0 || result == "false") {
-        return;
-      }
-      result = document["paintBBSCallback"]("header");
-      if (result && typeof result == "string") {
-        headerString = result;
-      }
-    }
-    if (!headerString) headerString = Neo.config.send_header || "";
-    var imageType = Neo.config.send_header_image_type;
-    if (imageType && imageType == "true") {
-      headerString = "image_type=png&" + headerString;
-    }
-    var count = Neo.painter.securityCount;
-    var timer = Date.now() - Neo.painter.securityTimer;
-    if (Neo.config.send_header_count == "true") {
-      headerString = "count=" + count + "&" + headerString;
-    }
-    if (Neo.config.send_header_timer == "true") {
-      headerString = "timer=" + timer + "&" + headerString;
-    }
-    if (Neo.config.neo_emulate_security_error == "true") {
-      var securityError = false;
-      if (Neo.config.security_click) {
-        if (count - parseInt(Neo.config.security_click || 0) < 0) {
-          securityError = true;
-        }
-      }
-      if (Neo.config.security_timer) {
-        if (timer - parseInt(Neo.config.security_timer || 0) * 1e3 < 0) {
-          securityError = true;
-        }
-      }
-      if (securityError && Neo.config.security_url) {
-        if (Neo.config.security_post == "true") {
-          url = Neo.config.security_url;
-        } else {
-          location.href = Neo.config.security_url;
-          return;
-        }
-      }
-    }
-    if (thumbnail2) {
-      const thumbnailSize = thumbnail2.size;
-      if (!isNaN(Neo.config.animation_max) && Number(Neo.config.animation_max)) {
-        const maxSize = Number(Neo.config.animation_max) * 1024;
-        if (maxSize < thumbnailSize) {
-          thumbnail2 = null;
-        }
-      }
-    }
-    let formData = null;
-    if (Neo.config.neo_send_with_formdata == "true") {
-      formData = new FormData();
-      formData.append("header", headerString);
-      formData.append("picture", blob, "blob");
-      let thumbnail_size = 0;
-      if (thumbnail) {
-        formData.append("thumbnail", thumbnail, "blob");
-        thumbnail_size = thumbnail.size;
-      }
-      if (thumbnail2) {
-        if (isNaN(Neo.config.neo_max_pch) || //0,-1の場合は無制限
-        Number(Neo.config.neo_max_pch) <= 0 || Number(Neo.config.neo_max_pch) * 1024 * 1024 > headerString.length + blob.size + thumbnail_size + thumbnail2.size) {
-          formData.append("pch", thumbnail2, "blob");
-        } else {
-          thumbnail2 = null;
-        }
-      }
-    }
-    var header = new Blob([headerString]);
-    var headerLength = this.getSizeString(header.size);
-    var imgLength = this.getSizeString(blob.size);
-    var array = [
-      "P",
-      // PaintBBS
-      headerLength,
-      header,
-      imgLength,
-      "\r\n",
-      blob
-    ];
-    if (thumbnail) {
-      var thumbnailLength = this.getSizeString(thumbnail.size);
-      array.push(thumbnailLength, thumbnail);
-    }
-    if (thumbnail2) {
-      var thumbnail2Length = this.getSizeString(thumbnail2.size);
-      array.push(thumbnail2Length, thumbnail2);
-    }
-    const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);
-    var subtype = futaba ? "octet-binary" : "octet-stream";
-    var body = new Blob(array, { type: "application/" + subtype });
-    const postData = (path, data2) => {
-      var errorMessage = path + "\n";
-      const requestOptions = {
-        method: "post",
-        body: data2
-      };
-      if (!futaba) {
-        requestOptions.mode = "same-origin";
-        requestOptions.headers = {
-          "X-Requested-With": "PaintBBS"
-        };
-      }
-      fetch(path, requestOptions).then((response) => {
-        var _a2;
-        if (response.ok) {
-          response.text().then((text) => {
-            var _a3, _b;
-            console.log(text);
-            if (text.match(/^error\n/m)) {
-              (_a3 = Neo.submitButton) == null ? void 0 : _a3.enable();
-              return alert(text.replace(/^error\n/m, ""));
-            }
-            if (Neo.config.neo_validate_exact_ok_text_in_response === "true") {
-              if (text !== "ok") {
-                (_b = Neo.submitButton) == null ? void 0 : _b.enable();
-                return alert(
-                  errorMessage + Neo.translate(
-                    "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002"
-                  )
-                );
-              }
-            }
-            var exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
-            var responseURL = text.replace(/&amp;/g, "&");
-            if (responseURL.match(/painttmp=/)) {
-              exitURL = responseURL;
-            }
-            if (responseURL.match(/^URL:/)) {
-              exitURL = responseURL.replace(/^URL:/, "");
-            }
-            Neo.uploaded = true;
-            if (typeof Neo.handleExit === "function") {
-              return Neo.handleExit();
-            }
-            return location.href = exitURL;
-          });
-        } else {
-          (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
-          const response_status = response.status;
-          let httpErrorMessag = "";
-          switch (response_status) {
-            case 400:
-              httpErrorMessag = "Bad Request";
-              break;
-            case 401:
-              httpErrorMessag = "Unauthorized";
-              break;
-            case 403:
-              httpErrorMessag = "Forbidden";
-              break;
-            case 404:
-              httpErrorMessag = "Not Found";
-              break;
-            case 500:
-              httpErrorMessag = "Internal Server Error";
-              break;
-            case 502:
-              httpErrorMessag = "Bad Gateway";
-              break;
-            case 503:
-              httpErrorMessag = "Service Unavailable";
-              break;
-            default:
-              httpErrorMessag = "Unknown Error";
-              break;
-          }
-          return alert(
-            `${Neo.translate("HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9")} ${response_status} : ${httpErrorMessag}
-${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")}`
-          );
-        }
-      }).catch((error) => {
-        var _a2;
-        (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
-        return alert(
-          errorMessage + Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")
-        );
-      });
-    };
-    if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
-      const isConfirmed = window.confirm(
-        Neo.translate("\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?")
-      );
-      if (!isConfirmed) {
-        (_a = Neo.submitButton) == null ? void 0 : _a.enable();
-        console.log("\u4E2D\u6B62\u3057\u307E\u3057\u305F\u3002");
-        return;
-      }
-    }
-    const data = Neo.config.neo_send_with_formdata === "true" ? formData : body;
-    if (data) {
-      postData(url, data);
-    } else {
-      console.error("failed to post data");
-    }
-  };
-  Neo.getColors = function() {
-    var array = [];
-    for (var i = 0; i < 14; i++) {
-      array.push(Neo.colorTips[i].color);
-    }
-    return array.join("\n");
-  };
-  Neo.setColors = function(colors) {
-    var array = colors.split("\n");
-    for (var i = 0; i < 14; i++) {
-      var color = array[i];
-      Neo.config.colors[i] = color;
-      Neo.colorTips[i].setColor(color);
-    }
-  };
-  Neo.pExit = function() {
-    const commands = new Commands();
-    new commands.SubmitCommand(Neo.painter).execute();
-  };
-  Neo.str_header = "";
-  Neo.createContainer = function(applet) {
-    var neo = document.createElement("div");
-    neo.className = "NEO";
-    neo.id = "NEO";
-    const html = '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;"><div id="neo-container" style="visibility:hidden;" class="o"><div id="neo-center" class="o"><div id="neo-painterContainer" class="o"><div id="neo-painterWrapper" class="o"><div id="neo-upper" class="o"><div id="neo-redo">[\u3084\u308A\u76F4\u3057]</div> <div id="neo-undo">[\u5143\u306B\u623B\u3059]</div> <div id="neo-fill">[\u5857\u308A\u6F70\u3057]</div> <div id="neo-right" style="display:none;">[\u53F3]</div> </div><div id="neo-painter"><div id="neo-canvas"><div id="neo-scrollH"></div><div id="neo-scrollV"></div><div id="neo-zoomPlusWrapper"><div id="neo-zoomPlus">+</div></div><div id="neo-zoomMinusWrapper"><div id="neo-zoomMinus">-</div></div><div id="neoWarning"></div></div></div><div id="neo-lower" class="o"></div></div><div id="neo-toolsWrapper"><div id="neo-tools"><div id="neo-toolSet"><div id="neo-pen"></div><div id="neo-pen2"></div><div id="neo-effect"></div><div id="neo-effect2"></div><div id="neo-eraser"></div><div id="neo-draw"></div><div id="neo-mask"></div><div class="colorTips"><div id="neo-color2"></div><div id="neo-color1"></div><br><div id="neo-color4"></div><div id="neo-color3"></div><br><div id="neo-color6"></div><div id="neo-color5"></div><br><div id="neo-color8"></div><div id="neo-color7"></div><br><div id="neo-color10"></div><div id="neo-color9"></div><br><div id="neo-color12"></div><div id="neo-color11"></div><br><div id="neo-color14"></div><div id="neo-color13"></div></div><div id="neo-sliderRed"></div><div id="neo-sliderGreen"></div><div id="neo-sliderBlue"></div><div id="neo-sliderAlpha"></div><div id="neo-sliderSize"></div><div class="reserveControl" style="margin-top:4px;"><div id="neo-reserve1"></div><div id="neo-reserve2"></div><div id="neo-reserve3"></div></div><div id="neo-layerControl" style="margin-top:6px;"></div></div></div></div></div></div><div id="neo-headerButtons"><div id="neo-window">[\u7A93]</div></div><div id="neo-footerButtons"><div id="neo-submit">[\u6295\u7A3F]</div> <div id="neo-copyright">[(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO]</div> </div></div></div><div id="neo-windowView" style="display: none;"></div>';
-    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
-      return Neo.translate(str);
-    });
-    const parent = applet.parentNode;
-    if (!parent) {
-      console.error("Failed to create container.");
-      return;
-    }
-    parent.appendChild(neo);
-    parent.insertBefore(neo, applet);
-    setTimeout(function() {
-      const tmp = document.querySelectorAll(".NEO");
-      if (tmp.length > 1) {
-        for (var i = 1; i < tmp.length; i++) {
-          tmp[i].style.display = "none";
-        }
-      }
-    }, 0);
-  };
-  Neo.tintImage = function(ctx, color) {
-    const c = Neo.painter.getColor(color) & 16777215;
-    var imageData = ctx.getImageData(0, 0, 46, 18);
-    var buf32 = new Uint32Array(imageData.data.buffer);
-    var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-    for (var i = 0; i < buf32.length; i++) {
-      var a = buf32[i] & 4278190080;
-      if (a) {
-        buf32[i] = buf32[i] & a | c;
-      }
-    }
-    imageData.data.set(buf8);
-    ctx.putImageData(imageData, 0, 0);
-  };
-  Neo.setToolSide = function(htmlConfiguredSide) {
-    let side;
-    if (htmlConfiguredSide === "left") {
-      side = true;
-    } else if (htmlConfiguredSide === "right") {
-      side = false;
-    } else {
-      side = htmlConfiguredSide;
-    }
-    Neo.toolSide = !!side;
-    if (!Neo.toolSide) {
-      Neo.addRule(".NEO #neo-toolsWrapper", "right", "-3px");
-      Neo.addRule(".NEO #neo-toolsWrapper", "left", "auto");
-      Neo.addRule(".NEO #neo-painterWrapper", "padding", "0 55px 0 0 !important");
-      Neo.addRule(".NEO #neo-upper", "padding-right", "75px !important");
-    } else {
-      Neo.addRule(".NEO #neo-toolsWrapper", "right", "auto");
-      Neo.addRule(".NEO #neo-toolsWrapper", "left", "-1px");
-      Neo.addRule(".NEO #neo-painterWrapper", "padding", "0 0 0 55px !important");
-      Neo.addRule(".NEO #neo-upper", "padding-right", "20px !important");
-    }
-  };
-  document.addEventListener("DOMContentLoaded", () => {
-    let elementNeo_touchMoveListenerAdded = false;
-    const isPinchZooming = function() {
-      if ("visualViewport" in window && window.visualViewport) {
-        return window.visualViewport.scale > 1;
-      } else {
-        return document.documentElement.clientWidth > window.innerWidth;
-      }
-    };
-    const touch_move_grid_control = function(e) {
-      if (Neo.config.neo_disable_grid_touch_move) {
-        let screenwidth = Number(screen.width);
-        if (e.touches.length === 1 && (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)) {
-          if (typeof e.cancelable !== "boolean" || e.cancelable) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }
-      }
-    };
-    const elementNeo = document.getElementById("NEO");
-    const add_touch_move_grid_control = function() {
-      if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
-        if (!elementNeo_touchMoveListenerAdded) {
-          elementNeo == null ? void 0 : elementNeo.addEventListener("touchmove", touch_move_grid_control, {
-            passive: false
-          });
-          elementNeo_touchMoveListenerAdded = true;
-        }
-      }
-    };
-    elementNeo == null ? void 0 : elementNeo.addEventListener("touchmove", function(e) {
-      if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
-        add_touch_move_grid_control();
-        if (isPinchZooming()) {
-          elementNeo.removeEventListener("touchmove", touch_move_grid_control);
-          elementNeo_touchMoveListenerAdded = false;
-        }
-      }
-    });
-    add_touch_move_grid_control();
-  });
-  Neo.setStabilizeLevel = function(htmlConfig) {
-    let level = parseInt(String(htmlConfig));
-    if (isNaN(level) || level < 0) {
-      level = 0;
-    } else if (level > 5) {
-      level = 5;
-    }
-    Neo.stabilize_level = level;
-  };
-  Neo.setStabilizLevel = Neo.setStabilizeLevel;
-
-  // src/dictionary.js
-  var dictionary = {
-    ja: {},
-    en: {
-      \u3084\u308A\u76F4\u3057: "Redo",
-      \u5143\u306B\u623B\u3059: "Undo",
-      \u5857\u308A\u6F70\u3057: "Paint",
-      \u7A93: "F&nbsp;",
-      \u6295\u7A3F: "Send",
-      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "(C)shi-chan PaintBBS NEO",
-      \u925B\u7B46: "Solid",
-      \u6C34\u5F69: "WaterC",
-      \uFF83\uFF77\uFF7D\uFF84: "Text",
-      \u30C8\u30FC\u30F3: "Tone",
-      \u307C\u304B\u3057: "ShadeOff",
-      \u8986\u3044\u713C\u304D: "HLight",
-      \u713C\u304D\u8FBC\u307F: "Dark",
-      \u6D88\u3057\u30DA\u30F3: "White",
-      \u6D88\u3057\u56DB\u89D2: "WhiteRect",
-      \u5168\u6D88\u3057: "Clear",
-      \u56DB\u89D2: "Rect",
-      \u7DDA\u56DB\u89D2: "LineRect",
-      \u6955\u5186: "Oval",
-      \u7DDA\u6955\u5186: "LineOval",
-      \u30B3\u30D4\u30FC: "Copy",
-      \uFF9A\uFF72\uFF94\u7D50\u5408: "lay-unif",
-      \u89D2\u53D6\u308A: "Antialias",
-      \u5DE6\u53F3\u53CD\u8EE2: "reverseL",
-      \u4E0A\u4E0B\u53CD\u8EE2: "reverseU",
-      \u50BE\u3051: "lie",
-      \u901A\u5E38: "Normal",
-      \u30DE\u30B9\u30AF: "Mask",
-      \u9006\uFF8F\uFF7D\uFF78: "ReMask",
-      \u52A0\u7B97: "And",
-      \u9006\u52A0\u7B97: "Div",
-      \u624B\u66F8\u304D: "FreeLine",
-      \u76F4\u7DDA: "Straight",
-      BZ\u66F2\u7DDA: "Bezie",
-      "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "Page view?",
-      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "Window view?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Restore session?",
-      \u53F3: "Right Click",
-      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
-      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "This browser may fail to send your picture.<br>",
-      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Discard animation data and restore session?",
-      \u6700: "Mx",
-      \u65E9: "H",
-      \u65E2: "M",
-      \u920D: "L",
-      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "Please push send button again.",
-      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "HTTP status code",
-      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "Layer information will not be saved.\nAre you sure you want to continue?"
-    },
-    enx: {
-      \u3084\u308A\u76F4\u3057: "Redo",
-      \u5143\u306B\u623B\u3059: "Undo",
-      \u5857\u308A\u6F70\u3057: "Fill",
-      \u7A93: "Float",
-      \u6295\u7A3F: "Send",
-      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
-      \u925B\u7B46: "Solid",
-      \u6C34\u5F69: "WaterCo",
-      \uFF83\uFF77\uFF7D\uFF84: "Text",
-      \u30C8\u30FC\u30F3: "Halftone",
-      \u307C\u304B\u3057: "Blur",
-      \u8986\u3044\u713C\u304D: "Light",
-      \u713C\u304D\u8FBC\u307F: "Dark",
-      \u6D88\u3057\u30DA\u30F3: "White",
-      \u6D88\u3057\u56DB\u89D2: "WhiteRe",
-      \u5168\u6D88\u3057: "Clear",
-      \u56DB\u89D2: "Rect",
-      \u7DDA\u56DB\u89D2: "LineRect",
-      \u6955\u5186: "Oval",
-      \u7DDA\u6955\u5186: "LineOval",
-      \u30B3\u30D4\u30FC: "Copy",
-      \uFF9A\uFF72\uFF94\u7D50\u5408: "layerUnit",
-      \u89D2\u53D6\u308A: "antiAlias",
-      \u5DE6\u53F3\u53CD\u8EE2: "flipHorita",
-      \u4E0A\u4E0B\u53CD\u8EE2: "flipVertic",
-      \u50BE\u3051: "rotate",
-      \u901A\u5E38: "Normal",
-      \u30DE\u30B9\u30AF: "Mask",
-      \u9006\uFF8F\uFF7D\uFF78: "ReMask",
-      \u52A0\u7B97: "And",
-      \u9006\u52A0\u7B97: "Divide",
-      \u624B\u66F8\u304D: "Freehan",
-      \u76F4\u7DDA: "Line",
-      BZ\u66F2\u7DDA: "Bezier",
-      Layer0: "LayerBG",
-      Layer1: "LayerFG",
-      "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "Page view?",
-      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "Window view?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Restore session?",
-      \u53F3: "Right Click",
-      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
-      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "This browser may fail to send your picture.<br>",
-      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "Send this picture and end session?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Discard animation data and restore session?",
-      \u6700: "Mx",
-      \u65E9: "H",
-      \u65E2: "M",
-      \u920D: "L",
-      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "Failed to upload image. please try again.",
-      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "HTTP status code",
-      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "Layer information will not be saved.\nAre you sure you want to continue?"
-    },
-    es: {
-      \u3084\u308A\u76F4\u3057: "Rehacer",
-      \u5143\u306B\u623B\u3059: "Deshacer",
-      \u5857\u308A\u6F70\u3057: "Llenar",
-      \u7A93: "Ventana",
-      \u6295\u7A3F: "Enviar",
-      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
-      \u925B\u7B46: "L\xE1piz",
-      \u6C34\u5F69: "Acuarela",
-      \uFF83\uFF77\uFF7D\uFF84: "Texto",
-      \u30C8\u30FC\u30F3: "Tono",
-      \u307C\u304B\u3057: "Gradaci\xF3n",
-      \u8986\u3044\u713C\u304D: "Sobreexp.",
-      \u713C\u304D\u8FBC\u307F: "Quemar",
-      \u6D88\u3057\u30DA\u30F3: "Goma",
-      \u6D88\u3057\u56DB\u89D2: "GomaRect",
-      \u5168\u6D88\u3057: "Borrar",
-      \u56DB\u89D2: "Rect",
-      \u7DDA\u56DB\u89D2: "L\xEDneaRect",
-      \u6955\u5186: "\xD3valo",
-      \u7DDA\u6955\u5186: "L\xEDnea\xD3valo",
-      \u30B3\u30D4\u30FC: "Copiar",
-      \uFF9A\uFF72\uFF94\u7D50\u5408: "UnirCapa",
-      \u89D2\u53D6\u308A: "Antialias",
-      \u5DE6\u53F3\u53CD\u8EE2: "Inv.Izq/Der",
-      \u4E0A\u4E0B\u53CD\u8EE2: "Inv.Arr/Aba",
-      \u50BE\u3051: "Inclinar",
-      \u901A\u5E38: "Normal",
-      \u30DE\u30B9\u30AF: "Masc.",
-      \u9006\uFF8F\uFF7D\uFF78: "Masc.Inv",
-      \u52A0\u7B97: "Adici\xF3n",
-      \u9006\u52A0\u7B97: "Subtrac",
-      \u624B\u66F8\u304D: "Libre",
-      \u76F4\u7DDA: "L\xEDnea",
-      BZ\u66F2\u7DDA: "Curva",
-      Layer0: "Capa0",
-      Layer1: "Capa1",
-      "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "\xBFVista de p\xE1gina?",
-      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "\xBFVista de ventana?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "\xBFRestaurar sesi\xF3n anterior?",
-      \u53F3: "Clic derecho",
-      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO es una versi\xF3n para HTML5 de Oekaki Shi-BBS PaintBBS (\xA9 2000-2004 shi-chan). \xBFMostrar la p\xE1gina del proyecto?",
-      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "Este navegador podr\xEDa no enviar su imagen.<br>",
-      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "\xBFEnviar esta imagen y finalizar sesi\xF3n?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "\xBFDesechar datos de animaci\xF3n y restaurar sesi\xF3n?",
-      \u6700: "Mx",
-      \u65E9: "H",
-      \u65E2: "M",
-      \u920D: "L",
-      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "No se pudo cargar la imagen. por favor, int\xE9ntalo de nuevo.",
-      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "C\xF3digo de estado HTTP",
-      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "La informaci\xF3n de las capas no se guardar\xE1.\n\xBFEst\xE1 seguro de que desea continuar?"
-    }
-  };
-  var translate = (function() {
-    var language = window.navigator.languages && window.navigator.languages[0] || window.navigator.language;
-    var lang = "en";
-    for (var key in dictionary) {
-      if (language.indexOf(key) == 0) {
-        lang = key;
-        break;
-      }
-    }
-    return function(string) {
-      if (Neo.config.neo_alt_translation) {
-        if (lang == "en") lang = "enx";
-      } else {
-        if (lang != "ja") lang = "en";
-      }
-      return dictionary[lang][string] || string;
-    };
-  })();
-
   // src/main.js
   Object.assign(Neo, painter_exports, actions_exports, tools_exports, widgets_exports, commands_exports);
-  Neo.translate = translate;
   window.Neo = Neo;
 })();

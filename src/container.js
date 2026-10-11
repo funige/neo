@@ -4,6 +4,7 @@ import { Neo } from "./neo.js";
 import { Commands } from "./commands.js";
 import { Painter } from "./painter.js";
 import { Button } from "./widgets.js";
+import { translate } from "./dictionary.js";
 import {
   FillButton,
   RightButton,
@@ -190,7 +191,7 @@ Neo.init2 = function () {
     Neo.painter.clearSession();
     storageTimestamp = null;
   }
-  if (storageTimestamp && confirm(Neo.translate(message))) {
+  if (storageTimestamp && confirm(translate(message))) {
     setTimeout(function () {
       Neo.painter.loadSession(function () {
         Neo.painter._pushUndo();
@@ -1160,9 +1161,7 @@ Neo.showWarning = function () {
   var str = "";
   if (futaba || samplebbs) {
     if (edgeVersion && edgeVersion < 15) {
-      str = Neo.translate(
-        "このブラウザでは<br>投稿に失敗することがあります<br>",
-      );
+      str = translate("このブラウザでは<br>投稿に失敗することがあります<br>");
     }
   }
 
@@ -1599,7 +1598,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
                 Neo.submitButton?.enable();
                 return alert(
                   errorMessage +
-                    Neo.translate(
+                    translate(
                       "投稿に失敗。時間を置いて再度投稿してみてください。",
                     ),
                 );
@@ -1656,7 +1655,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
               break;
           }
           return alert(
-            `${Neo.translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`,
+            `${translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`,
           );
         }
       })
@@ -1664,14 +1663,14 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
         Neo.submitButton?.enable();
         return alert(
           errorMessage +
-            Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"),
+            translate("投稿に失敗。時間を置いて再度投稿してみてください。"),
         );
       });
   };
 
   if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
     const isConfirmed = window.confirm(
-      Neo.translate("レイヤー情報は保存されません。\n続行してよろしいですか?"),
+      translate("レイヤー情報は保存されません。\n続行してよろしいですか?"),
     );
 
     if (!isConfirmed) {
@@ -1818,7 +1817,7 @@ Neo.createContainer = function (applet) {
     "</div>";
 
   neo.innerHTML = html.replace(/\[(.*?)\]/g, function (match, str) {
-    return Neo.translate(str);
+    return translate(str);
   });
 
   const parent = applet.parentNode;

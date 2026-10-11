@@ -582,6 +582,20 @@
   Neo.SLIDERTYPE_SIZE = 4;
   document.neo = Neo;
 
+  // src/painter.js
+  var painter_exports = {};
+  __export(painter_exports, {
+    Painter: () => Painter,
+    UndoItem: () => UndoItem,
+    UndoManager: () => UndoManager
+  });
+
+  // src/commands.js
+  var commands_exports = {};
+  __export(commands_exports, {
+    Commands: () => Commands
+  });
+
   // src/dictionary.js
   var dictionary = {
     ja: {},
@@ -762,25 +776,7 @@
     };
   })();
 
-  // src/painter.js
-  var painter_exports = {};
-  __export(painter_exports, {
-    Painter: () => Painter,
-    UndoItem: () => UndoItem,
-    UndoManager: () => UndoManager
-  });
-
-  // src/actions.js
-  var actions_exports = {};
-  __export(actions_exports, {
-    ActionManager: () => ActionManager
-  });
-
   // src/commands.js
-  var commands_exports = {};
-  __export(commands_exports, {
-    Commands: () => Commands
-  });
   var Commands = class {
     constructor() {
       this.CommandBase = class {
@@ -880,12 +876,12 @@
         }
         execute() {
           if (Neo.fullScreen) {
-            if (confirm(Neo.translate("\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F"))) {
+            if (confirm(translate("\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F"))) {
               Neo.fullScreen = false;
               Neo.updateWindow();
             }
           } else {
-            if (confirm(Neo.translate("\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F"))) {
+            if (confirm(translate("\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F"))) {
               Neo.fullScreen = true;
               Neo.updateWindow();
             }
@@ -912,7 +908,7 @@
         execute() {
           var url = "http://github.com/funige/neo/";
           if (confirm(
-            Neo.translate(
+            translate(
               "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F"
             ) + "\n"
           )) {
@@ -981,7 +977,7 @@
       this.elementID = elementID;
       this.selected = false;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -1177,7 +1173,7 @@
       this.elementID = elementID;
       this.selected = this.elementID == "neo-color1" ? true : false;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -1297,8 +1293,7 @@
      * @returns {ColorTip|null}
      */
     static getCurrent() {
-      for (var i = 0; i < Neo.colorTips.length; i++) {
-        var colorTip = Neo.colorTips[i];
+      for (const colorTip of Neo.colorTips) {
         if (colorTip.selected) return colorTip;
       }
       return null;
@@ -1338,7 +1333,7 @@
       this.elementID = elementID;
       this.mode = 0;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.params.type = this.element.id;
         this.element.onmousedown = function(e) {
@@ -1474,7 +1469,7 @@
         if (this.prevMode != this.mode) {
           this.prevMode = this.mode;
           var img = new Image();
-          var ref = this;
+          const ref = this;
           img.onload = function() {
             if (!ref.canvas) {
               console.error("Canvas not found for ToolTip on image load.");
@@ -1545,9 +1540,9 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u925B\u7B46"),
-        Neo.translate("\u6C34\u5F69"),
-        Neo.translate("\uFF83\uFF77\uFF7D\uFF84")
+        translate("\u925B\u7B46"),
+        translate("\u6C34\u5F69"),
+        translate("\uFF83\uFF77\uFF7D\uFF84")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1590,10 +1585,10 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u30C8\u30FC\u30F3"),
-        Neo.translate("\u307C\u304B\u3057"),
-        Neo.translate("\u8986\u3044\u713C\u304D"),
-        Neo.translate("\u713C\u304D\u8FBC\u307F")
+        translate("\u30C8\u30FC\u30F3"),
+        translate("\u307C\u304B\u3057"),
+        translate("\u8986\u3044\u713C\u304D"),
+        translate("\u713C\u304D\u8FBC\u307F")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1676,9 +1671,9 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u6D88\u3057\u30DA\u30F3"),
-        Neo.translate("\u6D88\u3057\u56DB\u89D2"),
-        Neo.translate("\u5168\u6D88\u3057")
+        translate("\u6D88\u3057\u30DA\u30F3"),
+        translate("\u6D88\u3057\u56DB\u89D2"),
+        translate("\u5168\u6D88\u3057")
       ];
       this.drawOnce = false;
       this.isTool = true;
@@ -1746,10 +1741,10 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u56DB\u89D2"),
-        Neo.translate("\u7DDA\u56DB\u89D2"),
-        Neo.translate("\u6955\u5186"),
-        Neo.translate("\u7DDA\u6955\u5186")
+        translate("\u56DB\u89D2"),
+        translate("\u7DDA\u56DB\u89D2"),
+        translate("\u6955\u5186"),
+        translate("\u7DDA\u6955\u5186")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1800,12 +1795,12 @@
     init(elementID, params = {}) {
       var _a;
       this.toolStrings = [
-        Neo.translate("\u30B3\u30D4\u30FC"),
-        Neo.translate("\uFF9A\uFF72\uFF94\u7D50\u5408"),
-        Neo.translate("\u89D2\u53D6\u308A"),
-        Neo.translate("\u5DE6\u53F3\u53CD\u8EE2"),
-        Neo.translate("\u4E0A\u4E0B\u53CD\u8EE2"),
-        Neo.translate("\u50BE\u3051")
+        translate("\u30B3\u30D4\u30FC"),
+        translate("\uFF9A\uFF72\uFF94\u7D50\u5408"),
+        translate("\u89D2\u53D6\u308A"),
+        translate("\u5DE6\u53F3\u53CD\u8EE2"),
+        translate("\u4E0A\u4E0B\u53CD\u8EE2"),
+        translate("\u50BE\u3051")
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1841,11 +1836,11 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u901A\u5E38"),
-        Neo.translate("\u30DE\u30B9\u30AF"),
-        Neo.translate("\u9006\uFF8F\uFF7D\uFF78"),
-        Neo.translate("\u52A0\u7B97"),
-        Neo.translate("\u9006\u52A0\u7B97")
+        translate("\u901A\u5E38"),
+        translate("\u30DE\u30B9\u30AF"),
+        translate("\u9006\uFF8F\uFF7D\uFF78"),
+        translate("\u52A0\u7B97"),
+        translate("\u9006\u52A0\u7B97")
       ];
       this.fixed = true;
       super.init(elementID, params);
@@ -1915,9 +1910,9 @@
      */
     init(elementID, params = {}) {
       this.toolStrings = [
-        Neo.translate("\u624B\u66F8\u304D"),
-        Neo.translate("\u76F4\u7DDA"),
-        Neo.translate("BZ\u66F2\u7DDA")
+        translate("\u624B\u66F8\u304D"),
+        translate("\u76F4\u7DDA"),
+        translate("BZ\u66F2\u7DDA")
       ];
       this.fixed = true;
       super.init(elementID, params);
@@ -2298,7 +2293,7 @@
       this.params = params || {};
       this.elementID = elementID;
       this.isMouseDown = false;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -2315,7 +2310,7 @@
           { passive: false, capture: true }
         );
         this.element.className = "layerControl";
-        var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+        var layerStrings = [translate("Layer0"), translate("Layer1")];
         this.element.innerHTML = "<div class='bg'></div><div class='label0'>" + layerStrings[0] + "</div><div class='label1'>" + layerStrings[1] + "</div><div class='line1'></div><div class='line0'></div>";
         this.bg = this.element.querySelector(".bg");
         this.label0 = this.element.querySelector(".label0");
@@ -2390,7 +2385,7 @@
       this.element = document.getElementById(elementID);
       this.params = params || {};
       this.elementID = elementID;
-      var ref = this;
+      const ref = this;
       if (this.element) {
         this.element.onmousedown = function(e) {
           ref._mouseDownHandler(e);
@@ -2579,7 +2574,7 @@
     update() {
       if (this.elementID == "neo-viewerSpeed") {
         var mode = Neo.painter._actionMgr.speedMode();
-        var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+        var speedString = translate(Neo.ViewerButton.speedStrings[mode]);
         if (this.element) {
           this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
         }
@@ -2635,7 +2630,7 @@
       this.mark = this.length;
       this.seek = 0;
       if (this.element) {
-        var ref = this;
+        const ref = this;
         this.element.addEventListener(
           "pointerdown",
           function(e) {
@@ -2810,7 +2805,7 @@
       Neo.painter.clearSession();
       storageTimestamp = null;
     }
-    if (storageTimestamp && confirm(Neo.translate(message))) {
+    if (storageTimestamp && confirm(translate(message))) {
       setTimeout(function() {
         Neo.painter.loadSession(function() {
           Neo.painter._pushUndo();
@@ -3597,9 +3592,7 @@
     var str = "";
     if (futaba || samplebbs) {
       if (edgeVersion && edgeVersion < 15) {
-        str = Neo.translate(
-          "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>"
-        );
+        str = translate("\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>");
       }
     }
     if (Neo.config.neo_warning) {
@@ -3692,7 +3685,6 @@
     );
   };
   Neo.resizeCanvas = function() {
-    var _a;
     if (!Neo.container) {
       console.error("resizeCanvas: Container element not found");
       return;
@@ -3743,7 +3735,7 @@
       Neo.canvas.style.width = width + "px";
       Neo.canvas.style.height = height + "px";
     }
-    const tools = (_a = Neo.tools) != null ? _a : "";
+    const tools = Neo.tools || null;
     if (tools) {
       tools.style.touchAction = "none";
       tools.style.pointerEvents = "auto";
@@ -3915,7 +3907,7 @@
               if (text !== "ok") {
                 (_b = Neo.submitButton) == null ? void 0 : _b.enable();
                 return alert(
-                  errorMessage + Neo.translate(
+                  errorMessage + translate(
                     "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002"
                   )
                 );
@@ -3966,21 +3958,21 @@
               break;
           }
           return alert(
-            `${Neo.translate("HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9")} ${response_status} : ${httpErrorMessag}
-${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")}`
+            `${translate("HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9")} ${response_status} : ${httpErrorMessag}
+${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")}`
           );
         }
       }).catch((error) => {
         var _a2;
         (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
         return alert(
-          errorMessage + Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")
+          errorMessage + translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")
         );
       });
     };
     if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
       const isConfirmed = window.confirm(
-        Neo.translate("\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?")
+        translate("\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?")
       );
       if (!isConfirmed) {
         (_a = Neo.submitButton) == null ? void 0 : _a.enable();
@@ -4021,7 +4013,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
     neo.id = "NEO";
     const html = '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;"><div id="neo-container" style="visibility:hidden;" class="o"><div id="neo-center" class="o"><div id="neo-painterContainer" class="o"><div id="neo-painterWrapper" class="o"><div id="neo-upper" class="o"><div id="neo-redo">[\u3084\u308A\u76F4\u3057]</div> <div id="neo-undo">[\u5143\u306B\u623B\u3059]</div> <div id="neo-fill">[\u5857\u308A\u6F70\u3057]</div> <div id="neo-right" style="display:none;">[\u53F3]</div> </div><div id="neo-painter"><div id="neo-canvas"><div id="neo-scrollH"></div><div id="neo-scrollV"></div><div id="neo-zoomPlusWrapper"><div id="neo-zoomPlus">+</div></div><div id="neo-zoomMinusWrapper"><div id="neo-zoomMinus">-</div></div><div id="neoWarning"></div></div></div><div id="neo-lower" class="o"></div></div><div id="neo-toolsWrapper"><div id="neo-tools"><div id="neo-toolSet"><div id="neo-pen"></div><div id="neo-pen2"></div><div id="neo-effect"></div><div id="neo-effect2"></div><div id="neo-eraser"></div><div id="neo-draw"></div><div id="neo-mask"></div><div class="colorTips"><div id="neo-color2"></div><div id="neo-color1"></div><br><div id="neo-color4"></div><div id="neo-color3"></div><br><div id="neo-color6"></div><div id="neo-color5"></div><br><div id="neo-color8"></div><div id="neo-color7"></div><br><div id="neo-color10"></div><div id="neo-color9"></div><br><div id="neo-color12"></div><div id="neo-color11"></div><br><div id="neo-color14"></div><div id="neo-color13"></div></div><div id="neo-sliderRed"></div><div id="neo-sliderGreen"></div><div id="neo-sliderBlue"></div><div id="neo-sliderAlpha"></div><div id="neo-sliderSize"></div><div class="reserveControl" style="margin-top:4px;"><div id="neo-reserve1"></div><div id="neo-reserve2"></div><div id="neo-reserve3"></div></div><div id="neo-layerControl" style="margin-top:6px;"></div></div></div></div></div></div><div id="neo-headerButtons"><div id="neo-window">[\u7A93]</div></div><div id="neo-footerButtons"><div id="neo-submit">[\u6295\u7A3F]</div> <div id="neo-copyright">[(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO]</div> </div></div></div><div id="neo-windowView" style="display: none;"></div>';
     neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
-      return Neo.translate(str);
+      return translate(str);
     });
     const parent = applet.parentNode;
     if (!parent) {
@@ -4129,6 +4121,10 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
   Neo.setStabilizLevel = Neo.setStabilizeLevel;
 
   // src/actions.js
+  var actions_exports = {};
+  __export(actions_exports, {
+    ActionManager: () => ActionManager
+  });
   var import_lz_string = __toESM(require_lz_string());
   var ActionManager = class {
     constructor() {
@@ -4183,7 +4179,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
     }
     pushCurrent() {
       if (!Neo.isAnimation) return;
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var head = this._items[this._head - 1];
       var color = oe._currentColor;
       var mask = oe._currentMask;
@@ -4200,7 +4196,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * [2]~[5]: RGBAカラー、[6]~[8]: マスクカラー、[9]: ブラシ幅、[10]: マスクタイプ
      */
     getCurrent(item) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       oe._currentColor = [item[2], item[3], item[4], item[5]];
       oe._currentMask = [item[6], item[7], item[8]];
       oe._currentWidth = item[9];
@@ -4330,7 +4326,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
         var item = arguments[0];
         layer = item[1];
       }
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       oe.canvasCtx[layer].clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
       var callback = arguments[1];
@@ -4343,7 +4339,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number|null} [lineType] - 線の種類
      */
     freeHand(x0, y0, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x0 = Number(x0);
@@ -4390,7 +4386,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number|null} [lineType] - 線の種類
      */
     freeHandFast(x0, y0, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x0 = Number(x0);
@@ -4432,7 +4428,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      */
     freeHandMove(x0, y0, x1, y1, lineType) {
       if (arguments.length > 1) {
-        var oe = Neo.painter;
+        const oe = Neo.painter;
         var layer = oe.current;
         var head = this._items[this._head - 1];
         if (head && head.length == 0) {
@@ -4461,7 +4457,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number|null} [lineType] - 線の種類
      */
     line(x0, y0, x1, y1, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x0 = Number(x0);
@@ -4503,7 +4499,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [lineType] - 線の種類
      */
     bezier(x0, y0, x1, y1, x2, y2, x3, y3, lineType) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       var isReplay = true;
       if (typeof arguments[0] != "object") {
@@ -4573,7 +4569,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number|null} [type] - 塗りつぶしの種類(四角楕円など)
      */
     fill(x, y, width, height, type) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4608,7 +4604,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - 反転する高さ
      */
     flipH(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4638,7 +4634,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - 反転する高さ
      */
     flipV(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4668,7 +4664,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - 結合する高さ
      */
     merge(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4698,7 +4694,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - ぼかす範囲の高さ
      */
     blurRect(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4728,7 +4724,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - 消去する高さ
      */
     eraseRect2(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4762,7 +4758,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - 消去する高さ
      */
     eraseRect(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4793,7 +4789,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - コピーする高さ
      */
     copy(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4824,7 +4820,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [dy] - 貼り付け先のY座標
      */
     paste(x, y, width, height, dx, dy) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4859,7 +4855,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
      * @param {number} [height] - 変形する範囲の高さ
      */
     turn(x, y, width, height) {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         x = Number(x);
@@ -4895,7 +4891,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
       string = String(string);
       size = String(size);
       family = String(family);
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var layer = oe.current;
       if (typeof arguments[0] != "object") {
         const numX = Number(x);
@@ -4931,7 +4927,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
       if (callback && typeof callback == "function") callback(true);
     }
     restore() {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var width = oe.canvasWidth;
       var height = oe.canvasHeight;
       if (typeof arguments[0] != "object") {
@@ -4959,7 +4955,7 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
       }
     }
     dummy() {
-      var oe = Neo.painter;
+      const oe = Neo.painter;
       var callback = arguments[1];
       if (callback && typeof callback == "function") callback(true);
     }
@@ -10307,6 +10303,5 @@ ${errorMessage}${Neo.translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593
 
   // src/main.js
   Object.assign(Neo, painter_exports, actions_exports, tools_exports, widgets_exports, commands_exports);
-  Neo.translate = translate;
   window.Neo = Neo;
 })();

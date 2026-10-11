@@ -2,6 +2,8 @@
 //@ts-check
 import { Neo } from "./container.js";
 import { Painter } from "./painter.js";
+import { translate } from "./dictionary.js";
+
 export class Commands {
   constructor() {
     this.CommandBase = class {
@@ -131,12 +133,12 @@ export class Commands {
       }
       execute() {
         if (Neo.fullScreen) {
-          if (confirm(Neo.translate("ページビュー？"))) {
+          if (confirm(translate("ページビュー？"))) {
             Neo.fullScreen = false;
             Neo.updateWindow();
           }
         } else {
-          if (confirm(Neo.translate("ウィンドウビュー？"))) {
+          if (confirm(translate("ウィンドウビュー？"))) {
             Neo.fullScreen = true;
             Neo.updateWindow();
           }
@@ -167,7 +169,7 @@ export class Commands {
         var url = "http://github.com/funige/neo/";
         if (
           confirm(
-            Neo.translate(
+            translate(
               "PaintBBS NEOは、お絵かきしぃ掲示板 PaintBBS (©2000-2004 しぃちゃん) をhtml5化するプロジェクトです。\n\nPaintBBS NEOのホームページを表示しますか？",
             ) + "\n",
           )

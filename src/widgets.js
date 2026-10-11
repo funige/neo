@@ -1,6 +1,8 @@
 "use strict";
 import { Neo } from "./container.js";
 import { Painter } from "./painter.js";
+import { translate } from "./dictionary.js";
+
 //@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -755,9 +757,9 @@ export class PenTip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("鉛筆"),
-      Neo.translate("水彩"),
-      Neo.translate("ﾃｷｽﾄ"),
+      translate("鉛筆"),
+      translate("水彩"),
+      translate("ﾃｷｽﾄ"),
     ];
     this.isTool = true;
     super.init(elementID, params);
@@ -814,10 +816,10 @@ export class Pen2Tip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("トーン"),
-      Neo.translate("ぼかし"),
-      Neo.translate("覆い焼き"),
-      Neo.translate("焼き込み"),
+      translate("トーン"),
+      translate("ぼかし"),
+      translate("覆い焼き"),
+      translate("焼き込み"),
     ];
 
     this.isTool = true;
@@ -930,9 +932,9 @@ export class EraserTip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("消しペン"),
-      Neo.translate("消し四角"),
-      Neo.translate("全消し"),
+      translate("消しペン"),
+      translate("消し四角"),
+      translate("全消し"),
     ];
 
     this.drawOnce = false;
@@ -1019,10 +1021,10 @@ export class EffectTip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("四角"),
-      Neo.translate("線四角"),
-      Neo.translate("楕円"),
-      Neo.translate("線楕円"),
+      translate("四角"),
+      translate("線四角"),
+      translate("楕円"),
+      translate("線楕円"),
     ];
 
     this.isTool = true;
@@ -1089,12 +1091,12 @@ export class Effect2Tip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("コピー"),
-      Neo.translate("ﾚｲﾔ結合"),
-      Neo.translate("角取り"),
-      Neo.translate("左右反転"),
-      Neo.translate("上下反転"),
-      Neo.translate("傾け"),
+      translate("コピー"),
+      translate("ﾚｲﾔ結合"),
+      translate("角取り"),
+      translate("左右反転"),
+      translate("上下反転"),
+      translate("傾け"),
     ];
 
     this.isTool = true;
@@ -1145,11 +1147,11 @@ export class MaskTip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("通常"),
-      Neo.translate("マスク"),
-      Neo.translate("逆ﾏｽｸ"),
-      Neo.translate("加算"),
-      Neo.translate("逆加算"),
+      translate("通常"),
+      translate("マスク"),
+      translate("逆ﾏｽｸ"),
+      translate("加算"),
+      translate("逆加算"),
     ];
 
     this.fixed = true;
@@ -1234,9 +1236,9 @@ export class DrawTip extends ToolTip {
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("手書き"),
-      Neo.translate("直線"),
-      Neo.translate("BZ曲線"),
+      translate("手書き"),
+      translate("直線"),
+      translate("BZ曲線"),
     ];
 
     this.fixed = true;
@@ -1731,7 +1733,7 @@ export class LayerControl {
 
       this.element.className = "layerControl";
 
-      var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+      var layerStrings = [translate("Layer0"), translate("Layer1")];
 
       this.element.innerHTML =
         "<div class='bg'></div><div class='label0'>" +
@@ -2086,7 +2088,7 @@ export class ViewerButton extends Button {
   update() {
     if (this.elementID == "neo-viewerSpeed") {
       var mode = Neo.painter._actionMgr.speedMode();
-      var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+      var speedString = translate(Neo.ViewerButton.speedStrings[mode]);
       if (this.element) {
         this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
       }
