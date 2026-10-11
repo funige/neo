@@ -2,7 +2,7 @@
 //@ts-check
 import { Neo } from "./neo.js";
 import { translate } from "./dictionary.js";
-
+import { LZString } from "./lz-string.js";
 /*
   -----------------------------------------------------------------------
     Action Manager

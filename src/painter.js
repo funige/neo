@@ -30,6 +30,7 @@ import {
   BlurRectTool,
   TurnTool,
 } from "./tools.js";
+import { LZString } from "./lz-string.js";
 
 Neo.CurrentToolType = 1;
 

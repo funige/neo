@@ -1,7 +1,7 @@
 "use strict";
 //@ts-check
 import { Neo } from "./neo.js";
-import { Painter } from "./painter.js";
+/** @typedef {import('./painter.js').Painter} Painter */
 import { ToolTip, FillButton } from "./widgets.js";
 
 export class ToolBase {
