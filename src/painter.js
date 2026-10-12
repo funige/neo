@@ -1,8 +1,10 @@
 "use strict";
 //@ts-check
-import { Neo } from "./container.js";
-import { ActionManager } from "./actions.js";
+import { Neo, submit } from "./container.js";
+import { ActionManager, getPCH } from "./actions.js";
 import { Commands } from "./commands.js";
+import { ColorTip } from "./widgets.js";
+import { RightButton } from "./widgets.js";
 import {
   ToolBase,
   PenTool,
@@ -88,6 +90,7 @@ export class Painter {
   static TOOLTYPE_TURN = 25;
 
   constructor() {
+    /** @type {UndoManager} */
     this._undoMgr = new UndoManager(50);
     /** @type {ActionManager} */
     this._actionMgr = new ActionManager();
@@ -102,10 +105,14 @@ export class Painter {
     this.zoom = 1;
     this.zoomX = 0;
     this.zoomY = 0;
+    /** @type {boolean} */
     this.isMouseDown = false;
+    /** @type {boolean} */
     this.isMouseDownRight = false;
+    /** @type {boolean} */
     this.isSpaceDown = false;
     this.isBezierActive = false;
+    /** @type {boolean} */
     this.isCopyActive = false;
     this.tempX = 0;
     this.tempY = 0;
@@ -177,7 +184,9 @@ export class Painter {
     this.isAltDown = false;
 
     //this.touchModifier = null;
+    /** @type {boolean} */
     this.virtualRight = false;
+    /** @type {boolean} */
     this.virtualShift = false;
 
     //this.onUpdateCanvas;
@@ -1049,7 +1058,7 @@ export class Painter {
 
     if (e.target instanceof HTMLElement && e.target.id != "neo-right") {
       this.virtualRight = false;
-      Neo.RightButton.clear();
+      RightButton.clear();
     }
 
     this._updateMousePosition(e);
@@ -1440,7 +1449,7 @@ export class Painter {
       console.error("Failed to get PNG data. Submission aborted.");
       return;
     }
-    Neo.submit(baseURL, png, thumbnail2, thumbnail);
+    submit(baseURL, png, thumbnail2, thumbnail);
   }
 
   useThumbnail() {
@@ -2116,7 +2125,7 @@ export class Painter {
    * @param {number} y0 - 描画対象のグローバルY座標。
    * @param {number} left - バッファ左上のグローバルXオフセット。
    * @param {number} top - バッファ左上のグローバルYオフセット。
-   * @param {number} type - 使用するツールタイプ（Neo.Painter.LINETYPE_...）。
+   * @param {number} type - 使用するツールタイプ（Painter.LINETYPE_...）。
    * @returns {void}
    */
   setPoint(buf8, bufWidth, x0, y0, left, top, type) {
@@ -3940,7 +3949,7 @@ export class Painter {
     this.busySkipped = Neo.config.neo_animation_skip == "true";
 
     const ref = this;
-    Neo.getPCH(filename, function (pch) {
+    getPCH(filename, function (pch) {
       //console.log(pch);
       ref._actionMgr._items = pch.data;
       ref._actionMgr._mark = pch.data.length;
@@ -4324,7 +4333,7 @@ export class UndoManager {
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット
-  var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+  var colorTip = /** @type {ColorTip|null} **/ ColorTip.getCurrent();
   if (colorTip) {
     //カラーチップに色をセット
     colorTip.setColor(color);

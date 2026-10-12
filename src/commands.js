@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./container.js";
+import { Neo, updateWindow, resizeCanvas } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
 
@@ -61,8 +61,8 @@ export class Commands {
         }
 
         // console.log(this.data.zoom);
-        Neo.resizeCanvas();
-        // Neo.resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
+        resizeCanvas();
+        // resizeCanvas()でupdateDestCanvas()を引数付きで呼び出しているためコメントアウト
         // Neo.painter.updateDestCanvas();
       }
     };
@@ -93,7 +93,7 @@ export class Commands {
         }
 
         // console.log(this.data.zoom);
-        Neo.resizeCanvas();
+        resizeCanvas();
       }
     };
 
@@ -135,12 +135,12 @@ export class Commands {
         if (Neo.fullScreen) {
           if (confirm(translate("ページビュー？"))) {
             Neo.fullScreen = false;
-            Neo.updateWindow();
+            updateWindow();
           }
         } else {
           if (confirm(translate("ウィンドウビュー？"))) {
             Neo.fullScreen = true;
-            Neo.updateWindow();
+            updateWindow();
           }
         }
       }

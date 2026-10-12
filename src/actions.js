@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./container.js";
+import { Neo, getStyleSheet, addRule, multColor } from "./container.js";
 import { translate } from "./dictionary.js";
 import LZString from "lz-string";
 import { Painter } from "./painter.js";
@@ -1027,7 +1027,7 @@ export class ActionManager {
   -----------------------------------------------------------------------
 */
 /** @param {HTMLElement} applet */
-Neo.createViewer = function (applet) {
+export const createViewer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
@@ -1084,7 +1084,7 @@ Neo.createViewer = function (applet) {
  * @param {Object} [pch] - PCHファイルデータ（あれば再生を開始する）
  * @param {Array<*>} [pch.data] - 再生用アクションデータ
  */
-Neo.initViewer = function (pch) {
+export const initViewer = function (pch) {
   const pageview = document.getElementById("neo-pageView");
   if (!pageview) return;
   var pageWidth = Neo.config.applet_width;
@@ -1202,7 +1202,7 @@ Neo.initViewer = function (pch) {
   if (pch && pch.data && pch.data.length > 0) {
     //Neo.config.pch_file) {
     Neo.painter._actionMgr._items = pch.data;
-    Neo.startViewer();
+    startViewer();
     setTimeout(() => {
       Neo.painter.play();
     }, 50);
@@ -1215,7 +1215,7 @@ Neo.initViewer = function (pch) {
  * 2. 設定値(Neo.config)に基づくCSSルールの動的生成。
  * 3. プレイヤーコントロール(ボタン類)の生成と機能バインディング。
  */
-Neo.startViewer = function () {
+const startViewer = function () {
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "pch";
     if (!(/** @type {any} */ (document)[name]))
@@ -1225,86 +1225,78 @@ Neo.startViewer = function () {
     }
   }
 
-  Neo.styleSheet = Neo.getStyleSheet();
-  var lightBack = Neo.multColor(Neo.config.color_back, 1.3);
-  var darkBack = Neo.multColor(Neo.config.color_back, 0.7);
+  Neo.styleSheet = getStyleSheet();
+  var lightBack = multColor(Neo.config.color_back, 1.3);
+  var darkBack = multColor(Neo.config.color_back, 0.7);
 
-  Neo.addRule(".NEO #neo-viewerButtons", "color", Neo.config.color_text);
-  Neo.addRule(
-    ".NEO #neo-viewerButtons",
-    "background-color",
-    Neo.config.color_back,
-  );
+  addRule(".NEO #neo-viewerButtons", "color", Neo.config.color_text);
+  addRule(".NEO #neo-viewerButtons", "background-color", Neo.config.color_back);
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtonsWrapper",
     "border",
     "1px solid " + Neo.config.color_frame + " !important",
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons",
     "border",
     "1px solid " + Neo.config.color_back + " !important",
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons",
     "border-left",
     "1px solid " + lightBack + " !important",
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons",
     "border-top",
     "1px solid " + lightBack + " !important",
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div.buttonOff",
     "background-color",
     Neo.config.color_icon + " !important",
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div.buttonOff:active",
     "background-color",
     darkBack + " !important",
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div.buttonOn",
     "background-color",
     darkBack + " !important",
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div",
     "border",
     "1px solid " + Neo.config.color_frame + " !important",
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div.buttonOff:hover",
     "border",
     "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div.buttonOff:active",
     "border",
     "1px solid" + Neo.config.color_bar_select + " !important",
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-viewerButtons >div.buttonOn",
     "border",
     "1px solid" + Neo.config.color_bar_select + " !important",
   );
 
-  Neo.addRule(
-    ".NEO #neo-viewerBar >div",
-    "background-color",
-    Neo.config.color_bar,
-  );
-  //  Neo.addRule(".NEO #neo-viewerBar:active", "background-color", darkBack);
-  Neo.addRule(
+  addRule(".NEO #neo-viewerBar >div", "background-color", Neo.config.color_bar);
+  //  addRule(".NEO #neo-viewerBar:active", "background-color", darkBack);
+  addRule(
     ".NEO #neo-viewerBarMark",
     "background-color",
     Neo.config.color_text + " !important",
@@ -1312,17 +1304,17 @@ Neo.startViewer = function () {
 
   //幅の狭い端末に動画の幅をあわせる
   if (Neo.config.neo_viewer_max_width_100) {
-    Neo.addRule(".NEO #neo-pageView", "max-width", "100%");
-    Neo.addRule(".NEO #neo-painter", "max-width", "100%");
-    Neo.addRule(".NEO #neo-canvas", "max-width", "100%");
-    Neo.addRule(".NEO #neo-canvas", "height", "auto");
-    Neo.addRule(".NEO #neo-canvas canvas", "max-width", "100%");
-    Neo.addRule(".NEO #neo-canvas canvas", "height", "auto");
-    Neo.addRule(".NEO #neo-canvas canvas", "display", "block");
-    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "max-width", "100%");
-    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "position", "relative");
-    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "bottom", "auto");
-    Neo.addRule(".NEO #neo-viewerButtonsWrapper", "left", "auto");
+    addRule(".NEO #neo-pageView", "max-width", "100%");
+    addRule(".NEO #neo-painter", "max-width", "100%");
+    addRule(".NEO #neo-canvas", "max-width", "100%");
+    addRule(".NEO #neo-canvas", "height", "auto");
+    addRule(".NEO #neo-canvas canvas", "max-width", "100%");
+    addRule(".NEO #neo-canvas canvas", "height", "auto");
+    addRule(".NEO #neo-canvas canvas", "display", "block");
+    addRule(".NEO #neo-viewerButtonsWrapper", "max-width", "100%");
+    addRule(".NEO #neo-viewerButtonsWrapper", "position", "relative");
+    addRule(".NEO #neo-viewerButtonsWrapper", "bottom", "auto");
+    addRule(".NEO #neo-viewerButtonsWrapper", "left", "auto");
     Neo.painter.clearCanvasHeight();
   }
 
@@ -1361,6 +1353,7 @@ Neo.startViewer = function () {
         Neo.painter.onrewind();
       };
     }
+    /** @type {Commands} */
     const commands = new Commands();
 
     const neo_viewerPlus = new ViewerButton().init("neo-viewerPlus");
@@ -1392,7 +1385,7 @@ Neo.startViewer = function () {
   }, 0);
 };
 
-Neo.getFilename = function () {
+export const getFilename = function () {
   return Neo.config.pch_file || Neo.config.image_canvas;
 };
 
@@ -1403,13 +1396,13 @@ Neo.getFilename = function () {
  * @param {string} filename - 対象のPCHファイルパス
  * @param {function({data: any[][], width: number, height: number}):void} callback - デコードされたPCHデータを受け取るコールバック
  */
-Neo.getPCH = function (filename, callback) {
+export const getPCH = function (filename, callback) {
   if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
 
   fetch(filename)
     .then((response) => response.arrayBuffer())
     .then((buffer) => {
-      const pch = Neo.decodePCH(buffer);
+      const pch = decodePCH(buffer);
       if (pch) {
         if (callback) callback(pch);
       } else {
@@ -1431,7 +1424,7 @@ Neo.getPCH = function (filename, callback) {
  * @returns {PCHData|null} デコード成功時はオブジェクト、失敗時はnullを返す
  * * @example
  */
-Neo.decodePCH = function (rawdata) {
+const decodePCH = function (rawdata) {
   const byteArray = new Uint8Array(rawdata);
   const data = LZString.decompressFromUint8Array(byteArray.subarray(12));
   const header = byteArray.subarray(0, 12);

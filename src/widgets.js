@@ -1,8 +1,7 @@
 "use strict";
-import { Neo } from "./container.js";
+import { Neo, tintImage } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
-
 //@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
@@ -705,7 +704,7 @@ export class ToolTip {
         };
         img.src = this.toolIcons[this.mode];
       } else {
-        Neo.tintImage(ctx, c);
+        tintImage(ctx, c);
       }
     }
   }
@@ -721,7 +720,7 @@ export class ToolTip {
    */
   drawTintImage(ctx, img, c, x, y) {
     ctx.drawImage(img, x, y);
-    Neo.tintImage(ctx, c);
+    tintImage(ctx, c);
   }
 }
 
@@ -745,7 +744,7 @@ export class PenTip extends ToolTip {
     ];
 
     this.hasTintImage = true;
-    this.toolIcons = [Neo.ToolTip.pen, Neo.ToolTip.brush, Neo.ToolTip.text];
+    this.toolIcons = [ToolTip.pen, ToolTip.brush, ToolTip.text];
     this.mode = 0;
   }
 
@@ -799,12 +798,7 @@ export class Pen2Tip extends ToolTip {
     ];
 
     this.hasTintImage = true;
-    this.toolIcons = [
-      Neo.ToolTip.tone,
-      Neo.ToolTip.blur,
-      Neo.ToolTip.burn,
-      Neo.ToolTip.burn,
-    ];
+    this.toolIcons = [ToolTip.tone, ToolTip.blur, ToolTip.burn, ToolTip.burn];
     this.mode = 0;
   }
 
@@ -976,7 +970,7 @@ export class EraserTip extends ToolTip {
     img.onload = function () {
       ctx?.drawImage(img, 0, 0);
     };
-    img.src = Neo.ToolTip.eraser;
+    img.src = ToolTip.eraser;
   }
 }
 
@@ -1006,10 +1000,10 @@ export class EffectTip extends ToolTip {
 
     this.hasTintImage = true;
     this.toolIcons = [
-      Neo.ToolTip.rectfill,
-      Neo.ToolTip.rect,
-      Neo.ToolTip.ellipsefill,
-      Neo.ToolTip.ellipse,
+      ToolTip.rectfill,
+      ToolTip.rect,
+      ToolTip.ellipsefill,
+      ToolTip.ellipse,
     ];
   }
 
@@ -1074,12 +1068,12 @@ export class Effect2Tip extends ToolTip {
 
     this.hasTintImage = true;
     this.toolIcons = [
-      Neo.ToolTip.copy,
-      Neo.ToolTip.merge,
-      Neo.ToolTip.blurrect,
-      Neo.ToolTip.flip,
-      Neo.ToolTip.flip,
-      Neo.ToolTip.flip,
+      ToolTip.copy,
+      ToolTip.merge,
+      ToolTip.blurrect,
+      ToolTip.flip,
+      ToolTip.flip,
+      ToolTip.flip,
     ];
   }
 
@@ -1103,7 +1097,7 @@ export class Effect2Tip extends ToolTip {
     super.init(elementID, params);
 
     this.img = document.createElement("img");
-    this.img.src = Neo.ToolTip.copy2;
+    this.img.src = ToolTip.copy2;
     this.element?.appendChild(this.img);
     return this;
   }
@@ -1220,11 +1214,7 @@ export class DrawTip extends ToolTip {
     /** @type {string[]} */
     this.toolStrings = [];
     this.hasTintImage = true;
-    this.toolIcons = [
-      Neo.ToolTip.freehand,
-      Neo.ToolTip.line,
-      Neo.ToolTip.bezier,
-    ];
+    this.toolIcons = [ToolTip.freehand, ToolTip.line, ToolTip.bezier];
     this.mode = 0;
   }
 
@@ -1453,8 +1443,7 @@ export class ColorSlider {
       var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
       var color = (r << 16) | (g << 8) | b;
 
-      var colorTip =
-        /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+      var colorTip = /** @type {ColorTip|null} **/ ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.getColorString(color));
       }
@@ -2070,9 +2059,9 @@ export class ViewerButton extends Button {
       img.onload = function () {
         ctx.clearRect(0, 0, 24, 24);
         ctx.drawImage(img, 0, 0);
-        Neo.tintImage(ctx, Neo.config.color_text);
+        tintImage(ctx, Neo.config.color_text);
       }.bind(this);
-      img.src = /**@type {any}*/ (Neo.ViewerButton)[
+      img.src = /**@type {any}*/ (ViewerButton)[
         elementID.toLowerCase().replace(/neo-viewer/, "")
       ];
     } else {
@@ -2088,7 +2077,7 @@ export class ViewerButton extends Button {
   update() {
     if (this.elementID == "neo-viewerSpeed") {
       var mode = Neo.painter._actionMgr.speedMode();
-      var speedString = translate(Neo.ViewerButton.speedStrings[mode]);
+      var speedString = translate(ViewerButton.speedStrings[mode]);
       if (this.element) {
         this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
       }

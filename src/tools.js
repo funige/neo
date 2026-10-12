@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo } from "./container.js";
+import { Neo, isMobile } from "./container.js";
 import { Painter } from "./painter.js";
 import { ToolTip, FillButton } from "./widgets.js";
 
@@ -312,7 +312,7 @@ export class DrawToolBase extends ToolBase {
       const rect = oe.getBound(oe.mouseX, oe.mouseY, oe.mouseX, oe.mouseY, r);
       oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
     }
-    if (!Neo.isMobile()) {
+    if (!isMobile()) {
       this.drawCursor(oe);
     }
   }
@@ -358,7 +358,7 @@ export class DrawToolBase extends ToolBase {
       r,
     );
     oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
-    if (!Neo.isMobile()) {
+    if (!isMobile()) {
       this.drawCursor(oe);
     }
   }

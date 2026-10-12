@@ -57,35 +57,35 @@ Neo.reservePen =
 Neo.reserveEraser =
   /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
 //@ts-ignore
-/**@type {Neo.Button|null} */
+/**@type {Button|null} */
 Neo.submitButton = null;
 //@ts-ignore
-/**@type {Neo.FillButton|null} */
+/**@type {FillButton|null} */
 Neo.fillButton = null;
 //@ts-ignore
-/**@type {Neo.RightButton|null} */
+/**@type {RightButton|null} */
 Neo.rightButton = null;
 // toolTip
 //@ts-ignore
-/**@type {Neo.PenTip|null} */
+/**@type {PenTip|null} */
 Neo.penTip = null;
 //@ts-ignore
-/**@type {Neo.Pen2Tip|null} */
+/**@type {Pen2Tip|null} */
 Neo.pen2Tip = null;
 //@ts-ignore
-/**@type {Neo.EffectTip|null} */
+/**@type {EffectTip|null} */
 Neo.effectTip = null;
 //@ts-ignore
-/**@type {Neo.Effect2Tip|null} */
+/**@type {Effect2Tip|null} */
 Neo.effect2Tip = null;
 //@ts-ignore
-/**@type {Neo.EraserTip|null} */
+/**@type {EraserTip|null} */
 Neo.eraserTip = null;
 //@ts-ignore
-/**@type {Neo.DrawTip|null} */
+/**@type {DrawTip|null} */
 Neo.drawTip = null;
 //@ts-ignore
-/**@type {Neo.MaskTip|null} */
+/**@type {MaskTip|null} */
 Neo.maskTip = null;
 
 Neo.isApp = false;
@@ -93,13 +93,13 @@ Neo.isApp = false;
 /**@type {Neo.ViewerBar|null} */
 Neo.viewerBar = null;
 // @ts-ignore
-/**@type {Neo.ViewerButton|null} */
+/**@type {ViewerButton|null} */
 Neo.viewerPlay = null;
 // @ts-ignore
-/**@type {Neo.ViewerButton|null} */
+/**@type {ViewerButton|null} */
 Neo.viewerStop = null;
 // @ts-ignore
-/**@type {Neo.ViewerButton|null} */
+/**@type {ViewerButton|null} */
 Neo.viewerSpeed = null;
 Neo.speed = 0;
 /**@type {object|null} */
