@@ -15,6 +15,7 @@ npx esbuild src/main.js \
   --format=iife \
   --target=es2015 \
   --external:electron \
+  --banner:js="/*! PaintBBS NEO v$VERSION | https://github.com/funige/neo */" \
   --outfile=dist/neo.js
 
   sed "s/PACKAGE_JSON_VERSION/$VERSION/g" \

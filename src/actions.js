@@ -1438,7 +1438,7 @@ const decodePCH = function (rawdata) {
   ) {
     const width = header[4] + header[5] * 0x100;
     const height = header[6] + header[7] * 0x100;
-    const items = Neo.fixPCH(JSON.parse(data));
+    const items = fixPCH(JSON.parse(data));
     return {
       width: width,
       height: height,
@@ -1456,7 +1456,7 @@ const decodePCH = function (rawdata) {
  * @param {Array<string>} items - 復元された描画命令の配列
  * @returns {Array<string>} 修正済みの描画命令配列
  */
-Neo.fixPCH = function (items) {
+const fixPCH = function (items) {
   for (var i = 0; i < items.length; i++) {
     var item = items[i];
 

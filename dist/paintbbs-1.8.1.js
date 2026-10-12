@@ -1,3 +1,4 @@
+/*! PaintBBS NEO v1.8.1 | https://github.com/funige/neo */
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -894,7 +895,7 @@
               "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F"
             ) + "\n"
           )) {
-            Neo.openURL(url);
+            openURL(url);
           }
         }
       };
@@ -905,7 +906,7 @@
   var import_lz_string = __toESM(require_lz_string());
 
   // src/widgets.js
-  Neo.getModifier = function(e) {
+  var getModifier = function(e) {
     if (e.shiftKey) {
       return "shift";
     } else if (e instanceof MouseEvent && e.button == 2 || e.ctrlKey || e.altKey || Neo.painter.virtualRight) {
@@ -1187,7 +1188,7 @@
       for (var i = 0; i < Neo.colorTips.length; i++) {
         var colorTip = Neo.colorTips[i];
         if (this == colorTip) {
-          switch (Neo.getModifier(e)) {
+          switch (getModifier(e)) {
             case "shift":
               this.setColor(Neo.config.colors[this.params.index - 1]);
               break;
@@ -1355,7 +1356,7 @@
           }
         } else {
           var length = this.toolStrings.length;
-          if (Neo.getModifier(e) == "right") {
+          if (getModifier(e) == "right") {
             this.mode--;
             if (this.mode < 0) this.mode = length - 1;
           } else {
@@ -1807,7 +1808,7 @@
     /** @param {MouseEvent|TouchEvent} e */
     _mouseDownHandler(e) {
       this.isMouseDown = true;
-      if (Neo.getModifier(e) == "right") {
+      if (getModifier(e) == "right") {
         Neo.painter.maskColor = Neo.painter.foregroundColor;
       } else {
         var length = this.toolStrings.length;
@@ -1876,7 +1877,7 @@
     _mouseDownHandler(e) {
       this.isMouseDown = true;
       var length = this.toolStrings.length;
-      if (Neo.getModifier(e) == "right") {
+      if (getModifier(e) == "right") {
         this.mode--;
         if (this.mode < 0) this.mode = length - 1;
       } else {
@@ -2286,7 +2287,7 @@
     }
     /** @param {MouseEvent|TouchEvent} e */
     _mouseDownHandler(e) {
-      if (Neo.getModifier(e) == "right") {
+      if (getModifier(e) == "right") {
         var visible = Neo.painter.visible[Neo.painter.current];
         Neo.painter.visible[Neo.painter.current] = visible ? false : true;
       } else {
@@ -2370,7 +2371,7 @@
      */
     /** @param {MouseEvent|TouchEvent} e */
     _mouseDownHandler(e) {
-      if (Neo.getModifier(e) == "right") {
+      if (getModifier(e) == "right") {
         this.save();
       } else {
         this.load();
@@ -3784,7 +3785,7 @@
     if (header[0] == "N".charCodeAt(0) && header[1] == "E".charCodeAt(0) && header[2] == "O".charCodeAt(0)) {
       const width = header[4] + header[5] * 256;
       const height = header[6] + header[7] * 256;
-      const items = Neo.fixPCH(JSON.parse(data));
+      const items = fixPCH(JSON.parse(data));
       return {
         width,
         height,
@@ -3794,7 +3795,7 @@
       return null;
     }
   };
-  Neo.fixPCH = function(items) {
+  var fixPCH = function(items) {
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
       var index = item.indexOf("eraseAll");
@@ -4535,7 +4536,7 @@
       },
       false
     );
-    Neo.showWarning();
+    showWarning();
     if (Neo.styleSheet) {
       addRule("*", "user-select", "none");
       addRule("*", "-webkit-user-select", "none");
@@ -4683,7 +4684,7 @@
     if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
     return false;
   };
-  Neo.showWarning = function() {
+  var showWarning = function() {
     const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);
     const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
     var edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
@@ -4870,14 +4871,14 @@
     }
     return result;
   };
-  Neo.openURL = function(url) {
+  var openURL = function(url) {
     if (Neo.isApp) {
       __require("electron").shell.openExternal(url);
     } else {
       window.open(url, "_blank");
     }
   };
-  Neo.getAbsoluteURL = function(baseURL, url) {
+  var getAbsoluteURL = function(baseURL, url) {
     if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
       return url;
     } else {
@@ -4886,7 +4887,7 @@
   };
   var submit = function(baseURL, blob, thumbnail, thumbnail2) {
     var _a;
-    let url = Neo.getAbsoluteURL(baseURL, Neo.config.url_save);
+    let url = getAbsoluteURL(baseURL, Neo.config.url_save);
     var headerString = Neo.str_header || "";
     if (document["paintBBSCallback"]) {
       var result = document["paintBBSCallback"]("check");
@@ -5015,7 +5016,7 @@
                 );
               }
             }
-            var exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
+            var exitURL = getAbsoluteURL(baseURL, Neo.config.url_exit);
             var responseURL = text.replace(/&amp;/g, "&");
             if (responseURL.match(/painttmp=/)) {
               exitURL = responseURL;

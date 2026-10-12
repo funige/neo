@@ -1,6 +1,6 @@
 "use strict";
 //@ts-check
-import { Neo, updateWindow, resizeCanvas } from "./container.js";
+import { Neo, updateWindow, resizeCanvas, openURL } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
 
@@ -174,7 +174,7 @@ export class Commands {
             ) + "\n",
           )
         ) {
-          Neo.openURL(url);
+          openURL(url);
         }
       }
     };

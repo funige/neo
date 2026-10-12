@@ -925,7 +925,7 @@ export const initComponents = function () {
   );
 
   // 投稿に失敗する可能性があるときは警告を表示する
-  Neo.showWarning();
+  showWarning();
 
   if (Neo.styleSheet) {
     addRule("*", "user-select", "none");
@@ -1114,7 +1114,7 @@ export const isMobile = function () {
   return false;
 };
 
-Neo.showWarning = function () {
+const showWarning = function () {
   const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
   const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
 
@@ -1380,7 +1380,7 @@ export const getSizeString = function (len) {
 /**
  * @param {string} url
  */
-Neo.openURL = function (url) {
+export const openURL = function (url) {
   if (Neo.isApp) {
     // @ts-ignore
     require("electron").shell.openExternal(url);
@@ -1394,7 +1394,7 @@ Neo.openURL = function (url) {
  * @param {string} url - 完全なURL、または baseURL からの相対パス（クエリ文字列を含む場合がある）
  * @returns {string} - 完全なURL（ディレクトリとは限らない。クエリ文字列を含む場合がある）
  */
-Neo.getAbsoluteURL = function (baseURL, url) {
+const getAbsoluteURL = function (baseURL, url) {
   if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
     return url;
   } else {
@@ -1410,7 +1410,7 @@ Neo.getAbsoluteURL = function (baseURL, url) {
  * @param {Blob|null} thumbnail2 - アニメーション動画（PCH）データ（無い場合は null）
  */
 export const submit = function (baseURL, blob, thumbnail, thumbnail2) {
-  let url = Neo.getAbsoluteURL(baseURL, Neo.config.url_save);
+  let url = getAbsoluteURL(baseURL, Neo.config.url_save);
   var headerString = Neo.str_header || "";
   //@ts-ignore
   if (document["paintBBSCallback"]) {
@@ -1575,7 +1575,7 @@ export const submit = function (baseURL, blob, thumbnail, thumbnail2) {
                 );
               }
             }
-            var exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
+            var exitURL = getAbsoluteURL(baseURL, Neo.config.url_exit);
             var responseURL = text.replace(/&amp;/g, "&");
 
             // ふたばではresponseの文字列をそのままURLとして解釈する

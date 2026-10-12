@@ -6,7 +6,7 @@ import { translate } from "./dictionary.js";
 /**
  * @param {MouseEvent|TouchEvent} e
  */
-Neo.getModifier = function (e) {
+const getModifier = function (e) {
   if (e.shiftKey) {
     return "shift";
   } else if (
@@ -365,7 +365,7 @@ export class ColorTip {
     for (var i = 0; i < Neo.colorTips.length; i++) {
       var colorTip = Neo.colorTips[i];
       if (this == colorTip) {
-        switch (Neo.getModifier(e)) {
+        switch (getModifier(e)) {
           case "shift":
             this.setColor(Neo.config.colors[this.params.index - 1]);
             break;
@@ -608,7 +608,7 @@ export class ToolTip {
         }
       } else {
         var length = this.toolStrings.length;
-        if (Neo.getModifier(e) == "right") {
+        if (getModifier(e) == "right") {
           this.mode--;
           if (this.mode < 0) this.mode = length - 1;
         } else {
@@ -1157,7 +1157,7 @@ export class MaskTip extends ToolTip {
   _mouseDownHandler(e) {
     this.isMouseDown = true;
 
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       Neo.painter.maskColor = Neo.painter.foregroundColor;
     } else {
       var length = this.toolStrings.length;
@@ -1242,7 +1242,7 @@ export class DrawTip extends ToolTip {
 
     var length = this.toolStrings.length;
 
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       this.mode--;
       if (this.mode < 0) this.mode = length - 1;
     } else {
@@ -1758,7 +1758,7 @@ export class LayerControl {
 
   /** @param {MouseEvent|TouchEvent} e */
   _mouseDownHandler(e) {
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       var visible = Neo.painter.visible[Neo.painter.current];
       Neo.painter.visible[Neo.painter.current] = visible ? false : true;
     } else {
@@ -1862,7 +1862,7 @@ export class ReserveControl {
    */
   /** @param {MouseEvent|TouchEvent} e */
   _mouseDownHandler(e) {
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       this.save();
     } else {
       this.load();
