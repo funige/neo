@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.1 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.2 | https://github.com/funige/neo */
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -509,7 +509,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.1";
+  Neo.version = "1.8.2";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -895,7 +895,7 @@
               "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F"
             ) + "\n"
           )) {
-            openURL(url);
+            Neo.openURL(url);
           }
         }
       };
@@ -4871,7 +4871,7 @@
     }
     return result;
   };
-  var openURL = function(url) {
+  Neo.openURL = function(url) {
     if (Neo.isApp) {
       __require("electron").shell.openExternal(url);
     } else {

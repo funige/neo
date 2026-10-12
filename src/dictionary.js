@@ -1,6 +1,6 @@
 "use strict";
-import { Neo } from "./container.js";
 //@ts-check
+import { Neo } from "./container.js";
 /** @type {Object.<string, Object.<string, string>>} */
 export const dictionary = {
   ja: {},
