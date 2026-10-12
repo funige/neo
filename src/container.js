@@ -1,4 +1,5 @@
 "use strict";
+//@ts-check
 
 import { Neo } from "./neo.js";
 import { Commands } from "./commands.js";
@@ -25,7 +26,6 @@ import {
   SizeSlider,
   ColorSlider,
 } from "./widgets.js";
-//@ts-check
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
     if (!navigator.userAgent.match("Electron")) {
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
  * 起動設定（paramの中身）を抽出する
  * @param {string} targetName - "paintbbs" | "pch"
  */
-export const extractBootConfig = function (targetName) {
+const extractBootConfig = function (targetName) {
   // 1. 外部で設定されたObjectの場合
   Neo.params = Neo.params || Neo.param; //エイリアス。`Neo.params`でも、単数形の`Neo.param`でも設定できる。
   if (
@@ -264,7 +264,7 @@ Neo.init2 = function () {
  * 初期設定
  * @param {HTMLElement|any} applet div,applet,applet-dummy
  */
-export const initConfig = function (applet) {
+const initConfig = function (applet) {
   if (applet) {
     var appletWidth = applet.dataset.width || applet.getAttribute("width");
     var appletHeight = applet.dataset.height || applet.getAttribute("height");
@@ -382,7 +382,7 @@ export const initConfig = function (applet) {
  * @returns {string}
  * @note true|falseのときは小文字が返る
  */
-export const fixConfig = function (value) {
+const fixConfig = function (value) {
   // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
   if (value.match(/^#[0-9a-fA-F]{5}$/)) {
     value = "#0" + value.slice(1);
@@ -407,7 +407,7 @@ export const getStyleSheet = function () {
   return style.sheet;
 };
 
-export const initSkin = function () {
+const initSkin = function () {
   Neo.styleSheet = getStyleSheet();
   var lightBorder = multColor(Neo.config.color_icon, 1.3);
   var darkBorder = multColor(Neo.config.color_icon, 0.7);
@@ -646,7 +646,7 @@ export const addRule = function (selector, styleName, value, sheet = null) {
  * @function
  * @returns {void}
  */
-export const readStyles = function () {
+const readStyles = function () {
   Neo.rules = [];
   for (var i = 0; i < document.styleSheets.length; i++) {
     readStyle(document.styleSheets[i]);
@@ -657,7 +657,7 @@ export const readStyles = function () {
  * スタイルシートからカラー設定を読み込んで Neo.rules に格納する
  * @param {CSSStyleSheet} sheet
  */
-export const readStyle = function (sheet) {
+const readStyle = function (sheet) {
   try {
     var rules = sheet.cssRules;
     for (var i = 0; i < rules.length; i++) {
@@ -693,7 +693,7 @@ export const readStyle = function (sheet) {
  * @param {string} name
  * @param {string} defaultColor
  */
-export const applyStyle = function (name, defaultColor) {
+const applyStyle = function (name, defaultColor) {
   if (Neo.config[name] == undefined) {
     Neo.config[name] = Neo.rules[name] || defaultColor;
   }
@@ -745,7 +745,7 @@ export const multColor = function (c, scale) {
  * @param {string} name - 色の名前（"red"等）または "rgb(r,g,b)" 形式の文字列
  * @returns {string|boolean} 変換後のカラーコード（失敗時は false）
  */
-export const colorNameToHex = function (name) {
+const colorNameToHex = function (name) {
   /** @type {Record<string, string>} */
   const colors = {
     aliceblue: "#f0f8ff",
@@ -905,7 +905,7 @@ export const colorNameToHex = function (name) {
   return false;
 };
 
-export const initComponents = function () {
+const initComponents = function () {
   const copyright = document.getElementById("neo-copyright");
   if (copyright) copyright.innerHTML += "v" + Neo.version;
 
@@ -934,7 +934,7 @@ export const initComponents = function () {
   }
 };
 
-export const initButtons = function () {
+const initButtons = function () {
   const commands = new Commands();
   const neo_undo = new Button().init("neo-undo");
   if (neo_undo) {
@@ -1369,7 +1369,7 @@ Neo.clone = function (src) {
  * * @param {number|string} len - 変換したいデータサイズ（数値または文字列）
  * @returns {string} 8文字にゼロパディングされた文字列
  */
-export const getSizeString = function (len) {
+const getSizeString = function (len) {
   var result = String(len);
   while (result.length < 8) {
     result = "0" + result;
@@ -1380,7 +1380,7 @@ export const getSizeString = function (len) {
 /**
  * @param {string} url
  */
-export const openURL = function (url) {
+Neo.openURL = function (url) {
   if (Neo.isApp) {
     // @ts-ignore
     require("electron").shell.openExternal(url);
@@ -1707,7 +1707,7 @@ Neo.str_header = "";
 /**
  * @param {HTMLElement} applet
  */
-export const createContainer = function (applet) {
+const createContainer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";

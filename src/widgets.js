@@ -1,8 +1,8 @@
 "use strict";
+//@ts-check
 import { Neo, tintImage } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
-//@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
  */
