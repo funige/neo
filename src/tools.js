@@ -1574,6 +1574,7 @@ export class PasteTool extends ToolBase {
   kill() {
     var oe = Neo.painter;
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
 
   /** @param {Painter} oe */
