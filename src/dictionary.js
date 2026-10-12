@@ -1,7 +1,8 @@
 "use strict";
+import { Neo } from "./container.js";
 //@ts-check
 /** @type {Object.<string, Object.<string, string>>} */
-Neo.dictionary = {
+export const dictionary = {
   ja: {},
   en: {
     やり直し: "Redo",
@@ -186,13 +187,13 @@ Neo.dictionary = {
   },
 };
 
-Neo.translate = (function () {
+export const translate = (function () {
   var language =
     (window.navigator.languages && window.navigator.languages[0]) ||
     window.navigator.language;
 
   var lang = "en";
-  for (var key in Neo.dictionary) {
+  for (var key in dictionary) {
     if (language.indexOf(key) == 0) {
       lang = key;
       break;
@@ -205,6 +206,6 @@ Neo.translate = (function () {
     } else {
       if (lang != "ja") lang = "en";
     }
-    return Neo.dictionary[lang][string] || string;
+    return dictionary[lang][string] || string;
   };
 })();

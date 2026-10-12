@@ -1,4 +1,30 @@
 "use strict";
+
+import { Neo } from "./neo.js";
+import { Commands } from "./commands.js";
+import { Painter } from "./painter.js";
+import { getFilename } from "./actions.js";
+import { getPCH } from "./actions.js";
+import { initViewer, createViewer } from "./actions.js";
+import { Button } from "./widgets.js";
+import { translate } from "./dictionary.js";
+import {
+  FillButton,
+  RightButton,
+  PenTip,
+  Pen2Tip,
+  EffectTip,
+  Effect2Tip,
+  EraserTip,
+  DrawTip,
+  MaskTip,
+  ColorTip,
+  ReserveControl,
+  LayerControl,
+  ScrollBarButton,
+  SizeSlider,
+  ColorSlider,
+} from "./widgets.js";
 //@ts-check
 document.addEventListener("DOMContentLoaded", () => {
   if (Neo.init()) {
@@ -18,135 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 
-var Neo = {};
-
-Neo.version = "PACKAGE_JSON_VERSION";
-// @ts-ignore
-/** @type {Neo.Painter} */
-Neo.painter;
-
-Neo.fullScreen = false;
-Neo.uploaded = false;
-Neo.viewer = false;
-/**@type  {HTMLElement|null} */
-Neo.container = null;
-/**@type {HTMLElement|null} */
-Neo.center = null;
-/**@type {HTMLElement|null} */
-Neo.canvas = null;
-/**@type {HTMLElement|null} */
-Neo.toolsWrapper = null;
-/**@type {HTMLElement|null} */
-Neo.tools = null;
-Neo.toolSide = false;
-/**@type {HTMLElement|null} */
-Neo.applet = null;
-Neo.isAnimation = false;
-Neo.viewerWrapperOnTop = false;
-Neo.storage = localStorage;
-Neo.updateUI = function () {};
-Neo.stabilize_level = 0;
-/** @type {CSSStyleSheet|null}*/
-Neo.styleSheet = null;
-/** @type {any} **/
-Neo.rules = [];
-/** @type {any} **/
-Neo.config = {
-  width: 300,
-  height: 300,
-
-  colors: [
-    "#000000",
-    "#FFFFFF",
-    "#B47575",
-    "#888888",
-    "#FA9696",
-    "#C096C0",
-    "#FFB6FF",
-    "#8080FF",
-    "#25C7C9",
-    "#E7E58D",
-    "#E7962D",
-    "#99CB7B",
-    "#FCECE2",
-    "#F9DDCF",
-  ],
-};
-
-Neo.reservePen =
-  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
-Neo.reserveEraser =
-  /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ ({});
-//@ts-ignore
-/**@type {Neo.Button|null} */
-Neo.submitButton = null;
-//@ts-ignore
-/**@type {Neo.FillButton|null} */
-Neo.fillButton = null;
-//@ts-ignore
-/**@type {Neo.RightButton|null} */
-Neo.rightButton = null;
-// toolTip
-//@ts-ignore
-/**@type {Neo.PenTip|null} */
-Neo.penTip = null;
-//@ts-ignore
-/**@type {Neo.Pen2Tip|null} */
-Neo.pen2Tip = null;
-//@ts-ignore
-/**@type {Neo.EffectTip|null} */
-Neo.effectTip = null;
-//@ts-ignore
-/**@type {Neo.Effect2Tip|null} */
-Neo.effect2Tip = null;
-//@ts-ignore
-/**@type {Neo.EraserTip|null} */
-Neo.eraserTip = null;
-//@ts-ignore
-/**@type {Neo.DrawTip|null} */
-Neo.drawTip = null;
-//@ts-ignore
-/**@type {Neo.MaskTip|null} */
-Neo.maskTip = null;
-
-Neo.isApp = false;
-// @ts-ignore
-/**@type {Neo.ViewerBar|null} */
-Neo.viewerBar = null;
-// @ts-ignore
-/**@type {Neo.ViewerButton|null} */
-Neo.viewerPlay = null;
-// @ts-ignore
-/**@type {Neo.ViewerButton|null} */
-Neo.viewerStop = null;
-// @ts-ignore
-/**@type {Neo.ViewerButton|null} */
-Neo.viewerSpeed = null;
-Neo.speed = 0;
-/**@type {object|null} */
-Neo.params = null;
-/**@type {object|null} */
-Neo.param = null;
-// @ts-ignore
-/**@type {Neo.SizeSlider|null} */
-Neo.sizeslider = null;
-Neo.SLIDERTYPE_RED = 0;
-Neo.SLIDERTYPE_GREEN = 1;
-Neo.SLIDERTYPE_BLUE = 2;
-Neo.SLIDERTYPE_ALPHA = 3;
-Neo.SLIDERTYPE_SIZE = 4;
-
-/**
- *  @type {any} *
- *  @note ライブコネクト
- */
-(document).neo = Neo;
-
 /**
  * 起動設定（paramの中身）を抽出する
  * @param {string} targetName - "paintbbs" | "pch"
  */
-Neo.extractBootConfig = function (targetName) {
+export const extractBootConfig = function (targetName) {
   // 1. 外部で設定されたObjectの場合
   Neo.params = Neo.params || Neo.param; //エイリアス。`Neo.params`でも、単数形の`Neo.param`でも設定できる。
   if (
@@ -176,13 +78,16 @@ Neo.extractBootConfig = function (targetName) {
     const key = param.getAttribute("name");
     const val = param.getAttribute("value");
     if (key) {
-      config[key] = Neo.fixConfig(String(val));
+      config[key] = fixConfig(String(val));
     }
   }
 
   return config;
 };
 
+/**
+ * @returns {boolean}
+ */
 Neo.init = function () {
   //appletタグまたはそれに代わるdivタグのID
   let applets = document.querySelectorAll(
@@ -205,21 +110,21 @@ Neo.init = function () {
         Neo.applet = applet;
 
         if (name == "paintbbs") {
-          Neo.initConfig(applet);
-          Neo.createContainer(applet);
+          initConfig(applet);
+          createContainer(applet);
           Neo.init2();
         } else {
           Neo.viewer = true;
-          Neo.initConfig(applet);
+          initConfig(applet);
 
-          var filename = Neo.getFilename();
-          Neo.getPCH(filename, function (pch) {
+          var filename = getFilename();
+          getPCH(filename, function (pch) {
             if (pch) {
-              Neo.createViewer(applet);
+              createViewer(applet);
               Neo.config.width = pch.width;
               Neo.config.height = pch.height;
-              Neo.initViewer(pch);
-              // Neo.initViewer()内へ移動
+              initViewer(pch);
+              // initViewer()内へ移動
               // ボタンが表示される前に再生される事があるため
               // Neo.startViewer();
             }
@@ -231,6 +136,9 @@ Neo.init = function () {
   }
   return false;
 };
+/**
+ * @returns {void}
+ */
 Neo.init2 = function () {
   const pageview = document.getElementById("neo-pageView");
   if (!pageview) return;
@@ -261,7 +169,7 @@ Neo.init2 = function () {
     Neo.center.style.minWidth = "397px";
   }
 
-  Neo.painter = new Neo.Painter();
+  Neo.painter = new Painter();
   Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
 
   Neo.container.oncontextmenu = function () {
@@ -274,7 +182,7 @@ Neo.init2 = function () {
   // 続きから描く
   Neo.storage = localStorage; //PCの時にもlocalStorageを使用
 
-  var filename = Neo.getFilename();
+  var filename = getFilename();
   var message =
     !filename || filename.slice(-4).toLowerCase() != ".pch"
       ? "描きかけの画像があります。復元しますか？"
@@ -292,15 +200,14 @@ Neo.init2 = function () {
     Neo.painter.clearSession();
     storageTimestamp = null;
   }
-  if (storageTimestamp && confirm(Neo.translate(message))) {
-    var oe = Neo.painter;
+  if (storageTimestamp && confirm(translate(message))) {
     setTimeout(function () {
-      oe.loadSession(function () {
-        oe._pushUndo();
-        oe._actionMgr.restore();
+      Neo.painter.loadSession(function () {
+        Neo.painter._pushUndo();
+        Neo.painter._actionMgr.restore();
         //復元時にサイズが違うキャンバスで開き直した時に画像が切り取られないようにするため
         //復元処理の直後はデータが変更されていない事にする
-        oe.dirty = false;
+        Neo.painter.dirty = false;
       });
     }, 1);
   } else {
@@ -357,7 +264,7 @@ Neo.init2 = function () {
  * 初期設定
  * @param {HTMLElement|any} applet div,applet,applet-dummy
  */
-Neo.initConfig = function (applet) {
+export const initConfig = function (applet) {
   if (applet) {
     var appletWidth = applet.dataset.width || applet.getAttribute("width");
     var appletHeight = applet.dataset.height || applet.getAttribute("height");
@@ -381,7 +288,7 @@ Neo.initConfig = function (applet) {
     }
 
     // 1. 設定値（paramの代わり）を抽出する
-    const params = Neo.extractBootConfig(targetName);
+    const params = extractBootConfig(targetName);
 
     // 2. 抽出した設定値をループして Neo.config に反映させる
     if (params) {
@@ -390,7 +297,7 @@ Neo.initConfig = function (applet) {
 
         // 設定値を適用
         // console.log(value);
-        Neo.config[key] = Neo.fixConfig(value);
+        Neo.config[key] = fixConfig(value);
 
         if (key === "image_width") Neo.config.width = parseInt(value);
         if (key === "image_height") Neo.config.height = parseInt(value);
@@ -403,24 +310,24 @@ Neo.initConfig = function (applet) {
       Neo.config.color_bar = "#eeeeff";
     }
 
-    Neo.readStyles();
-    Neo.applyStyle("color_bk", "#ccccff");
-    Neo.applyStyle("color_bk2", "#bbbbff");
-    Neo.applyStyle("color_tool_icon", "#e8dfae");
-    Neo.applyStyle("color_icon", "#ccccff");
-    Neo.applyStyle("color_iconselect", "#ffaaaa");
-    Neo.applyStyle("color_text", "#666699");
-    Neo.applyStyle("color_bar", "#6f6fae");
-    Neo.applyStyle("tool_color_button", "#e8dfae");
-    Neo.applyStyle("tool_color_button2", "#f8daaa");
-    Neo.applyStyle("tool_color_text", "#773333");
-    Neo.applyStyle("tool_color_bar", "#ddddff");
-    Neo.applyStyle("tool_color_frame", "#000000");
+    readStyles();
+    applyStyle("color_bk", "#ccccff");
+    applyStyle("color_bk2", "#bbbbff");
+    applyStyle("color_tool_icon", "#e8dfae");
+    applyStyle("color_icon", "#ccccff");
+    applyStyle("color_iconselect", "#ffaaaa");
+    applyStyle("color_text", "#666699");
+    applyStyle("color_bar", "#6f6fae");
+    applyStyle("tool_color_button", "#e8dfae");
+    applyStyle("tool_color_button2", "#f8daaa");
+    applyStyle("tool_color_text", "#773333");
+    applyStyle("tool_color_bar", "#ddddff");
+    applyStyle("tool_color_frame", "#000000");
 
     // viewer用
     if (Neo.viewer) {
-      Neo.applyStyle("color_back", "#ccccff");
-      Neo.applyStyle("color_bar_select", "#407675");
+      applyStyle("color_back", "#ccccff");
+      applyStyle("color_bar_select", "#407675");
     }
 
     // const container = document.getElementById("neo-container");
@@ -440,22 +347,22 @@ Neo.initConfig = function (applet) {
       size: 1,
       color: "#000000",
       alpha: 1.0,
-      tool: Neo.Painter.TOOLTYPE_PEN,
-      drawType: Neo.Painter.DRAWTYPE_FREEHAND,
+      tool: Painter.TOOLTYPE_PEN,
+      drawType: Painter.DRAWTYPE_FREEHAND,
     },
     {
       size: 5,
       color: "#FFFFFF",
       alpha: 1.0,
-      tool: Neo.Painter.TOOLTYPE_ERASER,
-      drawType: Neo.Painter.DRAWTYPE_FREEHAND,
+      tool: Painter.TOOLTYPE_ERASER,
+      drawType: Painter.DRAWTYPE_FREEHAND,
     },
     {
       size: 10,
       color: "#FFFFFF",
       alpha: 1.0,
-      tool: Neo.Painter.TOOLTYPE_ERASER,
-      drawType: Neo.Painter.DRAWTYPE_FREEHAND,
+      tool: Painter.TOOLTYPE_ERASER,
+      drawType: Painter.DRAWTYPE_FREEHAND,
     },
   ];
 
@@ -475,7 +382,7 @@ Neo.initConfig = function (applet) {
  * @returns {string}
  * @note true|falseのときは小文字が返る
  */
-Neo.fixConfig = function (value) {
+export const fixConfig = function (value) {
   // javaでは"#12345"を色として解釈するがjavascriptでは"#012345"に変換しないとだめ
   if (value.match(/^#[0-9a-fA-F]{5}$/)) {
     value = "#0" + value.slice(1);
@@ -494,65 +401,48 @@ Neo.fixConfig = function (value) {
  * スタイルシートを取得
  * @returns {CSSStyleSheet|null}
  */
-Neo.getStyleSheet = function () {
+export const getStyleSheet = function () {
   var style = document.createElement("style");
   document.head.appendChild(style);
   return style.sheet;
 };
 
-Neo.initSkin = function () {
-  Neo.styleSheet = Neo.getStyleSheet();
-  var lightBorder = Neo.multColor(Neo.config.color_icon, 1.3);
-  var darkBorder = Neo.multColor(Neo.config.color_icon, 0.7);
-  var lightBar = Neo.multColor(Neo.config.color_bar, 1.3);
-  var darkBar = Neo.multColor(Neo.config.color_bar, 0.7);
+export const initSkin = function () {
+  Neo.styleSheet = getStyleSheet();
+  var lightBorder = multColor(Neo.config.color_icon, 1.3);
+  var darkBorder = multColor(Neo.config.color_icon, 0.7);
+  var lightBar = multColor(Neo.config.color_bar, 1.3);
+  var darkBar = multColor(Neo.config.color_bar, 0.7);
   var bgImage = Neo.painter ? Neo.backgroundImage() : "";
 
-  Neo.addRule(
-    ".NEO #neo-container",
-    "background-image",
-    "url(" + bgImage + ")",
-  );
-  Neo.addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
-  Neo.addRule(".NEO .sizeSlider .label", "color", Neo.config.tool_color_text);
-  Neo.addRule(
-    ".NEO .layerControl .label1",
-    "color",
-    Neo.config.tool_color_text,
-  );
-  Neo.addRule(
-    ".NEO .layerControl .label0",
-    "color",
-    Neo.config.tool_color_text,
-  );
-  Neo.addRule(".NEO .toolTipOn .label", "color", Neo.config.tool_color_text);
-  Neo.addRule(".NEO .toolTipOff .label", "color", Neo.config.tool_color_text);
+  addRule(".NEO #neo-container", "background-image", "url(" + bgImage + ")");
+  addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
+  addRule(".NEO .sizeSlider .label", "color", Neo.config.tool_color_text);
+  addRule(".NEO .layerControl .label1", "color", Neo.config.tool_color_text);
+  addRule(".NEO .layerControl .label0", "color", Neo.config.tool_color_text);
+  addRule(".NEO .toolTipOn .label", "color", Neo.config.tool_color_text);
+  addRule(".NEO .toolTipOff .label", "color", Neo.config.tool_color_text);
 
-  Neo.addRule(".NEO #neo-toolSet", "background-color", Neo.config.color_bk);
-  Neo.addRule(".NEO #neo-tools", "color", Neo.config.tool_color_text);
-  Neo.addRule(
+  addRule(".NEO #neo-toolSet", "background-color", Neo.config.color_bk);
+  addRule(".NEO #neo-tools", "color", Neo.config.tool_color_text);
+  addRule(
     ".NEO .layerControl .bg",
     "border-bottom",
     "1px solid " + Neo.config.tool_color_text,
   );
 
-  Neo.addRule(".NEO .buttonOn", "color", Neo.config.color_text);
-  Neo.addRule(".NEO .buttonOff", "color", Neo.config.color_text);
+  addRule(".NEO .buttonOn", "color", Neo.config.color_text);
+  addRule(".NEO .buttonOff", "color", Neo.config.color_text);
 
-  Neo.addRule(".NEO .buttonOff", "background-color", Neo.config.color_icon);
-  Neo.addRule(
-    ".NEO .buttonOff",
-    "border-top",
-    "1px solid ",
-    Neo.config.color_icon,
-  );
-  Neo.addRule(
+  addRule(".NEO .buttonOff", "background-color", Neo.config.color_icon);
+  addRule(".NEO .buttonOff", "border-top", "1px solid ", Neo.config.color_icon);
+  addRule(
     ".NEO .buttonOff",
     "border-left",
     "1px solid ",
     Neo.config.color_icon,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .buttonOff",
     "box-shadow",
     "0 0 0 1px " +
@@ -561,22 +451,10 @@ Neo.initSkin = function () {
       Neo.config.color_frame,
   );
 
-  Neo.addRule(
-    ".NEO .buttonOff:hover",
-    "background-color",
-    Neo.config.color_icon,
-  );
-  Neo.addRule(
-    ".NEO .buttonOff:hover",
-    "border-top",
-    "1px solid " + lightBorder,
-  );
-  Neo.addRule(
-    ".NEO .buttonOff:hover",
-    "border-left",
-    "1px solid " + lightBorder,
-  );
-  Neo.addRule(
+  addRule(".NEO .buttonOff:hover", "background-color", Neo.config.color_icon);
+  addRule(".NEO .buttonOff:hover", "border-top", "1px solid " + lightBorder);
+  addRule(".NEO .buttonOff:hover", "border-left", "1px solid " + lightBorder);
+  addRule(
     ".NEO .buttonOff:hover",
     "box-shadow",
     "0 0 0 1px " +
@@ -585,22 +463,22 @@ Neo.initSkin = function () {
       Neo.config.color_frame,
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "background-color",
     darkBorder,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "border-top",
     "1px solid " + darkBorder,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "border-left",
     "1px solid " + darkBorder,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .buttonOff:active, .NEO .buttonOn",
     "box-shadow",
     "0 0 0 1px " +
@@ -609,127 +487,115 @@ Neo.initSkin = function () {
       Neo.config.color_frame,
   );
 
-  Neo.addRule(
-    ".NEO #neo-canvas",
-    "border",
-    "1px solid " + Neo.config.color_frame,
-  );
-  Neo.addRule(
+  addRule(".NEO #neo-canvas", "border", "1px solid " + Neo.config.color_frame);
+  addRule(
     ".NEO #neo-scrollH, .NEO #neo-scrollV",
     "background-color",
     Neo.config.color_icon,
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH, .NEO #neo-scrollV",
     "box-shadow",
     "0 0 0 1px white" + ", 0 0 0 2px " + Neo.config.color_frame,
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
     "background-color",
     Neo.config.color_bar,
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
     "box-shadow",
     "0 0 0 1px " + Neo.config.color_icon,
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div:hover, .NEO #neo-scrollV div:hover",
     "box-shadow",
     "0 0 0 1px " + Neo.config.color_iconselect,
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
     "border-top",
     "1px solid " + lightBar,
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
     "border-left",
     "1px solid " + lightBar,
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
     "border-right",
     "1px solid " + darkBar,
   );
-  Neo.addRule(
+  addRule(
     ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
     "border-bottom",
     "1px solid " + darkBar,
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO .toolTipOn",
     "background-color",
-    Neo.multColor(Neo.config.tool_color_button, 0.7),
+    multColor(Neo.config.tool_color_button, 0.7),
   );
-  Neo.addRule(
-    ".NEO .toolTipOff",
-    "background-color",
-    Neo.config.tool_color_button,
-  );
-  Neo.addRule(
+  addRule(".NEO .toolTipOff", "background-color", Neo.config.tool_color_button);
+  addRule(
     ".NEO .toolTipFixed",
     "background-color",
     Neo.config.tool_color_button2,
   );
 
-  Neo.addRule(
+  addRule(
     ".NEO .colorSlider, .NEO .sizeSlider",
     "background-color",
     Neo.config.tool_color_bar,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .reserveControl",
     "background-color",
     Neo.config.tool_color_bar,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .reserveControl",
     "background-color",
     Neo.config.tool_color_bar,
   );
-  Neo.addRule(
-    ".NEO .layerControl",
-    "background-color",
-    Neo.config.tool_color_bar,
-  );
+  addRule(".NEO .layerControl", "background-color", Neo.config.tool_color_bar);
 
-  Neo.addRule(
+  addRule(
     ".NEO .colorTipOn, .NEO .colorTipOff",
     "box-shadow",
     "0 0 0 1px " + Neo.config.tool_color_frame,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .toolTipOn, .NEO .toolTipOff",
     "box-shadow",
     "0 0 0 1px " + Neo.config.tool_color_frame,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .toolTipFixed",
     "box-shadow",
     "0 0 0 1px " + Neo.config.tool_color_frame,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .colorSlider, .NEO .sizeSlider",
     "box-shadow",
     "0 0 0 1px " + Neo.config.tool_color_frame,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .reserveControl",
     "box-shadow",
     "0 0 0 1px " + Neo.config.tool_color_frame,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .layerControl",
     "box-shadow",
     "0 0 0 1px " + Neo.config.tool_color_frame,
   );
-  Neo.addRule(
+  addRule(
     ".NEO .reserveControl .reserve",
     "border",
     "1px solid " + Neo.config.tool_color_frame,
@@ -739,7 +605,7 @@ Neo.initSkin = function () {
     var labels = ["Fixed", "On", "Off"];
     for (var i = 0; i < labels.length; i++) {
       var selector = ".NEO .toolTip" + labels[i] + " .label";
-      Neo.addRule(selector, "letter-spacing", "0px !important");
+      addRule(selector, "letter-spacing", "0px !important");
     }
   }
   Neo.setToolSide(Neo.toolSide);
@@ -752,14 +618,14 @@ Neo.initSkin = function () {
  * @param {string|number} value - 設定する値 (例: "0px !important")
  * @param {CSSStyleSheet|null} [sheet] - 対象のスタイルシート（省略時は Neo.styleSheet）
  */
-Neo.addRule = function (selector, styleName, value, sheet = null) {
+export const addRule = function (selector, styleName, value, sheet = null) {
   // 1. 省略時はデフォルトの stylesheet を適用
   if (!sheet) {
     sheet = Neo.styleSheet;
   }
 
   if (!sheet) {
-    throw new Error("Neo.addRule: Stylesheet is undefined.");
+    throw new Error("addRule: Stylesheet is undefined.");
   }
   try {
     if (sheet?.insertRule) {
@@ -770,23 +636,20 @@ Neo.addRule = function (selector, styleName, value, sheet = null) {
     }
   } catch (e) {
     // スタイル定義の内容による例外（無視しても動作に影響がない場合が多い）
-    console.error(
-      "Neo.addRule: Failed to insert rule for '" + selector + "'.",
-      e,
-    );
+    console.error("addRule: Failed to insert rule for '" + selector + "'.", e);
   }
 };
 /**
  * ドキュメント内の全スタイルシートを走査し、Neo.rules に読み込む。
- * スタイルシートの解析は Neo.readStyle() で行う。
+ * スタイルシートの解析は readStyle() で行う。
  *
  * @function
  * @returns {void}
  */
-Neo.readStyles = function () {
+export const readStyles = function () {
   Neo.rules = [];
   for (var i = 0; i < document.styleSheets.length; i++) {
-    Neo.readStyle(document.styleSheets[i]);
+    readStyle(document.styleSheets[i]);
   }
 };
 
@@ -794,14 +657,14 @@ Neo.readStyles = function () {
  * スタイルシートからカラー設定を読み込んで Neo.rules に格納する
  * @param {CSSStyleSheet} sheet
  */
-Neo.readStyle = function (sheet) {
+export const readStyle = function (sheet) {
   try {
     var rules = sheet.cssRules;
     for (var i = 0; i < rules.length; i++) {
       var rule = rules[i];
 
       if (rule instanceof CSSImportRule && rule.styleSheet) {
-        Neo.readStyle(rule.styleSheet);
+        readStyle(rule.styleSheet);
         continue;
       }
 
@@ -815,7 +678,7 @@ Neo.readStyle = function (sheet) {
           var result = css.match(/color:\s*(.*)\s*;/);
 
           if (result) {
-            var hex = Neo.colorNameToHex(result[1]);
+            var hex = colorNameToHex(result[1]);
             if (hex) {
               Neo.rules[selector] = hex;
             }
@@ -830,7 +693,7 @@ Neo.readStyle = function (sheet) {
  * @param {string} name
  * @param {string} defaultColor
  */
-Neo.applyStyle = function (name, defaultColor) {
+export const applyStyle = function (name, defaultColor) {
   if (Neo.config[name] == undefined) {
     Neo.config[name] = Neo.rules[name] || defaultColor;
   }
@@ -867,7 +730,7 @@ Neo.backgroundImage = function () {
  * @param {number} scale - 明度の倍率
  * @returns {string} 変換後の16進数カラーコード
  */
-Neo.multColor = function (c, scale) {
+export const multColor = function (c, scale) {
   const rNum = Math.round(parseInt(c.slice(1, 3), 16) * scale);
   const gNum = Math.round(parseInt(c.slice(3, 5), 16) * scale);
   const bNum = Math.round(parseInt(c.slice(5, 7), 16) * scale);
@@ -882,7 +745,7 @@ Neo.multColor = function (c, scale) {
  * @param {string} name - 色の名前（"red"等）または "rgb(r,g,b)" 形式の文字列
  * @returns {string|boolean} 変換後のカラーコード（失敗時は false）
  */
-Neo.colorNameToHex = function (name) {
+export const colorNameToHex = function (name) {
   /** @type {Record<string, string>} */
   const colors = {
     aliceblue: "#f0f8ff",
@@ -1042,8 +905,8 @@ Neo.colorNameToHex = function (name) {
   return false;
 };
 
-Neo.initComponents = function () {
-  var copyright = document.getElementById("neo-copyright");
+export const initComponents = function () {
+  const copyright = document.getElementById("neo-copyright");
   if (copyright) copyright.innerHTML += "v" + Neo.version;
 
   // ドラッグしたまま画面外に移動した時
@@ -1062,83 +925,91 @@ Neo.initComponents = function () {
   );
 
   // 投稿に失敗する可能性があるときは警告を表示する
-  Neo.showWarning();
+  showWarning();
 
   if (Neo.styleSheet) {
-    Neo.addRule("*", "user-select", "none");
-    Neo.addRule("*", "-webkit-user-select", "none");
-    Neo.addRule("*", "-ms-user-select", "none");
+    addRule("*", "user-select", "none");
+    addRule("*", "-webkit-user-select", "none");
+    addRule("*", "-ms-user-select", "none");
   }
 };
 
-Neo.initButtons = function () {
-  const neo_undo = new Neo.Button().init("neo-undo");
+export const initButtons = function () {
+  const commands = new Commands();
+  const neo_undo = new Button().init("neo-undo");
   if (neo_undo) {
     neo_undo.onmouseup = function () {
-      new Neo.UndoCommand(Neo.painter).execute();
+      const UndoCommand = new commands.UndoCommand(Neo.painter);
+      UndoCommand.execute();
     };
   }
-  const neo_redo = new Neo.Button().init("neo-redo");
+  const neo_redo = new Button().init("neo-redo");
   if (neo_redo) {
     neo_redo.onmouseup = function () {
-      new Neo.RedoCommand(Neo.painter).execute();
+      const RedoCommand = new commands.RedoCommand(Neo.painter);
+      RedoCommand.execute();
     };
   }
-  const neo_window = new Neo.Button().init("neo-window");
+  const neo_window = new Button().init("neo-window");
   if (neo_window) {
     neo_window.onmouseup = function () {
-      new Neo.WindowCommand(Neo.painter).execute();
+      const WindowCommand = new commands.WindowCommand(Neo.painter);
+      WindowCommand.execute();
     };
   }
-  const neo_copyright = new Neo.Button().init("neo-copyright");
+  const neo_copyright = new Button().init("neo-copyright");
   if (neo_copyright) {
     neo_copyright.onmouseup = function () {
-      new Neo.CopyrightCommand(Neo.painter).execute();
+      const CopyrightCommand = new commands.CopyrightCommand(Neo.painter);
+      CopyrightCommand.execute();
     };
   }
-  const neo_zoomPlus = new Neo.Button().init("neo-zoomPlus");
+  const neo_zoomPlus = new Button().init("neo-zoomPlus");
   if (neo_zoomPlus) {
     neo_zoomPlus.onmouseup = function () {
-      new Neo.ZoomPlusCommand(Neo.painter).execute();
+      const ZoomPlusCommand = new commands.ZoomPlusCommand(Neo.painter);
+      ZoomPlusCommand.execute();
     };
   }
-  const neo_zoomMinus = new Neo.Button().init("neo-zoomMinus");
+  const neo_zoomMinus = new Button().init("neo-zoomMinus");
   if (neo_zoomMinus) {
     neo_zoomMinus.onmouseup = function () {
-      new Neo.ZoomMinusCommand(Neo.painter).execute();
+      const ZoomMinusCommand = new commands.ZoomMinusCommand(Neo.painter);
+      ZoomMinusCommand.execute();
     };
   }
-  Neo.submitButton = new Neo.Button().init("neo-submit");
+  Neo.submitButton = new Button().init("neo-submit");
   if (!Neo.submitButton) {
     console.error("initButtons: SubmitButton not found");
     return;
   }
   Neo.submitButton.onmouseup = function () {
     Neo.submitButton?.disable(5000);
-    new Neo.SubmitCommand(Neo.painter).execute();
+    const SubmitCommand = new commands.SubmitCommand(Neo.painter);
+    SubmitCommand.execute();
   };
 
-  Neo.fillButton = new Neo.FillButton().init("neo-fill");
-  Neo.rightButton = new Neo.RightButton().init("neo-right");
+  Neo.fillButton = new FillButton().init("neo-fill");
+  Neo.rightButton = new RightButton().init("neo-right");
   if (!Neo.rightButton) {
     console.error("initButtons: RightButton not found");
     return;
   }
 
-  if (Neo.isMobile() || Neo.config.neo_show_right_button == "true") {
+  if (isMobile() || Neo.config.neo_show_right_button == "true") {
     if (Neo.rightButton.element) {
       Neo.rightButton.element.style.display = "block";
     }
   }
 
   // toolTip
-  Neo.penTip = new Neo.PenTip().init("neo-pen");
-  Neo.pen2Tip = new Neo.Pen2Tip().init("neo-pen2");
-  Neo.effectTip = new Neo.EffectTip().init("neo-effect");
-  Neo.effect2Tip = new Neo.Effect2Tip().init("neo-effect2");
-  Neo.eraserTip = new Neo.EraserTip().init("neo-eraser");
-  Neo.drawTip = new Neo.DrawTip().init("neo-draw");
-  Neo.maskTip = new Neo.MaskTip().init("neo-mask");
+  Neo.penTip = new PenTip().init("neo-pen");
+  Neo.pen2Tip = new Pen2Tip().init("neo-pen2");
+  Neo.effectTip = new EffectTip().init("neo-effect");
+  Neo.effect2Tip = new Effect2Tip().init("neo-effect2");
+  Neo.eraserTip = new EraserTip().init("neo-eraser");
+  Neo.drawTip = new DrawTip().init("neo-draw");
+  Neo.maskTip = new MaskTip().init("neo-mask");
 
   Neo.toolButtons =
     Neo.fillButton &&
@@ -1161,45 +1032,39 @@ Neo.initButtons = function () {
 
   // colorTip
   for (var i = 1; i <= 14; i++) {
-    new Neo.ColorTip().init("neo-color" + i, { index: i });
+    new ColorTip().init("neo-color" + i, { index: i });
   }
 
   // colorSlider
-  Neo.sliders[Neo.SLIDERTYPE_RED] = new Neo.ColorSlider().init(
-    "neo-sliderRed",
-    {
-      type: Neo.SLIDERTYPE_RED,
-    },
-  );
-  Neo.sliders[Neo.SLIDERTYPE_GREEN] = new Neo.ColorSlider().init(
+  Neo.sliders[Neo.SLIDERTYPE_RED] = new ColorSlider().init("neo-sliderRed", {
+    type: Neo.SLIDERTYPE_RED,
+  });
+  Neo.sliders[Neo.SLIDERTYPE_GREEN] = new ColorSlider().init(
     "neo-sliderGreen",
     { type: Neo.SLIDERTYPE_GREEN },
   );
-  Neo.sliders[Neo.SLIDERTYPE_BLUE] = new Neo.ColorSlider().init(
-    "neo-sliderBlue",
-    {
-      type: Neo.SLIDERTYPE_BLUE,
-    },
-  );
-  Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new Neo.ColorSlider().init(
+  Neo.sliders[Neo.SLIDERTYPE_BLUE] = new ColorSlider().init("neo-sliderBlue", {
+    type: Neo.SLIDERTYPE_BLUE,
+  });
+  Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new ColorSlider().init(
     "neo-sliderAlpha",
     { type: Neo.SLIDERTYPE_ALPHA },
   );
 
   // sizeSlider
-  Neo.sizeslider = new Neo.SizeSlider();
+  Neo.sizeslider = new SizeSlider();
   Neo.sliders[Neo.SLIDERTYPE_SIZE] = Neo.sizeslider.init("neo-sliderSize", {
     type: Neo.SLIDERTYPE_SIZE,
   });
 
   // reserveControl
   for (var i = 1; i <= 3; i++) {
-    new Neo.ReserveControl().init("neo-reserve" + i, { index: i });
+    new ReserveControl().init("neo-reserve" + i, { index: i });
   }
 
-  new Neo.LayerControl().init("neo-layerControl");
-  new Neo.ScrollBarButton().init("neo-scrollH");
-  new Neo.ScrollBarButton().init("neo-scrollV");
+  new LayerControl().init("neo-layerControl");
+  new ScrollBarButton().init("neo-scrollH");
+  new ScrollBarButton().init("neo-scrollV");
 };
 
 /**
@@ -1209,10 +1074,10 @@ Neo.initButtons = function () {
 Neo.start = function (isApp = false) {
   if (Neo.viewer) return;
 
-  Neo.initSkin();
-  Neo.initComponents();
+  initSkin();
+  initComponents();
 
-  Neo.initButtons();
+  initButtons();
 
   Neo.isApp = isApp;
   if (Neo.applet) {
@@ -1220,7 +1085,7 @@ Neo.start = function (isApp = false) {
     Neo.applet.outerHTML = "";
     /** @type {any} */ (document)[name] = Neo;
 
-    Neo.resizeCanvas();
+    resizeCanvas();
 
     if (!Neo.container) {
       console.error("start: Container element not found");
@@ -1243,13 +1108,13 @@ Neo.start = function (isApp = false) {
   }
 };
 
-Neo.isMobile = function () {
+export const isMobile = function () {
   if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
   if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
   return false;
 };
 
-Neo.showWarning = function () {
+const showWarning = function () {
   const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i); //サブドメインありなし両方に対応
   const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
 
@@ -1261,9 +1126,7 @@ Neo.showWarning = function () {
   var str = "";
   if (futaba || samplebbs) {
     if (edgeVersion && edgeVersion < 15) {
-      str = Neo.translate(
-        "このブラウザでは<br>投稿に失敗することがあります<br>",
-      );
+      str = translate("このブラウザでは<br>投稿に失敗することがあります<br>");
     }
   }
 
@@ -1295,7 +1158,7 @@ Neo.updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
   for (let i = 0; i < Neo.toolButtons.length; i++) {
     //@ts-ignore
-    const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+    const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
     if (current) {
       if (current == toolTip) {
         toolTip.setSelected(true);
@@ -1319,7 +1182,7 @@ Neo.updateUI = function () {
 Neo.updateUIColor = function (updateSlider, updateColorTip) {
   for (let i = 0; i < Neo.toolButtons.length; i++) {
     //@ts-ignore
-    const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+    const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
     toolTip.update();
   }
 
@@ -1335,7 +1198,7 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
 
   // パレットを変更するとき
   if (updateColorTip) {
-    var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+    var colorTip = /** @type {ColorTip|null} **/ ColorTip.getCurrent();
     if (colorTip) {
       colorTip.setColor(Neo.painter.foregroundColor);
     }
@@ -1348,9 +1211,10 @@ Neo.updateUIColor = function (updateSlider, updateColorTip) {
    -----------------------------------------------------------------------
  */
 /**
+ * 通常表示フルスクリーン表示切り替え
  * @returns {void}
  */
-Neo.updateWindow = function () {
+export const updateWindow = function () {
   const windowView = document.getElementById("neo-windowView");
   const pageView = document.getElementById("neo-pageView");
   if (!Neo.container) {
@@ -1370,7 +1234,7 @@ Neo.updateWindow = function () {
     }
   }
 
-  Neo.resizeCanvas();
+  resizeCanvas();
 
   //ウィンドウビューに切り替わった事を通知するカスタムイベント
   document.dispatchEvent(
@@ -1380,7 +1244,12 @@ Neo.updateWindow = function () {
   );
 };
 
-Neo.resizeCanvas = function () {
+/**
+ * コンテナとズーム倍率に合わせて destCanvas と関連要素のサイズ・スタイルを更新する。
+ *
+ * @returns {void}
+ */
+export const resizeCanvas = function () {
   if (!Neo.container) {
     console.error("resizeCanvas: Container element not found");
     return;
@@ -1406,7 +1275,9 @@ Neo.resizeCanvas = function () {
   width = Math.floor(width / 2) * 2;
   height = Math.floor(height / 2) * 2;
 
+  /** @type {number} */
   Neo.painter.destWidth = width;
+  /** @type {number} */
   Neo.painter.destHeight = height;
 
   const destCanvas = Neo.painter.destCanvas;
@@ -1446,7 +1317,8 @@ Neo.resizeCanvas = function () {
     Neo.canvas.style.height = height + "px";
   }
 
-  const tools = Neo.tools ?? "";
+  /** @type {HTMLElement |null} */
+  const tools = Neo.tools || null;
   if (tools) {
     tools.style.touchAction = "none";
     tools.style.pointerEvents = "auto";
@@ -1497,7 +1369,7 @@ Neo.clone = function (src) {
  * * @param {number|string} len - 変換したいデータサイズ（数値または文字列）
  * @returns {string} 8文字にゼロパディングされた文字列
  */
-Neo.getSizeString = function (len) {
+export const getSizeString = function (len) {
   var result = String(len);
   while (result.length < 8) {
     result = "0" + result;
@@ -1508,7 +1380,7 @@ Neo.getSizeString = function (len) {
 /**
  * @param {string} url
  */
-Neo.openURL = function (url) {
+export const openURL = function (url) {
   if (Neo.isApp) {
     // @ts-ignore
     require("electron").shell.openExternal(url);
@@ -1522,7 +1394,7 @@ Neo.openURL = function (url) {
  * @param {string} url - 完全なURL、または baseURL からの相対パス（クエリ文字列を含む場合がある）
  * @returns {string} - 完全なURL（ディレクトリとは限らない。クエリ文字列を含む場合がある）
  */
-Neo.getAbsoluteURL = function (baseURL, url) {
+const getAbsoluteURL = function (baseURL, url) {
   if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
     return url;
   } else {
@@ -1537,8 +1409,8 @@ Neo.getAbsoluteURL = function (baseURL, url) {
  * @param {Blob|null} thumbnail - 通常のサムネイル画像データ（無い場合は null）
  * @param {Blob|null} thumbnail2 - アニメーション動画（PCH）データ（無い場合は null）
  */
-Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
-  let url = Neo.getAbsoluteURL(baseURL, Neo.config.url_save);
+export const submit = function (baseURL, blob, thumbnail, thumbnail2) {
+  let url = getAbsoluteURL(baseURL, Neo.config.url_save);
   var headerString = Neo.str_header || "";
   //@ts-ignore
   if (document["paintBBSCallback"]) {
@@ -1637,8 +1509,8 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   //console.log("submit url=" + url + " header=" + headerString);
 
   var header = new Blob([headerString]);
-  var headerLength = this.getSizeString(header.size);
-  var imgLength = this.getSizeString(blob.size);
+  var headerLength = getSizeString(header.size);
+  var imgLength = getSizeString(blob.size);
 
   var array = [
     "P", // PaintBBS
@@ -1650,11 +1522,11 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
   ];
 
   if (thumbnail) {
-    var thumbnailLength = this.getSizeString(thumbnail.size);
+    var thumbnailLength = getSizeString(thumbnail.size);
     array.push(thumbnailLength, thumbnail);
   }
   if (thumbnail2) {
-    var thumbnail2Length = this.getSizeString(thumbnail2.size);
+    var thumbnail2Length = getSizeString(thumbnail2.size);
     array.push(thumbnail2Length, thumbnail2);
   }
 
@@ -1697,13 +1569,13 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
                 Neo.submitButton?.enable();
                 return alert(
                   errorMessage +
-                    Neo.translate(
+                    translate(
                       "投稿に失敗。時間を置いて再度投稿してみてください。",
                     ),
                 );
               }
             }
-            var exitURL = Neo.getAbsoluteURL(baseURL, Neo.config.url_exit);
+            var exitURL = getAbsoluteURL(baseURL, Neo.config.url_exit);
             var responseURL = text.replace(/&amp;/g, "&");
 
             // ふたばではresponseの文字列をそのままURLとして解釈する
@@ -1754,7 +1626,7 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
               break;
           }
           return alert(
-            `${Neo.translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`,
+            `${translate("HTTPステータスコード")} ${response_status} : ${httpErrorMessag}\n${errorMessage}${translate("投稿に失敗。時間を置いて再度投稿してみてください。")}`,
           );
         }
       })
@@ -1762,14 +1634,14 @@ Neo.submit = function (baseURL, blob, thumbnail, thumbnail2) {
         Neo.submitButton?.enable();
         return alert(
           errorMessage +
-            Neo.translate("投稿に失敗。時間を置いて再度投稿してみてください。"),
+            translate("投稿に失敗。時間を置いて再度投稿してみてください。"),
         );
       });
   };
 
   if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
     const isConfirmed = window.confirm(
-      Neo.translate("レイヤー情報は保存されません。\n続行してよろしいですか?"),
+      translate("レイヤー情報は保存されません。\n続行してよろしいですか?"),
     );
 
     if (!isConfirmed) {
@@ -1820,7 +1692,8 @@ Neo.setColors = function (colors) {
 };
 
 Neo.pExit = function () {
-  new Neo.SubmitCommand(Neo.painter).execute();
+  const commands = new Commands();
+  new commands.SubmitCommand(Neo.painter).execute();
 };
 
 Neo.str_header = "";
@@ -1834,7 +1707,7 @@ Neo.str_header = "";
 /**
  * @param {HTMLElement} applet
  */
-Neo.createContainer = function (applet) {
+export const createContainer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
@@ -1915,7 +1788,7 @@ Neo.createContainer = function (applet) {
     "</div>";
 
   neo.innerHTML = html.replace(/\[(.*?)\]/g, function (match, str) {
-    return Neo.translate(str);
+    return translate(str);
   });
 
   const parent = applet.parentNode;
@@ -1947,7 +1820,7 @@ Neo.createContainer = function (applet) {
  * @param {CanvasRenderingContext2D} ctx - 対象となるCanvasの2Dコンテキスト
  * @param {string} color - 置き換えたい新しい色（カラーコードまたは数値）
  */
-Neo.tintImage = function (ctx, color) {
+export const tintImage = function (ctx, color) {
   const c = Neo.painter.getColor(color) & 0xffffff;
 
   var imageData = ctx.getImageData(0, 0, 46, 18);
@@ -1980,15 +1853,15 @@ Neo.setToolSide = function (htmlConfiguredSide) {
   Neo.toolSide = !!side;
 
   if (!Neo.toolSide) {
-    Neo.addRule(".NEO #neo-toolsWrapper", "right", "-3px");
-    Neo.addRule(".NEO #neo-toolsWrapper", "left", "auto");
-    Neo.addRule(".NEO #neo-painterWrapper", "padding", "0 55px 0 0 !important");
-    Neo.addRule(".NEO #neo-upper", "padding-right", "75px !important");
+    addRule(".NEO #neo-toolsWrapper", "right", "-3px");
+    addRule(".NEO #neo-toolsWrapper", "left", "auto");
+    addRule(".NEO #neo-painterWrapper", "padding", "0 55px 0 0 !important");
+    addRule(".NEO #neo-upper", "padding-right", "75px !important");
   } else {
-    Neo.addRule(".NEO #neo-toolsWrapper", "right", "auto");
-    Neo.addRule(".NEO #neo-toolsWrapper", "left", "-1px");
-    Neo.addRule(".NEO #neo-painterWrapper", "padding", "0 0 0 55px !important");
-    Neo.addRule(".NEO #neo-upper", "padding-right", "20px !important");
+    addRule(".NEO #neo-toolsWrapper", "right", "auto");
+    addRule(".NEO #neo-toolsWrapper", "left", "-1px");
+    addRule(".NEO #neo-painterWrapper", "padding", "0 0 0 55px !important");
+    addRule(".NEO #neo-upper", "padding-right", "20px !important");
   }
 };
 
@@ -2076,3 +1949,4 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  *
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
+export { Neo };

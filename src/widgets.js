@@ -1,9 +1,12 @@
 "use strict";
+import { Neo, tintImage } from "./container.js";
+import { Painter } from "./painter.js";
+import { translate } from "./dictionary.js";
 //@ts-check
 /**
  * @param {MouseEvent|TouchEvent} e
  */
-Neo.getModifier = function (e) {
+const getModifier = function (e) {
   if (e.shiftKey) {
     return "shift";
   } else if (
@@ -23,7 +26,7 @@ Neo.getModifier = function (e) {
   -------------------------------------------------------------------------
 */
 
-Neo.Button = class {
+export class Button {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -36,19 +39,19 @@ Neo.Button = class {
     this.disable = function (wait) {};
     this.enable = function () {};
 
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmousedown = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseup = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseover = null;
-    /** @type {((Button: Neo.Button) => void) | null} */
+    /** @type {((Button: Button) => void) | null} */
     this.onmouseout = null;
   }
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Button|null}
+   * @returns {Button|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -57,7 +60,7 @@ Neo.Button = class {
     this.selected = false;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
     if (this.element) {
       /** @param {MouseEvent} e */
       this.element.onmousedown = function (e) {
@@ -132,10 +135,10 @@ Neo.Button = class {
 
     if (this.params.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
-        const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+        const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
       }
-      Neo.painter.setToolByType(Neo.Painter.TOOLTYPE_FILL);
+      Neo.painter.setToolByType(Painter.TOOLTYPE_FILL);
     }
 
     if (this.onmousedown) this.onmousedown(this);
@@ -175,7 +178,7 @@ Neo.Button = class {
   }
 
   update() {}
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -183,7 +186,7 @@ Neo.Button = class {
   -------------------------------------------------------------------------
 */
 
-Neo.RightButton = class extends Neo.Button {
+export class RightButton extends Button {
   constructor() {
     super();
     /** @type {any} */
@@ -195,7 +198,7 @@ Neo.RightButton = class extends Neo.Button {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @return {Neo.RightButton|null}
+   * @return {RightButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
@@ -235,7 +238,7 @@ Neo.RightButton = class extends Neo.Button {
     const right = Neo.rightButton;
     right?.setSelected(false);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -243,7 +246,7 @@ Neo.RightButton = class extends Neo.Button {
   -------------------------------------------------------------------------
 */
 
-Neo.FillButton = class extends Neo.Button {
+export class FillButton extends Button {
   constructor() {
     super();
   }
@@ -251,14 +254,14 @@ Neo.FillButton = class extends Neo.Button {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.FillButton|null}
+   * @returns {FillButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
     this.params.type = "fill";
     return this;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -266,10 +269,9 @@ Neo.FillButton = class extends Neo.Button {
   -------------------------------------------------------------------------
 */
 
-/** @typedef {Neo.ColorTip} ColorTip */
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
-Neo.ColorTip = class {
+export class ColorTip {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
@@ -279,13 +281,13 @@ Neo.ColorTip = class {
     this.selected = false;
     this.isMouseDown = false;
     this.color = "";
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmousedown = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseup = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseover = null;
-    /** @type {((ColorTip: Neo.ColorTip) => void) | null} */
+    /** @type {((ColorTip: ColorTip) => void) | null} */
     this.onmouseout = null;
   }
 
@@ -301,7 +303,7 @@ Neo.ColorTip = class {
     this.selected = this.elementID == "neo-color1" ? true : false;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
     if (this.element) {
       /** @param {MouseEvent} e */
       this.element.onmousedown = function (e) {
@@ -363,7 +365,7 @@ Neo.ColorTip = class {
     for (var i = 0; i < Neo.colorTips.length; i++) {
       var colorTip = Neo.colorTips[i];
       if (this == colorTip) {
-        switch (Neo.getModifier(e)) {
+        switch (getModifier(e)) {
           case "shift":
             this.setColor(Neo.config.colors[this.params.index - 1]);
             break;
@@ -371,13 +373,6 @@ Neo.ColorTip = class {
             this.setColor(Neo.painter.foregroundColor);
             break;
         }
-
-        //          if (e.shiftKey) {
-        //              this.setColor(Neo.config.colors[this.params.index - 1]);
-        //          } else if (e.button == 2 || e.ctrlKey || e.altKey ||
-        //                     Neo.painter.virtualRight) {
-        //              this.setColor(Neo.painter.foregroundColor);
-        //          }
       }
       colorTip.setSelected(this === colorTip);
     }
@@ -440,16 +435,15 @@ Neo.ColorTip = class {
     this.element.style.backgroundColor = color;
   }
   /**
-   * @returns {Neo.ColorTip|null}
+   * @returns {ColorTip|null}
    */
   static getCurrent() {
-    for (var i = 0; i < Neo.colorTips.length; i++) {
-      var colorTip = Neo.colorTips[i];
+    for (const colorTip of Neo.colorTips) {
       if (colorTip.selected) return colorTip;
     }
     return null;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -457,10 +451,10 @@ Neo.ColorTip = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {(Neo.FillButton|Neo.ToolTip)[]} */
+/** @type {(FillButton|ToolTip)[]} */
 Neo.toolButtons = [];
 
-Neo.ToolTip = class {
+export class ToolTip {
   static bezier =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==";
   static blur =
@@ -510,13 +504,13 @@ Neo.ToolTip = class {
     this.elementID = "";
     this.mode = 0;
     this.isMouseDown = false;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmousedown = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseup = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseover = null;
-    /** @type {((ToolTip: Neo.ToolTip) => void) | null} */
+    /** @type {((ToolTip: ToolTip) => void) | null} */
     this.onmouseout = null;
     this.selected = false;
     this.isTool = false;
@@ -538,7 +532,7 @@ Neo.ToolTip = class {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ToolTip|null}
+   * @returns {ToolTip|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -548,7 +542,7 @@ Neo.ToolTip = class {
 
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.params.type = this.element.id;
@@ -609,12 +603,12 @@ Neo.ToolTip = class {
     if (this.isTool) {
       if (this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          const toolTip = /** @type {Neo.ToolTip} */ (Neo.toolButtons[i]);
+          const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
           toolTip.setSelected(this === toolTip);
         }
       } else {
         var length = this.toolStrings.length;
-        if (Neo.getModifier(e) == "right") {
+        if (getModifier(e) == "right") {
           this.mode--;
           if (this.mode < 0) this.mode = length - 1;
         } else {
@@ -699,7 +693,7 @@ Neo.ToolTip = class {
         this.prevMode = this.mode;
 
         var img = new Image();
-        var ref = this;
+        const ref = this;
         img.onload = function () {
           if (!ref.canvas) {
             console.error("Canvas not found for ToolTip on image load.");
@@ -710,7 +704,7 @@ Neo.ToolTip = class {
         };
         img.src = this.toolIcons[this.mode];
       } else {
-        Neo.tintImage(ctx, c);
+        tintImage(ctx, c);
       }
     }
   }
@@ -726,9 +720,9 @@ Neo.ToolTip = class {
    */
   drawTintImage(ctx, img, c, x, y) {
     ctx.drawImage(img, x, y);
-    Neo.tintImage(ctx, c);
+    tintImage(ctx, c);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -736,7 +730,7 @@ Neo.ToolTip = class {
   -------------------------------------------------------------------------
 */
 
-Neo.PenTip = class extends Neo.ToolTip {
+export class PenTip extends ToolTip {
   constructor() {
     super();
     this.isTool = true;
@@ -744,13 +738,13 @@ Neo.PenTip = class extends Neo.ToolTip {
     this.toolStrings = [];
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_PEN,
-      Neo.Painter.TOOLTYPE_BRUSH,
-      Neo.Painter.TOOLTYPE_TEXT,
+      Painter.TOOLTYPE_PEN,
+      Painter.TOOLTYPE_BRUSH,
+      Painter.TOOLTYPE_TEXT,
     ];
 
     this.hasTintImage = true;
-    this.toolIcons = [Neo.ToolTip.pen, Neo.ToolTip.brush, Neo.ToolTip.text];
+    this.toolIcons = [ToolTip.pen, ToolTip.brush, ToolTip.text];
     this.mode = 0;
   }
 
@@ -758,13 +752,13 @@ Neo.PenTip = class extends Neo.ToolTip {
    * 鉛筆･水彩･テキスト
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.PenTip|null}
+   * @returns {PenTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("鉛筆"),
-      Neo.translate("水彩"),
-      Neo.translate("ﾃｷｽﾄ"),
+      translate("鉛筆"),
+      translate("水彩"),
+      translate("ﾃｷｽﾄ"),
     ];
     this.isTool = true;
     super.init(elementID, params);
@@ -781,7 +775,7 @@ Neo.PenTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -789,7 +783,7 @@ Neo.PenTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.Pen2Tip = class extends Neo.ToolTip {
+export class Pen2Tip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -797,19 +791,14 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_TONE,
-      Neo.Painter.TOOLTYPE_BLUR,
-      Neo.Painter.TOOLTYPE_DODGE,
-      Neo.Painter.TOOLTYPE_BURN,
+      Painter.TOOLTYPE_TONE,
+      Painter.TOOLTYPE_BLUR,
+      Painter.TOOLTYPE_DODGE,
+      Painter.TOOLTYPE_BURN,
     ];
 
     this.hasTintImage = true;
-    this.toolIcons = [
-      Neo.ToolTip.tone,
-      Neo.ToolTip.blur,
-      Neo.ToolTip.burn,
-      Neo.ToolTip.burn,
-    ];
+    this.toolIcons = [ToolTip.tone, ToolTip.blur, ToolTip.burn, ToolTip.burn];
     this.mode = 0;
   }
 
@@ -817,14 +806,14 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
    * トーン･ぼかし･覆い焼き･焼き込み
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Pen2Tip|null}
+   * @returns {Pen2Tip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("トーン"),
-      Neo.translate("ぼかし"),
-      Neo.translate("覆い焼き"),
-      Neo.translate("焼き込み"),
+      translate("トーン"),
+      translate("ぼかし"),
+      translate("覆い焼き"),
+      translate("焼き込み"),
     ];
 
     this.isTool = true;
@@ -838,16 +827,16 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
     }
 
     switch (this.tools[this.mode]) {
-      case Neo.Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_TONE:
         // this.drawTone(Neo.painter.foregroundColor);
         this.drawTone();
         break;
 
-      case Neo.Painter.TOOLTYPE_DODGE:
+      case Painter.TOOLTYPE_DODGE:
         this.draw(0xffc0c0c0);
         break;
 
-      case Neo.Painter.TOOLTYPE_BURN:
+      case Painter.TOOLTYPE_BURN:
         this.draw(0xff404040);
         break;
 
@@ -900,7 +889,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
 
     this.prevMode = this.mode;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -908,7 +897,7 @@ Neo.Pen2Tip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.EraserTip = class extends Neo.ToolTip {
+export class EraserTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -923,9 +912,9 @@ Neo.EraserTip = class extends Neo.ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_ERASER,
-      Neo.Painter.TOOLTYPE_ERASERECT,
-      Neo.Painter.TOOLTYPE_ERASEALL,
+      Painter.TOOLTYPE_ERASER,
+      Painter.TOOLTYPE_ERASERECT,
+      Painter.TOOLTYPE_ERASEALL,
     ];
   }
 
@@ -933,13 +922,13 @@ Neo.EraserTip = class extends Neo.ToolTip {
    * 消しペン･消し四角･全消し
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.EraserTip|null}
+   * @returns {EraserTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("消しペン"),
-      Neo.translate("消し四角"),
-      Neo.translate("全消し"),
+      translate("消しペン"),
+      translate("消し四角"),
+      translate("全消し"),
     ];
 
     this.drawOnce = false;
@@ -981,9 +970,9 @@ Neo.EraserTip = class extends Neo.ToolTip {
     img.onload = function () {
       ctx?.drawImage(img, 0, 0);
     };
-    img.src = Neo.ToolTip.eraser;
+    img.src = ToolTip.eraser;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -991,7 +980,7 @@ Neo.EraserTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.EffectTip = class extends Neo.ToolTip {
+export class EffectTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -1003,18 +992,18 @@ Neo.EffectTip = class extends Neo.ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_RECTFILL,
-      Neo.Painter.TOOLTYPE_RECT,
-      Neo.Painter.TOOLTYPE_ELLIPSEFILL,
-      Neo.Painter.TOOLTYPE_ELLIPSE,
+      Painter.TOOLTYPE_RECTFILL,
+      Painter.TOOLTYPE_RECT,
+      Painter.TOOLTYPE_ELLIPSEFILL,
+      Painter.TOOLTYPE_ELLIPSE,
     ];
 
     this.hasTintImage = true;
     this.toolIcons = [
-      Neo.ToolTip.rectfill,
-      Neo.ToolTip.rect,
-      Neo.ToolTip.ellipsefill,
-      Neo.ToolTip.ellipse,
+      ToolTip.rectfill,
+      ToolTip.rect,
+      ToolTip.ellipsefill,
+      ToolTip.ellipse,
     ];
   }
 
@@ -1022,14 +1011,14 @@ Neo.EffectTip = class extends Neo.ToolTip {
    * 四角･線四角･楕円･線楕円
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.EffectTip|null}
+   * @returns {EffectTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("四角"),
-      Neo.translate("線四角"),
-      Neo.translate("楕円"),
-      Neo.translate("線楕円"),
+      translate("四角"),
+      translate("線四角"),
+      translate("楕円"),
+      translate("線楕円"),
     ];
 
     this.isTool = true;
@@ -1047,7 +1036,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1055,7 +1044,7 @@ Neo.EffectTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.Effect2Tip = class extends Neo.ToolTip {
+export class Effect2Tip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
@@ -1069,22 +1058,22 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
 
     /** @type {number[]} **/
     this.tools = [
-      Neo.Painter.TOOLTYPE_COPY,
-      Neo.Painter.TOOLTYPE_MERGE,
-      Neo.Painter.TOOLTYPE_BLURRECT,
-      Neo.Painter.TOOLTYPE_FLIP_H,
-      Neo.Painter.TOOLTYPE_FLIP_V,
-      Neo.Painter.TOOLTYPE_TURN,
+      Painter.TOOLTYPE_COPY,
+      Painter.TOOLTYPE_MERGE,
+      Painter.TOOLTYPE_BLURRECT,
+      Painter.TOOLTYPE_FLIP_H,
+      Painter.TOOLTYPE_FLIP_V,
+      Painter.TOOLTYPE_TURN,
     ];
 
     this.hasTintImage = true;
     this.toolIcons = [
-      Neo.ToolTip.copy,
-      Neo.ToolTip.merge,
-      Neo.ToolTip.blurrect,
-      Neo.ToolTip.flip,
-      Neo.ToolTip.flip,
-      Neo.ToolTip.flip,
+      ToolTip.copy,
+      ToolTip.merge,
+      ToolTip.blurrect,
+      ToolTip.flip,
+      ToolTip.flip,
+      ToolTip.flip,
     ];
   }
 
@@ -1092,23 +1081,23 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
    * コピー･レイヤー結合･角取り･左右反転･上下反転･傾け
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.Effect2Tip|null}
+   * @returns {Effect2Tip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("コピー"),
-      Neo.translate("ﾚｲﾔ結合"),
-      Neo.translate("角取り"),
-      Neo.translate("左右反転"),
-      Neo.translate("上下反転"),
-      Neo.translate("傾け"),
+      translate("コピー"),
+      translate("ﾚｲﾔ結合"),
+      translate("角取り"),
+      translate("左右反転"),
+      translate("上下反転"),
+      translate("傾け"),
     ];
 
     this.isTool = true;
     super.init(elementID, params);
 
     this.img = document.createElement("img");
-    this.img.src = Neo.ToolTip.copy2;
+    this.img.src = ToolTip.copy2;
     this.element?.appendChild(this.img);
     return this;
   }
@@ -1123,7 +1112,7 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1131,11 +1120,11 @@ Neo.Effect2Tip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.MaskTip = class extends Neo.ToolTip {
+export class MaskTip extends ToolTip {
   constructor() {
     super();
     this.isMouseDown = false;
-    /** @type {((MaskTip: Neo.MaskTip) => void) | null} */
+    /** @type {((MaskTip: MaskTip) => void) | null} */
     this.onmousedown = null;
     /** @type {HTMLCanvasElement|null} */
     this.canvas = null;
@@ -1148,15 +1137,15 @@ Neo.MaskTip = class extends Neo.ToolTip {
    * 通常･マスク･逆マスク･加算･逆加算
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.MaskTip|null}
+   * @returns {MaskTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("通常"),
-      Neo.translate("マスク"),
-      Neo.translate("逆ﾏｽｸ"),
-      Neo.translate("加算"),
-      Neo.translate("逆加算"),
+      translate("通常"),
+      translate("マスク"),
+      translate("逆ﾏｽｸ"),
+      translate("加算"),
+      translate("逆加算"),
     ];
 
     this.fixed = true;
@@ -1168,7 +1157,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
   _mouseDownHandler(e) {
     this.isMouseDown = true;
 
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       Neo.painter.maskColor = Neo.painter.foregroundColor;
     } else {
       var length = this.toolStrings.length;
@@ -1211,7 +1200,7 @@ Neo.MaskTip = class extends Neo.ToolTip {
     ctx.fillStyle = c;
     ctx.fillRect(1, 1, 43, 9);
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1219,17 +1208,13 @@ Neo.MaskTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-Neo.DrawTip = class extends Neo.ToolTip {
+export class DrawTip extends ToolTip {
   constructor() {
     super();
     /** @type {string[]} */
     this.toolStrings = [];
     this.hasTintImage = true;
-    this.toolIcons = [
-      Neo.ToolTip.freehand,
-      Neo.ToolTip.line,
-      Neo.ToolTip.bezier,
-    ];
+    this.toolIcons = [ToolTip.freehand, ToolTip.line, ToolTip.bezier];
     this.mode = 0;
   }
 
@@ -1237,13 +1222,13 @@ Neo.DrawTip = class extends Neo.ToolTip {
    * 手書き･直線･BZ曲線
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.DrawTip|null}
+   * @returns {DrawTip|null}
    */
   init(elementID, params = {}) {
     this.toolStrings = [
-      Neo.translate("手書き"),
-      Neo.translate("直線"),
-      Neo.translate("BZ曲線"),
+      translate("手書き"),
+      translate("直線"),
+      translate("BZ曲線"),
     ];
 
     this.fixed = true;
@@ -1257,7 +1242,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
 
     var length = this.toolStrings.length;
 
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       this.mode--;
       if (this.mode < 0) this.mode = length - 1;
     } else {
@@ -1277,7 +1262,7 @@ Neo.DrawTip = class extends Neo.ToolTip {
       this.label.innerHTML = this.toolStrings[this.mode];
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1285,10 +1270,10 @@ Neo.DrawTip = class extends Neo.ToolTip {
   -------------------------------------------------------------------------
 */
 
-/** @type {(Neo.ColorSlider|Neo.SizeSlider)[]} */
+/** @type {(ColorSlider|SizeSlider)[]} */
 Neo.sliders = [];
 
-Neo.ColorSlider = class {
+export class ColorSlider {
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -1318,7 +1303,7 @@ Neo.ColorSlider = class {
    * カラースライダーを初期化
    * @param {string} elementID
    * @param {any} [params]
-   * @returns {Neo.ColorSlider}
+   * @returns {ColorSlider}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1458,8 +1443,7 @@ Neo.ColorSlider = class {
       var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
       var color = (r << 16) | (g << 8) | b;
 
-      var colorTip =
-        /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+      var colorTip = /** @type {ColorTip|null} **/ ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.getColorString(color));
       }
@@ -1497,7 +1481,7 @@ Neo.ColorSlider = class {
       this.label.innerHTML = this.prefix + this.value.toFixed(0);
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1505,7 +1489,7 @@ Neo.ColorSlider = class {
   -------------------------------------------------------------------------
 */
 
-Neo.SizeSlider = class {
+export class SizeSlider {
   constructor() {
     this.selected = false;
     /** @type {string[]} */
@@ -1535,7 +1519,7 @@ Neo.SizeSlider = class {
    * サイズスライダーを初期化
    * @param {string} elementID - 要素のID
    * @param {any} [params] - パラメータ
-   * @returns {Neo.SizeSlider} - 初期化されたサイズスライダー
+   * @returns {SizeSlider} - 初期化されたサイズスライダー
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1651,10 +1635,10 @@ Neo.SizeSlider = class {
 
     var tool = Neo.painter.getCurrentTool();
     if (tool) {
-      if (tool.type == Neo.Painter.TOOLTYPE_BRUSH) {
+      if (tool.type == Painter.TOOLTYPE_BRUSH) {
         Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
         Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
-      } else if (tool.type == Neo.Painter.TOOLTYPE_TEXT) {
+      } else if (tool.type == Painter.TOOLTYPE_TEXT) {
         Neo.painter.updateInputText();
       }
     }
@@ -1674,7 +1658,7 @@ Neo.SizeSlider = class {
       this.slider.style.backgroundColor = Neo.painter.foregroundColor;
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1682,9 +1666,9 @@ Neo.SizeSlider = class {
   -------------------------------------------------------------------------
 */
 
-Neo.LayerControl = class {
+export class LayerControl {
   constructor() {
-    /** @type {((LayerControl: Neo.LayerControl) => void) | null} */
+    /** @type {((LayerControl: LayerControl) => void) | null} */
     this.onmousedown = null;
     /** @type {HTMLElement|null}*/
     this.bg = null;
@@ -1710,7 +1694,7 @@ Neo.LayerControl = class {
    * レイヤーコントローラーを初期化
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.LayerControl|null}
+   * @returns {LayerControl|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1718,7 +1702,7 @@ Neo.LayerControl = class {
     this.elementID = elementID;
     this.isMouseDown = false;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.element.onmousedown = function (e) {
@@ -1738,7 +1722,7 @@ Neo.LayerControl = class {
 
       this.element.className = "layerControl";
 
-      var layerStrings = [Neo.translate("Layer0"), Neo.translate("Layer1")];
+      var layerStrings = [translate("Layer0"), translate("Layer1")];
 
       this.element.innerHTML =
         "<div class='bg'></div><div class='label0'>" +
@@ -1774,7 +1758,7 @@ Neo.LayerControl = class {
 
   /** @param {MouseEvent|TouchEvent} e */
   _mouseDownHandler(e) {
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       var visible = Neo.painter.visible[Neo.painter.current];
       Neo.painter.visible[Neo.painter.current] = visible ? false : true;
     } else {
@@ -1787,7 +1771,7 @@ Neo.LayerControl = class {
       Neo.painter.canvasWidth,
       Neo.painter.canvasHeight,
     );
-    if (Neo.painter.tool.type == Neo.Painter.TOOLTYPE_PASTE) {
+    if (Neo.painter.tool.type == Painter.TOOLTYPE_PASTE) {
       Neo.painter.pasteTool.drawCursor(Neo.painter);
     }
     this.update();
@@ -1809,17 +1793,17 @@ Neo.LayerControl = class {
       this.line1.style.display = Neo.painter.visible[1] ? "none" : "block";
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
     ReserveControl
   -------------------------------------------------------------------------
 */
-/** @type {Neo.ReserveControl[]} */
+/** @type {ReserveControl[]} */
 Neo.reserveControls = [];
 
-Neo.ReserveControl = class {
+export class ReserveControl {
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -1836,14 +1820,14 @@ Neo.ReserveControl = class {
    * リバースコントローラーを初期化
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ReserveControl|null}
+   * @returns {ReserveControl|null}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
     this.params = params || {};
     this.elementID = elementID;
 
-    var ref = this;
+    const ref = this;
 
     if (this.element) {
       this.element.onmousedown = function (e) {
@@ -1878,7 +1862,7 @@ Neo.ReserveControl = class {
    */
   /** @param {MouseEvent|TouchEvent} e */
   _mouseDownHandler(e) {
-    if (Neo.getModifier(e) == "right") {
+    if (getModifier(e) == "right") {
       this.save();
     } else {
       this.load();
@@ -1897,9 +1881,9 @@ Neo.ReserveControl = class {
     Neo.painter.alpha = this.reserve.alpha;
 
     switch (this.reserve.tool) {
-      case Neo.Painter.TOOLTYPE_PEN:
-      case Neo.Painter.TOOLTYPE_BRUSH:
-      case Neo.Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_PEN:
+      case Painter.TOOLTYPE_BRUSH:
+      case Painter.TOOLTYPE_TONE:
         Neo.painter.drawType = this.reserve.drawType;
     }
     Neo.updateUI();
@@ -1931,7 +1915,7 @@ Neo.ReserveControl = class {
     }
     this.element.style.backgroundColor = this.reserve.color;
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -1939,12 +1923,12 @@ Neo.ReserveControl = class {
   -------------------------------------------------------------------------
 */
 
-/** @type {Neo.ScrollBarButton|null} */
+/** @type {ScrollBarButton|null} */
 Neo.scrollH = null;
-/** @type {Neo.ScrollBarButton|null} */
+/** @type {ScrollBarButton|null} */
 Neo.scrollV = null;
 
-Neo.ScrollBarButton = class {
+export class ScrollBarButton {
   constructor() {
     /** @type {HTMLElement|null} */
     this.element = null;
@@ -1959,7 +1943,7 @@ Neo.ScrollBarButton = class {
   /**
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
+   * @returns {ScrollBarButton|null} 初期化成功時はインスタンス、失敗時は null
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -1984,7 +1968,7 @@ Neo.ScrollBarButton = class {
   }
 
   /**
-   * @param {Neo.Painter} oe
+   * @param {Painter} oe
    * @returns {void|null} 更新成功時は void、失敗時は null
    */
   update(oe) {
@@ -2010,14 +1994,14 @@ Neo.ScrollBarButton = class {
       this.barButton.style.top = Math.floor(barY) + "px";
     }
   }
-};
+}
 /*
   -------------------------------------------------------------------------
     ViewerButton
   -------------------------------------------------------------------------
 */
 
-Neo.ViewerButton = class extends Neo.Button {
+export class ViewerButton extends Button {
   static speedStrings = ["最", "早", "既", "鈍"];
   static minus =
     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC";
@@ -2046,7 +2030,7 @@ Neo.ViewerButton = class extends Neo.Button {
    *
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ViewerButton|null}
+   * @returns {ViewerButton|null}
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
@@ -2075,9 +2059,9 @@ Neo.ViewerButton = class extends Neo.Button {
       img.onload = function () {
         ctx.clearRect(0, 0, 24, 24);
         ctx.drawImage(img, 0, 0);
-        Neo.tintImage(ctx, Neo.config.color_text);
+        tintImage(ctx, Neo.config.color_text);
       }.bind(this);
-      img.src = /**@type {any}*/ (Neo.ViewerButton)[
+      img.src = /**@type {any}*/ (ViewerButton)[
         elementID.toLowerCase().replace(/neo-viewer/, "")
       ];
     } else {
@@ -2093,13 +2077,13 @@ Neo.ViewerButton = class extends Neo.Button {
   update() {
     if (this.elementID == "neo-viewerSpeed") {
       var mode = Neo.painter._actionMgr.speedMode();
-      var speedString = Neo.translate(Neo.ViewerButton.speedStrings[mode]);
+      var speedString = translate(ViewerButton.speedStrings[mode]);
       if (this.element) {
         this.element.children[0].innerHTML = "<div>" + speedString + "</div>";
       }
     }
   }
-};
+}
 
 /*
   -------------------------------------------------------------------------
@@ -2110,7 +2094,7 @@ Neo.ViewerButton = class extends Neo.Button {
 // length/mark/count
 // update
 
-Neo.ViewerBar = class {
+export class ViewerBar {
   constructor() {
     /** @type {any} */
     this.params = null;
@@ -2133,7 +2117,7 @@ Neo.ViewerBar = class {
    *
    * @param {string} elementID
    * @param {Object} [params]
-   * @returns {Neo.ViewerBar}
+   * @returns {ViewerBar}
    */
   init(elementID, params = {}) {
     this.element = document.getElementById(elementID);
@@ -2164,7 +2148,7 @@ Neo.ViewerBar = class {
     this.mark = this.length;
     this.seek = 0;
     if (this.element) {
-      var ref = this;
+      const ref = this;
       this.element.addEventListener(
         "pointerdown",
         function (e) {
@@ -2231,4 +2215,4 @@ Neo.ViewerBar = class {
 
     Neo.painter.onmark();
   }
-};
+}

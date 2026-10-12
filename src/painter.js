@@ -1,9 +1,42 @@
 "use strict";
 //@ts-check
-
+import { Neo, submit } from "./container.js";
+import { ActionManager, getPCH } from "./actions.js";
+import { Commands } from "./commands.js";
+import { ColorTip } from "./widgets.js";
+import { RightButton } from "./widgets.js";
+import {
+  ToolBase,
+  PenTool,
+  EraserTool,
+  HandTool,
+  FillTool,
+  EraseAllTool,
+  EraseRectTool,
+  CopyTool,
+  PasteTool,
+  MergeTool,
+  FlipHTool,
+  FlipVTool,
+  BrushTool,
+  TextTool,
+  ToneTool,
+  BlurTool,
+  DodgeTool,
+  BurnTool,
+  SliderTool,
+  DummyTool,
+  RectTool,
+  RectFillTool,
+  EllipseTool,
+  EllipseFillTool,
+  BlurRectTool,
+  TurnTool,
+} from "./tools.js";
+import LZString from "lz-string";
 Neo.CurrentToolType = 1;
 
-Neo.Painter = class {
+export class Painter {
   static LINETYPE_NONE = 0;
   static LINETYPE_PEN = 1;
   static LINETYPE_ERASER = 2;
@@ -57,9 +90,10 @@ Neo.Painter = class {
   static TOOLTYPE_TURN = 25;
 
   constructor() {
-    this._undoMgr = new Neo.UndoManager(50);
-    /** @type {Neo.ActionManager} */
-    this._actionMgr = new Neo.ActionManager();
+    /** @type {UndoManager} */
+    this._undoMgr = new UndoManager(50);
+    /** @type {ActionManager} */
+    this._actionMgr = new ActionManager();
     this.clipMouseX = 0;
     this.clipMouseY = 0;
     this.scrollBarX = 0;
@@ -71,10 +105,14 @@ Neo.Painter = class {
     this.zoom = 1;
     this.zoomX = 0;
     this.zoomY = 0;
+    /** @type {boolean} */
     this.isMouseDown = false;
+    /** @type {boolean} */
     this.isMouseDownRight = false;
+    /** @type {boolean} */
     this.isSpaceDown = false;
     this.isBezierActive = false;
+    /** @type {boolean} */
     this.isCopyActive = false;
     this.tempX = 0;
     this.tempY = 0;
@@ -85,7 +123,7 @@ Neo.Painter = class {
     /** @type {HTMLElement|null} */
     this.container = null;
 
-    this.tool = /** @type {Neo.ToolBase} */ ({});
+    this.tool = /** @type {ToolBase} */ ({});
     /** @type {HTMLElement|null} */
     this.inputText = null;
     /** @type {number[]|null} */
@@ -146,7 +184,9 @@ Neo.Painter = class {
     this.isAltDown = false;
 
     //this.touchModifier = null;
+    /** @type {boolean} */
     this.virtualRight = false;
+    /** @type {boolean} */
     this.virtualShift = false;
 
     //this.onUpdateCanvas;
@@ -171,58 +211,33 @@ Neo.Painter = class {
     this.busySkipped = false;
 
     this.touchlength = 0;
-    /**@type {Neo.PenTool} */
     this.penTool;
-    /**@type {Neo.EraserTool} */
     this.eraserTool;
-    /**@type {Neo.HandTool} */
     this.handTool;
-    /**@type {Neo.FillTool} */
     this.fillTool;
-    /**@type {Neo.EraseAllTool} */
     this.eraseAllTool;
-    /**@type {Neo.EraseRectTool} */
     this.eraseRectTool;
 
-    /**@type {Neo.CopyTool} */
     this.copyTool;
-    /**@type {Neo.PasteTool} */
     this.pasteTool;
-    /**@type {Neo.MergeTool} */
     this.mergeTool;
-    /**@type {Neo.FlipHTool} */
     this.flipHTool;
-    /**@type {Neo.FlipVTool} */
     this.flipVTool;
 
-    /**@type {Neo.BrushTool} */
     this.brushTool;
-    /**@type {Neo.TextTool} */
     this.textTool;
-    /**@type {Neo.ToneTool} */
     this.toneTool;
-    /**@type {Neo.BlurTool} */
     this.blurTool;
-    /**@type {Neo.DodgeTool} */
     this.dodgeTool;
-    /**@type {Neo.BurnTool} */
     this.burnTool;
-    /**@type {Neo.SliderTool} */
     this.sliderTool;
-    /**@type {Neo.DummyTool} */
     this.dummyTool;
 
-    /**@type {Neo.RectTool} */
     this.rectTool;
-    /**@type {Neo.RectFillTool} */
     this.rectFillTool;
-    /**@type {Neo.EllipseTool} */
     this.ellipseTool;
-    /**@type {Neo.EllipseFillTool} */
     this.ellipseFillTool;
-    /**@type {Neo.BlurRectTool} */
     this.blurRectTool;
-    /**@type {Neo.TurnTool} */
     this.turnTool;
   }
 
@@ -260,19 +275,19 @@ Neo.Painter = class {
 
     //テキストツール以外のツールに切り替えるときは、テキストツールを終了する
     if (tool !== this.textTool) {
-      this.textTool.kill();
+      this.textTool?.kill();
     }
     if (this.tool && this.tool.cancelBezier) {
       this.tool.cancelBezier();
     }
     if (tool !== this.pasteTool) {
-      this.pasteTool.kill();
+      this.pasteTool?.kill();
     }
     if (this.tool && this.tool.kill) {
       this.tool.kill();
     }
-    this.tool = /**@type {Neo.ToolBase} */ (tool);
-    /**@type {Neo.ToolBase} */ (tool).init(this);
+    this.tool = /**@type {ToolBase} */ (tool);
+    /**@type {ToolBase} */ (tool).init(this);
     if (this.tool && this.tool.loadStates) this.tool.loadStates();
   }
 
@@ -286,8 +301,8 @@ Neo.Painter = class {
    */
   pushTool(tool) {
     this.toolStack.push(this.tool);
-    this.tool = /**@type {Neo.ToolBase} */ (tool);
-    /**@type {Neo.ToolBase} */ (tool).init(this);
+    this.tool = /**@type {ToolBase} */ (tool);
+    /**@type {ToolBase} */ (tool).init(this);
   }
 
   /**
@@ -310,13 +325,13 @@ Neo.Painter = class {
    * ツールがスライダー等の設定変更中である場合、スタックの最上位にある
    * 以前のツール（ペイントツール等）を優先的に返すことで、
    * 現在の操作文脈を正しく取得する。
-   * @returns {Neo.ToolBase|null} 現在のツールインスタンス、またはnull
+   * @returns {ToolBase|null} 現在のツールインスタンス、またはnull
    */
   getCurrentTool() {
     if (this.tool) {
       var tool = this.tool;
       // スライダー操作中はスタックから直前のツールを参照する
-      if (tool && tool.type == Neo.Painter.TOOLTYPE_SLIDER) {
+      if (tool && tool.type == Painter.TOOLTYPE_SLIDER) {
         var stack = this.toolStack;
         if (stack.length > 0) {
           tool = stack[stack.length - 1];
@@ -331,80 +346,80 @@ Neo.Painter = class {
    * ツールタイプに基づいてアクティブなツールを切り替える。
    * @description
    * ツールタイプ（ID）から対応するインスタンスを特定し、セットする。
-   * @param {number|string} toolType - Neo.Painter.TOOLTYPE_xxx で定義されたツールID
+   * @param {number|string} toolType - Painter.TOOLTYPE_xxx で定義されたツールID
    */
   setToolByType(toolType) {
     switch (parseInt(String(toolType))) {
-      case Neo.Painter.TOOLTYPE_PEN:
+      case Painter.TOOLTYPE_PEN:
         this.setTool(this.penTool);
         break;
-      case Neo.Painter.TOOLTYPE_ERASER:
+      case Painter.TOOLTYPE_ERASER:
         this.setTool(this.eraserTool);
         break;
-      case Neo.Painter.TOOLTYPE_HAND:
+      case Painter.TOOLTYPE_HAND:
         this.setTool(this.handTool);
         break;
-      case Neo.Painter.TOOLTYPE_FILL:
+      case Painter.TOOLTYPE_FILL:
         this.setTool(this.fillTool);
         break;
-      case Neo.Painter.TOOLTYPE_ERASEALL:
+      case Painter.TOOLTYPE_ERASEALL:
         this.setTool(this.eraseAllTool);
         break;
-      case Neo.Painter.TOOLTYPE_ERASERECT:
+      case Painter.TOOLTYPE_ERASERECT:
         this.setTool(this.eraseRectTool);
         break;
 
-      case Neo.Painter.TOOLTYPE_COPY:
+      case Painter.TOOLTYPE_COPY:
         this.setTool(this.copyTool);
         break;
-      case Neo.Painter.TOOLTYPE_PASTE:
+      case Painter.TOOLTYPE_PASTE:
         this.setTool(this.pasteTool);
         break;
-      case Neo.Painter.TOOLTYPE_MERGE:
+      case Painter.TOOLTYPE_MERGE:
         this.setTool(this.mergeTool);
         break;
-      case Neo.Painter.TOOLTYPE_FLIP_H:
+      case Painter.TOOLTYPE_FLIP_H:
         this.setTool(this.flipHTool);
         break;
-      case Neo.Painter.TOOLTYPE_FLIP_V:
+      case Painter.TOOLTYPE_FLIP_V:
         this.setTool(this.flipVTool);
         break;
 
-      case Neo.Painter.TOOLTYPE_BRUSH:
+      case Painter.TOOLTYPE_BRUSH:
         this.setTool(this.brushTool);
         break;
-      case Neo.Painter.TOOLTYPE_TEXT:
+      case Painter.TOOLTYPE_TEXT:
         this.setTool(this.textTool);
         break;
-      case Neo.Painter.TOOLTYPE_TONE:
+      case Painter.TOOLTYPE_TONE:
         this.setTool(this.toneTool);
         break;
-      case Neo.Painter.TOOLTYPE_BLUR:
+      case Painter.TOOLTYPE_BLUR:
         this.setTool(this.blurTool);
         break;
-      case Neo.Painter.TOOLTYPE_DODGE:
+      case Painter.TOOLTYPE_DODGE:
         this.setTool(this.dodgeTool);
         break;
-      case Neo.Painter.TOOLTYPE_BURN:
+      case Painter.TOOLTYPE_BURN:
         this.setTool(this.burnTool);
         break;
 
-      case Neo.Painter.TOOLTYPE_RECT:
+      case Painter.TOOLTYPE_RECT:
         this.setTool(this.rectTool);
         break;
-      case Neo.Painter.TOOLTYPE_RECTFILL:
+      case Painter.TOOLTYPE_RECTFILL:
         this.setTool(this.rectFillTool);
         break;
-      case Neo.Painter.TOOLTYPE_ELLIPSE:
+      case Painter.TOOLTYPE_ELLIPSE:
         this.setTool(this.ellipseTool);
         break;
-      case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+      case Painter.TOOLTYPE_ELLIPSEFILL:
         this.setTool(this.ellipseFillTool);
         break;
-      case Neo.Painter.TOOLTYPE_BLURRECT:
+      case Painter.TOOLTYPE_BLURRECT:
         this.setTool(this.blurRectTool);
         break;
-      case Neo.Painter.TOOLTYPE_TURN:
+      case Painter.TOOLTYPE_TURN:
         this.setTool(this.turnTool);
         break;
 
@@ -689,35 +704,35 @@ Neo.Painter = class {
   }
 
   _initTools() {
-    this.penTool = new Neo.PenTool();
-    this.eraserTool = new Neo.EraserTool();
-    this.handTool = new Neo.HandTool();
-    this.fillTool = new Neo.FillTool();
-    this.eraseAllTool = new Neo.EraseAllTool();
-    this.eraseRectTool = new Neo.EraseRectTool();
+    this.penTool = new PenTool();
+    this.eraserTool = new EraserTool();
+    this.handTool = new HandTool();
+    this.fillTool = new FillTool();
+    this.eraseAllTool = new EraseAllTool();
+    this.eraseRectTool = new EraseRectTool();
 
-    this.copyTool = new Neo.CopyTool();
-    this.pasteTool = new Neo.PasteTool();
-    this.mergeTool = new Neo.MergeTool();
-    this.flipHTool = new Neo.FlipHTool();
-    this.flipVTool = new Neo.FlipVTool();
+    this.copyTool = new CopyTool();
+    this.pasteTool = new PasteTool();
+    this.mergeTool = new MergeTool();
+    this.flipHTool = new FlipHTool();
+    this.flipVTool = new FlipVTool();
 
-    this.brushTool = new Neo.BrushTool();
-    this.textTool = new Neo.TextTool();
-    this.toneTool = new Neo.ToneTool();
-    this.blurTool = new Neo.BlurTool();
-    this.dodgeTool = new Neo.DodgeTool();
-    this.burnTool = new Neo.BurnTool();
+    this.brushTool = new BrushTool();
+    this.textTool = new TextTool();
+    this.toneTool = new ToneTool();
+    this.blurTool = new BlurTool();
+    this.dodgeTool = new DodgeTool();
+    this.burnTool = new BurnTool();
 
-    this.rectTool = new Neo.RectTool();
-    this.rectFillTool = new Neo.RectFillTool();
-    this.ellipseTool = new Neo.EllipseTool();
-    this.ellipseFillTool = new Neo.EllipseFillTool();
-    this.blurRectTool = new Neo.BlurRectTool();
-    this.turnTool = new Neo.TurnTool();
+    this.rectTool = new RectTool();
+    this.rectFillTool = new RectFillTool();
+    this.ellipseTool = new EllipseTool();
+    this.ellipseFillTool = new EllipseFillTool();
+    this.blurRectTool = new BlurRectTool();
+    this.turnTool = new TurnTool();
 
-    this.sliderTool = new Neo.SliderTool();
-    this.dummyTool = new Neo.DummyTool();
+    this.sliderTool = new SliderTool();
+    this.dummyTool = new DummyTool();
   }
 
   hideInputText() {
@@ -749,9 +764,9 @@ Neo.Painter = class {
 
   cancelCopy() {
     if (!this.isCopyActive) return;
-    if (Neo.CurrentToolType !== Neo.Painter.TOOLTYPE_PASTE) return;
+    if (Neo.CurrentToolType !== Painter.TOOLTYPE_PASTE) return;
     this.popTool();
-    this.setToolByType(Neo.Painter.TOOLTYPE_COPY);
+    this.setToolByType(Painter.TOOLTYPE_COPY);
     this.updateDestCanvas(0, 0, this.canvasWidth, this.canvasHeight, true);
   }
 
@@ -838,14 +853,15 @@ Neo.Painter = class {
       }
     }
     if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-      if (key == "+") new Neo.ZoomPlusCommand(this).execute(); // +
-      if (key == "-") new Neo.ZoomMinusCommand(this).execute(); // -
+      const commands = new Commands();
+      if (key == "+") new commands.ZoomPlusCommand(this).execute(); // +
+      if (key == "-") new commands.ZoomMinusCommand(this).execute(); // -
       //鉛筆
-      if (key == "b") this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
+      if (key == "b") this.setToolByType(Painter.TOOLTYPE_PEN);
       //水彩
-      if (key == "w") this.setToolByType(Neo.Painter.TOOLTYPE_BRUSH);
+      if (key == "w") this.setToolByType(Painter.TOOLTYPE_BRUSH);
       //消しゴム
-      if (key == "e") this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
+      if (key == "e") this.setToolByType(Painter.TOOLTYPE_ERASER);
       //全消し
       if (
         document.activeElement != this.inputText &&
@@ -949,7 +965,7 @@ Neo.Painter = class {
     }
 
     if (
-      Neo.CurrentToolType === Neo.Painter.TOOLTYPE_PASTE &&
+      Neo.CurrentToolType === Painter.TOOLTYPE_PASTE &&
       this.isCopyActive &&
       this.isMouseDownRight
     ) {
@@ -958,7 +974,7 @@ Neo.Painter = class {
       return;
     }
     if (
-      this.drawType == Neo.Painter.DRAWTYPE_BEZIER &&
+      this.drawType == Painter.DRAWTYPE_BEZIER &&
       this.isBezierActive &&
       this.isMouseDownRight
     ) {
@@ -968,7 +984,7 @@ Neo.Painter = class {
       }
       return;
     }
-    if (this.drawType != Neo.Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
+    if (this.drawType != Painter.DRAWTYPE_BEZIER && this.isBezierActive) {
       if (this.tool.cancelBezier) {
         this.tool.cancelBezier();
       }
@@ -991,21 +1007,29 @@ Neo.Painter = class {
         /** @type {BarElement} */ (e.target)["data-bar"]
       ) {
         this.pushTool(this.handTool);
-        this.handTool.reverse = false;
+        if (this.handTool) {
+          this.handTool.reverse = false;
+        }
       } else if (this.isSpaceDown && document.activeElement != this.inputText) {
         this.pushTool(this.handTool);
-        this.handTool.reverse = true;
+        if (this.handTool) {
+          this.handTool.reverse = true;
+        }
       } else if (
         e.target instanceof HTMLElement &&
         /** @type {any} */ (e.target)["data-slider"] != undefined
       ) {
         this.pushTool(this.sliderTool);
-        this.sliderTool.target = e.target;
-        this.sliderTool.isAlt = false;
+        if (this.sliderTool) {
+          this.sliderTool.target = e.target;
+          this.sliderTool.isAlt = false;
+        }
       } else if (e.ctrlKey && e.altKey && !e.shiftKey) {
         this.pushTool(this.sliderTool);
-        this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
-        this.sliderTool.isAlt = true;
+        if (this.sliderTool) {
+          this.sliderTool.target = Neo.sliders[Neo.SLIDERTYPE_SIZE].element;
+          this.sliderTool.isAlt = true;
+        }
       } else if (e.target instanceof HTMLElement && this.isWidget(e.target)) {
         // UI操作時のツール切り替え（dummyToolへの差し替え）
         this.isMouseDown = false;
@@ -1034,7 +1058,7 @@ Neo.Painter = class {
 
     if (e.target instanceof HTMLElement && e.target.id != "neo-right") {
       this.virtualRight = false;
-      Neo.RightButton.clear();
+      RightButton.clear();
     }
 
     this._updateMousePosition(e);
@@ -1110,13 +1134,13 @@ Neo.Painter = class {
     const freeHandMode = this.drawType === 0;
 
     const toolTypes = [
-      Neo.Painter.TOOLTYPE_PEN,
-      Neo.Painter.TOOLTYPE_ERASER,
-      Neo.Painter.TOOLTYPE_BRUSH,
-      Neo.Painter.TOOLTYPE_TONE,
-      Neo.Painter.TOOLTYPE_BLUR,
-      Neo.Painter.TOOLTYPE_DODGE,
-      Neo.Painter.TOOLTYPE_BURN,
+      Painter.TOOLTYPE_PEN,
+      Painter.TOOLTYPE_ERASER,
+      Painter.TOOLTYPE_BRUSH,
+      Painter.TOOLTYPE_TONE,
+      Painter.TOOLTYPE_BLUR,
+      Painter.TOOLTYPE_DODGE,
+      Painter.TOOLTYPE_BURN,
     ];
 
     const isDrawTool = freeHandMode && toolTypes.includes(Neo.CurrentToolType);
@@ -1260,7 +1284,7 @@ Neo.Painter = class {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new Neo.UndoItem();
+    var undoItem = new UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -1292,7 +1316,7 @@ Neo.Painter = class {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new Neo.UndoItem();
+    var undoItem = new UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -1425,7 +1449,7 @@ Neo.Painter = class {
       console.error("Failed to get PNG data. Submission aborted.");
       return;
     }
-    Neo.submit(baseURL, png, thumbnail2, thumbnail);
+    submit(baseURL, png, thumbnail2, thumbnail);
   }
 
   useThumbnail() {
@@ -1588,7 +1612,9 @@ Neo.Painter = class {
         return null;
       }
       const jsonString = JSON.stringify(this._actionMgr._items);
-      const data = LZString.compressToUint8Array(jsonString);
+      const compressed = LZString.compressToUint8Array(jsonString);
+      const data = new Uint8Array(new ArrayBuffer(compressed.byteLength));
+      data.set(compressed);
 
       var magic = "NEO ";
       var w = this.canvasWidth;
@@ -1960,7 +1986,7 @@ Neo.Painter = class {
     let a1 = this._currentColor[3] / 255.0; //this.alpha;
 
     switch (type) {
-      case Neo.Painter.ALPHATYPE_PEN:
+      case Painter.ALPHATYPE_PEN:
         if (a1 > 0.5) {
           a1 = 1.0 / 16 + ((a1 - 0.5) * 30.0) / 16;
         } else {
@@ -1969,12 +1995,12 @@ Neo.Painter = class {
         a1 = Math.min(1, Math.max(0, a1));
         break;
 
-      case Neo.Painter.ALPHATYPE_FILL:
+      case Painter.ALPHATYPE_FILL:
         a1 = -0.00056 * a1 + 0.0042 / (1.0 - a1) - 0.0042;
         a1 = Math.min(1.0, Math.max(0, a1 * 10));
         break;
 
-      case Neo.Painter.ALPHATYPE_BRUSH:
+      case Painter.ALPHATYPE_BRUSH:
         a1 = -0.00056 * a1 + 0.0042 / (1.0 - a1) - 0.0042;
         a1 = Math.min(1.0, Math.max(0, a1));
         break;
@@ -2047,23 +2073,23 @@ Neo.Painter = class {
     //TODO
     //いろいろ試したのですが半透明で描画するときの加算・逆加算を再現する方法がわかりません。
     //とりあえず単純に無視しています。
-    if (type == Neo.Painter.MASKTYPE_ADD || type == Neo.Painter.MASKTYPE_SUB) {
+    if (type == Painter.MASKTYPE_ADD || type == Painter.MASKTYPE_SUB) {
       if (this._currentColor[3] < 250) {
-        type = Neo.Painter.MASKTYPE_NONE;
+        type = Painter.MASKTYPE_NONE;
       }
     }
 
     switch (type) {
-      case Neo.Painter.MASKTYPE_NONE:
+      case Painter.MASKTYPE_NONE:
         return;
 
-      case Neo.Painter.MASKTYPE_NORMAL:
+      case Painter.MASKTYPE_NORMAL:
         return r0 == r && g0 == g && b0 == b ? true : false;
 
-      case Neo.Painter.MASKTYPE_REVERSE:
+      case Painter.MASKTYPE_REVERSE:
         return r0 != r || g0 != g || b0 != b ? true : false;
 
-      case Neo.Painter.MASKTYPE_ADD:
+      case Painter.MASKTYPE_ADD:
         if (a0 > 0) {
           var sort = this.sortColor(r0, g0, b0);
           for (var i = 0; i < 3; i++) {
@@ -2075,7 +2101,7 @@ Neo.Painter = class {
           return false;
         }
 
-      case Neo.Painter.MASKTYPE_SUB:
+      case Painter.MASKTYPE_SUB:
         if (a0 > 0) {
           var sort = this.sortColor(r0, g0, b0);
           for (var i = 0; i < 3; i++) {
@@ -2099,7 +2125,7 @@ Neo.Painter = class {
    * @param {number} y0 - 描画対象のグローバルY座標。
    * @param {number} left - バッファ左上のグローバルXオフセット。
    * @param {number} top - バッファ左上のグローバルYオフセット。
-   * @param {number} type - 使用するツールタイプ（Neo.Painter.LINETYPE_...）。
+   * @param {number} type - 使用するツールタイプ（Painter.LINETYPE_...）。
    * @returns {void}
    */
   setPoint(buf8, bufWidth, x0, y0, left, top, type) {
@@ -2107,31 +2133,31 @@ Neo.Painter = class {
     const y = y0 - top;
 
     switch (type) {
-      case Neo.Painter.LINETYPE_PEN:
+      case Painter.LINETYPE_PEN:
         this.setPenPoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_BRUSH:
+      case Painter.LINETYPE_BRUSH:
         this.setBrushPoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_TONE:
+      case Painter.LINETYPE_TONE:
         this.setTonePoint(buf8, bufWidth, x, y, x0, y0);
         break;
 
-      case Neo.Painter.LINETYPE_ERASER:
+      case Painter.LINETYPE_ERASER:
         this.setEraserPoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_BLUR:
+      case Painter.LINETYPE_BLUR:
         this.setBlurPoint(buf8, bufWidth, x, y, x0, y0);
         break;
 
-      case Neo.Painter.LINETYPE_DODGE:
+      case Painter.LINETYPE_DODGE:
         this.setDodgePoint(buf8, bufWidth, x, y);
         break;
 
-      case Neo.Painter.LINETYPE_BURN:
+      case Painter.LINETYPE_BURN:
         this.setBurnPoint(buf8, bufWidth, x, y);
         break;
 
@@ -2161,7 +2187,7 @@ Neo.Painter = class {
     var r1 = this._currentColor[0];
     var g1 = this._currentColor[1];
     var b1 = this._currentColor[2];
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_PEN);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_PEN);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2226,7 +2252,7 @@ Neo.Painter = class {
     const r1 = this._currentColor[0];
     const g1 = this._currentColor[1];
     const b1 = this._currentColor[2];
-    const a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    const a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2371,7 +2397,7 @@ Neo.Painter = class {
     var shapeIndex = 0;
     var height = buf8.length / (width * 4);
 
-    //  var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    //  var a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     //  var a1 = this.alpha / 12;
     var a1 = this._currentColor[3] / 255.0 / 12;
     if (a1 == 0) return;
@@ -2439,7 +2465,7 @@ Neo.Painter = class {
     var shape = this._roundData[d];
     var shapeIndex = 0;
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2504,7 +2530,7 @@ Neo.Painter = class {
     var shape = this._roundData[d];
     var shapeIndex = 0;
 
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_BRUSH);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_BRUSH);
     if (a1 == 0) return;
 
     for (var i = 0; i < d; i++) {
@@ -2652,7 +2678,7 @@ Neo.Painter = class {
         var oAlpha = ref._currentColor[3];
 
         if (isPreview) {
-          ref._currentMaskType = Neo.Painter.MASKTYPE_NONE;
+          ref._currentMaskType = Painter.MASKTYPE_NONE;
           ref._currentColor[3] = 255;
         }
 
@@ -3379,12 +3405,12 @@ Neo.Painter = class {
       //透明色を右クリックでスポイトした時に消しゴム化する。
       //v2.16より古いバージョンではレイヤー1でスポイトした色が透明の時は消しゴムに切り換わる。
       if (a == 0 && (result == 0xffffff || this.getEmulationMode() < 2.16)) {
-        this.setToolByType(Neo.Painter.TOOLTYPE_ERASER);
+        this.setToolByType(Painter.TOOLTYPE_ERASER);
       } else {
         // v2.16以後の新しいバージョンでは
         // レイヤー0に色がある時は消しゴム化しない。
         if (Neo.eraserTip?.selected) {
-          this.setToolByType(Neo.Painter.TOOLTYPE_PEN);
+          this.setToolByType(Painter.TOOLTYPE_PEN);
         }
       }
     }
@@ -3640,13 +3666,13 @@ Neo.Painter = class {
    */
   getMaskFunc(type) {
     switch (type) {
-      case Neo.Painter.TOOLTYPE_RECT:
+      case Painter.TOOLTYPE_RECT:
         return this.rectMask;
-      case Neo.Painter.TOOLTYPE_RECTFILL:
+      case Painter.TOOLTYPE_RECTFILL:
         return this.rectFillMask;
-      case Neo.Painter.TOOLTYPE_ELLIPSE:
+      case Painter.TOOLTYPE_ELLIPSE:
         return this.ellipseMask;
-      case Neo.Painter.TOOLTYPE_ELLIPSEFILL:
+      case Painter.TOOLTYPE_ELLIPSEFILL:
         return this.ellipseFillMask;
     }
     return null;
@@ -3676,14 +3702,14 @@ Neo.Painter = class {
     var r1 = this._currentColor[0];
     var g1 = this._currentColor[1];
     var b1 = this._currentColor[2];
-    var a1 = this.getAlpha(Neo.Painter.ALPHATYPE_FILL);
+    var a1 = this.getAlpha(Painter.ALPHATYPE_FILL);
 
     for (var j = 0; j < height; j++) {
       for (var i = 0; i < width; i++) {
         if (maskFunc && maskFunc.call(this, i, j, width, height)) {
           //なぜか加算逆加算は適用されない
           if (
-            this._currentMaskType >= Neo.Painter.MASKTYPE_ADD ||
+            this._currentMaskType >= Painter.MASKTYPE_ADD ||
             !this.isMasked(buf8, index)
           ) {
             const r0 = buf8[index + 0];
@@ -3886,8 +3912,8 @@ Neo.Painter = class {
       this.tool.upHandler(this);
 
       //      switch (this.tool.type) {
-      //      case Neo.Painter.TOOLTYPE_HAND:
-      //      case Neo.Painter.TOOLTYPE_SLIDER:
+      //      case Painter.TOOLTYPE_HAND:
+      //      case Painter.TOOLTYPE_SLIDER:
       //          this.isMouseDown = false;
       //          this.tool.upHandler(this);
       //      }
@@ -3923,7 +3949,7 @@ Neo.Painter = class {
     this.busySkipped = Neo.config.neo_animation_skip == "true";
 
     const ref = this;
-    Neo.getPCH(filename, function (pch) {
+    getPCH(filename, function (pch) {
       //console.log(pch);
       ref._actionMgr._items = pch.data;
       ref._actionMgr._mark = pch.data.length;
@@ -4083,7 +4109,7 @@ Neo.Painter = class {
    * @returns {boolean} - Bzで操作中ならtrueが返る
    */
   isUIPaused() {
-    if (this.drawType == Neo.Painter.DRAWTYPE_BEZIER) {
+    if (this.drawType == Painter.DRAWTYPE_BEZIER) {
       if (this.tool.step && this.tool.step > 0) {
         return true;
       }
@@ -4211,12 +4237,12 @@ Neo.Painter = class {
   isDirty() {
     return this.dirty;
   }
-};
+}
 
 /**
  * キャンバスの状態を保持するUndo/Redo用のクラス
  */
-Neo.UndoItem = class {
+export class UndoItem {
   /**
    * @param {ImageData[]} [data]
    * @param {number} [x]
@@ -4231,7 +4257,7 @@ Neo.UndoItem = class {
     this.width = width;
     this.height = height;
   }
-};
+}
 
 /*
    -------------------------------------------------------------------------
@@ -4246,15 +4272,15 @@ Neo.UndoItem = class {
  * 最大ステップ数（_maxStep）を設定することで、メモリの肥大化を抑制しつつ
  * ユーザーの操作履歴を安全に管理する。
  */
-Neo.UndoManager = class {
+export class UndoManager {
   /**
    * @param {number} _maxStep - 最大ステップ数。これを超えると古い履歴が削除される。
    */
   constructor(_maxStep) {
     this._maxStep = _maxStep;
-    /** @type {Neo.UndoItem[]} */
+    /** @type {UndoItem[]} */
     this._undoItems = [];
-    /** @type {Neo.UndoItem[]} */
+    /** @type {UndoItem[]} */
     this._redoItems = [];
   }
 
@@ -4265,7 +4291,7 @@ Neo.UndoManager = class {
    * 2. 最大ステップ数を超えた場合、最も古い履歴を削除してメモリを解放する。
    * 3. 新しい操作が行われた場合、それ以降の「やり直し（Redo）」履歴をクリアし、
    * 操作の分岐点を明確にする。
-   * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
+   * @param {UndoItem} undoItem - 保存するキャンバスの状態データ
    * @param {boolean} holdRedo - Redo履歴を保持するかどうか
    * @returns {void}
    */
@@ -4290,7 +4316,7 @@ Neo.UndoManager = class {
    * @description
    * Undo操作によってスタックから取り出された状態を Redo 履歴に保存して
    * Undoした状態からRedoできるようにする。
-   * @param {Neo.UndoItem} undoItem - 保存するキャンバスの状態データ
+   * @param {UndoItem} undoItem - 保存するキャンバスの状態データ
    */
   pushRedo(undoItem) {
     this._redoItems.push(undoItem);
@@ -4299,7 +4325,7 @@ Neo.UndoManager = class {
   popRedo() {
     return this._redoItems.pop();
   }
-};
+}
 /**
  * カラーピッカーで色をセット
  * @param {string} color - <input type="color">で取得した色
@@ -4307,7 +4333,7 @@ Neo.UndoManager = class {
  */
 Neo.setColor = function (color) {
   Neo.painter.setColor(color); //色をセット
-  var colorTip = /** @type {Neo.ColorTip|null} **/ Neo.ColorTip.getCurrent();
+  var colorTip = /** @type {ColorTip|null} **/ ColorTip.getCurrent();
   if (colorTip) {
     //カラーチップに色をセット
     colorTip.setColor(color);
