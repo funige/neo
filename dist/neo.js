@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.2 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.3 | https://github.com/funige/neo */
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -509,7 +509,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.2";
+  Neo.version = "1.8.3";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -6424,6 +6424,7 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
     kill() {
       var oe = Neo.painter;
       oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     }
     /** @param {Painter} oe */
     drawCursor(oe) {
