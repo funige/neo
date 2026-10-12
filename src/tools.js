@@ -502,6 +502,7 @@ export class DrawToolBase extends ToolBase {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
   cancelBezier() {
+    /** @type {Painter} oe */
     var oe = Neo.painter;
 
     this.step = 0;
