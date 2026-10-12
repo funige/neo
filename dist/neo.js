@@ -5469,6 +5469,7 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
     rollOutHandler(oe) {
       if (!oe.isMouseDown && !oe.isMouseDownRight) {
         oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
+        oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
       }
     }
     loadStates() {
@@ -6424,7 +6425,6 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
     kill() {
       var oe = Neo.painter;
       oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
     }
     /** @param {Painter} oe */
     drawCursor(oe) {

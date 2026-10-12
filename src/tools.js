@@ -270,7 +270,7 @@ export class DrawToolBase extends ToolBase {
   rollOutHandler(oe) {
     if (!oe.isMouseDown && !oe.isMouseDownRight) {
       oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-      // oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
+      oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight, true);
     }
   }
 
@@ -502,6 +502,7 @@ export class DrawToolBase extends ToolBase {
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
   cancelBezier() {
+    /** @type {Painter} oe */
     var oe = Neo.painter;
 
     this.step = 0;
@@ -1563,6 +1564,7 @@ export class PasteTool extends ToolBase {
    * @param {KeyboardEvent} e
    */
   keyDownHandler(e) {
+    /** @type {Painter} */
     var oe = Neo.painter;
 
     if (e.key == "Escape") {
@@ -1572,9 +1574,10 @@ export class PasteTool extends ToolBase {
   }
 
   kill() {
+    /** @type {Painter} */
     var oe = Neo.painter;
     oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
-    oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
+    // oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
   }
 
   /** @param {Painter} oe */
