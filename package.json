@@ -1,5 +1,5 @@
 {
-  "name": "paintbbs-neo",
+  "name": "paintbbs",
   "version": "1.8.3",
   "main": "app/main.js",
   "repository": {

@@ -1783,7 +1783,7 @@ export class TextTool extends ToolBase {
     if (e.key == "Enter") {
       // Returnで確定
       e.preventDefault();
-
+      /** @type {Painter} */
       const oe = Neo.painter;
       /** @type {HTMLElement|null} **/
       const text = oe.inputText;
