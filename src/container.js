@@ -111,7 +111,7 @@ Neo.init = function () {
         if (name == "paintbbs") {
           initConfig(applet);
           createContainer(applet);
-          Neo.init2();
+          init2();
         } else {
           Neo.viewer = true;
           initConfig(applet);
@@ -138,7 +138,7 @@ Neo.init = function () {
 /**
  * @returns {void}
  */
-Neo.init2 = function () {
+const init2 = function () {
   const pageview = document.getElementById("neo-pageView");
   if (!pageview) return;
   pageview.style.width = Neo.config.applet_width + "px";
@@ -367,11 +367,11 @@ const initConfig = function (applet) {
 
   Neo.reservePen =
     /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ (
-      Neo.clone(Neo.config.reserves[0])
+      clone(Neo.config.reserves[0])
     );
   Neo.reserveEraser =
     /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */ (
-      Neo.clone(Neo.config.reserves[1])
+      clone(Neo.config.reserves[1])
     );
 };
 
@@ -412,7 +412,7 @@ const initSkin = function () {
   var darkBorder = multColor(Neo.config.color_icon, 0.7);
   var lightBar = multColor(Neo.config.color_bar, 1.3);
   var darkBar = multColor(Neo.config.color_bar, 0.7);
-  var bgImage = Neo.painter ? Neo.backgroundImage() : "";
+  var bgImage = Neo.painter ? createBackgroundImage() : "";
 
   addRule(".NEO #neo-container", "background-image", "url(" + bgImage + ")");
   addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
@@ -698,7 +698,7 @@ const applyStyle = function (name, defaultColor) {
   }
 };
 
-Neo.backgroundImage = function () {
+const createBackgroundImage = function () {
   var c1 = Neo.painter.getColor(Neo.config.color_bk) | 0xff000000;
   var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 0xff000000;
   var bgCanvas = document.createElement("canvas");
@@ -1171,14 +1171,14 @@ Neo.updateUI = function () {
     Neo.drawTip.update();
   }
 
-  Neo.updateUIColor(true, false);
+  updateUIColor(true, false);
 };
 
 /**
  * @param {boolean} updateSlider
  * @param {boolean} updateColorTip
  */
-Neo.updateUIColor = function (updateSlider, updateColorTip) {
+export const updateUIColor = function (updateSlider, updateColorTip) {
   for (let i = 0; i < Neo.toolButtons.length; i++) {
     //@ts-ignore
     const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
@@ -1352,7 +1352,7 @@ export const resizeCanvas = function () {
  * @param {Record<string, any>} src - コピー元のオブジェクト
  * @returns {Record<string, any>} コピーされた新しいオブジェクト
  */
-Neo.clone = function (src) {
+export const clone = function (src) {
   /** @type {Record<string, any>} */
   const dst = {};
   for (const k in src) {

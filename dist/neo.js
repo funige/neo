@@ -577,6 +577,7 @@
   Neo.scrollV = null;
   Neo.toolButtons = [];
   Neo.colorTips = [];
+  Neo.reserveControls = [];
   Neo.CurrentToolType = 1;
   Neo.SLIDERTYPE_RED = 0;
   Neo.SLIDERTYPE_GREEN = 1;
@@ -1063,7 +1064,7 @@
         colorTip.setSelected(this === colorTip);
       }
       Neo.painter.setColor(this.color);
-      Neo.updateUIColor(true, false);
+      updateUIColor(true, false);
       if (this.onmousedown) this.onmousedown(this);
     }
     /**
@@ -1871,13 +1872,13 @@
       if (this.type == Neo.SLIDERTYPE_ALPHA) {
         Neo.painter.alpha = this.value / 255;
         this.update();
-        Neo.updateUIColor(false, false);
+        updateUIColor(false, false);
       } else {
         const r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         const g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         const b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
         Neo.painter.setColor(r << 16 | g << 8 | b);
-        Neo.updateUIColor(true, true);
+        updateUIColor(true, true);
       }
     }
     /**
@@ -1900,7 +1901,7 @@
       if (this.type == Neo.SLIDERTYPE_ALPHA) {
         Neo.painter.alpha = this.value / 255;
         this.update();
-        Neo.updateUIColor(false, false);
+        updateUIColor(false, false);
       } else {
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
@@ -2229,7 +2230,7 @@
         var index = parseInt(this.elementID.slice(11)) - 1;
         this.element.style.top = "1px";
         this.element.style.left = index * 15 + 2 + "px";
-        this.reserve = Neo.clone(Neo.config.reserves[index]);
+        this.reserve = clone(Neo.config.reserves[index]);
       }
       this.update();
       Neo.reserveControls.push(this);
@@ -8855,7 +8856,7 @@
           if (name == "paintbbs") {
             initConfig(applet);
             createContainer(applet);
-            Neo.init2();
+            init2();
           } else {
             Neo.viewer = true;
             initConfig(applet);
@@ -8875,7 +8876,7 @@
     }
     return false;
   };
-  Neo.init2 = function() {
+  var init2 = function() {
     const pageview = document.getElementById("neo-pageView");
     if (!pageview) return;
     pageview.style.width = Neo.config.applet_width + "px";
@@ -9038,9 +9039,9 @@
       }
     ];
     Neo.reservePen = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-    Neo.clone(Neo.config.reserves[0]);
+    clone(Neo.config.reserves[0]);
     Neo.reserveEraser = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-    Neo.clone(Neo.config.reserves[1]);
+    clone(Neo.config.reserves[1]);
   };
   var fixConfig = function(value) {
     if (value.match(/^#[0-9a-fA-F]{5}$/)) {
@@ -9062,7 +9063,7 @@
     var darkBorder = multColor(Neo.config.color_icon, 0.7);
     var lightBar = multColor(Neo.config.color_bar, 1.3);
     var darkBar = multColor(Neo.config.color_bar, 0.7);
-    var bgImage = Neo.painter ? Neo.backgroundImage() : "";
+    var bgImage = Neo.painter ? createBackgroundImage() : "";
     addRule(".NEO #neo-container", "background-image", "url(" + bgImage + ")");
     addRule(".NEO .colorSlider .label", "color", Neo.config.tool_color_text);
     addRule(".NEO .sizeSlider .label", "color", Neo.config.tool_color_text);
@@ -9293,7 +9294,7 @@
       Neo.config[name] = Neo.rules[name] || defaultColor;
     }
   };
-  Neo.backgroundImage = function() {
+  var createBackgroundImage = function() {
     var c1 = Neo.painter.getColor(Neo.config.color_bk) | 4278190080;
     var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 4278190080;
     var bgCanvas = document.createElement("canvas");
@@ -9691,9 +9692,9 @@
     if (Neo.drawTip) {
       Neo.drawTip.update();
     }
-    Neo.updateUIColor(true, false);
+    updateUIColor(true, false);
   };
-  Neo.updateUIColor = function(updateSlider, updateColorTip) {
+  var updateUIColor = function(updateSlider, updateColorTip) {
     for (let i = 0; i < Neo.toolButtons.length; i++) {
       const toolTip = (
         /** @type {ToolTip} */
@@ -9816,7 +9817,7 @@
     Neo.painter.setZoom(Neo.painter.zoom);
     Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
   };
-  Neo.clone = function(src) {
+  var clone = function(src) {
     const dst = {};
     for (const k in src) {
       dst[k] = src[k];

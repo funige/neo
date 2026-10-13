@@ -17,6 +17,7 @@
 /** @typedef {import("./widgets.js").ScrollBarButton} ScrollBarButton */
 /** @typedef {import("./widgets.js").ToolTip} ToolTip */
 /** @typedef {import("./widgets.js").ColorTip} ColorTip */
+/** @typedef {import("./widgets.js").ReserveControl} ReserveControl */
 
 var Neo = {};
 Neo.version = "PACKAGE_JSON_VERSION";
@@ -123,6 +124,8 @@ Neo.scrollV = null;
 Neo.toolButtons = [];
 /** @type {ColorTip[]} */
 Neo.colorTips = [];
+/** @type {ReserveControl[]} */
+Neo.reserveControls = [];
 
 Neo.CurrentToolType = 1;
 Neo.SLIDERTYPE_RED = 0;
