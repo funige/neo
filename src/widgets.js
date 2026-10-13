@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
-import { Neo, tintImage } from "./container.js";
+import { Neo } from "./neo.js";
+import { tintImage } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
 /**
@@ -1582,7 +1583,7 @@ export class SizeSlider {
     var value0 = Neo.painter.lineWidth;
     var value;
 
-    if (!Neo.painter.sliderTool.isAlt) {
+    if (!Neo.painter.sliderTool?.isAlt) {
       var v = Math.floor(((y - 4) * 30.0) / 33.0);
 
       value = Math.max(Math.min(v, 30), 1);
@@ -1604,7 +1605,7 @@ export class SizeSlider {
    */
   slide(x, y) {
     var value;
-    if (!Neo.painter.sliderTool.isAlt) {
+    if (!Neo.painter.sliderTool?.isAlt) {
       if (x >= 0 && x < 48 && y >= 0 && y < 41) {
         var v = Math.floor(((y - 4) * 30.0) / 33.0);
         value = v;
@@ -1636,7 +1637,9 @@ export class SizeSlider {
     var tool = Neo.painter.getCurrentTool();
     if (tool) {
       if (tool.type == Painter.TOOLTYPE_BRUSH) {
-        Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
+        if (Neo.painter.brushTool) {
+          Neo.painter.alpha = Neo.painter.brushTool.getAlpha();
+        }
         Neo.sliders[Neo.SLIDERTYPE_ALPHA].update();
       } else if (tool.type == Painter.TOOLTYPE_TEXT) {
         Neo.painter.updateInputText();
@@ -1772,7 +1775,9 @@ export class LayerControl {
       Neo.painter.canvasHeight,
     );
     if (Neo.painter.tool.type == Painter.TOOLTYPE_PASTE) {
-      Neo.painter.pasteTool.drawCursor(Neo.painter);
+      if (Neo.painter.pasteTool) {
+        Neo.painter.pasteTool.drawCursor(Neo.painter);
+      }
     }
     this.update();
 

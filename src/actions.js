@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
-import { Neo, getStyleSheet, addRule, multColor } from "./container.js";
+import { Neo } from "./neo.js";
+import { getStyleSheet, addRule, multColor } from "./container.js";
 import { translate } from "./dictionary.js";
 import LZString from "lz-string";
 import { Painter } from "./painter.js";

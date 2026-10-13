@@ -1,6 +1,5 @@
 "use strict";
 //@ts-check
-
 import { Neo } from "./neo.js";
 import { Commands } from "./commands.js";
 import { Painter } from "./painter.js";

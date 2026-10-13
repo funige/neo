@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
-import { Neo, submit } from "./container.js";
+import { Neo } from "./neo.js";
+import { submit } from "./container.js";
 import { ActionManager, getPCH } from "./actions.js";
 import { Commands } from "./commands.js";
 import { ColorTip } from "./widgets.js";

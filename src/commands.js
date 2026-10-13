@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
-import { Neo, updateWindow, resizeCanvas } from "./container.js";
+import { Neo } from "./neo.js";
+import { updateWindow, resizeCanvas } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
 
