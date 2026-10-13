@@ -572,6 +572,12 @@
   Neo.params = null;
   Neo.param = null;
   Neo.sizeslider = null;
+  Neo.sliders = [];
+  Neo.scrollH = null;
+  Neo.scrollV = null;
+  Neo.toolButtons = [];
+  Neo.colorTips = [];
+  Neo.CurrentToolType = 1;
   Neo.SLIDERTYPE_RED = 0;
   Neo.SLIDERTYPE_GREEN = 1;
   Neo.SLIDERTYPE_BLUE = 2;

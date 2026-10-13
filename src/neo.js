@@ -13,6 +13,10 @@
 /** @typedef {import("./widgets.js").ViewerBar} ViewerBar */
 /** @typedef {import("./widgets.js").ViewerButton} ViewerButton */
 /** @typedef {import("./widgets.js").SizeSlider} SizeSlider */
+/** @typedef {import("./widgets.js").ColorSlider} ColorSlider */
+/** @typedef {import("./widgets.js").ScrollBarButton} ScrollBarButton */
+/** @typedef {import("./widgets.js").ToolTip} ToolTip */
+/** @typedef {import("./widgets.js").ColorTip} ColorTip */
 
 var Neo = {};
 Neo.version = "PACKAGE_JSON_VERSION";
@@ -109,6 +113,18 @@ Neo.params = null;
 Neo.param = null;
 /**@type {SizeSlider|null} */
 Neo.sizeslider = null;
+/**@type {ColorSlider[]|SizeSlider[]} */
+Neo.sliders = [];
+/** @type {ScrollBarButton|null} */
+Neo.scrollH = null;
+/** @type {ScrollBarButton|null} */
+Neo.scrollV = null;
+/** @type {(FillButton|ToolTip)[]} */
+Neo.toolButtons = [];
+/** @type {ColorTip[]} */
+Neo.colorTips = [];
+
+Neo.CurrentToolType = 1;
 Neo.SLIDERTYPE_RED = 0;
 Neo.SLIDERTYPE_GREEN = 1;
 Neo.SLIDERTYPE_BLUE = 2;

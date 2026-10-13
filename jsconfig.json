@@ -8,6 +8,7 @@
     "noImplicitAny": false
   },
   "files": [
+    "src/neo.js",
     "src/container.js",
     "src/dictionary.js",
     "src/painter.js",
