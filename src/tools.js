@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
-import { Neo, isMobile } from "./container.js";
+import { Neo } from "./neo.js";
+import { isMobile } from "./container.js";
 import { Painter } from "./painter.js";
 import { ToolTip, FillButton } from "./widgets.js";
 
@@ -59,7 +60,6 @@ export class ToolBase {
    * @returns {ToolTip|FillButton|null}
    */
   getToolButton() {
-    /** @type {Painter} */
     switch (this.type) {
       case Painter.TOOLTYPE_PEN:
       case Painter.TOOLTYPE_BRUSH:
