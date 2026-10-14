@@ -43,7 +43,6 @@ Neo.applet = null;
 Neo.isAnimation = false;
 Neo.viewerWrapperOnTop = false;
 Neo.storage = localStorage;
-Neo.updateUI = function () {};
 Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;

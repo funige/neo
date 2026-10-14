@@ -1152,7 +1152,7 @@ const showWarning = function () {
    -----------------------------------------------------------------------
  */
 
-Neo.updateUI = function () {
+export const updateUI = function () {
   var current = Neo.painter.tool.getToolButton();
   for (let i = 0; i < Neo.toolButtons.length; i++) {
     //@ts-ignore

@@ -1,7 +1,7 @@
 "use strict";
 //@ts-check
 import { Neo } from "./neo.js";
-import { updateUIColor, clone } from "./container.js";
+import { updateUIColor, updateUI, clone } from "./container.js";
 import { tintImage } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
@@ -1896,7 +1896,7 @@ export class ReserveControl {
       case Painter.TOOLTYPE_TONE:
         Neo.painter.drawType = this.reserve.drawType;
     }
-    Neo.updateUI();
+    updateUI();
   }
 
   save() {
@@ -1915,7 +1915,7 @@ export class ReserveControl {
     }
     this.element.style.backgroundColor = this.reserve.color;
     this.update();
-    Neo.updateUI();
+    updateUI();
   }
 
   update() {

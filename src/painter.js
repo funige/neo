@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
 import { Neo } from "./neo.js";
+import { updateUI } from "./container";
 import { submit } from "./container.js";
 import { ActionManager, getPCH } from "./actions.js";
 import { Commands } from "./commands.js";
@@ -798,6 +799,15 @@ export class Painter {
     };
 
     const target = e.target;
+
+    // ラジオボタン・selectメニューにフォーカスがあれば外す
+    if (
+      target instanceof HTMLSelectElement ||
+      (target instanceof HTMLInputElement && target.type === "radio")
+    ) {
+      target.blur();
+    }
+
     //NEO外部の input textAreaへの入力をNEOで処理しない
     if (
       target instanceof HTMLInputElement ||
@@ -1971,7 +1981,7 @@ export class Painter {
     if (typeof color != "string") color = this.getColorString(color);
     this.foregroundColor = color;
 
-    Neo.updateUI();
+    updateUI();
   }
 
   /**
