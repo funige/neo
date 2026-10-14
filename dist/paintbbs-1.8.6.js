@@ -524,8 +524,6 @@
   Neo.isAnimation = false;
   Neo.viewerWrapperOnTop = false;
   Neo.storage = localStorage;
-  Neo.updateUI = function() {
-  };
   Neo.stabilize_level = 0;
   Neo.styleSheet = null;
   Neo.rules = {};
@@ -2312,7 +2310,7 @@
         case Painter.TOOLTYPE_TONE:
           Neo.painter.drawType = this.reserve.drawType;
       }
-      Neo.updateUI();
+      updateUI();
     }
     save() {
       if (!this.reserve) {
@@ -2330,7 +2328,7 @@
       }
       this.element.style.backgroundColor = this.reserve.color;
       this.update();
-      Neo.updateUI();
+      updateUI();
     }
     update() {
       if (!this.element) {
@@ -3897,7 +3895,7 @@
       const reserve = this.getReserve();
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
-        Neo.updateUI();
+        updateUI();
       }
     }
     //描画系ブラシまたは消しゴムのブラシサイズを保存し上書きする
@@ -4011,7 +4009,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 1;
-        Neo.updateUI();
+        updateUI();
       }
     }
     /**
@@ -4367,7 +4365,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 1;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -4382,7 +4380,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = this.getAlpha();
-        Neo.updateUI();
+        updateUI();
       }
     }
     getAlpha() {
@@ -4401,7 +4399,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 23 / 255;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -4423,7 +4421,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 128 / 255;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -4438,7 +4436,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 128 / 255;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -4453,7 +4451,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 128 / 255;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -4750,7 +4748,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = this.defaultAlpha || 1;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -4827,7 +4825,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 0.5;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -5135,7 +5133,7 @@
       if (reserve) {
         Neo.painter.lineWidth = reserve.size;
         Neo.painter.alpha = 1;
-        Neo.updateUI();
+        updateUI();
       }
     }
   };
@@ -6676,7 +6674,7 @@
     setColor(color) {
       if (typeof color != "string") color = this.getColorString(color);
       this.foregroundColor = color;
-      Neo.updateUI();
+      updateUI();
     }
     /**
      * ツールの種類に応じて、現在の色から描画用のアルファ値を計算する。
@@ -9722,7 +9720,7 @@
       warning.style.opacity = "0";
     }, 15e3);
   };
-  Neo.updateUI = function() {
+  var updateUI = function() {
     var current = Neo.painter.tool.getToolButton();
     for (let i = 0; i < Neo.toolButtons.length; i++) {
       const toolTip = (

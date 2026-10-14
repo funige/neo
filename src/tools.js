@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
 import { Neo } from "./neo.js";
+import { updateUI } from "./container.js";
 import { isMobile } from "./container.js";
 import { Painter } from "./painter.js";
 import { ToolTip, FillButton } from "./widgets.js";
@@ -150,7 +151,7 @@ export class ToolBase {
     const reserve = this.getReserve();
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
-      Neo.updateUI();
+      updateUI();
     }
   }
 
@@ -279,7 +280,7 @@ export class DrawToolBase extends ToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 1.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 
@@ -745,7 +746,7 @@ export class PenTool extends DrawToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 1.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -769,7 +770,7 @@ export class BrushTool extends DrawToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = this.getAlpha();
-      Neo.updateUI();
+      updateUI();
     }
   }
 
@@ -798,7 +799,7 @@ export class ToneTool extends DrawToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 23 / 255.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -837,7 +838,7 @@ export class BlurTool extends DrawToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 128 / 255.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -861,7 +862,7 @@ export class DodgeTool extends DrawToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 128 / 255.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -885,7 +886,7 @@ export class BurnTool extends DrawToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 128 / 255.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -1258,7 +1259,7 @@ export class EffectToolBase extends ToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = this.defaultAlpha || 1.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -1384,7 +1385,7 @@ export class BlurRectTool extends EffectToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 0.5;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
@@ -1831,7 +1832,7 @@ export class TextTool extends ToolBase {
     if (reserve) {
       Neo.painter.lineWidth = reserve.size;
       Neo.painter.alpha = 1.0;
-      Neo.updateUI();
+      updateUI();
     }
   }
 }
