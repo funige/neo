@@ -209,7 +209,7 @@ export class ActionManager {
       this.push("clearCanvas");
     }
     /** @type {Painter} */
-    var painter = Neo.painter;
+    const painter = Neo.painter;
     painter.canvasCtx[0].clearRect(
       0,
       0,
@@ -1028,7 +1028,7 @@ export class ActionManager {
   -----------------------------------------------------------------------
 */
 /** @param {HTMLElement} applet */
-export const createViewer = function (applet) {
+Neo.createViewer = function (applet) {
   var neo = document.createElement("div");
   neo.className = "NEO";
   neo.id = "NEO";
@@ -1085,7 +1085,7 @@ export const createViewer = function (applet) {
  * @param {Object} [pch] - PCHファイルデータ（あれば再生を開始する）
  * @param {Array<*>} [pch.data] - 再生用アクションデータ
  */
-export const initViewer = function (pch) {
+Neo.initViewer = function (pch) {
   const pageview = document.getElementById("neo-pageView");
   if (!pageview) return;
   var pageWidth = Neo.config.applet_width;
@@ -1203,7 +1203,7 @@ export const initViewer = function (pch) {
   if (pch && pch.data && pch.data.length > 0) {
     //Neo.config.pch_file) {
     Neo.painter._actionMgr._items = pch.data;
-    startViewer();
+    Neo.startViewer();
     setTimeout(() => {
       Neo.painter.play();
     }, 50);
@@ -1216,7 +1216,7 @@ export const initViewer = function (pch) {
  * 2. 設定値(Neo.config)に基づくCSSルールの動的生成。
  * 3. プレイヤーコントロール(ボタン類)の生成と機能バインディング。
  */
-const startViewer = function () {
+Neo.startViewer = function () {
   if (Neo.applet) {
     var name = Neo.applet.getAttribute("name") || "pch";
     if (!(/** @type {any} */ (document)[name]))
@@ -1395,7 +1395,7 @@ export const getFilename = function () {
  * @description
  * 読み込み失敗時はコンソールにエラーを出力し、処理を終了する。
  * @param {string} filename - 対象のPCHファイルパス
- * @param {function({data: any[][], width: number, height: number}):void} callback - デコードされたPCHデータを受け取るコールバック
+ * @param {(pch: PCHData) => void} [callback] - デコードされたPCHデータを受け取るコールバック
  */
 export const getPCH = function (filename, callback) {
   if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
@@ -1403,7 +1403,7 @@ export const getPCH = function (filename, callback) {
   fetch(filename)
     .then((response) => response.arrayBuffer())
     .then((buffer) => {
-      const pch = decodePCH(buffer);
+      const pch = Neo.decodePCH(buffer);
       if (pch) {
         if (callback) callback(pch);
       } else {
@@ -1425,7 +1425,7 @@ export const getPCH = function (filename, callback) {
  * @returns {PCHData|null} デコード成功時はオブジェクト、失敗時はnullを返す
  * * @example
  */
-const decodePCH = function (rawdata) {
+Neo.decodePCH = function (rawdata) {
   const byteArray = new Uint8Array(rawdata);
   const data = LZString.decompressFromUint8Array(byteArray.subarray(12));
   const header = byteArray.subarray(0, 12);
@@ -1516,10 +1516,12 @@ Neo.setMark = function (value) {
   Neo.painter.onmark();
 };
 
+/**@return {Number} */
 Neo.getSeek = function () {
   return Neo.painter._actionMgr._head;
 };
 
+/**@return {Number} */
 Neo.getLineCount = function () {
   return Neo.painter._actionMgr._items.length;
 };

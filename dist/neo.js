@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.5 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.6 | https://github.com/funige/neo */
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -509,7 +509,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.5";
+  Neo.version = "1.8.6";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -528,7 +528,7 @@
   };
   Neo.stabilize_level = 0;
   Neo.styleSheet = null;
-  Neo.rules = [];
+  Neo.rules = {};
   Neo.config = {
     width: 300,
     height: 300,
@@ -584,6 +584,50 @@
   Neo.SLIDERTYPE_BLUE = 2;
   Neo.SLIDERTYPE_ALPHA = 3;
   Neo.SLIDERTYPE_SIZE = 4;
+  Neo.playPCH = function() {
+  };
+  Neo.suspendDraw = function() {
+  };
+  Neo.setSpeed = function(value) {
+  };
+  Neo.setVisit = function(layer, value) {
+  };
+  Neo.setMark = function(value) {
+  };
+  Neo.getSeek = function() {
+  };
+  Neo.getLineCount = function() {
+  };
+  Neo.setToolSide = function(htmlConfiguredSide) {
+  };
+  Neo.setStabilizeLevel = function(htmlConfig) {
+  };
+  Neo.setStabilizLevel = Neo.setStabilizeLevel;
+  Neo.getColors = function() {
+  };
+  Neo.setColors = function(colors) {
+  };
+  Neo.setColor = function(color) {
+  };
+  Neo.pExit = function() {
+  };
+  Neo.str_header = "";
+  Neo.openURL = function(url) {
+  };
+  Neo.createViewer = function(applet) {
+  };
+  Neo.initViewer = function(pch) {
+  };
+  Neo.startViewer = function() {
+  };
+  Neo.decodePCH = function(rawdata) {
+    return null;
+  };
+  Neo.init = function() {
+    return false;
+  };
+  Neo.start = function(isApp = false) {
+  };
   document.neo = Neo;
 
   // src/dictionary.js
@@ -865,9 +909,10 @@
      * @param {MouseEvent|TouchEvent} e
      */
     _mouseDownHandler(e) {
+      var _a;
       if (Neo.painter.isUIPaused()) return;
       this.isMouseDown = true;
-      if (this.params.type == "fill" && this.selected == false) {
+      if (((_a = this.params) == null ? void 0 : _a.type) == "fill" && this.selected == false) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
           const toolTip = (
             /** @type {ToolTip} */
@@ -931,7 +976,9 @@
      */
     init(elementID, params = {}) {
       super.init(elementID, params);
-      this.params.type = "right";
+      if (this.params) {
+        this.params.type = "right";
+      }
       return this;
     }
     /** @param {MouseEvent|TouchEvent} e */
@@ -973,7 +1020,9 @@
      */
     init(elementID, params = {}) {
       super.init(elementID, params);
-      this.params.type = "fill";
+      if (this.params) {
+        this.params.type = "fill";
+      }
       return this;
     }
   };
@@ -2666,7 +2715,7 @@
       if (typeof arguments[0] != "object") {
         this.push("clearCanvas");
       }
-      var painter = Neo.painter;
+      const painter = Neo.painter;
       painter.canvasCtx[0].clearRect(
         0,
         0,
@@ -3352,7 +3401,7 @@
       if (callback && typeof callback == "function") callback(true);
     }
   };
-  var createViewer = function(applet) {
+  Neo.createViewer = function(applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
@@ -3372,7 +3421,7 @@
       }
     }, 0);
   };
-  var initViewer = function(pch) {
+  Neo.initViewer = function(pch) {
     const pageview = document.getElementById("neo-pageView");
     if (!pageview) return;
     var pageWidth = Neo.config.applet_width;
@@ -3472,13 +3521,13 @@
     );
     if (pch && pch.data && pch.data.length > 0) {
       Neo.painter._actionMgr._items = pch.data;
-      startViewer();
+      Neo.startViewer();
       setTimeout(() => {
         Neo.painter.play();
       }, 50);
     }
   };
-  var startViewer = function() {
+  Neo.startViewer = function() {
     if (Neo.applet) {
       var name = Neo.applet.getAttribute("name") || "pch";
       if (!/** @type {any} */
@@ -3635,7 +3684,7 @@
   var getPCH = function(filename, callback) {
     if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
     fetch(filename).then((response) => response.arrayBuffer()).then((buffer) => {
-      const pch = decodePCH(buffer);
+      const pch = Neo.decodePCH(buffer);
       if (pch) {
         if (callback) callback(pch);
       } else {
@@ -3645,7 +3694,7 @@
       console.log(error);
     });
   };
-  var decodePCH = function(rawdata) {
+  Neo.decodePCH = function(rawdata) {
     const byteArray = new Uint8Array(rawdata);
     const data = import_lz_string.default.decompressFromUint8Array(byteArray.subarray(12));
     const header = byteArray.subarray(0, 12);
@@ -8863,10 +8912,10 @@
             var filename = getFilename();
             getPCH(filename, function(pch) {
               if (pch) {
-                createViewer(applet);
+                Neo.createViewer(applet);
                 Neo.config.width = pch.width;
                 Neo.config.height = pch.height;
-                initViewer(pch);
+                Neo.initViewer(pch);
               }
             });
           }
@@ -9257,7 +9306,7 @@
     }
   };
   var readStyles = function() {
-    Neo.rules = [];
+    Neo.rules = {};
     for (var i = 0; i < document.styleSheets.length; i++) {
       readStyle(document.styleSheets[i]);
     }

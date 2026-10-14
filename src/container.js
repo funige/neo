@@ -5,7 +5,6 @@ import { Commands } from "./commands.js";
 import { Painter } from "./painter.js";
 import { getFilename } from "./actions.js";
 import { getPCH } from "./actions.js";
-import { initViewer, createViewer } from "./actions.js";
 import { Button } from "./widgets.js";
 import { translate } from "./dictionary.js";
 import {
@@ -55,7 +54,7 @@ const extractBootConfig = function (targetName) {
     typeof Neo.params === "object" &&
     Object.keys(Neo.params).length > 0
   ) {
-    /** @type {any} */
+    /** @type {Record<string, any>} */
     const params = Neo.params;
     return params[targetName] ? { ...params[targetName] } : {};
   }
@@ -119,10 +118,10 @@ Neo.init = function () {
           var filename = getFilename();
           getPCH(filename, function (pch) {
             if (pch) {
-              createViewer(applet);
+              Neo.createViewer(applet);
               Neo.config.width = pch.width;
               Neo.config.height = pch.height;
-              initViewer(pch);
+              Neo.initViewer(pch);
               // initViewer()内へ移動
               // ボタンが表示される前に再生される事があるため
               // Neo.startViewer();
@@ -646,7 +645,7 @@ export const addRule = function (selector, styleName, value, sheet = null) {
  * @returns {void}
  */
 const readStyles = function () {
-  Neo.rules = [];
+  Neo.rules = {};
   for (var i = 0; i < document.styleSheets.length; i++) {
     readStyle(document.styleSheets[i]);
   }
@@ -742,7 +741,7 @@ export const multColor = function (c, scale) {
 /**
  * 色の名前やrgb表記の文字列を16進数のカラーコードに変換する
  * @param {string} name - 色の名前（"red"等）または "rgb(r,g,b)" 形式の文字列
- * @returns {string|boolean} 変換後のカラーコード（失敗時は false）
+ * @returns {string|false} 変換後のカラーコード（失敗時は false）
  */
 const colorNameToHex = function (name) {
   /** @type {Record<string, string>} */

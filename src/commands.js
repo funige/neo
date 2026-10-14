@@ -9,7 +9,7 @@ export class Commands {
   constructor() {
     this.CommandBase = class {
       constructor() {
-        /** @type {any} */
+        /** @type {Painter | null} */
         this.data = null;
 
         // ズームの許容値を配列で定義
