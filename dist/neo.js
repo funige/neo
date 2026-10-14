@@ -5772,7 +5772,7 @@
         }
       };
       const target = e.target;
-      if (target instanceof HTMLSelectElement || target instanceof HTMLInputElement && target.type === "radio") {
+      if (target instanceof HTMLSelectElement || target instanceof HTMLInputElement && (target.type === "radio" || target.type === "button")) {
         target.blur();
       }
       if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {

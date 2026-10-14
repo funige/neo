@@ -803,7 +803,8 @@ export class Painter {
     // ラジオボタン・selectメニューにフォーカスがあれば外す
     if (
       target instanceof HTMLSelectElement ||
-      (target instanceof HTMLInputElement && target.type === "radio")
+      (target instanceof HTMLInputElement &&
+        (target.type === "radio" || target.type === "button"))
     ) {
       target.blur();
     }
