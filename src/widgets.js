@@ -1,6 +1,7 @@
 "use strict";
 //@ts-check
 import { Neo } from "./neo.js";
+import { updateUIColor, clone } from "./container.js";
 import { tintImage } from "./container.js";
 import { Painter } from "./painter.js";
 import { translate } from "./dictionary.js";
@@ -378,7 +379,7 @@ export class ColorTip {
       colorTip.setSelected(this === colorTip);
     }
     Neo.painter.setColor(this.color);
-    Neo.updateUIColor(true, false);
+    updateUIColor(true, false);
 
     if (this.onmousedown) this.onmousedown(this);
   }
@@ -1403,14 +1404,14 @@ export class ColorSlider {
     if (this.type == Neo.SLIDERTYPE_ALPHA) {
       Neo.painter.alpha = this.value / 255.0;
       this.update();
-      Neo.updateUIColor(false, false);
+      updateUIColor(false, false);
     } else {
       const r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
       const g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
       const b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
 
       Neo.painter.setColor((r << 16) | (g << 8) | b);
-      Neo.updateUIColor(true, true);
+      updateUIColor(true, true);
     }
   }
 
@@ -1437,7 +1438,7 @@ export class ColorSlider {
     if (this.type == Neo.SLIDERTYPE_ALPHA) {
       Neo.painter.alpha = this.value / 255.0;
       this.update();
-      Neo.updateUIColor(false, false);
+      updateUIColor(false, false);
     } else {
       var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
       var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
@@ -1450,7 +1451,7 @@ export class ColorSlider {
       }
 
       Neo.painter.setColor(color);
-      //      Neo.updateUIColor(true, true);
+      //      updateUIColor(true, true);
     }
   }
 
@@ -1855,7 +1856,7 @@ export class ReserveControl {
       var index = parseInt(this.elementID.slice(11)) - 1; //neo-reserve なので11文字目
       this.element.style.top = "1px";
       this.element.style.left = index * 15 + 2 + "px";
-      this.reserve = Neo.clone(Neo.config.reserves[index]);
+      this.reserve = clone(Neo.config.reserves[index]);
     }
     this.update();
     //どこからも参照されていない?
