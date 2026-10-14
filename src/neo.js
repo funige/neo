@@ -47,9 +47,18 @@ Neo.updateUI = function () {};
 Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
-/** @type {any} **/
-Neo.rules = [];
-/** @type {any} **/
+/** @type {Record<string, string>} */
+Neo.rules = {};
+
+/**
+ * @typedef {Object} NeoConfig
+ * @property {number} width
+ * @property {number} height
+ * @property {string[]} colors
+ * @property {boolean} [neo_enable_zoom_out]
+ * @property {any} [key]
+ */
+/** @type {NeoConfig & Record<string, any>} */
 Neo.config = {
   width: 300,
   height: 300,
@@ -133,6 +142,98 @@ Neo.SLIDERTYPE_GREEN = 1;
 Neo.SLIDERTYPE_BLUE = 2;
 Neo.SLIDERTYPE_ALPHA = 3;
 Neo.SLIDERTYPE_SIZE = 4;
+
+/*
+  -----------------------------------------------------------------------
+    LiveConnect
+  -----------------------------------------------------------------------
+*/
+
+Neo.playPCH = function () {};
+
+Neo.suspendDraw = function () {};
+
+/** @param {number} value */
+Neo.setSpeed = function (value) {};
+
+/**
+ * レイヤー可視性
+ * @param {number} layer - 対象となるレイヤーのインデックス
+ * @param {number|boolean} value - 表示状態（0またはfalseで非表示、それ以外で表示）
+ */
+Neo.setVisit = function (layer, value) {};
+
+/**
+ * @param {number} value
+ */
+Neo.setMark = function (value) {};
+Neo.getSeek = function () {};
+Neo.getLineCount = function () {};
+/**
+ * HTML側からの指定に基づきツールの位置を変更する
+ * @param {boolean|string} htmlConfiguredSide - HTMLタグ等で設定された外部からのサイド指定
+ */
+Neo.setToolSide = function (htmlConfiguredSide) {};
+
+/**
+ * 手ぶれ補正の強さ
+ * @param {Number|string} htmlConfig
+ * @note 0-5の範囲 デフォルト1
+ */
+Neo.setStabilizeLevel = function (htmlConfig) {};
+Neo.setStabilizLevel = Neo.setStabilizeLevel;
+Neo.getColors = function () {};
+/**
+ * パレット全体のカラーを一括で設定し、UIのカラーチップに反映する
+ * @param {string} colors - 改行区切りの16進数カラーコードの文字列（14色分）
+ */
+Neo.setColors = function (colors) {};
+/**
+ * カラーピッカーで色をセット
+ * @param {string} color - <input type="color">で取得した色
+ * @returns {void}
+ */
+Neo.setColor = function (color) {};
+
+Neo.pExit = function () {};
+
+Neo.str_header = "";
+
+/**
+ * @param {string} url
+ */
+Neo.openURL = function (url) {};
+
+/** @param {HTMLElement} applet */
+Neo.createViewer = function (applet) {};
+/**
+ * ビューアの初期化処理
+ * @param {Object} [pch] - PCHファイルデータ（あれば再生を開始する）
+ * @param {Array<*>} [pch.data] - 再生用アクションデータ
+ */
+Neo.initViewer = function (pch) {};
+Neo.startViewer = function () {};
+/**
+ * PCHファイルのバイナリデータをデコードし、構造化されたオブジェクトに変換する。
+ * * @typedef {Object} PCHData
+ * @property {number} width - キャンバスの横幅
+ * @property {number} height - キャンバスの高さ
+ * @property {Array<any>} data - 描画命令の配列（fixPCH適用済み）
+ * * @param {ArrayBuffer} rawdata - fetchで取得した生のバイナリデータ
+ * @returns {PCHData|null} デコード成功時はオブジェクト、失敗時はnullを返す
+ * * @example
+ */
+Neo.decodePCH = function (rawdata) {
+  return null;
+};
+/**@return {boolean} **/
+Neo.init = function () {
+  return false;
+};
+/**
+ * @param {boolean} [isApp]
+ */
+Neo.start = function (isApp = false) {};
 
 /**
  *  @type {any} *

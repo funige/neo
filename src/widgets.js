@@ -32,7 +32,7 @@ export class Button {
   constructor() {
     /**@type {HTMLElement|null} */
     this.element = null;
-    /** @type {any} */
+    /** @type {Record<string, any>|null} */
     this.params = null;
     this.elementID = "";
     this.selected = false;
@@ -135,7 +135,7 @@ export class Button {
     if (Neo.painter.isUIPaused()) return;
     this.isMouseDown = true;
 
-    if (this.params.type == "fill" && this.selected == false) {
+    if (this.params?.type == "fill" && this.selected == false) {
       for (let i = 0; i < Neo.toolButtons.length; i++) {
         const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
         toolTip.setSelected(this.selected ? false : true);
@@ -204,7 +204,9 @@ export class RightButton extends Button {
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
-    this.params.type = "right";
+    if (this.params) {
+      this.params.type = "right";
+    }
     return this;
   }
 
@@ -260,7 +262,9 @@ export class FillButton extends Button {
    */
   init(elementID, params = {}) {
     super.init(elementID, params);
-    this.params.type = "fill";
+    if (this.params) {
+      this.params.type = "fill";
+    }
     return this;
   }
 }
