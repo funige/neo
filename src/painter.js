@@ -819,7 +819,7 @@ export class Painter {
       target.blur();
     }
 
-    //NEO外部の input textAreaへの入力をNEOで処理しない
+    //NEO外部の input textAreaへの文字入力をNEOで処理しない
     if (
       (target instanceof HTMLInputElement &&
         !NON_TEXT_INPUT_TYPES.includes(target.type)) ||
