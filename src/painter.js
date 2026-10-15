@@ -800,18 +800,29 @@ export class Painter {
 
     const target = e.target;
 
-    // ラジオボタン・selectメニューにフォーカスがあれば外す
+    //ボタン類・ラジオ・selectにフォーカスがあれば外して、そのままショートカット処理に進む
+    const NON_TEXT_INPUT_TYPES = [
+      "radio",
+      "checkbox",
+      "range",
+      "button",
+      "submit",
+      "reset",
+    ];
     if (
-      target instanceof HTMLSelectElement ||
-      (target instanceof HTMLInputElement &&
-        (target.type === "radio" || target.type === "button"))
+      e.key !== "Tab" &&
+      (target instanceof HTMLButtonElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLInputElement &&
+          NON_TEXT_INPUT_TYPES.includes(target.type)))
     ) {
       target.blur();
     }
 
     //NEO外部の input textAreaへの入力をNEOで処理しない
     if (
-      target instanceof HTMLInputElement ||
+      (target instanceof HTMLInputElement &&
+        !NON_TEXT_INPUT_TYPES.includes(target.type)) ||
       target instanceof HTMLTextAreaElement
     ) {
       //NEO外部の input textAreaへの入力中はフラグをリセット

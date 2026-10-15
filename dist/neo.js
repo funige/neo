@@ -5772,10 +5772,18 @@
         }
       };
       const target = e.target;
-      if (target instanceof HTMLSelectElement || target instanceof HTMLInputElement && (target.type === "radio" || target.type === "button")) {
+      const NON_TEXT_INPUT_TYPES = [
+        "radio",
+        "checkbox",
+        "range",
+        "button",
+        "submit",
+        "reset"
+      ];
+      if (e.key !== "Tab" && (target instanceof HTMLButtonElement || target instanceof HTMLSelectElement || target instanceof HTMLInputElement && NON_TEXT_INPUT_TYPES.includes(target.type))) {
         target.blur();
       }
-      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+      if (target instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.includes(target.type) || target instanceof HTMLTextAreaElement) {
         this.isShiftDown = false;
         this.isCtrlDown = false;
         this.isAltDown = false;
