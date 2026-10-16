@@ -1,4 +1,29 @@
 /*! PaintBBS NEO v1.8.7 | https://github.com/funige/neo */
+/*! Includes this MIT-licensed library (the license below applies only to it):
+ *
+ *   lz-string (https://github.com/pieroxy/lz-string)
+ *   Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+ *
+ * MIT License
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -8,56 +33,87 @@
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __defNormalProp = (obj, key, value) =>
+    key in obj
+      ? __defProp(obj, key, {
+          enumerable: true,
+          configurable: true,
+          writable: true,
+          value,
+        })
+      : (obj[key] = value);
   var __spreadValues = (a, b) => {
     for (var prop in b || (b = {}))
-      if (__hasOwnProp.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
+      if (__hasOwnProp.call(b, prop)) __defNormalProp(a, prop, b[prop]);
     if (__getOwnPropSymbols)
       for (var prop of __getOwnPropSymbols(b)) {
-        if (__propIsEnum.call(b, prop))
-          __defNormalProp(a, prop, b[prop]);
+        if (__propIsEnum.call(b, prop)) __defNormalProp(a, prop, b[prop]);
       }
     return a;
   };
-  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-  }) : x)(function(x) {
+  var __require = /* @__PURE__ */ ((x) =>
+    typeof require !== "undefined"
+      ? require
+      : typeof Proxy !== "undefined"
+        ? new Proxy(x, {
+            get: (a, b) => (typeof require !== "undefined" ? require : a)[b],
+          })
+        : x)(function (x) {
     if (typeof require !== "undefined") return require.apply(this, arguments);
     throw Error('Dynamic require of "' + x + '" is not supported');
   });
-  var __commonJS = (cb, mod) => function __require2() {
-    try {
-      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-    } catch (e) {
-      throw mod = 0, e;
-    }
-  };
+  var __commonJS = (cb, mod) =>
+    function __require2() {
+      try {
+        return (
+          mod ||
+            (0, cb[__getOwnPropNames(cb)[0]])(
+              (mod = { exports: {} }).exports,
+              mod,
+            ),
+          mod.exports
+        );
+      } catch (e) {
+        throw ((mod = 0), e);
+      }
+    };
   var __copyProps = (to, from, except, desc) => {
-    if (from && typeof from === "object" || typeof from === "function") {
+    if ((from && typeof from === "object") || typeof from === "function") {
       for (let key of __getOwnPropNames(from))
         if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+          __defProp(to, key, {
+            get: () => from[key],
+            enumerable:
+              !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+          });
     }
     return to;
   };
-  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-    // If the importer is in node compatibility mode or this is not an ESM
-    // file that has been converted to a CommonJS file using a Babel-
-    // compatible transform (i.e. "__esModule" has not been set), then set
-    // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-    mod
-  ));
-  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  var __toESM = (mod, isNodeMode, target) => (
+    (target = mod != null ? __create(__getProtoOf(mod)) : {}),
+    __copyProps(
+      // If the importer is in node compatibility mode or this is not an ESM
+      // file that has been converted to a CommonJS file using a Babel-
+      // compatible transform (i.e. "__esModule" has not been set), then set
+      // "default" to the CommonJS "module.exports" for node compatibility.
+      isNodeMode || !mod || !mod.__esModule
+        ? __defProp(target, "default", { value: mod, enumerable: true })
+        : target,
+      mod,
+    )
+  );
+  var __publicField = (obj, key, value) =>
+    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
 
   // node_modules/lz-string/libs/lz-string.js
   var require_lz_string = __commonJS({
     "node_modules/lz-string/libs/lz-string.js"(exports, module) {
-      var LZString3 = (function() {
+      var LZString3 = (function () {
         var f = String.fromCharCode;
-        var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+        var keyStrBase64 =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        var keyStrUriSafe =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
         var baseReverseDic = {};
         function getBaseValue(alphabet, character) {
           if (!baseReverseDic[alphabet]) {
@@ -69,9 +125,9 @@
           return baseReverseDic[alphabet][character];
         }
         var LZString4 = {
-          compressToBase64: function(input) {
+          compressToBase64: function (input) {
             if (input == null) return "";
-            var res = LZString4._compress(input, 6, function(a) {
+            var res = LZString4._compress(input, 6, function (a) {
               return keyStrBase64.charAt(a);
             });
             switch (res.length % 4) {
@@ -88,28 +144,34 @@
                 return res + "=";
             }
           },
-          decompressFromBase64: function(input) {
+          decompressFromBase64: function (input) {
             if (input == null) return "";
             if (input == "") return null;
-            return LZString4._decompress(input.length, 32, function(index) {
+            return LZString4._decompress(input.length, 32, function (index) {
               return getBaseValue(keyStrBase64, input.charAt(index));
             });
           },
-          compressToUTF16: function(input) {
+          compressToUTF16: function (input) {
             if (input == null) return "";
-            return LZString4._compress(input, 15, function(a) {
-              return f(a + 32);
-            }) + " ";
+            return (
+              LZString4._compress(input, 15, function (a) {
+                return f(a + 32);
+              }) + " "
+            );
           },
-          decompressFromUTF16: function(compressed) {
+          decompressFromUTF16: function (compressed) {
             if (compressed == null) return "";
             if (compressed == "") return null;
-            return LZString4._decompress(compressed.length, 16384, function(index) {
-              return compressed.charCodeAt(index) - 32;
-            });
+            return LZString4._decompress(
+              compressed.length,
+              16384,
+              function (index) {
+                return compressed.charCodeAt(index) - 32;
+              },
+            );
           },
           //compress into uint8array (UCS-2 big endian format)
-          compressToUint8Array: function(uncompressed) {
+          compressToUint8Array: function (uncompressed) {
             var compressed = LZString4.compress(uncompressed);
             var buf = new Uint8Array(compressed.length * 2);
             for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
@@ -120,7 +182,7 @@
             return buf;
           },
           //decompress from uint8array (UCS-2 big endian format)
-          decompressFromUint8Array: function(compressed) {
+          decompressFromUint8Array: function (compressed) {
             if (compressed === null || compressed === void 0) {
               return LZString4.decompress(compressed);
             } else {
@@ -129,47 +191,75 @@
                 buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
               }
               var result = [];
-              buf.forEach(function(c) {
+              buf.forEach(function (c) {
                 result.push(f(c));
               });
               return LZString4.decompress(result.join(""));
             }
           },
           //compress into a string that is already URI encoded
-          compressToEncodedURIComponent: function(input) {
+          compressToEncodedURIComponent: function (input) {
             if (input == null) return "";
-            return LZString4._compress(input, 6, function(a) {
+            return LZString4._compress(input, 6, function (a) {
               return keyStrUriSafe.charAt(a);
             });
           },
           //decompress from an output of compressToEncodedURIComponent
-          decompressFromEncodedURIComponent: function(input) {
+          decompressFromEncodedURIComponent: function (input) {
             if (input == null) return "";
             if (input == "") return null;
             input = input.replace(/ /g, "+");
-            return LZString4._decompress(input.length, 32, function(index) {
+            return LZString4._decompress(input.length, 32, function (index) {
               return getBaseValue(keyStrUriSafe, input.charAt(index));
             });
           },
-          compress: function(uncompressed) {
-            return LZString4._compress(uncompressed, 16, function(a) {
+          compress: function (uncompressed) {
+            return LZString4._compress(uncompressed, 16, function (a) {
               return f(a);
             });
           },
-          _compress: function(uncompressed, bitsPerChar, getCharFromInt) {
+          _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
             if (uncompressed == null) return "";
-            var i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
+            var i,
+              value,
+              context_dictionary = {},
+              context_dictionaryToCreate = {},
+              context_c = "",
+              context_wc = "",
+              context_w = "",
+              context_enlargeIn = 2,
+              context_dictSize = 3,
+              context_numBits = 2,
+              context_data = [],
+              context_data_val = 0,
+              context_data_position = 0,
+              ii;
             for (ii = 0; ii < uncompressed.length; ii += 1) {
               context_c = uncompressed.charAt(ii);
-              if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+              if (
+                !Object.prototype.hasOwnProperty.call(
+                  context_dictionary,
+                  context_c,
+                )
+              ) {
                 context_dictionary[context_c] = context_dictSize++;
                 context_dictionaryToCreate[context_c] = true;
               }
               context_wc = context_w + context_c;
-              if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+              if (
+                Object.prototype.hasOwnProperty.call(
+                  context_dictionary,
+                  context_wc,
+                )
+              ) {
                 context_w = context_wc;
               } else {
-                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                if (
+                  Object.prototype.hasOwnProperty.call(
+                    context_dictionaryToCreate,
+                    context_w,
+                  )
+                ) {
                   if (context_w.charCodeAt(0) < 256) {
                     for (i = 0; i < context_numBits; i++) {
                       context_data_val = context_data_val << 1;
@@ -183,7 +273,7 @@
                     }
                     value = context_w.charCodeAt(0);
                     for (i = 0; i < 8; i++) {
-                      context_data_val = context_data_val << 1 | value & 1;
+                      context_data_val = (context_data_val << 1) | (value & 1);
                       if (context_data_position == bitsPerChar - 1) {
                         context_data_position = 0;
                         context_data.push(getCharFromInt(context_data_val));
@@ -196,7 +286,7 @@
                   } else {
                     value = 1;
                     for (i = 0; i < context_numBits; i++) {
-                      context_data_val = context_data_val << 1 | value;
+                      context_data_val = (context_data_val << 1) | value;
                       if (context_data_position == bitsPerChar - 1) {
                         context_data_position = 0;
                         context_data.push(getCharFromInt(context_data_val));
@@ -208,7 +298,7 @@
                     }
                     value = context_w.charCodeAt(0);
                     for (i = 0; i < 16; i++) {
-                      context_data_val = context_data_val << 1 | value & 1;
+                      context_data_val = (context_data_val << 1) | (value & 1);
                       if (context_data_position == bitsPerChar - 1) {
                         context_data_position = 0;
                         context_data.push(getCharFromInt(context_data_val));
@@ -228,7 +318,7 @@
                 } else {
                   value = context_dictionary[context_w];
                   for (i = 0; i < context_numBits; i++) {
-                    context_data_val = context_data_val << 1 | value & 1;
+                    context_data_val = (context_data_val << 1) | (value & 1);
                     if (context_data_position == bitsPerChar - 1) {
                       context_data_position = 0;
                       context_data.push(getCharFromInt(context_data_val));
@@ -249,7 +339,12 @@
               }
             }
             if (context_w !== "") {
-              if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+              if (
+                Object.prototype.hasOwnProperty.call(
+                  context_dictionaryToCreate,
+                  context_w,
+                )
+              ) {
                 if (context_w.charCodeAt(0) < 256) {
                   for (i = 0; i < context_numBits; i++) {
                     context_data_val = context_data_val << 1;
@@ -263,7 +358,7 @@
                   }
                   value = context_w.charCodeAt(0);
                   for (i = 0; i < 8; i++) {
-                    context_data_val = context_data_val << 1 | value & 1;
+                    context_data_val = (context_data_val << 1) | (value & 1);
                     if (context_data_position == bitsPerChar - 1) {
                       context_data_position = 0;
                       context_data.push(getCharFromInt(context_data_val));
@@ -276,7 +371,7 @@
                 } else {
                   value = 1;
                   for (i = 0; i < context_numBits; i++) {
-                    context_data_val = context_data_val << 1 | value;
+                    context_data_val = (context_data_val << 1) | value;
                     if (context_data_position == bitsPerChar - 1) {
                       context_data_position = 0;
                       context_data.push(getCharFromInt(context_data_val));
@@ -288,7 +383,7 @@
                   }
                   value = context_w.charCodeAt(0);
                   for (i = 0; i < 16; i++) {
-                    context_data_val = context_data_val << 1 | value & 1;
+                    context_data_val = (context_data_val << 1) | (value & 1);
                     if (context_data_position == bitsPerChar - 1) {
                       context_data_position = 0;
                       context_data.push(getCharFromInt(context_data_val));
@@ -308,7 +403,7 @@
               } else {
                 value = context_dictionary[context_w];
                 for (i = 0; i < context_numBits; i++) {
-                  context_data_val = context_data_val << 1 | value & 1;
+                  context_data_val = (context_data_val << 1) | (value & 1);
                   if (context_data_position == bitsPerChar - 1) {
                     context_data_position = 0;
                     context_data.push(getCharFromInt(context_data_val));
@@ -327,7 +422,7 @@
             }
             value = 2;
             for (i = 0; i < context_numBits; i++) {
-              context_data_val = context_data_val << 1 | value & 1;
+              context_data_val = (context_data_val << 1) | (value & 1);
               if (context_data_position == bitsPerChar - 1) {
                 context_data_position = 0;
                 context_data.push(getCharFromInt(context_data_val));
@@ -346,15 +441,33 @@
             }
             return context_data.join("");
           },
-          decompress: function(compressed) {
+          decompress: function (compressed) {
             if (compressed == null) return "";
             if (compressed == "") return null;
-            return LZString4._decompress(compressed.length, 32768, function(index) {
-              return compressed.charCodeAt(index);
-            });
+            return LZString4._decompress(
+              compressed.length,
+              32768,
+              function (index) {
+                return compressed.charCodeAt(index);
+              },
+            );
           },
-          _decompress: function(length, resetValue, getNextValue) {
-            var dictionary2 = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
+          _decompress: function (length, resetValue, getNextValue) {
+            var dictionary2 = [],
+              next,
+              enlargeIn = 4,
+              dictSize = 4,
+              numBits = 3,
+              entry = "",
+              result = [],
+              i,
+              w,
+              bits,
+              resb,
+              maxpower,
+              power,
+              c,
+              data = { val: getNextValue(0), position: resetValue, index: 1 };
             for (i = 0; i < 3; i += 1) {
               dictionary2[i] = i;
             }
@@ -371,7 +484,7 @@
               bits |= (resb > 0 ? 1 : 0) * power;
               power <<= 1;
             }
-            switch (next = bits) {
+            switch ((next = bits)) {
               case 0:
                 bits = 0;
                 maxpower = Math.pow(2, 8);
@@ -427,7 +540,7 @@
                 bits |= (resb > 0 ? 1 : 0) * power;
                 power <<= 1;
               }
-              switch (c = bits) {
+              switch ((c = bits)) {
                 case 0:
                   bits = 0;
                   maxpower = Math.pow(2, 8);
@@ -489,22 +602,22 @@
                 numBits++;
               }
             }
-          }
+          },
         };
         return LZString4;
       })();
       if (typeof define === "function" && define.amd) {
-        define(function() {
+        define(function () {
           return LZString3;
         });
       } else if (typeof module !== "undefined" && module != null) {
         module.exports = LZString3;
       } else if (typeof angular !== "undefined" && angular != null) {
-        angular.module("LZString", []).factory("LZString", function() {
+        angular.module("LZString", []).factory("LZString", function () {
           return LZString3;
         });
       }
-    }
+    },
   });
 
   // src/neo.js
@@ -544,13 +657,15 @@
       "#E7962D",
       "#99CB7B",
       "#FCECE2",
-      "#F9DDCF"
-    ]
+      "#F9DDCF",
+    ],
   };
-  Neo.reservePen = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-  {};
-  Neo.reserveEraser = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-  {};
+  Neo.reservePen =
+    /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
+    {};
+  Neo.reserveEraser =
+    /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
+    {};
   Neo.submitButton = null;
   Neo.fillButton = null;
   Neo.rightButton = null;
@@ -582,215 +697,224 @@
   Neo.SLIDERTYPE_BLUE = 2;
   Neo.SLIDERTYPE_ALPHA = 3;
   Neo.SLIDERTYPE_SIZE = 4;
-  Neo.playPCH = function() {
-  };
-  Neo.suspendDraw = function() {
-  };
-  Neo.setSpeed = function(value) {
-  };
-  Neo.setVisit = function(layer, value) {
-  };
-  Neo.setMark = function(value) {
-  };
-  Neo.getSeek = function() {
-  };
-  Neo.getLineCount = function() {
-  };
-  Neo.setToolSide = function(htmlConfiguredSide) {
-  };
-  Neo.setStabilizeLevel = function(htmlConfig) {
-  };
+  Neo.playPCH = function () {};
+  Neo.suspendDraw = function () {};
+  Neo.setSpeed = function (value) {};
+  Neo.setVisit = function (layer, value) {};
+  Neo.setMark = function (value) {};
+  Neo.getSeek = function () {};
+  Neo.getLineCount = function () {};
+  Neo.setToolSide = function (htmlConfiguredSide) {};
+  Neo.setStabilizeLevel = function (htmlConfig) {};
   Neo.setStabilizLevel = Neo.setStabilizeLevel;
-  Neo.getColors = function() {
-  };
-  Neo.setColors = function(colors) {
-  };
-  Neo.setColor = function(color) {
-  };
-  Neo.pExit = function() {
-  };
+  Neo.getColors = function () {};
+  Neo.setColors = function (colors) {};
+  Neo.setColor = function (color) {};
+  Neo.pExit = function () {};
   Neo.str_header = "";
-  Neo.openURL = function(url) {
-  };
-  Neo.createViewer = function(applet) {
-  };
-  Neo.initViewer = function(pch) {
-  };
-  Neo.startViewer = function() {
-  };
-  Neo.decodePCH = function(rawdata) {
+  Neo.openURL = function (url) {};
+  Neo.createViewer = function (applet) {};
+  Neo.initViewer = function (pch) {};
+  Neo.startViewer = function () {};
+  Neo.decodePCH = function (rawdata) {
     return null;
   };
-  Neo.init = function() {
+  Neo.init = function () {
     return false;
   };
-  Neo.start = function(isApp = false) {
-  };
+  Neo.start = function (isApp = false) {};
   document.neo = Neo;
 
   // src/dictionary.js
   var dictionary = {
     ja: {},
     en: {
-      \u3084\u308A\u76F4\u3057: "Redo",
-      \u5143\u306B\u623B\u3059: "Undo",
-      \u5857\u308A\u6F70\u3057: "Paint",
-      \u7A93: "F&nbsp;",
-      \u6295\u7A3F: "Send",
-      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "(C)shi-chan PaintBBS NEO",
-      \u925B\u7B46: "Solid",
-      \u6C34\u5F69: "WaterC",
-      \uFF83\uFF77\uFF7D\uFF84: "Text",
-      \u30C8\u30FC\u30F3: "Tone",
-      \u307C\u304B\u3057: "ShadeOff",
-      \u8986\u3044\u713C\u304D: "HLight",
-      \u713C\u304D\u8FBC\u307F: "Dark",
-      \u6D88\u3057\u30DA\u30F3: "White",
-      \u6D88\u3057\u56DB\u89D2: "WhiteRect",
-      \u5168\u6D88\u3057: "Clear",
-      \u56DB\u89D2: "Rect",
-      \u7DDA\u56DB\u89D2: "LineRect",
-      \u6955\u5186: "Oval",
-      \u7DDA\u6955\u5186: "LineOval",
-      \u30B3\u30D4\u30FC: "Copy",
-      \uFF9A\uFF72\uFF94\u7D50\u5408: "lay-unif",
-      \u89D2\u53D6\u308A: "Antialias",
-      \u5DE6\u53F3\u53CD\u8EE2: "reverseL",
-      \u4E0A\u4E0B\u53CD\u8EE2: "reverseU",
-      \u50BE\u3051: "lie",
-      \u901A\u5E38: "Normal",
-      \u30DE\u30B9\u30AF: "Mask",
-      \u9006\uFF8F\uFF7D\uFF78: "ReMask",
-      \u52A0\u7B97: "And",
-      \u9006\u52A0\u7B97: "Div",
-      \u624B\u66F8\u304D: "FreeLine",
-      \u76F4\u7DDA: "Straight",
-      BZ\u66F2\u7DDA: "Bezie",
+      やり直し: "Redo",
+      元に戻す: "Undo",
+      塗り潰し: "Paint",
+      窓: "F&nbsp;",
+      投稿: "Send",
+      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO":
+        "(C)shi-chan PaintBBS NEO",
+      鉛筆: "Solid",
+      水彩: "WaterC",
+      ﾃｷｽﾄ: "Text",
+      トーン: "Tone",
+      ぼかし: "ShadeOff",
+      覆い焼き: "HLight",
+      焼き込み: "Dark",
+      消しペン: "White",
+      消し四角: "WhiteRect",
+      全消し: "Clear",
+      四角: "Rect",
+      線四角: "LineRect",
+      楕円: "Oval",
+      線楕円: "LineOval",
+      コピー: "Copy",
+      ﾚｲﾔ結合: "lay-unif",
+      角取り: "Antialias",
+      左右反転: "reverseL",
+      上下反転: "reverseU",
+      傾け: "lie",
+      通常: "Normal",
+      マスク: "Mask",
+      逆ﾏｽｸ: "ReMask",
+      加算: "And",
+      逆加算: "Div",
+      手書き: "FreeLine",
+      直線: "Straight",
+      BZ曲線: "Bezie",
       "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "Page view?",
       "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "Window view?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Restore session?",
-      \u53F3: "Right Click",
-      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
-      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "This browser may fail to send your picture.<br>",
-      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Discard animation data and restore session?",
-      \u6700: "Mx",
-      \u65E9: "H",
-      \u65E2: "M",
-      \u920D: "L",
-      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "Please push send button again.",
-      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "HTTP status code",
-      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "Layer information will not be saved.\nAre you sure you want to continue?"
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F":
+        "Restore session?",
+      右: "Right Click",
+      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F":
+        "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
+      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>":
+        "This browser may fail to send your picture.<br>",
+      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002":
+        "Is the picture contributed?<br>if contribution completed, you jump to the comment page.",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F":
+        "Discard animation data and restore session?",
+      最: "Mx",
+      早: "H",
+      既: "M",
+      鈍: "L",
+      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002":
+        "Please push send button again.",
+      HTTPステータスコード: "HTTP status code",
+      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?":
+        "Layer information will not be saved.\nAre you sure you want to continue?",
     },
     enx: {
-      \u3084\u308A\u76F4\u3057: "Redo",
-      \u5143\u306B\u623B\u3059: "Undo",
-      \u5857\u308A\u6F70\u3057: "Fill",
-      \u7A93: "Float",
-      \u6295\u7A3F: "Send",
-      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
-      \u925B\u7B46: "Solid",
-      \u6C34\u5F69: "WaterCo",
-      \uFF83\uFF77\uFF7D\uFF84: "Text",
-      \u30C8\u30FC\u30F3: "Halftone",
-      \u307C\u304B\u3057: "Blur",
-      \u8986\u3044\u713C\u304D: "Light",
-      \u713C\u304D\u8FBC\u307F: "Dark",
-      \u6D88\u3057\u30DA\u30F3: "White",
-      \u6D88\u3057\u56DB\u89D2: "WhiteRe",
-      \u5168\u6D88\u3057: "Clear",
-      \u56DB\u89D2: "Rect",
-      \u7DDA\u56DB\u89D2: "LineRect",
-      \u6955\u5186: "Oval",
-      \u7DDA\u6955\u5186: "LineOval",
-      \u30B3\u30D4\u30FC: "Copy",
-      \uFF9A\uFF72\uFF94\u7D50\u5408: "layerUnit",
-      \u89D2\u53D6\u308A: "antiAlias",
-      \u5DE6\u53F3\u53CD\u8EE2: "flipHorita",
-      \u4E0A\u4E0B\u53CD\u8EE2: "flipVertic",
-      \u50BE\u3051: "rotate",
-      \u901A\u5E38: "Normal",
-      \u30DE\u30B9\u30AF: "Mask",
-      \u9006\uFF8F\uFF7D\uFF78: "ReMask",
-      \u52A0\u7B97: "And",
-      \u9006\u52A0\u7B97: "Divide",
-      \u624B\u66F8\u304D: "Freehan",
-      \u76F4\u7DDA: "Line",
-      BZ\u66F2\u7DDA: "Bezier",
+      やり直し: "Redo",
+      元に戻す: "Undo",
+      塗り潰し: "Fill",
+      窓: "Float",
+      投稿: "Send",
+      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO":
+        "&copy;shi-chan PaintBBS NEO",
+      鉛筆: "Solid",
+      水彩: "WaterCo",
+      ﾃｷｽﾄ: "Text",
+      トーン: "Halftone",
+      ぼかし: "Blur",
+      覆い焼き: "Light",
+      焼き込み: "Dark",
+      消しペン: "White",
+      消し四角: "WhiteRe",
+      全消し: "Clear",
+      四角: "Rect",
+      線四角: "LineRect",
+      楕円: "Oval",
+      線楕円: "LineOval",
+      コピー: "Copy",
+      ﾚｲﾔ結合: "layerUnit",
+      角取り: "antiAlias",
+      左右反転: "flipHorita",
+      上下反転: "flipVertic",
+      傾け: "rotate",
+      通常: "Normal",
+      マスク: "Mask",
+      逆ﾏｽｸ: "ReMask",
+      加算: "And",
+      逆加算: "Divide",
+      手書き: "Freehan",
+      直線: "Line",
+      BZ曲線: "Bezier",
       Layer0: "LayerBG",
       Layer1: "LayerFG",
       "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "Page view?",
       "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "Window view?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Restore session?",
-      \u53F3: "Right Click",
-      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
-      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "This browser may fail to send your picture.<br>",
-      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "Send this picture and end session?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "Discard animation data and restore session?",
-      \u6700: "Mx",
-      \u65E9: "H",
-      \u65E2: "M",
-      \u920D: "L",
-      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "Failed to upload image. please try again.",
-      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "HTTP status code",
-      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "Layer information will not be saved.\nAre you sure you want to continue?"
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F":
+        "Restore session?",
+      右: "Right Click",
+      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F":
+        "PaintBBS NEO is an HTML5 port of Oekaki Shi-BBS PaintBBS (\xA92000-2004 shi-chan). Show the project page?",
+      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>":
+        "This browser may fail to send your picture.<br>",
+      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002":
+        "Send this picture and end session?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F":
+        "Discard animation data and restore session?",
+      最: "Mx",
+      早: "H",
+      既: "M",
+      鈍: "L",
+      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002":
+        "Failed to upload image. please try again.",
+      HTTPステータスコード: "HTTP status code",
+      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?":
+        "Layer information will not be saved.\nAre you sure you want to continue?",
     },
     es: {
-      \u3084\u308A\u76F4\u3057: "Rehacer",
-      \u5143\u306B\u623B\u3059: "Deshacer",
-      \u5857\u308A\u6F70\u3057: "Llenar",
-      \u7A93: "Ventana",
-      \u6295\u7A3F: "Enviar",
-      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO": "&copy;shi-chan PaintBBS NEO",
-      \u925B\u7B46: "L\xE1piz",
-      \u6C34\u5F69: "Acuarela",
-      \uFF83\uFF77\uFF7D\uFF84: "Texto",
-      \u30C8\u30FC\u30F3: "Tono",
-      \u307C\u304B\u3057: "Gradaci\xF3n",
-      \u8986\u3044\u713C\u304D: "Sobreexp.",
-      \u713C\u304D\u8FBC\u307F: "Quemar",
-      \u6D88\u3057\u30DA\u30F3: "Goma",
-      \u6D88\u3057\u56DB\u89D2: "GomaRect",
-      \u5168\u6D88\u3057: "Borrar",
-      \u56DB\u89D2: "Rect",
-      \u7DDA\u56DB\u89D2: "L\xEDneaRect",
-      \u6955\u5186: "\xD3valo",
-      \u7DDA\u6955\u5186: "L\xEDnea\xD3valo",
-      \u30B3\u30D4\u30FC: "Copiar",
-      \uFF9A\uFF72\uFF94\u7D50\u5408: "UnirCapa",
-      \u89D2\u53D6\u308A: "Antialias",
-      \u5DE6\u53F3\u53CD\u8EE2: "Inv.Izq/Der",
-      \u4E0A\u4E0B\u53CD\u8EE2: "Inv.Arr/Aba",
-      \u50BE\u3051: "Inclinar",
-      \u901A\u5E38: "Normal",
-      \u30DE\u30B9\u30AF: "Masc.",
-      \u9006\uFF8F\uFF7D\uFF78: "Masc.Inv",
-      \u52A0\u7B97: "Adici\xF3n",
-      \u9006\u52A0\u7B97: "Subtrac",
-      \u624B\u66F8\u304D: "Libre",
-      \u76F4\u7DDA: "L\xEDnea",
-      BZ\u66F2\u7DDA: "Curva",
+      やり直し: "Rehacer",
+      元に戻す: "Deshacer",
+      塗り潰し: "Llenar",
+      窓: "Ventana",
+      投稿: "Enviar",
+      "(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO":
+        "&copy;shi-chan PaintBBS NEO",
+      鉛筆: "L\xE1piz",
+      水彩: "Acuarela",
+      ﾃｷｽﾄ: "Texto",
+      トーン: "Tono",
+      ぼかし: "Gradaci\xF3n",
+      覆い焼き: "Sobreexp.",
+      焼き込み: "Quemar",
+      消しペン: "Goma",
+      消し四角: "GomaRect",
+      全消し: "Borrar",
+      四角: "Rect",
+      線四角: "L\xEDneaRect",
+      楕円: "\xD3valo",
+      線楕円: "L\xEDnea\xD3valo",
+      コピー: "Copiar",
+      ﾚｲﾔ結合: "UnirCapa",
+      角取り: "Antialias",
+      左右反転: "Inv.Izq/Der",
+      上下反転: "Inv.Arr/Aba",
+      傾け: "Inclinar",
+      通常: "Normal",
+      マスク: "Masc.",
+      逆ﾏｽｸ: "Masc.Inv",
+      加算: "Adici\xF3n",
+      逆加算: "Subtrac",
+      手書き: "Libre",
+      直線: "L\xEDnea",
+      BZ曲線: "Curva",
       Layer0: "Capa0",
       Layer1: "Capa1",
       "\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F": "\xBFVista de p\xE1gina?",
-      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F": "\xBFVista de ventana?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "\xBFRestaurar sesi\xF3n anterior?",
-      \u53F3: "Clic derecho",
-      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F": "PaintBBS NEO es una versi\xF3n para HTML5 de Oekaki Shi-BBS PaintBBS (\xA9 2000-2004 shi-chan). \xBFMostrar la p\xE1gina del proyecto?",
-      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>": "Este navegador podr\xEDa no enviar su imagen.<br>",
-      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002": "\xBFEnviar esta imagen y finalizar sesi\xF3n?",
-      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F": "\xBFDesechar datos de animaci\xF3n y restaurar sesi\xF3n?",
-      \u6700: "Mx",
-      \u65E9: "H",
-      \u65E2: "M",
-      \u920D: "L",
-      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002": "No se pudo cargar la imagen. por favor, int\xE9ntalo de nuevo.",
-      HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9: "C\xF3digo de estado HTTP",
-      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?": "La informaci\xF3n de las capas no se guardar\xE1.\n\xBFEst\xE1 seguro de que desea continuar?"
-    }
+      "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F":
+        "\xBFVista de ventana?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F":
+        "\xBFRestaurar sesi\xF3n anterior?",
+      右: "Clic derecho",
+      "PaintBBS NEO\u306F\u3001\u304A\u7D75\u63CF\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F":
+        "PaintBBS NEO es una versi\xF3n para HTML5 de Oekaki Shi-BBS PaintBBS (\xA9 2000-2004 shi-chan). \xBFMostrar la p\xE1gina del proyecto?",
+      "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>":
+        "Este navegador podr\xEDa no enviar su imagen.<br>",
+      "\u753B\u50CF\u3092\u6295\u7A3F\u3057\u307E\u3059\u304B\uFF1F<br>\u6295\u7A3F\u306B\u6210\u529F\u5F8C\u3001\u7DE8\u96C6\u3092\u7D42\u4E86\u3057\u307E\u3059\u3002":
+        "\xBFEnviar esta imagen y finalizar sesi\xF3n?",
+      "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F":
+        "\xBFDesechar datos de animaci\xF3n y restaurar sesi\xF3n?",
+      最: "Mx",
+      早: "H",
+      既: "M",
+      鈍: "L",
+      "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002":
+        "No se pudo cargar la imagen. por favor, int\xE9ntalo de nuevo.",
+      HTTPステータスコード: "C\xF3digo de estado HTTP",
+      "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?":
+        "La informaci\xF3n de las capas no se guardar\xE1.\n\xBFEst\xE1 seguro de que desea continuar?",
+    },
   };
-  var translate = (function() {
-    var language = window.navigator.languages && window.navigator.languages[0] || window.navigator.language;
+  var translate = (function () {
+    var language =
+      (window.navigator.languages && window.navigator.languages[0]) ||
+      window.navigator.language;
     var lang = "en";
     for (var key in dictionary) {
       if (language.indexOf(key) == 0) {
@@ -798,7 +922,7 @@
         break;
       }
     }
-    return function(string) {
+    return function (string) {
       if (Neo.config.neo_alt_translation) {
         if (lang == "en") lang = "enx";
       } else {
@@ -812,10 +936,15 @@
   var import_lz_string = __toESM(require_lz_string());
 
   // src/widgets.js
-  var getModifier = function(e) {
+  var getModifier = function (e) {
     if (e.shiftKey) {
       return "shift";
-    } else if (e instanceof MouseEvent && e.button == 2 || e.ctrlKey || e.altKey || Neo.painter.virtualRight) {
+    } else if (
+      (e instanceof MouseEvent && e.button == 2) ||
+      e.ctrlKey ||
+      e.altKey ||
+      Neo.painter.virtualRight
+    ) {
       return "right";
     }
     return null;
@@ -827,10 +956,8 @@
       this.elementID = "";
       this.selected = false;
       this.isMouseDown = false;
-      this.disable = function(wait) {
-      };
-      this.enable = function() {
-      };
+      this.disable = function (wait) {};
+      this.enable = function () {};
       this.onmousedown = null;
       this.onmouseup = null;
       this.onmouseover = null;
@@ -849,16 +976,16 @@
       this.isMouseDown = false;
       const ref = this;
       if (this.element) {
-        this.element.onmousedown = function(e) {
+        this.element.onmousedown = function (e) {
           ref._mouseDownHandler(e);
         };
-        this.element.onmouseup = function(e) {
+        this.element.onmouseup = function (e) {
           ref._mouseUpHandler(e);
         };
-        this.element.onmouseover = function(e) {
+        this.element.onmouseover = function (e) {
           ref._mouseOverHandler(e);
         };
-        this.element.onmouseout = function(e) {
+        this.element.onmouseout = function (e) {
           ref._mouseOutHandler(e);
         };
         this.element.addEventListener(
@@ -866,36 +993,36 @@
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._mouseDownHandler(e);
             e.preventDefault();
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.addEventListener(
           "touchend",
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._mouseUpHandler(e);
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.className = "buttonOff";
       }
-      this.disable = function(wait) {
+      this.disable = function (wait) {
         if (this.element) {
           this.element.style.pointerEvents = "none";
           this.element.style.opacity = "0.5";
         }
         if (wait) {
-          setTimeout(function() {
+          setTimeout(function () {
             ref.enable();
           }, wait);
         }
       };
-      this.enable = function() {
+      this.enable = function () {
         if (this.element) {
           this.element.style.pointerEvents = "inherit";
           this.element.style.opacity = "1.0";
@@ -910,12 +1037,14 @@
       var _a;
       if (Neo.painter.isUIPaused()) return;
       this.isMouseDown = true;
-      if (((_a = this.params) == null ? void 0 : _a.type) == "fill" && this.selected == false) {
+      if (
+        ((_a = this.params) == null ? void 0 : _a.type) == "fill" &&
+        this.selected == false
+      ) {
         for (let i = 0; i < Neo.toolButtons.length; i++) {
-          const toolTip = (
+          const toolTip =
             /** @type {ToolTip} */
-            Neo.toolButtons[i]
-          );
+            Neo.toolButtons[i];
           toolTip.setSelected(this.selected ? false : true);
         }
         Neo.painter.setToolByType(Painter.TOOLTYPE_FILL);
@@ -954,15 +1083,13 @@
       }
       this.selected = selected;
     }
-    update() {
-    }
+    update() {}
   };
   var RightButton = class extends Button {
     constructor() {
       super();
       /** @param {MouseEvent} e */
-      __publicField(this, "_mouseOutHandler", function(e) {
-      });
+      __publicField(this, "_mouseOutHandler", function (e) {});
       this.params = null;
       this.element = null;
       this.selected = false;
@@ -980,8 +1107,7 @@
       return this;
     }
     /** @param {MouseEvent|TouchEvent} e */
-    _mouseDownHandler(e) {
-    }
+    _mouseDownHandler(e) {}
     /** @param {MouseEvent|TouchEvent} e */
     _mouseUpHandler(e) {
       this.setSelected(!this.selected);
@@ -1050,40 +1176,41 @@
       this.isMouseDown = false;
       const ref = this;
       if (this.element) {
-        this.element.onmousedown = function(e) {
+        this.element.onmousedown = function (e) {
           ref._mouseDownHandler(e);
         };
-        this.element.onmouseup = function(e) {
+        this.element.onmouseup = function (e) {
           ref._mouseUpHandler(e);
         };
-        this.element.onmouseover = function(e) {
+        this.element.onmouseover = function (e) {
           ref._mouseOverHandler(e);
         };
-        this.element.onmouseout = function(e) {
+        this.element.onmouseout = function (e) {
           ref._mouseOutHandler(e);
         };
         this.element.addEventListener(
           "touchstart",
           /** @param {TouchEvent} e */
-          function(e) {
+          function (e) {
             ref._mouseDownHandler(e);
             e.preventDefault();
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.addEventListener(
           "touchend",
           /** @param {TouchEvent} e */
-          function(e) {
+          function (e) {
             ref._mouseUpHandler(e);
           },
-          true
+          true,
         );
         this.element.className = "colorTipOff";
         var index = parseInt(this.elementID.slice(9)) - 1;
         this.element.style.left = index % 2 ? "0px" : "26px";
         this.element.style.top = Math.floor(index / 2) * 21 + "px";
-        this.element.innerHTML = "<img style='max-width:44px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />";
+        this.element.innerHTML =
+          "<img style='max-width:44px;' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAASCAYAAAAg9DzcAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANklEQVRIx+3OAQkAMADDsO3+Pe8qCj+0Akq6bQFqS2wTCpwE+R4IiyVYsGDBggULfirBgn8HX7BzCRwDx1QeAAAAAElFTkSuQmCC' />";
       }
       this.setColor(Neo.config.colors[params.index - 1]);
       this.setSelected(this.selected);
@@ -1211,16 +1338,16 @@
       const ref = this;
       if (this.element) {
         this.params.type = this.element.id;
-        this.element.onmousedown = function(e) {
+        this.element.onmousedown = function (e) {
           ref._mouseDownHandler(e);
         };
-        this.element.onmouseup = function(e) {
+        this.element.onmouseup = function (e) {
           ref._mouseUpHandler(e);
         };
-        this.element.onmouseover = function(e) {
+        this.element.onmouseover = function (e) {
           ref._mouseOverHandler(e);
         };
-        this.element.onmouseout = function(e) {
+        this.element.onmouseout = function (e) {
           ref._mouseOutHandler(e);
         };
         this.element.addEventListener(
@@ -1228,25 +1355,26 @@
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._mouseDownHandler(e);
             e.preventDefault();
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.addEventListener(
           "touchend",
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._mouseUpHandler(e);
           },
-          true
+          true,
         );
         this.selected = this.params.type == "neo-pen" ? true : false;
         this.setSelected(this.selected);
-        this.element.innerHTML = "<canvas width=46 height=18></canvas><div class='label'></div>";
+        this.element.innerHTML =
+          "<canvas width=46 height=18></canvas><div class='label'></div>";
         this.canvas = this.element.querySelector("canvas");
         this.label = this.element.querySelector("div");
       }
@@ -1259,10 +1387,9 @@
       if (this.isTool) {
         if (this.selected == false) {
           for (let i = 0; i < Neo.toolButtons.length; i++) {
-            const toolTip = (
+            const toolTip =
               /** @type {ToolTip} */
-              Neo.toolButtons[i]
-            );
+              Neo.toolButtons[i];
             toolTip.setSelected(this === toolTip);
           }
         } else {
@@ -1318,8 +1445,7 @@
       }
       this.selected = selected;
     }
-    update() {
-    }
+    update() {}
     /**
      * ツールチップのアイコンを描画し、必要に応じて色調補正（ティント）を施す。
      * 動作モードが変更された際には新たな画像を読み込み、
@@ -1329,13 +1455,14 @@
      */
     draw(color) {
       if (this.hasTintImage) {
-        const c = typeof color === "string" ? color : Neo.painter.getColorString(color);
+        const c =
+          typeof color === "string" ? color : Neo.painter.getColorString(color);
         if (!this.canvas) {
           console.error("Canvas not found for ToolTip.");
           return;
         }
         const ctx = this.canvas.getContext("2d", {
-          willReadFrequently: true
+          willReadFrequently: true,
         });
         if (!ctx) {
           console.error("Failed to get 2D context for ToolTip canvas.");
@@ -1345,7 +1472,7 @@
           this.prevMode = this.mode;
           var img = new Image();
           const ref = this;
-          img.onload = function() {
+          img.onload = function () {
             if (!ref.canvas) {
               console.error("Canvas not found for ToolTip on image load.");
               return;
@@ -1374,25 +1501,101 @@
       tintImage(ctx, c);
     }
   };
-  __publicField(ToolTip, "bezier", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "blur", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAASUlEQVRIx+3VMQ4AIAgEQeD/f8bWWBnJYUh2SgtgK82G8/MhzVKwxOtTLgIUx6tDout4laiPIICA0Qj4bXxAy0+8LZP9yACAJwsqkggS55eiZgAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "blurrect", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAX0lEQVRIx+2XQQ4AEAwEt+I7/v+8Org6lJKt6NzLjjYE8DAKtLpYoDeCCCC7tYUd3ru2qQOzDTyndhJzB6KSAmxSgM0fAlGuzBnmlziqxB8jFJkUYJMCbAQYPxt2kF06fvYKgjPBO/IAAAAASUVORK5CYII=");
-  __publicField(ToolTip, "brush", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQUlEQVRIx2NgGOKAEcb4z8CweRA4xpdUPSxofJ8BdP8WcjQxDaCDqQLQY4CsUBgFo2AUjIJRMApGwSgYBaNgZAIA0CoDwDbZu8oAAAAASUVORK5CYII=");
-  __publicField(ToolTip, "burn", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPklEQVRIx+3PMRIAMAQAQbzM0/0sKZPeiDG57TQ4keH0Htx9VR+MCM1vOezl8xUsv4IAAkYjoBsB3QgAgL9tYXgF19rh9yoAAAAASUVORK5CYII=");
-  __publicField(ToolTip, "copy", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAW0lEQVRIx+2XMQoAIAwDU/E7/v95Orh2KMUSC7m5Qs6AUqAxG1gzOLirwxhgmXOjOlg1oQY8sjf2mvYNSICNBNhIgE3oH/jlzfdo34AE2EiATXsBA+5mww6S5QASDwSGMt8ouwAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "copy2", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAN0lEQVRIx+3PwQkAIBADwdPKt3MtQVCOPNz5B7JV0pNxOwRW9zng+G92n+hmQJoBaQakGSBJf9tyBgQUV/fKCAAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "ellipse", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAATklEQVRIx+2VMQ4AIAgD6/8fjbOJi1LFmt4OPQ0KIE7LNgggCBLbHkuFM9lM+Om+QwDjpksyb4tT86vlvzgEbYxefQPyv5D8HjDGGGOk6b3jJ+lYubd8AAAAAElFTkSuQmCC");
-  __publicField(ToolTip, "ellipsefill", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAVUlEQVRIx+2VURIAEAgFc/9D5waSHpV5+43ZHRMizRnRA1REARLHHq6NCFl01Nail+LeEDMgU34nYhlQQd6K+PsGKkSEZyArBPoK3Y6K/AOEEEJIayZHbhIKjkZrFwAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "eraser", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABQElEQVRIx+1WQY7CMAwcI37Cad+yXOgH4Gu8gAt9CtrDirfMHjZJbbcktVSpQnROSeMkY3vsFHhzSG3xfLpz/JVmG0mIqDkIMcc6+7Kejx6fdb0dq7w09rVFkrjejrMOunQ9vg7f/5QEIAd6E1Eo38WF8fF7n8sdALCrLerIzoFI4sI0Vtv1SYZ8CVbeF7tzF7JugIkVkxOauc6CIe8842S+XmMfsq7TN9LRTngZmTmVD4SrnzYaGYhFoxCWgajXuMjYGTuJ3dlwIBIN3U0cUVqLXCs5E7YeVsvAYJul5HWeLUhL3EpstQwooqoOTEHDOebpMn7ngkUsg3RotU8X1MkuVDrYohkIupC0YArX6T+PfX3kcbQLNV/iCKi6EB3xqXdAZ0JKthZ8B0QEl673NIEX/0I/z36Rf6ENGzZ8EP4A8Lp+9e9VWC4AAAAASUVORK5CYII=");
-  __publicField(ToolTip, "flip", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAZklEQVRIx+2XQQoAIAgE1+g7/f95degWHSyTTXDOhTsSiUBgOtCq8mD3DiOA3NxTCVgKaLA0qHiFOsHSnC8ELKQAmxRgE15APQfWv9pzLjwX+CXsjvBPKAXYpACb8AICzM2GHeSWAfVOCIiJuQ9tAAAAAElFTkSuQmCC");
-  __publicField(ToolTip, "freehand", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAdUlEQVRIx+2WUQrAMAhD3dj9r+y+VoSyLhYDynzQv1qiJlCR4hzeAhVRsiC3Jkj0c5hN7Lx7IQ9SphLE1ICdwko420purEWQuywN3pqxgcw2+WwAtU1GzoqiLZNwZBvMAIcO8y3YKUO8mkbmjPzjK9E0TUPjBoeyLAS0usjLAAAAAElFTkSuQmCC");
-  __publicField(ToolTip, "line", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAU0lEQVRIx+2UQQ4AIAjD8P+PxivRGDQC47C+oN1hIgTLQAt4qIga2c23XYAVPkm3CVhlb4ShAa/rQgMi1i0NyFg3LaBq3bAA1LpfAd7/EkIIIR2YXFYSCpWS8w8AAAAASUVORK5CYII=");
-  __publicField(ToolTip, "merge", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAW0lEQVRIx+2XQQrAQAgDx9Lv9JF9+e6h54IINlgyZ4UMOYgwmAXXmRxc3WECorJ3dAfrJtXAC7c6PPygAQuosYAaC6hJ3YHqlfyC8Q1YQI0F1IwXCHg+G3WQKhvwgwUFmFyYbwAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "pen", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAK0lEQVRIx+3OsQkAMAwDQXn/oe3WfSAEctd9I5TA32pHJ/3AoTpfAQCAGwaa5AICJLKWSQAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "rect", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQElEQVRIx+3TMQ4AIAhD0WK8/5VxdcIYY8rw3wok7YAEr6iGKaU74BY0ro+6FKhyDHe4VxRwm6eFLn8AAADwwQIwTQgGo9ZMywAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "rectfill", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANElEQVRIx+3PIQ4AIBADwcL//3xYBMEgLiQztmab0GvcxkqqO3ALPbbO7rBXDnRzAADgYwvqDwIMJlGb5QAAAABJRU5ErkJggg==");
-  __publicField(ToolTip, "text", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAcUlEQVRIx+2VwQ7AIAhDy7L//2V2WmIYg+ky2KEv8aCCqYQqQMgrJNpUQMXEKKDmAPHyspgSrBBvLZu3cQqZEdwhfusq0KdkVR5HlFfBvpI0mtIzeusFot7vFPqYuzZYMXUFlzc+qrIn7tf/ACGEkIwDlEQ94YZjzcgAAAAASUVORK5CYII=");
-  __publicField(ToolTip, "tone", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAO0lEQVRIx+3PIQ4AMAgEwaP//zNVVZUELiQ7CgWstFy8IaVsPhT1Lb/T+fQEAtwIcCPAjQC39QEAgJIL6DQCFhAqsRkAAAAASUVORK5CYII=");
+  __publicField(
+    ToolTip,
+    "bezier",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAT0lEQVRIx+3SQQoAIAhE0en+h7ZVEEKBZrX5b5sjKknAkRYpNslaMLPq44ZI9wwHs0vMQ/v87u0Kk8xfsaI242jbMdjPi5Y0r/zTAAAAD3UOjRf9jcO4sgAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "blur",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAASUlEQVRIx+3VMQ4AIAgEQeD/f8bWWBnJYUh2SgtgK82G8/MhzVKwxOtTLgIUx6tDout4laiPIICA0Qj4bXxAy0+8LZP9yACAJwsqkggS55eiZgAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "blurrect",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAX0lEQVRIx+2XQQ4AEAwEt+I7/v+8Org6lJKt6NzLjjYE8DAKtLpYoDeCCCC7tYUd3ru2qQOzDTyndhJzB6KSAmxSgM0fAlGuzBnmlziqxB8jFJkUYJMCbAQYPxt2kF06fvYKgjPBO/IAAAAASUVORK5CYII=",
+  );
+  __publicField(
+    ToolTip,
+    "brush",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQUlEQVRIx2NgGOKAEcb4z8CweRA4xpdUPSxofJ8BdP8WcjQxDaCDqQLQY4CsUBgFo2AUjIJRMApGwSgYBaNgZAIA0CoDwDbZu8oAAAAASUVORK5CYII=",
+  );
+  __publicField(
+    ToolTip,
+    "burn",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAPklEQVRIx+3PMRIAMAQAQbzM0/0sKZPeiDG57TQ4keH0Htx9VR+MCM1vOezl8xUsv4IAAkYjoBsB3QgAgL9tYXgF19rh9yoAAAAASUVORK5CYII=",
+  );
+  __publicField(
+    ToolTip,
+    "copy",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAW0lEQVRIx+2XMQoAIAwDU/E7/v95Orh2KMUSC7m5Qs6AUqAxG1gzOLirwxhgmXOjOlg1oQY8sjf2mvYNSICNBNhIgE3oH/jlzfdo34AE2EiATXsBA+5mww6S5QASDwSGMt8ouwAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "copy2",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAN0lEQVRIx+3PwQkAIBADwdPKt3MtQVCOPNz5B7JV0pNxOwRW9zng+G92n+hmQJoBaQakGSBJf9tyBgQUV/fKCAAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "ellipse",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAATklEQVRIx+2VMQ4AIAgD6/8fjbOJi1LFmt4OPQ0KIE7LNgggCBLbHkuFM9lM+Om+QwDjpksyb4tT86vlvzgEbYxefQPyv5D8HjDGGGOk6b3jJ+lYubd8AAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    ToolTip,
+    "ellipsefill",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAVUlEQVRIx+2VURIAEAgFc/9D5waSHpV5+43ZHRMizRnRA1REARLHHq6NCFl01Nail+LeEDMgU34nYhlQQd6K+PsGKkSEZyArBPoK3Y6K/AOEEEJIayZHbhIKjkZrFwAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "eraser",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAABQElEQVRIx+1WQY7CMAwcI37Cad+yXOgH4Gu8gAt9CtrDirfMHjZJbbcktVSpQnROSeMkY3vsFHhzSG3xfLpz/JVmG0mIqDkIMcc6+7Kejx6fdb0dq7w09rVFkrjejrMOunQ9vg7f/5QEIAd6E1Eo38WF8fF7n8sdALCrLerIzoFI4sI0Vtv1SYZ8CVbeF7tzF7JugIkVkxOauc6CIe8842S+XmMfsq7TN9LRTngZmTmVD4SrnzYaGYhFoxCWgajXuMjYGTuJ3dlwIBIN3U0cUVqLXCs5E7YeVsvAYJul5HWeLUhL3EpstQwooqoOTEHDOebpMn7ngkUsg3RotU8X1MkuVDrYohkIupC0YArX6T+PfX3kcbQLNV/iCKi6EB3xqXdAZ0JKthZ8B0QEl673NIEX/0I/z36Rf6ENGzZ8EP4A8Lp+9e9VWC4AAAAASUVORK5CYII=",
+  );
+  __publicField(
+    ToolTip,
+    "flip",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAZklEQVRIx+2XQQoAIAgE1+g7/f95degWHSyTTXDOhTsSiUBgOtCq8mD3DiOA3NxTCVgKaLA0qHiFOsHSnC8ELKQAmxRgE15APQfWv9pzLjwX+CXsjvBPKAXYpACb8AICzM2GHeSWAfVOCIiJuQ9tAAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    ToolTip,
+    "freehand",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAdUlEQVRIx+2WUQrAMAhD3dj9r+y+VoSyLhYDynzQv1qiJlCR4hzeAhVRsiC3Jkj0c5hN7Lx7IQ9SphLE1ICdwko420purEWQuywN3pqxgcw2+WwAtU1GzoqiLZNwZBvMAIcO8y3YKUO8mkbmjPzjK9E0TUPjBoeyLAS0usjLAAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    ToolTip,
+    "line",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAU0lEQVRIx+2UQQ4AIAjD8P+PxivRGDQC47C+oN1hIgTLQAt4qIga2c23XYAVPkm3CVhlb4ShAa/rQgMi1i0NyFg3LaBq3bAA1LpfAd7/EkIIIR2YXFYSCpWS8w8AAAAASUVORK5CYII=",
+  );
+  __publicField(
+    ToolTip,
+    "merge",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAW0lEQVRIx+2XQQrAQAgDx9Lv9JF9+e6h54IINlgyZ4UMOYgwmAXXmRxc3WECorJ3dAfrJtXAC7c6PPygAQuosYAaC6hJ3YHqlfyC8Q1YQI0F1IwXCHg+G3WQKhvwgwUFmFyYbwAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "pen",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAK0lEQVRIx+3OsQkAMAwDQXn/oe3WfSAEctd9I5TA32pHJ/3AoTpfAQCAGwaa5AICJLKWSQAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "rect",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAQElEQVRIx+3TMQ4AIAhD0WK8/5VxdcIYY8rw3wok7YAEr6iGKaU74BY0ro+6FKhyDHe4VxRwm6eFLn8AAADwwQIwTQgGo9ZMywAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "rectfill",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAANElEQVRIx+3PIQ4AIBADwcL//3xYBMEgLiQztmab0GvcxkqqO3ALPbbO7rBXDnRzAADgYwvqDwIMJlGb5QAAAABJRU5ErkJggg==",
+  );
+  __publicField(
+    ToolTip,
+    "text",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAcUlEQVRIx+2VwQ7AIAhDy7L//2V2WmIYg+ky2KEv8aCCqYQqQMgrJNpUQMXEKKDmAPHyspgSrBBvLZu3cQqZEdwhfusq0KdkVR5HlFfBvpI0mtIzeusFot7vFPqYuzZYMXUFlzc+qrIn7tf/ACGEkIwDlEQ94YZjzcgAAAAASUVORK5CYII=",
+  );
+  __publicField(
+    ToolTip,
+    "tone",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAATCAYAAADWOo4fAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAABmJLR0QAAAAAAAD5Q7t/AAAACXBIWXMAAAsSAAALEgHS3X78AAAAO0lEQVRIx+3PIQ4AMAgEwaP//zNVVZUELiQ7CgWstFy8IaVsPhT1Lb/T+fQEAtwIcCPAjQC39QEAgJIL6DQCFhAqsRkAAAAASUVORK5CYII=",
+  );
   var PenTip = class extends ToolTip {
     constructor() {
       super();
@@ -1401,7 +1604,7 @@
       this.tools = [
         Painter.TOOLTYPE_PEN,
         Painter.TOOLTYPE_BRUSH,
-        Painter.TOOLTYPE_TEXT
+        Painter.TOOLTYPE_TEXT,
       ];
       this.hasTintImage = true;
       this.toolIcons = [ToolTip.pen, ToolTip.brush, ToolTip.text];
@@ -1417,7 +1620,7 @@
       this.toolStrings = [
         translate("\u925B\u7B46"),
         translate("\u6C34\u5F69"),
-        translate("\uFF83\uFF77\uFF7D\uFF84")
+        translate("\uFF83\uFF77\uFF7D\uFF84"),
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1441,7 +1644,7 @@
         Painter.TOOLTYPE_TONE,
         Painter.TOOLTYPE_BLUR,
         Painter.TOOLTYPE_DODGE,
-        Painter.TOOLTYPE_BURN
+        Painter.TOOLTYPE_BURN,
       ];
       this.hasTintImage = true;
       this.toolIcons = [ToolTip.tone, ToolTip.blur, ToolTip.burn, ToolTip.burn];
@@ -1458,7 +1661,7 @@
         translate("\u30C8\u30FC\u30F3"),
         translate("\u307C\u304B\u3057"),
         translate("\u8986\u3044\u713C\u304D"),
-        translate("\u713C\u304D\u8FBC\u307F")
+        translate("\u713C\u304D\u8FBC\u307F"),
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1492,7 +1695,7 @@
         return;
       }
       const ctx = this.canvas.getContext("2d", {
-        willReadFrequently: true
+        willReadFrequently: true,
       });
       if (!ctx) {
         console.error("Failed to get 2D context for Pen2Tip canvas.");
@@ -1506,7 +1709,13 @@
       var toneData = Neo.painter.getToneData(a);
       for (var j = 0; j < 18; j++) {
         for (var i = 0; i < 46; i++) {
-          if (j >= 1 && j < 12 && i >= 2 && i < 26 && toneData[i % 4 + j % 4 * 4]) {
+          if (
+            j >= 1 &&
+            j < 12 &&
+            i >= 2 &&
+            i < 26 &&
+            toneData[(i % 4) + (j % 4) * 4]
+          ) {
             buf32[j * 46 + i] = c;
           } else {
             buf32[j * 46 + i] = 0;
@@ -1530,7 +1739,7 @@
       this.tools = [
         Painter.TOOLTYPE_ERASER,
         Painter.TOOLTYPE_ERASERECT,
-        Painter.TOOLTYPE_ERASEALL
+        Painter.TOOLTYPE_ERASEALL,
       ];
     }
     /**
@@ -1543,7 +1752,7 @@
       this.toolStrings = [
         translate("\u6D88\u3057\u30DA\u30F3"),
         translate("\u6D88\u3057\u56DB\u89D2"),
-        translate("\u5168\u6D88\u3057")
+        translate("\u5168\u6D88\u3057"),
       ];
       this.drawOnce = false;
       this.isTool = true;
@@ -1568,7 +1777,7 @@
         return null;
       }
       var ctx = this.canvas.getContext("2d", {
-        willReadFrequently: true
+        willReadFrequently: true,
       });
       if (!ctx) {
         console.error("Failed to get 2D context for EraserTip canvas.");
@@ -1576,7 +1785,7 @@
       }
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       var img = new Image();
-      img.onload = function() {
+      img.onload = function () {
         ctx == null ? void 0 : ctx.drawImage(img, 0, 0);
       };
       img.src = ToolTip.eraser;
@@ -1593,14 +1802,14 @@
         Painter.TOOLTYPE_RECTFILL,
         Painter.TOOLTYPE_RECT,
         Painter.TOOLTYPE_ELLIPSEFILL,
-        Painter.TOOLTYPE_ELLIPSE
+        Painter.TOOLTYPE_ELLIPSE,
       ];
       this.hasTintImage = true;
       this.toolIcons = [
         ToolTip.rectfill,
         ToolTip.rect,
         ToolTip.ellipsefill,
-        ToolTip.ellipse
+        ToolTip.ellipse,
       ];
     }
     /**
@@ -1614,7 +1823,7 @@
         translate("\u56DB\u89D2"),
         translate("\u7DDA\u56DB\u89D2"),
         translate("\u6955\u5186"),
-        translate("\u7DDA\u6955\u5186")
+        translate("\u7DDA\u6955\u5186"),
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1644,7 +1853,7 @@
         Painter.TOOLTYPE_BLURRECT,
         Painter.TOOLTYPE_FLIP_H,
         Painter.TOOLTYPE_FLIP_V,
-        Painter.TOOLTYPE_TURN
+        Painter.TOOLTYPE_TURN,
       ];
       this.hasTintImage = true;
       this.toolIcons = [
@@ -1653,7 +1862,7 @@
         ToolTip.blurrect,
         ToolTip.flip,
         ToolTip.flip,
-        ToolTip.flip
+        ToolTip.flip,
       ];
     }
     /**
@@ -1670,7 +1879,7 @@
         translate("\u89D2\u53D6\u308A"),
         translate("\u5DE6\u53F3\u53CD\u8EE2"),
         translate("\u4E0A\u4E0B\u53CD\u8EE2"),
-        translate("\u50BE\u3051")
+        translate("\u50BE\u3051"),
       ];
       this.isTool = true;
       super.init(elementID, params);
@@ -1710,7 +1919,7 @@
         translate("\u30DE\u30B9\u30AF"),
         translate("\u9006\uFF8F\uFF7D\uFF78"),
         translate("\u52A0\u7B97"),
-        translate("\u9006\u52A0\u7B97")
+        translate("\u9006\u52A0\u7B97"),
       ];
       this.fixed = true;
       super.init(elementID, params);
@@ -1743,10 +1952,14 @@
      */
     draw(color) {
       var _a;
-      const c = typeof color === "string" ? color : Neo.painter.getColorString(color);
-      var ctx = (_a = this.canvas) == null ? void 0 : _a.getContext("2d", {
-        willReadFrequently: true
-      });
+      const c =
+        typeof color === "string" ? color : Neo.painter.getColorString(color);
+      var ctx =
+        (_a = this.canvas) == null
+          ? void 0
+          : _a.getContext("2d", {
+              willReadFrequently: true,
+            });
       if (!ctx) {
         console.error("Failed to get 2D context for MaskTip canvas.");
         return null;
@@ -1778,7 +1991,7 @@
       this.toolStrings = [
         translate("\u624B\u66F8\u304D"),
         translate("\u76F4\u7DDA"),
-        translate("BZ\u66F2\u7DDA")
+        translate("BZ\u66F2\u7DDA"),
       ];
       this.fixed = true;
       super.init(elementID, params);
@@ -1840,7 +2053,8 @@
       this.type = this.params.type;
       if (this.element) {
         this.element.className = "colorSlider";
-        this.element.innerHTML = "<div class='slider'></div><div class='label'></div>";
+        this.element.innerHTML =
+          "<div class='slider'></div><div class='label'></div>";
         this.element.innerHTML += "<div class='hit'></div>";
         this.slider = this.element.querySelector(".slider");
         this.label = this.element.querySelector(".label");
@@ -1895,8 +2109,7 @@
      * @param {number} x
      * @param {number} y
      */
-    upHandler(x, y) {
-    }
+    upHandler(x, y) {}
     /**
      * @param {number} x
      * @param {number} y
@@ -1924,7 +2137,7 @@
         const r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         const g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         const b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
-        Neo.painter.setColor(r << 16 | g << 8 | b);
+        Neo.painter.setColor((r << 16) | (g << 8) | b);
         updateUIColor(true, true);
       }
     }
@@ -1953,11 +2166,10 @@
         var r = Neo.sliders[Neo.SLIDERTYPE_RED].value;
         var g = Neo.sliders[Neo.SLIDERTYPE_GREEN].value;
         var b = Neo.sliders[Neo.SLIDERTYPE_BLUE].value;
-        var color = r << 16 | g << 8 | b;
-        var colorTip = (
+        var color = (r << 16) | (g << 8) | b;
+        var colorTip =
           /** @type {ColorTip|null} **/
-          ColorTip.getCurrent()
-        );
+          ColorTip.getCurrent();
         if (colorTip) {
           colorTip.setColor(Neo.painter.getColorString(color));
         }
@@ -1981,7 +2193,7 @@
           this.value = alpha;
           break;
       }
-      var width = this.value * 49 / 255;
+      var width = (this.value * 49) / 255;
       width = Math.max(Math.min(48, width), 1);
       if (this.slider instanceof HTMLElement) {
         this.slider.style.width = width.toFixed(2) + "px";
@@ -2021,7 +2233,8 @@
       this.value = this.value0 = 1;
       if (this.element) {
         this.element.className = "sizeSlider";
-        this.element.innerHTML = "<div class='slider'></div><div class='label'></div>";
+        this.element.innerHTML =
+          "<div class='slider'></div><div class='label'></div>";
         this.element.innerHTML += "<div class='hit'></div>";
         this.slider = this.element.querySelector(".slider");
         this.label = this.element.querySelector(".label");
@@ -2058,8 +2271,7 @@
      * @param {number} x
      * @param {number} y
      */
-    upHandler(x, y) {
-    }
+    upHandler(x, y) {}
     /**
      * @param {number} x
      * @param {number} y
@@ -2069,7 +2281,7 @@
       var value0 = Neo.painter.lineWidth;
       var value;
       if (!((_a = Neo.painter.sliderTool) == null ? void 0 : _a.isAlt)) {
-        var v = Math.floor((y - 4) * 30 / 33);
+        var v = Math.floor(((y - 4) * 30) / 33);
         value = Math.max(Math.min(v, 30), 1);
         if (value0 > value || value0 == 30) {
           value0--;
@@ -2091,7 +2303,7 @@
       var value;
       if (!((_a = Neo.painter.sliderTool) == null ? void 0 : _a.isAlt)) {
         if (x >= 0 && x < 48 && y >= 0 && y < 41) {
-          var v = Math.floor((y - 4) * 30 / 33);
+          var v = Math.floor(((y - 4) * 30) / 33);
           value = v;
           this.value0 = value;
           this.y0 = y;
@@ -2128,7 +2340,7 @@
     }
     update() {
       this.value = Neo.painter.lineWidth;
-      var height = this.value * 33 / 30;
+      var height = (this.value * 33) / 30;
       height = Math.max(Math.min(34, height), 1);
       if (this.slider instanceof HTMLElement) {
         this.slider.style.height = height.toFixed(2) + "px";
@@ -2165,7 +2377,7 @@
       this.isMouseDown = false;
       const ref = this;
       if (this.element) {
-        this.element.onmousedown = function(e) {
+        this.element.onmousedown = function (e) {
           ref._mouseDownHandler(e);
         };
         this.element.addEventListener(
@@ -2173,15 +2385,20 @@
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._mouseDownHandler(e);
             e.preventDefault();
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.className = "layerControl";
         var layerStrings = [translate("Layer0"), translate("Layer1")];
-        this.element.innerHTML = "<div class='bg'></div><div class='label0'>" + layerStrings[0] + "</div><div class='label1'>" + layerStrings[1] + "</div><div class='line1'></div><div class='line0'></div>";
+        this.element.innerHTML =
+          "<div class='bg'></div><div class='label0'>" +
+          layerStrings[0] +
+          "</div><div class='label1'>" +
+          layerStrings[1] +
+          "</div><div class='line1'></div><div class='line0'></div>";
         this.bg = this.element.querySelector(".bg");
         this.label0 = this.element.querySelector(".label0");
         this.label1 = this.element.querySelector(".label1");
@@ -2213,7 +2430,7 @@
         0,
         0,
         Neo.painter.canvasWidth,
-        Neo.painter.canvasHeight
+        Neo.painter.canvasHeight,
       );
       if (Neo.painter.tool.type == Painter.TOOLTYPE_PASTE) {
         if (Neo.painter.pasteTool) {
@@ -2259,7 +2476,7 @@
       this.elementID = elementID;
       const ref = this;
       if (this.element) {
-        this.element.onmousedown = function(e) {
+        this.element.onmousedown = function (e) {
           ref._mouseDownHandler(e);
         };
         this.element.addEventListener(
@@ -2267,11 +2484,11 @@
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._mouseDownHandler(e);
             e.preventDefault();
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.className = "reserve";
         var index = parseInt(this.elementID.slice(11)) - 1;
@@ -2344,8 +2561,7 @@
     constructor() {
       this.element = null;
       this.elementID = "";
-      this.params = /** @type {any} */
-      null;
+      this.params = /** @type {any} */ null;
       this.barButton = null;
     }
     /**
@@ -2421,23 +2637,25 @@
           return null;
         }
         const ctx = this.canvas.getContext("2d", {
-          willReadFrequently: true
+          willReadFrequently: true,
         });
         if (!ctx) {
           console.error("Canvas context not found for " + elementID);
           return null;
         }
         const img = new Image();
-        img.onload = function() {
+        img.onload = function () {
           ctx.clearRect(0, 0, 24, 24);
           ctx.drawImage(img, 0, 0);
           tintImage(ctx, Neo.config.color_text);
         }.bind(this);
-        img.src = /**@type {any}*/
-        _ViewerButton[elementID.toLowerCase().replace(/neo-viewer/, "")];
+        img.src =
+          /**@type {any}*/
+          _ViewerButton[elementID.toLowerCase().replace(/neo-viewer/, "")];
       } else {
         if (this.element) {
-          this.element.innerHTML = "<div></div><canvas width=24 height=24></canvas>";
+          this.element.innerHTML =
+            "<div></div><canvas width=24 height=24></canvas>";
         }
         this.update();
       }
@@ -2453,12 +2671,37 @@
       }
     }
   };
-  __publicField(_ViewerButton, "speedStrings", ["\u6700", "\u65E9", "\u65E2", "\u920D"]);
-  __publicField(_ViewerButton, "minus", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC");
-  __publicField(_ViewerButton, "plus", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAfSURBVAjXY2BAA0wTMAimVasaIARj2FQHCIGkBAUAAGm3CXHeKF1tAAAAAElFTkSuQmCC");
-  __publicField(_ViewerButton, "play", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAuSURBVAjXY2BAABUQoQkitBxAxAQQsQRErAQRq+CspSBiKogIAekIABKqDhAzAAuwB6SsnxQ6AAAAAElFTkSuQmCC");
-  __publicField(_ViewerButton, "stop", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYIAB+x8EEBgAACjyDV75Mi9xAAAAAElFTkSuQmCC");
-  __publicField(_ViewerButton, "rewind", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAACxJREFUCNdjYAADJiYGNjYGPj4GOTkGOzuGujqGf/9AJJANFAGKA2WBahgYAIE2Bb0RIYJRAAAAAElFTkSuQmCC");
+  __publicField(_ViewerButton, "speedStrings", [
+    "\u6700",
+    "\u65E9",
+    "\u65E2",
+    "\u920D",
+  ]);
+  __publicField(
+    _ViewerButton,
+    "minus",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYMAG5H+AEDYAADOnAi81ABEKAAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    _ViewerButton,
+    "plus",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAfSURBVAjXY2BAA0wTMAimVasaIARj2FQHCIGkBAUAAGm3CXHeKF1tAAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    _ViewerButton,
+    "play",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAACVBMVEX/////HgD/HgAvnCBAAAAAAnRSTlMAAHaTzTgAAAAuSURBVAjXY2BAABUQoQkitBxAxAQQsQRErAQRq+CspSBiKogIAekIABKqDhAzAAuwB6SsnxQ6AAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    _ViewerButton,
+    "stop",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAABFJREFUCNdjYIAB+x8EEBgAACjyDV75Mi9xAAAAAElFTkSuQmCC",
+  );
+  __publicField(
+    _ViewerButton,
+    "rewind",
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX/////HgA/G9hMAAAAAXRSTlMAQObYZgAAACxJREFUCNdjYAADJiYGNjYGPj4GOTkGOzuGujqGf/9AJJANFAGKA2WBahgYAIE2Bb0RIYJRAAAAAElFTkSuQmCC",
+  );
   var ViewerButton = _ViewerButton;
   var ViewerBar = class {
     constructor() {
@@ -2487,7 +2730,8 @@
       this.isMouseDown = false;
       if (this.element) {
         this.element.style.display = "inline-block";
-        this.element.innerHTML = "<div id='neo-viewerBarLeft'></div><div id='neo-viewerBarMark'></div><div id='neo-viewerBarText'>hoge</div>";
+        this.element.innerHTML =
+          "<div id='neo-viewerBarLeft'></div><div id='neo-viewerBarMark'></div><div id='neo-viewerBarText'>hoge</div>";
         if (this.element.children[0] instanceof HTMLElement) {
           this.seekElement = this.element.children[0];
         }
@@ -2506,32 +2750,32 @@
         const ref = this;
         this.element.addEventListener(
           "pointerdown",
-          function(e) {
+          function (e) {
             ref.isMouseDown = true;
             ref._touchHandler(e);
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.addEventListener(
           "pointermove",
-          function(e) {
+          function (e) {
             e.preventDefault();
             if (ref.isMouseDown) {
               ref._touchHandler(e);
             }
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
         this.element.addEventListener(
           "touchstart",
           /**
            * @param {TouchEvent} e
            */
-          function(e) {
+          function (e) {
             ref._touchHandler(e);
             e.preventDefault();
           },
-          { passive: false, capture: true }
+          { passive: false, capture: true },
         );
       }
       this.update();
@@ -2544,9 +2788,9 @@
       }
       this.mark = Neo.painter._actionMgr._mark;
       this.seek = Neo.painter._actionMgr._head;
-      var markX = this.mark / this.length * this.width;
+      var markX = (this.mark / this.length) * this.width;
       this.markElement.style.left = markX + "px";
-      var seekX = this.seek / this.length * this.width;
+      var seekX = (this.seek / this.length) * this.width;
       this.seekElement.style.width = seekX + "px";
       this.textElement.innerHTML = this.seek + "/" + this.length;
     }
@@ -2668,27 +2912,37 @@
       }
       var item = this._items[this._head];
       if (!Neo.viewer && !painter.busySkipped) {
-        painter._pushUndo(0, 0, painter.canvasWidth, painter.canvasHeight, true);
+        painter._pushUndo(
+          0,
+          0,
+          painter.canvasWidth,
+          painter.canvasHeight,
+          true,
+        );
       }
       if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
         Neo.viewerSpeed.update();
       }
       var func;
-      const hasRestore = this._items.some(
-        (item2) => item2[0] === "restore"
-      );
+      const hasRestore = this._items.some((item2) => item2[0] === "restore");
       if (painter.busySkipped && hasRestore) {
-        func = item[0] && /**@type {any}**/
-        this[item[0]] && item[0] === "restore" ? item[0] : "dummy";
+        func =
+          item[0] && /**@type {any}**/ this[item[0]] && item[0] === "restore"
+            ? item[0]
+            : "dummy";
       } else {
-        func = item[0] && /**@type {any}**/
-        this[item[0]] ? item[0] : "dummy";
+        func = item[0] && /**@type {any}**/ this[item[0]] ? item[0] : "dummy";
       }
       const ref = this;
       var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
-      this[func](item, function(result) {
+      this[func](item, function (result) {
         if (result) {
-          if (painter.busySkipped && ref._head < ref._mark - 2 && ref._mark - 2 >= 0 && ref._items[ref._mark - 1][0] == "restore") {
+          if (
+            painter.busySkipped &&
+            ref._head < ref._mark - 2 &&
+            ref._mark - 2 >= 0 &&
+            ref._items[ref._mark - 1][0] == "restore"
+          ) {
             ref._head = ref._mark - 2;
           } else {
             ref._head++;
@@ -2696,7 +2950,7 @@
           ref._index = 0;
           ref._prevSpeed = Neo.speed;
         }
-        setTimeout(function() {
+        setTimeout(function () {
           painter._actionMgr.play();
         }, wait);
       });
@@ -2718,13 +2972,13 @@
         0,
         0,
         painter.canvasWidth,
-        painter.canvasHeight
+        painter.canvasHeight,
       );
       painter.canvasCtx[1].clearRect(
         0,
         0,
         painter.canvasWidth,
-        painter.canvasHeight
+        painter.canvasHeight,
       );
       painter.updateDestCanvas(0, 0, painter.canvasWidth, painter.canvasHeight);
       var callback = arguments[1];
@@ -2878,7 +3132,11 @@
           head.push(x0, y0);
           var x = head[head.length - 4];
           var y = head[head.length - 3];
-          if (x1 != head[head.length - 4] || y1 != head[head.length - 3] || lineType != head[11]) {
+          if (
+            x1 != head[head.length - 4] ||
+            y1 != head[head.length - 3] ||
+            lineType != head[11]
+          ) {
             console.log("eror in freeHandMove?", x, y, lineType, head);
           }
         }
@@ -2966,7 +3224,7 @@
           x3,
           y3,
           lineType,
-          isReplay
+          isReplay,
         );
       } else {
         const item = arguments[0];
@@ -2992,7 +3250,7 @@
           x32,
           y32,
           lineType2,
-          isReplay
+          isReplay,
         );
       }
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
@@ -3346,7 +3604,7 @@
           numAlpha,
           string,
           size,
-          family
+          family,
         );
         oe.doText(layer, numX, numY, numColor, numAlpha, string, size, family);
       } else {
@@ -3379,8 +3637,8 @@
         var callback = arguments[1];
         const img0 = new Image();
         const img1 = new Image();
-        img0.onload = function() {
-          img1.onload = function() {
+        img0.onload = function () {
+          img1.onload = function () {
             oe.canvasCtx[0].clearRect(0, 0, width, height);
             oe.canvasCtx[1].clearRect(0, 0, width, height);
             oe.canvasCtx[0].drawImage(img0, 0, 0);
@@ -3399,18 +3657,19 @@
       if (callback && typeof callback == "function") callback(true);
     }
   };
-  Neo.createViewer = function(applet) {
+  Neo.createViewer = function (applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    var html = '<div id="neo-pageView" style="margin:auto;"><div id="neo-container" style="visibility:visible;" class="o"><div id="neo-painter" style="background-color:white;"><div id="neo-canvas" style="background-color:white;"></div></div><div id="neo-viewerButtonsWrapper" style="display:block;"><div id="neo-viewerButtons" style="display:block;"><div id="neo-viewerPlay"></div><div id="neo-viewerStop"></div><div id="neo-viewerRewind"></div><div id="neo-viewerSpeed" style="padding-left:2px; margin-top: 1px;"></div><div id="neo-viewerPlus"></div><div id="neo-viewerMinus"></div><div id="neo-viewerBar" style="display:inline-block;"></div></div></div></div>';
-    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+    var html =
+      '<div id="neo-pageView" style="margin:auto;"><div id="neo-container" style="visibility:visible;" class="o"><div id="neo-painter" style="background-color:white;"><div id="neo-canvas" style="background-color:white;"></div></div><div id="neo-viewerButtonsWrapper" style="display:block;"><div id="neo-viewerButtons" style="display:block;"><div id="neo-viewerPlay"></div><div id="neo-viewerStop"></div><div id="neo-viewerRewind"></div><div id="neo-viewerSpeed" style="padding-left:2px; margin-top: 1px;"></div><div id="neo-viewerPlus"></div><div id="neo-viewerMinus"></div><div id="neo-viewerBar" style="display:inline-block;"></div></div></div></div>';
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function (match, str) {
       return translate(str);
     });
     var parent = applet.parentNode;
     parent == null ? void 0 : parent.appendChild(neo);
     parent == null ? void 0 : parent.insertBefore(neo, applet);
-    setTimeout(function() {
+    setTimeout(function () {
       const tmp = document.querySelectorAll(".NEO");
       if (tmp.length > 1) {
         for (var i = 1; i < tmp.length; i++) {
@@ -3419,7 +3678,7 @@
       }
     }, 0);
   };
-  Neo.initViewer = function(pch) {
+  Neo.initViewer = function (pch) {
     const pageview = document.getElementById("neo-pageView");
     if (!pageview) return;
     var pageWidth = Neo.config.applet_width;
@@ -3441,7 +3700,9 @@
     var dx = (pageWidth - Neo.config.width) / 2;
     var dy = (pageHeight - Neo.config.height - 26) / 2;
     var painter = document.getElementById("neo-painter");
-    Neo.viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top && window.innerHeight < pageHeight + 100;
+    Neo.viewerWrapperOnTop =
+      Neo.config.neo_viewer_buttonswrapper_top &&
+      window.innerHeight < pageHeight + 100;
     if (painter) {
       painter.style.marginTop = "0";
       painter.style.position = "absolute";
@@ -3453,11 +3714,13 @@
       Neo.container.style.paddingTop = Neo.viewerWrapperOnTop ? "26px" : "";
     }
     var viewerButtonsWrapper = document.getElementById(
-      "neo-viewerButtonsWrapper"
+      "neo-viewerButtonsWrapper",
     );
     if (viewerButtonsWrapper) {
       viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
-      viewerButtonsWrapper.style.position = Neo.viewerWrapperOnTop ? "absolute" : "";
+      viewerButtonsWrapper.style.position = Neo.viewerWrapperOnTop
+        ? "absolute"
+        : "";
       viewerButtonsWrapper.style.top = Neo.viewerWrapperOnTop ? "0" : "";
     }
     const viewerBar = document.getElementById("neo-viewerBar");
@@ -3476,27 +3739,31 @@
     Neo.canvas.style.height = Neo.config.height + "px";
     Neo.painter = new Painter();
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-    Neo.container.oncontextmenu = function() {
+    Neo.container.oncontextmenu = function () {
       return false;
     };
     Neo.painter._actionMgr.isMouseDown = false;
-    painter == null ? void 0 : painter.addEventListener(
-      "pointerdown",
-      function() {
-        Neo.painter._actionMgr.isMouseDown = true;
-      },
-      false
-    );
-    painter == null ? void 0 : painter.addEventListener(
-      "touchmove",
-      function(e) {
-        e.preventDefault();
-      },
-      { passive: false, capture: false }
-    );
+    painter == null
+      ? void 0
+      : painter.addEventListener(
+          "pointerdown",
+          function () {
+            Neo.painter._actionMgr.isMouseDown = true;
+          },
+          false,
+        );
+    painter == null
+      ? void 0
+      : painter.addEventListener(
+          "touchmove",
+          function (e) {
+            e.preventDefault();
+          },
+          { passive: false, capture: false },
+        );
     document.addEventListener(
       "pointermove",
-      function(e) {
+      function (e) {
         e.preventDefault();
         if (Neo.painter._actionMgr.isMouseDown) {
           var zoom = Neo.painter.zoom;
@@ -3505,17 +3772,17 @@
           Neo.painter.setZoomPosition(x, y);
         }
       },
-      { passive: false, capture: false }
+      { passive: false, capture: false },
     );
     document.addEventListener(
       "pointerup",
-      function() {
+      function () {
         Neo.painter._actionMgr.isMouseDown = false;
         if (Neo.viewerBar) {
           Neo.viewerBar.isMouseDown = false;
         }
       },
-      false
+      false,
     );
     if (pch && pch.data && pch.data.length > 0) {
       Neo.painter._actionMgr._items = pch.data;
@@ -3525,12 +3792,10 @@
       }, 50);
     }
   };
-  Neo.startViewer = function() {
+  Neo.startViewer = function () {
     if (Neo.applet) {
       var name = Neo.applet.getAttribute("name") || "pch";
-      if (!/** @type {any} */
-      document[name])
-        document[name] = Neo;
+      if (!(/** @type {any} */ document[name])) document[name] = Neo;
       if (Neo.applet.parentNode) {
         Neo.applet.parentNode.removeChild(Neo.applet);
       }
@@ -3539,67 +3804,75 @@
     var lightBack = multColor(Neo.config.color_back, 1.3);
     var darkBack = multColor(Neo.config.color_back, 0.7);
     addRule(".NEO #neo-viewerButtons", "color", Neo.config.color_text);
-    addRule(".NEO #neo-viewerButtons", "background-color", Neo.config.color_back);
+    addRule(
+      ".NEO #neo-viewerButtons",
+      "background-color",
+      Neo.config.color_back,
+    );
     addRule(
       ".NEO #neo-viewerButtonsWrapper",
       "border",
-      "1px solid " + Neo.config.color_frame + " !important"
+      "1px solid " + Neo.config.color_frame + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons",
       "border",
-      "1px solid " + Neo.config.color_back + " !important"
+      "1px solid " + Neo.config.color_back + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons",
       "border-left",
-      "1px solid " + lightBack + " !important"
+      "1px solid " + lightBack + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons",
       "border-top",
-      "1px solid " + lightBack + " !important"
+      "1px solid " + lightBack + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div.buttonOff",
       "background-color",
-      Neo.config.color_icon + " !important"
+      Neo.config.color_icon + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div.buttonOff:active",
       "background-color",
-      darkBack + " !important"
+      darkBack + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div.buttonOn",
       "background-color",
-      darkBack + " !important"
+      darkBack + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div",
       "border",
-      "1px solid " + Neo.config.color_frame + " !important"
+      "1px solid " + Neo.config.color_frame + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div.buttonOff:hover",
       "border",
-      "1px solid" + Neo.config.color_bar_select + " !important"
+      "1px solid" + Neo.config.color_bar_select + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div.buttonOff:active",
       "border",
-      "1px solid" + Neo.config.color_bar_select + " !important"
+      "1px solid" + Neo.config.color_bar_select + " !important",
     );
     addRule(
       ".NEO #neo-viewerButtons >div.buttonOn",
       "border",
-      "1px solid" + Neo.config.color_bar_select + " !important"
+      "1px solid" + Neo.config.color_bar_select + " !important",
     );
-    addRule(".NEO #neo-viewerBar >div", "background-color", Neo.config.color_bar);
+    addRule(
+      ".NEO #neo-viewerBar >div",
+      "background-color",
+      Neo.config.color_bar,
+    );
     addRule(
       ".NEO #neo-viewerBarMark",
       "background-color",
-      Neo.config.color_text + " !important"
+      Neo.config.color_text + " !important",
     );
     if (Neo.config.neo_viewer_max_width_100) {
       addRule(".NEO #neo-pageView", "max-width", "100%");
@@ -3615,14 +3888,14 @@
       addRule(".NEO #neo-viewerButtonsWrapper", "left", "auto");
       Neo.painter.clearCanvasHeight();
     }
-    setTimeout(function() {
+    setTimeout(function () {
       Neo.viewerPlay = new ViewerButton().init("neo-viewerPlay");
       if (!Neo.viewerPlay) {
         console.error("startViewer: ViewerPlay not found");
         return;
       }
       Neo.viewerPlay.setSelected(true);
-      Neo.viewerPlay.onmouseup = function() {
+      Neo.viewerPlay.onmouseup = function () {
         Neo.painter.onplay();
       };
       Neo.viewerStop = new ViewerButton().init("neo-viewerStop");
@@ -3630,7 +3903,7 @@
         console.error("startViewer: ViewerStop not found");
         return;
       }
-      Neo.viewerStop.onmouseup = function() {
+      Neo.viewerStop.onmouseup = function () {
         Neo.painter.onstop();
       };
       Neo.viewerSpeed = new ViewerButton().init("neo-viewerSpeed");
@@ -3638,32 +3911,32 @@
         console.error("startViewer: ViewerSpeed not found");
         return;
       }
-      Neo.viewerSpeed.onmouseup = function() {
+      Neo.viewerSpeed.onmouseup = function () {
         Neo.painter.onspeed();
         this.update();
       };
       const neo_viewerRewind = new ViewerButton().init("neo-viewerRewind");
       if (neo_viewerRewind) {
-        neo_viewerRewind.onmouseup = function() {
+        neo_viewerRewind.onmouseup = function () {
           Neo.painter.onrewind();
         };
       }
       const commands = new Commands();
       const neo_viewerPlus = new ViewerButton().init("neo-viewerPlus");
       if (neo_viewerPlus) {
-        neo_viewerPlus.onmouseup = function() {
+        neo_viewerPlus.onmouseup = function () {
           new commands.ZoomPlusCommand(Neo.painter).execute();
         };
       }
       const neo_viewerMinus = new ViewerButton().init("neo-viewerMinus");
       if (neo_viewerMinus) {
-        neo_viewerMinus.onmouseup = function() {
+        neo_viewerMinus.onmouseup = function () {
           new commands.ZoomMinusCommand(Neo.painter).execute();
         };
       }
       const length = Neo.painter._actionMgr._items.length;
       Neo.viewerBar = new ViewerBar().init("neo-viewerBar", {
-        length
+        length,
       });
       if (Neo.config.neo_viewer_max_width_100 && Neo.viewerBar) {
         const viewerBar = document.getElementById("neo-viewerBar");
@@ -3676,43 +3949,52 @@
       }
     }, 0);
   };
-  var getFilename = function() {
+  var getFilename = function () {
     return Neo.config.pch_file || Neo.config.image_canvas;
   };
-  var getPCH = function(filename, callback) {
+  var getPCH = function (filename, callback) {
     if (!filename || filename.slice(-4).toLowerCase() != ".pch") return null;
-    fetch(filename).then((response) => response.arrayBuffer()).then((buffer) => {
-      const pch = Neo.decodePCH(buffer);
-      if (pch) {
-        if (callback) callback(pch);
-      } else {
-        console.log("not a NEO animation");
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+    fetch(filename)
+      .then((response) => response.arrayBuffer())
+      .then((buffer) => {
+        const pch = Neo.decodePCH(buffer);
+        if (pch) {
+          if (callback) callback(pch);
+        } else {
+          console.log("not a NEO animation");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-  Neo.decodePCH = function(rawdata) {
+  Neo.decodePCH = function (rawdata) {
     const byteArray = new Uint8Array(rawdata);
-    const data = import_lz_string.default.decompressFromUint8Array(byteArray.subarray(12));
+    const data = import_lz_string.default.decompressFromUint8Array(
+      byteArray.subarray(12),
+    );
     const header = byteArray.subarray(0, 12);
     if (!data) {
       throw new Error("Failed to decompress data");
     }
-    if (header[0] == "N".charCodeAt(0) && header[1] == "E".charCodeAt(0) && header[2] == "O".charCodeAt(0)) {
+    if (
+      header[0] == "N".charCodeAt(0) &&
+      header[1] == "E".charCodeAt(0) &&
+      header[2] == "O".charCodeAt(0)
+    ) {
       const width = header[4] + header[5] * 256;
       const height = header[6] + header[7] * 256;
       const items = fixPCH(JSON.parse(data));
       return {
         width,
         height,
-        data: items
+        data: items,
       };
     } else {
       return null;
     }
   };
-  var fixPCH = function(items) {
+  var fixPCH = function (items) {
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
       var index = item.indexOf("eraseAll");
@@ -3726,32 +4008,32 @@
     }
     return items;
   };
-  Neo.playPCH = function() {
+  Neo.playPCH = function () {
     Neo.painter.onplay();
   };
-  Neo.suspendDraw = function() {
+  Neo.suspendDraw = function () {
     Neo.painter.onstop();
   };
-  Neo.setSpeed = function(value) {
+  Neo.setSpeed = function (value) {
     Neo.speed = value;
   };
-  Neo.setVisit = function(layer, value) {
+  Neo.setVisit = function (layer, value) {
     Neo.painter.visible[layer] = value == 0 ? false : true;
     Neo.painter.updateDestCanvas(
       0,
       0,
       Neo.painter.canvasWidth,
-      Neo.painter.canvasHeight
+      Neo.painter.canvasHeight,
     );
   };
-  Neo.setMark = function(value) {
+  Neo.setMark = function (value) {
     Neo.painter._actionMgr._mark = value;
     Neo.painter.onmark();
   };
-  Neo.getSeek = function() {
+  Neo.getSeek = function () {
     return Neo.painter._actionMgr._head;
   };
-  Neo.getLineCount = function() {
+  Neo.getLineCount = function () {
     return Neo.painter._actionMgr._items.length;
   };
 
@@ -3769,38 +4051,28 @@
       this.lineType = Painter.LINETYPE_NONE;
     }
     /** @param {Painter} oe * */
-    init(oe) {
-    }
-    kill() {
-    }
+    init(oe) {}
+    kill() {}
     /** @param {Painter} oe * */
     downHandler(oe) {
       this.startX = oe.mouseX;
       this.startY = oe.mouseY;
     }
     /** @param {Painter} oe * */
-    upHandler(oe) {
-    }
+    upHandler(oe) {}
     /** @param {Painter} oe * */
-    moveHandler(oe) {
-    }
+    moveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {KeyboardEvent} e */
-    keyDownHandler(e) {
-    }
+    keyDownHandler(e) {}
     /** @param {KeyboardEvent} e */
-    keyUpHandler(e) {
-    }
-    cancelBezier() {
-    }
+    keyUpHandler(e) {}
+    cancelBezier() {}
     /** @param {Painter} oe * */
     transformForZoom(oe) {
       var ctx = oe.destCanvasCtx;
@@ -3995,8 +4267,7 @@
       }
     }
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
     rollOutHandler(oe) {
       if (!oe.isMouseDown && !oe.isMouseDownRight) {
@@ -4069,7 +4340,7 @@
         oe.mouseY,
         oe.prevMouseX,
         oe.prevMouseY,
-        r
+        r,
       );
       oe.updateDestCanvas(rect[0], rect[1], rect[2], rect[3], true);
       if (!isMobile()) {
@@ -4098,10 +4369,16 @@
       var my = Math.floor(oe.mouseY);
       var d = oe.lineWidth;
       d = d == 1 ? 2 : d;
-      var x = (mx - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
-      var y = (my - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
+      var x = (mx - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) * oe.zoom;
+      var y =
+        (my - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) * oe.zoom;
       var r = d * 0.5 * oe.zoom;
-      if (!(x > -r && y > -r && x < oe.destCanvas.width + r && y < oe.destCanvas.height + r))
+      if (!(
+        x > -r &&
+        y > -r &&
+        x < oe.destCanvas.width + r &&
+        y < oe.destCanvas.height + r
+      ))
         return;
       var ctx = oe.destCanvasCtx;
       ctx.save();
@@ -4138,8 +4415,7 @@
       this.drawLineCursor(oe);
     }
     /** @param {Painter} oe */
-    lineUpMoveHandler(oe) {
-    }
+    lineUpMoveHandler(oe) {}
     /**
      *  @param {Painter} oe
      *  @param {number} [mx]
@@ -4153,10 +4429,18 @@
       var ctx = oe.destCanvasCtx;
       ctx.save();
       this.transformForZoom(oe);
-      var x0 = (mx + 0.499 - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
-      var y0 = (my + 0.499 - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
-      var x1 = (nx + 0.499 - oe.zoomX + oe.destCanvas.width * 0.5 / oe.zoom) * oe.zoom;
-      var y1 = (ny + 0.499 - oe.zoomY + oe.destCanvas.height * 0.5 / oe.zoom) * oe.zoom;
+      var x0 =
+        (mx + 0.499 - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) *
+        oe.zoom;
+      var y0 =
+        (my + 0.499 - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) *
+        oe.zoom;
+      var x1 =
+        (nx + 0.499 - oe.zoomX + (oe.destCanvas.width * 0.5) / oe.zoom) *
+        oe.zoom;
+      var y1 =
+        (ny + 0.499 - oe.zoomY + (oe.destCanvas.height * 0.5) / oe.zoom) *
+        oe.zoom;
       oe.drawXORLine(ctx, x0, y0, x1, y1);
       ctx.restore();
     }
@@ -4209,7 +4493,7 @@
             this.y2,
             this.x3,
             this.y3,
-            this.lineType
+            this.lineType,
           );
           oe.tempCanvasCtx.clearRect(0, 0, oe.canvasWidth, oe.canvasHeight);
           this.step = 0;
@@ -4287,7 +4571,7 @@
         Painter.LINETYPE_PEN,
         //this.lineType,
         false,
-        true
+        true,
       );
       ctx.save();
       ctx.translate(oe.destCanvas.width * 0.5, oe.destCanvas.height * 0.5);
@@ -4302,7 +4586,7 @@
         0,
         0,
         oe.canvasWidth,
-        oe.canvasHeight
+        oe.canvasHeight,
       );
       ctx.restore();
     }
@@ -4334,7 +4618,7 @@
         Painter.LINETYPE_PEN,
         //this.lineType,
         false,
-        true
+        true,
       );
       ctx.save();
       ctx.translate(oe.destCanvas.width * 0.5, oe.destCanvas.height * 0.5);
@@ -4349,7 +4633,7 @@
         0,
         0,
         oe.canvasWidth,
-        oe.canvasHeight
+        oe.canvasHeight,
       );
       ctx.restore();
     }
@@ -4508,20 +4792,16 @@
       });
     }
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
   };
   var SliderTool = class extends ToolBase {
     constructor() {
       super();
-      this.target = /**@type {any} **/
-      null;
+      this.target = /**@type {any} **/ null;
       this.type = Painter.TOOLTYPE_SLIDER;
       this.isUpMove = false;
       this.isAlt = false;
@@ -4537,10 +4817,12 @@
         return;
       }
       const rect = this.target.getBoundingClientRect();
-      const sliderType = this.isAlt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
+      const sliderType = this.isAlt
+        ? Neo.SLIDERTYPE_SIZE
+        : this.target["data-slider"];
       Neo.sliders[sliderType].downHandler(
         oe.rawMouseX - rect.left,
-        oe.rawMouseY - rect.top
+        oe.rawMouseY - rect.top,
       );
     }
     /** @param {Painter} oe */
@@ -4552,10 +4834,12 @@
         return;
       }
       const rect = this.target.getBoundingClientRect();
-      const sliderType = this.isAlt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
+      const sliderType = this.isAlt
+        ? Neo.SLIDERTYPE_SIZE
+        : this.target["data-slider"];
       Neo.sliders[sliderType].upHandler(
         oe.rawMouseX - rect.left,
-        oe.rawMouseY - rect.top
+        oe.rawMouseY - rect.top,
       );
     }
     /** @param {Painter} oe */
@@ -4566,22 +4850,21 @@
           return;
         }
         const rect = this.target.getBoundingClientRect();
-        const sliderType = this.isAlt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
+        const sliderType = this.isAlt
+          ? Neo.SLIDERTYPE_SIZE
+          : this.target["data-slider"];
         Neo.sliders[sliderType].moveHandler(
           oe.rawMouseX - rect.left,
-          oe.rawMouseY - rect.top
+          oe.rawMouseY - rect.top,
         );
       }
     }
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
   };
   var FillTool = class extends ToolBase {
     constructor() {
@@ -4599,20 +4882,15 @@
       oe._actionMgr.floodFill(layer, x, y, color);
     }
     /** @param {Painter} oe */
-    upHandler(oe) {
-    }
+    upHandler(oe) {}
     /** @param {Painter} oe */
-    moveHandler(oe) {
-    }
+    moveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
   };
   var EraseAllTool = class extends ToolBase {
     constructor() {
@@ -4626,20 +4904,15 @@
       oe._actionMgr.eraseAll();
     }
     /** @param {Painter} oe */
-    upHandler(oe) {
-    }
+    upHandler(oe) {}
     /** @param {Painter} oe */
-    moveHandler(oe) {
-    }
+    moveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
   };
   var EffectToolBase = class extends ToolBase {
     constructor() {
@@ -4663,8 +4936,7 @@
      * @param {number} width
      * @param {number} height
      */
-    doEffect(oe, x, y, width, height) {
-    }
+    doEffect(oe, x, y, width, height) {}
     /** @param {Painter} oe */
     downHandler(oe) {
       this.isUpMove = false;
@@ -4717,14 +4989,11 @@
       });
     }
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
     drawCursor(oe) {
       var ctx = oe.destCanvasCtx;
@@ -4967,7 +5236,7 @@
       var end = oe.getDestCanvasPosition(
         this.x + this.width,
         this.y + this.height,
-        true
+        true,
       );
       var x = start.x + oe.tempX * oe.zoom;
       var y = start.y + oe.tempY * oe.zoom;
@@ -5063,7 +5332,8 @@
       this.startY = oe.mouseY;
       if (Neo.painter.inputText) {
         Neo.painter.updateInputText();
-        var rect = (_a = oe.container) == null ? void 0 : _a.getBoundingClientRect();
+        var rect =
+          (_a = oe.container) == null ? void 0 : _a.getBoundingClientRect();
         if (!rect) {
           console.error("Rect not found for TextTool");
           return;
@@ -5078,20 +5348,15 @@
       }
     }
     /** @param {Painter} oe */
-    upHandler(oe) {
-    }
+    upHandler(oe) {}
     /** @param {Painter} oe */
-    moveHandler(oe) {
-    }
+    moveHandler(oe) {}
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
     /**
      * テキスト入力の確定処理
      * @description
@@ -5118,7 +5383,7 @@
             alpha,
             string,
             size,
-            family
+            family,
           );
           text.style.display = "none";
           text.blur();
@@ -5144,24 +5409,19 @@
       this.isUpMove = false;
     }
     /** @param {Painter} oe */
-    downHandler(oe) {
-    }
+    downHandler(oe) {}
     /** @param {Painter} oe */
     upHandler(oe) {
       oe.popTool();
     }
     /** @param {Painter} oe */
-    moveHandler(oe) {
-    }
+    moveHandler(oe) {}
     /** @param {Painter} oe */
-    upMoveHandler(oe) {
-    }
+    upMoveHandler(oe) {}
     /** @param {Painter} oe */
-    rollOverHandler(oe) {
-    }
+    rollOverHandler(oe) {}
     /** @param {Painter} oe */
-    rollOutHandler(oe) {
-    }
+    rollOutHandler(oe) {}
   };
 
   // src/painter.js
@@ -5191,8 +5451,7 @@
       this.tempY = 0;
       this.prevLine = null;
       this.container = null;
-      this.tool = /** @type {ToolBase} */
-      {};
+      this.tool = /** @type {ToolBase} */ {};
       this.inputText = null;
       this.cursorRect = null;
       this.canvas = [];
@@ -5308,8 +5567,7 @@
       if (this.tool && this.tool.kill) {
         this.tool.kill();
       }
-      this.tool = /**@type {ToolBase} */
-      tool;
+      this.tool = /**@type {ToolBase} */ tool;
       tool.init(this);
       if (this.tool && this.tool.loadStates) this.tool.loadStates();
     }
@@ -5323,8 +5581,7 @@
      */
     pushTool(tool) {
       this.toolStack.push(this.tool);
-      this.tool = /**@type {ToolBase} */
-      tool;
+      this.tool = /**@type {ToolBase} */ tool;
       tool.init(this);
     }
     /**
@@ -5475,7 +5732,7 @@
         this.canvas[i].width = width;
         this.canvas[i].height = height;
         const ctx = this.canvas[i].getContext("2d", {
-          willReadFrequently: true
+          willReadFrequently: true,
         });
         if (!ctx) {
           console.error("_initCanvas: Failed to get 2d context");
@@ -5490,7 +5747,7 @@
       this.tempCanvas.width = width;
       this.tempCanvas.height = height;
       const tempCanvasCtx = this.tempCanvas.getContext("2d", {
-        willReadFrequently: true
+        willReadFrequently: true,
       });
       if (!tempCanvasCtx) {
         console.error("_initCanvas: Failed to get 2d context");
@@ -5498,15 +5755,18 @@
       }
       this.tempCanvasCtx = tempCanvasCtx;
       this.tempCanvas.style.position = "absolute";
-      var array = (_a = this.container) == null ? void 0 : _a.querySelectorAll("canvas");
+      var array =
+        (_a = this.container) == null ? void 0 : _a.querySelectorAll("canvas");
       if (array && array.length > 0) {
         this.destCanvas = array[0];
       } else {
         this.destCanvas = document.createElement("canvas");
-        (_b = this.container) == null ? void 0 : _b.appendChild(this.destCanvas);
+        (_b = this.container) == null
+          ? void 0
+          : _b.appendChild(this.destCanvas);
       }
       const destCanvasCtx = this.destCanvas.getContext("2d", {
-        willReadFrequently: true
+        willReadFrequently: true,
       });
       if (!destCanvasCtx) {
         console.error("_initCanvas: Failed to get 2d context");
@@ -5521,56 +5781,67 @@
       if (!Neo.viewer) {
         const container = document.getElementById("neo-container");
         if (!container) return;
-        container.addEventListener("mouseover", function(e) {
+        container.addEventListener("mouseover", function (e) {
           ref._rollOverHandler(e);
         });
-        container.addEventListener("mouseout", function(e) {
+        container.addEventListener("mouseout", function (e) {
           ref._rollOutHandler(e);
         });
         container.addEventListener(
           "mousedown",
           //pointerdownに変更するとここが先にトリガーされ、線幅を保存できなくなる
-          function(e) {
+          function (e) {
             ref._mouseDownHandler(e);
           },
-          { passive: false, capture: false }
+          { passive: false, capture: false },
         );
         container.addEventListener(
           "mouseup",
-          function(e) {
+          function (e) {
             ref.touchlength = 0;
             ref._mouseUpHandler(e);
           },
-          { passive: false, capture: false }
+          { passive: false, capture: false },
         );
         container.addEventListener(
           "touchstart",
-          function(e) {
+          function (e) {
             var _a2;
             ref.touchlength = (_a2 = e.touches) == null ? void 0 : _a2.length;
             ref._mouseDownHandler(e);
           },
-          { passive: false, capture: false }
+          { passive: false, capture: false },
         );
         container.addEventListener(
           "touchend",
-          function(e) {
+          function (e) {
             ref.touchlength = 0;
             ref._mouseUpHandler(e);
           },
-          { passive: false, capture: false }
+          { passive: false, capture: false },
         );
         container.addEventListener(
           "pointermove",
-          function(e) {
+          function (e) {
             var _a2, _b2;
             const freeHandMode = ref.drawType === 0;
             const usesHighPrecisionTool = [1, 2, 14].includes(
-              Neo.CurrentToolType
+              Neo.CurrentToolType,
             );
             const smallbrush = ref.lineWidth <= 16;
-            if (ref.isMouseDown && freeHandMode && usesHighPrecisionTool && smallbrush) {
-              const events = (_b2 = (_a2 = e.getCoalescedEvents) == null ? void 0 : _a2.call(e)) != null ? _b2 : [e];
+            if (
+              ref.isMouseDown &&
+              freeHandMode &&
+              usesHighPrecisionTool &&
+              smallbrush
+            ) {
+              const events =
+                (_b2 =
+                  (_a2 = e.getCoalescedEvents) == null
+                    ? void 0
+                    : _a2.call(e)) != null
+                  ? _b2
+                  : [e];
               for (const ev of events) {
                 ref._mouseMoveHandler(ev);
               }
@@ -5578,21 +5849,21 @@
               ref._mouseMoveHandler(e);
             }
           },
-          { passive: false, capture: false }
+          { passive: false, capture: false },
         );
         container.addEventListener(
           "pointercancel",
-          function(e) {
+          function (e) {
             ref.touchlength = 0;
             ref.isMouseDown = false;
             ref._mouseUpHandler(e);
           },
-          { capture: false }
+          { capture: false },
         );
-        document.addEventListener("keydown", function(e) {
+        document.addEventListener("keydown", function (e) {
           ref._keyDownHandler(e);
         });
-        document.addEventListener("keyup", function(e) {
+        document.addEventListener("keyup", function (e) {
           ref._keyUpHandler(e);
         });
         window.addEventListener("blur", () => {
@@ -5603,7 +5874,7 @@
         });
       }
       if (Neo.config.neo_confirm_unload == "true") {
-        window.addEventListener("beforeunload", function(e) {
+        window.addEventListener("beforeunload", function (e) {
           if (!Neo.uploaded && ref.isDirty()) {
             e.preventDefault();
             return false;
@@ -5622,7 +5893,7 @@
           for (var y = 0; y < r; y++) {
             var xx = x + 0.5 - r / 2;
             var yy = y + 0.5 - r / 2;
-            mask[index++] = xx * xx + yy * yy <= r * r / 4 ? 1 : 0;
+            mask[index++] = xx * xx + yy * yy <= (r * r) / 4 ? 1 : 0;
           }
         }
       }
@@ -5658,21 +5929,7 @@
      */
     getToneData(alpha) {
       var alphaTable = [
-        23,
-        47,
-        69,
-        92,
-        114,
-        114,
-        114,
-        138,
-        161,
-        184,
-        184,
-        207,
-        230,
-        230,
-        253
+        23, 47, 69, 92, 114, 114, 114, 138, 161, 184, 184, 207, 230, 230, 253,
       ];
       for (var i = 0; i < alphaTable.length; i++) {
         if (alpha < alphaTable[i]) {
@@ -5743,7 +6000,7 @@
         return;
       }
       const d = this.lineWidth;
-      const fontSize = Math.round(d * 55 / 28 + 7);
+      const fontSize = Math.round((d * 55) / 28 + 7);
       text.style.fontSize = fontSize + "px";
       text.style.lineHeight = fontSize + "px";
       text.style.height = fontSize + "px";
@@ -5767,7 +6024,11 @@
     _keyDownHandler(e) {
       const preventCtrlKeyDefaults = (e2) => {
         const keys = ["+", ";", "=", "-", "s", "h", "r", "u", "o"];
-        if ((e2.ctrlKey || e2.metaKey) && e2.key && keys.includes(e2.key.toLowerCase())) {
+        if (
+          (e2.ctrlKey || e2.metaKey) &&
+          e2.key &&
+          keys.includes(e2.key.toLowerCase())
+        ) {
           e2.preventDefault();
         }
       };
@@ -5778,12 +6039,22 @@
         "range",
         "button",
         "submit",
-        "reset"
+        "reset",
       ];
-      if (e.key !== "Tab" && (target instanceof HTMLButtonElement || target instanceof HTMLSelectElement || target instanceof HTMLInputElement && NON_TEXT_INPUT_TYPES.includes(target.type))) {
+      if (
+        e.key !== "Tab" &&
+        (target instanceof HTMLButtonElement ||
+          target instanceof HTMLSelectElement ||
+          (target instanceof HTMLInputElement &&
+            NON_TEXT_INPUT_TYPES.includes(target.type)))
+      ) {
         target.blur();
       }
-      if (target instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.includes(target.type) || target instanceof HTMLTextAreaElement) {
+      if (
+        (target instanceof HTMLInputElement &&
+          !NON_TEXT_INPUT_TYPES.includes(target.type)) ||
+        target instanceof HTMLTextAreaElement
+      ) {
         this.isShiftDown = false;
         this.isCtrlDown = false;
         this.isAltDown = false;
@@ -5822,7 +6093,11 @@
         if (key == "b") this.setToolByType(_Painter.TOOLTYPE_PEN);
         if (key == "w") this.setToolByType(_Painter.TOOLTYPE_BRUSH);
         if (key == "e") this.setToolByType(_Painter.TOOLTYPE_ERASER);
-        if (document.activeElement != this.inputText && key && ["delete", "backspace"].includes(key)) {
+        if (
+          document.activeElement != this.inputText &&
+          key &&
+          ["delete", "backspace"].includes(key)
+        ) {
           this._pushUndo();
           this._actionMgr.eraseAll();
         }
@@ -5884,7 +6159,7 @@
         e.preventDefault();
       }
       if (this.touchlength > 1) return;
-      if (e instanceof MouseEvent && e.button == 2 || this.virtualRight) {
+      if ((e instanceof MouseEvent && e.button == 2) || this.virtualRight) {
         this.isMouseDownRight = true;
       } else {
         if (!e.shiftKey && e.ctrlKey && e.altKey) {
@@ -5905,12 +6180,20 @@
       if (autosaveCount % 10 === 0 && this.isDirty()) {
         this.saveSession();
       }
-      if (Neo.CurrentToolType === _Painter.TOOLTYPE_PASTE && this.isCopyActive && this.isMouseDownRight) {
+      if (
+        Neo.CurrentToolType === _Painter.TOOLTYPE_PASTE &&
+        this.isCopyActive &&
+        this.isMouseDownRight
+      ) {
         this.cancelCopy();
         this.isMouseDownRight = false;
         return;
       }
-      if (this.drawType == _Painter.DRAWTYPE_BEZIER && this.isBezierActive && this.isMouseDownRight) {
+      if (
+        this.drawType == _Painter.DRAWTYPE_BEZIER &&
+        this.isBezierActive &&
+        this.isMouseDownRight
+      ) {
         this.isMouseDownRight = false;
         if (this.tool.cancelBezier) {
           this.tool.cancelBezier();
@@ -5931,19 +6214,28 @@
         }
       }
       if (!this.isUIPaused()) {
-        if (e.target instanceof HTMLElement && /** @type {BarElement} */
-        e.target["data-bar"]) {
+        if (
+          e.target instanceof HTMLElement &&
+          /** @type {BarElement} */
+          e.target["data-bar"]
+        ) {
           this.pushTool(this.handTool);
           if (this.handTool) {
             this.handTool.reverse = false;
           }
-        } else if (this.isSpaceDown && document.activeElement != this.inputText) {
+        } else if (
+          this.isSpaceDown &&
+          document.activeElement != this.inputText
+        ) {
           this.pushTool(this.handTool);
           if (this.handTool) {
             this.handTool.reverse = true;
           }
-        } else if (e.target instanceof HTMLElement && /** @type {any} */
-        e.target["data-slider"] != void 0) {
+        } else if (
+          e.target instanceof HTMLElement &&
+          /** @type {any} */
+          e.target["data-slider"] != void 0
+        ) {
           this.pushTool(this.sliderTool);
           if (this.sliderTool) {
             this.sliderTool.target = e.target;
@@ -5991,7 +6283,11 @@
       }
       this.prevMouseX = this.mouseX;
       this.prevMouseY = this.mouseY;
-      if (e.cancelable && e.target instanceof HTMLElement && e.target.className != "o") {
+      if (
+        e.cancelable &&
+        e.target instanceof HTMLElement &&
+        e.target.className != "o"
+      ) {
         e.preventDefault();
       }
     }
@@ -6021,9 +6317,10 @@
         _Painter.TOOLTYPE_TONE,
         _Painter.TOOLTYPE_BLUR,
         _Painter.TOOLTYPE_DODGE,
-        _Painter.TOOLTYPE_BURN
+        _Painter.TOOLTYPE_BURN,
       ];
-      const isDrawTool = freeHandMode && toolTypes.includes(Neo.CurrentToolType);
+      const isDrawTool =
+        freeHandMode && toolTypes.includes(Neo.CurrentToolType);
       if (!isDrawTool || !Neo.stabilize_level) {
         return;
       }
@@ -6035,9 +6332,14 @@
         const sizeModifier = this.lineWidth <= 8 ? 1 : 0.8;
         const stability = stabilityLebel * zoomModifier * sizeModifier;
         const factor = 1 - stability;
-        if (typeof this.stabilizedX === "number" && typeof this.stabilizedY === "number") {
-          this.stabilizedX = factor * this.mouseX + stability * this.stabilizedX;
-          this.stabilizedY = factor * this.mouseY + stability * this.stabilizedY;
+        if (
+          typeof this.stabilizedX === "number" &&
+          typeof this.stabilizedY === "number"
+        ) {
+          this.stabilizedX =
+            factor * this.mouseX + stability * this.stabilizedX;
+          this.stabilizedY =
+            factor * this.mouseY + stability * this.stabilizedY;
         } else {
           this.stabilizedX = this.mouseX;
           this.stabilizedY = this.mouseY;
@@ -6059,8 +6361,14 @@
       var x = pos.x;
       var y = pos.y;
       if (this.zoom <= 0) this.zoom = 1;
-      this.mouseX = (x - rect.left) / this.zoom + this.zoomX - this.destCanvas.width * 0.5 / this.zoom;
-      this.mouseY = (y - rect.top) / this.zoom + this.zoomY - this.destCanvas.height * 0.5 / this.zoom;
+      this.mouseX =
+        (x - rect.left) / this.zoom +
+        this.zoomX -
+        (this.destCanvas.width * 0.5) / this.zoom;
+      this.mouseY =
+        (y - rect.top) / this.zoom +
+        this.zoomY -
+        (this.destCanvas.height * 0.5) / this.zoom;
       if (isNaN(this.prevMouseX)) {
         this.prevMouseX = this.mouseX;
       }
@@ -6083,13 +6391,21 @@
       if (undoItem && undoItem.data.length > 0) {
         this._pushRedo();
         this._actionMgr.back();
-        this.canvasCtx[0].putImageData(undoItem.data[0], undoItem.x, undoItem.y);
-        this.canvasCtx[1].putImageData(undoItem.data[1], undoItem.x, undoItem.y);
+        this.canvasCtx[0].putImageData(
+          undoItem.data[0],
+          undoItem.x,
+          undoItem.y,
+        );
+        this.canvasCtx[1].putImageData(
+          undoItem.data[1],
+          undoItem.x,
+          undoItem.y,
+        );
         this.updateDestCanvas(
           undoItem.x,
           undoItem.y,
           undoItem.width,
-          undoItem.height
+          undoItem.height,
         );
       }
     }
@@ -6098,13 +6414,21 @@
       if (undoItem && undoItem.data.length > 0) {
         this._actionMgr.forward();
         this._pushUndo(0, 0, this.canvasWidth, this.canvasHeight, true);
-        this.canvasCtx[0].putImageData(undoItem.data[0], undoItem.x, undoItem.y);
-        this.canvasCtx[1].putImageData(undoItem.data[1], undoItem.x, undoItem.y);
+        this.canvasCtx[0].putImageData(
+          undoItem.data[0],
+          undoItem.x,
+          undoItem.y,
+        );
+        this.canvasCtx[1].putImageData(
+          undoItem.data[1],
+          undoItem.x,
+          undoItem.y,
+        );
         this.updateDestCanvas(
           undoItem.x,
           undoItem.y,
           undoItem.width,
-          undoItem.height
+          undoItem.height,
         );
       }
     }
@@ -6134,7 +6458,7 @@
       undoItem.height = h;
       undoItem.data = [
         this.canvasCtx[0].getImageData(x, y, w, h),
-        this.canvasCtx[1].getImageData(x, y, w, h)
+        this.canvasCtx[1].getImageData(x, y, w, h),
       ];
       this._undoMgr.pushUndo(undoItem, holdRedo);
       if (!holdRedo) {
@@ -6164,7 +6488,7 @@
       undoItem.height = h;
       undoItem.data = [
         this.canvasCtx[0].getImageData(x, y, w, h),
-        this.canvasCtx[1].getImageData(x, y, w, h)
+        this.canvasCtx[1].getImageData(x, y, w, h),
       ];
       this._undoMgr.pushRedo(undoItem);
     }
@@ -6208,9 +6532,9 @@
      * @param {number} y - 視点の中心Y座標
      */
     setZoomPosition(x, y) {
-      var minx = this.destCanvas.width / this.zoom * 0.5;
+      var minx = (this.destCanvas.width / this.zoom) * 0.5;
       var maxx = this.canvasWidth - minx;
-      var miny = this.destCanvas.height / this.zoom * 0.5;
+      var miny = (this.destCanvas.height / this.zoom) * 0.5;
       var maxy = this.canvasHeight - miny;
       x = Math.max(Math.min(maxx, x), minx);
       y = Math.max(Math.min(maxy, y), miny);
@@ -6238,7 +6562,10 @@
     submit(baseURL) {
       if (Neo.isAnimation) {
         var items = this._actionMgr._items;
-        if (items.length > 0 && items[items.length - 1][0] != "restore" || items.length < 1) {
+        if (
+          (items.length > 0 && items[items.length - 1][0] != "restore") ||
+          items.length < 1
+        ) {
           this._pushUndo();
           this._actionMgr.restore();
         }
@@ -6262,7 +6589,10 @@
       var thumbnailWidth = this.getThumbnailWidth();
       var thumbnailHeight = this.getThumbnailHeight();
       if (thumbnailWidth && thumbnailHeight) {
-        if (thumbnailWidth < this.canvasWidth || thumbnailHeight < this.canvasHeight) {
+        if (
+          thumbnailWidth < this.canvasWidth ||
+          thumbnailHeight < this.canvasHeight
+        ) {
           return true;
         }
       }
@@ -6309,7 +6639,7 @@
       pngCanvas.width = width;
       pngCanvas.height = height;
       var pngCanvasCtx = pngCanvas.getContext("2d", {
-        willReadFrequently: true
+        willReadFrequently: true,
       });
       if (!pngCanvasCtx) {
         return null;
@@ -6326,7 +6656,7 @@
           0,
           0,
           width,
-          height
+          height,
         );
       }
       if (this.visible[1]) {
@@ -6339,7 +6669,7 @@
           0,
           0,
           width,
-          height
+          height,
         );
       }
       return pngCanvas;
@@ -6377,10 +6707,10 @@
           const width = this.canvasWidth;
           const height = this.canvasHeight;
           if (thumbnailHeight && thumbnailWidth == 0) {
-            thumbnailWidth = thumbnailHeight * width / height;
+            thumbnailWidth = (thumbnailHeight * width) / height;
           }
           if (thumbnailWidth && thumbnailHeight == 0) {
-            thumbnailHeight = thumbnailWidth * height / width;
+            thumbnailHeight = (thumbnailWidth * height) / width;
           }
         } else {
           thumbnailWidth = thumbnailHeight = null;
@@ -6398,7 +6728,8 @@
           return null;
         }
         const jsonString = JSON.stringify(this._actionMgr._items);
-        const compressed = import_lz_string2.default.compressToUint8Array(jsonString);
+        const compressed =
+          import_lz_string2.default.compressToUint8Array(jsonString);
         const data = new Uint8Array(new ArrayBuffer(compressed.byteLength));
         data.set(compressed);
         var magic = "NEO ";
@@ -6409,7 +6740,7 @@
           new Uint8Array([w % 256, Math.floor(w / 256)]),
           new Uint8Array([h % 256, Math.floor(h / 256)]),
           new Uint8Array(4),
-          data
+          data,
         ]);
       }
     }
@@ -6475,7 +6806,8 @@
       y = Math.floor(y);
       var canvasWidth = this.canvasWidth;
       var canvasHeight = this.canvasHeight;
-      var updateAll = x === 0 && y === 0 && width === canvasWidth && height === canvasHeight;
+      var updateAll =
+        x === 0 && y === 0 && width === canvasWidth && height === canvasHeight;
       if (x + width > canvasWidth) width = canvasWidth - x;
       if (y + height > canvasHeight) height = canvasHeight - y;
       if (x < 0) x = 0;
@@ -6489,8 +6821,10 @@
       const is_useSuperSample = zoom === 1.5 || zoom === 2.5;
       this.scrollBarX = isNaN(this.scrollBarX) ? 0 : this.scrollBarX;
       this.scrollBarY = isNaN(this.scrollBarY) ? 0 : this.scrollBarY;
-      let offsetX = this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width);
-      let offsetY = this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height);
+      let offsetX =
+        this.scrollBarX * (this.canvasWidth * zoom - this.destCanvas.width);
+      let offsetY =
+        this.scrollBarY * (this.canvasHeight * zoom - this.destCanvas.height);
       if (is_useSuperSample) {
         offsetX = Math.round(offsetX);
         offsetY = Math.round(offsetY);
@@ -6504,11 +6838,11 @@
         const vy0 = Math.max(0, Math.floor(offsetY / zoom / 2) * 2);
         const vx1 = Math.min(
           canvasWidth,
-          Math.ceil((offsetX + this.destCanvas.width) / zoom / 2) * 2
+          Math.ceil((offsetX + this.destCanvas.width) / zoom / 2) * 2,
         );
         const vy1 = Math.min(
           canvasHeight,
-          Math.ceil((offsetY + this.destCanvas.height) / zoom / 2) * 2
+          Math.ceil((offsetY + this.destCanvas.height) / zoom / 2) * 2,
         );
         const nx = Math.max(x, vx0);
         const ny = Math.max(y, vy0);
@@ -6590,7 +6924,7 @@
           zx + tempX,
           zy + tempY,
           zw,
-          zh
+          zh,
         );
       }
       ctx.restore();
@@ -6651,8 +6985,9 @@
       const g = parseInt(c.slice(3, 5), 16);
       const b = parseInt(c.slice(5, 7), 16);
       const a = Math.floor(this.alpha * 255);
-      const value = a << 24 | b << 16 | g << 8 | r;
-      const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+      const value = (a << 24) | (b << 16) | (g << 8) | r;
+      const hex =
+        "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
       const colorPickerId = Neo.config.neo_color_picker_id;
       const colorPicker = document.getElementById(colorPickerId);
       if (colorPickerId) {
@@ -6662,8 +6997,8 @@
       }
       document.dispatchEvent(
         new CustomEvent("neo:colorchange", {
-          detail: { hex, r, g, b, a }
-        })
+          detail: { hex, r, g, b, a },
+        }),
       );
       return value;
     }
@@ -6701,7 +7036,7 @@
       switch (type) {
         case _Painter.ALPHATYPE_PEN:
           if (a1 > 0.5) {
-            a1 = 1 / 16 + (a1 - 0.5) * 30 / 16;
+            a1 = 1 / 16 + ((a1 - 0.5) * 30) / 16;
           } else {
             a1 = Math.sqrt(2 * a1) / 16;
           }
@@ -6876,7 +7211,9 @@
             let b0 = buf8[index + 2];
             let a0 = buf8[index + 3] / 255;
             var a = a0 + a1 - a0 * a1;
-            let r = r02, g = g0, b = b0;
+            let r = r02,
+              g = g0,
+              b = b0;
             if (a > 0) {
               var a1x = Math.max(a1, 1 / 255);
               r = (r1 * a1x + r02 * a0 * (1 - a1x)) / a;
@@ -6929,7 +7266,9 @@
             let b0 = buf8[index + 2];
             let a0 = buf8[index + 3] / 255;
             let a = a0 + a1 - a0 * a1;
-            let r = r02, g = g0, b = b0;
+            let r = r02,
+              g = g0,
+              b = b0;
             if (a > 0) {
               let a1x = Math.max(a1, 1 / 255);
               r = (r1 * a1x + r02 * a0) / (a0 + a1x);
@@ -6981,7 +7320,7 @@
       for (var i = 0; i < d; i++) {
         for (var j = 0; j < d; j++) {
           if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-            if (toneData[(y0 + i) % 4 + (x0 + j) % 4 * 4]) {
+            if (toneData[((y0 + i) % 4) + ((x0 + j) % 4) * 4]) {
               buf8[index + 0] = r;
               buf8[index + 1] = g;
               buf8[index + 2] = b;
@@ -7015,8 +7354,8 @@
       for (var i = 0; i < d; i++) {
         for (var j = 0; j < d; j++) {
           if (shape[shapeIndex++] && !this.isMasked(buf8, index)) {
-            var k = buf8[index + 3] / 255 * (1 - a / 255);
-            buf8[index + 3] -= a / (d * (255 - a) / 255);
+            var k = (buf8[index + 3] / 255) * (1 - a / 255);
+            buf8[index + 3] -= a / ((d * (255 - a)) / 255);
           }
           index += 4;
         }
@@ -7052,8 +7391,10 @@
       }
       var left = x0 - x - r0;
       var top = y0 - y - r0;
-      var xstart = 0, xend = d;
-      var ystart = 0, yend = d;
+      var xstart = 0,
+        xend = d;
+      var ystart = 0,
+        yend = d;
       if (xstart > left) xstart = -left;
       if (ystart > top) ystart = -top;
       if (xend > this.canvasWidth - left) xend = this.canvasWidth - left;
@@ -7071,7 +7412,7 @@
             buf8[index + 0] = Math.round(rgba[0]);
             buf8[index + 1] = Math.round(rgba[1]);
             buf8[index + 2] = Math.round(rgba[2]);
-            buf8[index + 3] = Math.round(rgba[3] / rgba[4] * 255);
+            buf8[index + 3] = Math.round((rgba[3] / rgba[4]) * 255);
           }
           index += 4;
         }
@@ -7106,9 +7447,9 @@
             let b0 = buf8[index + 2];
             let a0 = buf8[index + 3] / 255;
             if (a1 != 255) {
-              r1 = r02 * 255 / (255 - a1);
-              g1 = g0 * 255 / (255 - a1);
-              b1 = b0 * 255 / (255 - a1);
+              r1 = (r02 * 255) / (255 - a1);
+              g1 = (g0 * 255) / (255 - a1);
+              b1 = (b0 * 255) / (255 - a1);
             } else {
               r1 = 255;
               g1 = 255;
@@ -7161,9 +7502,9 @@
             let b0 = buf8[index + 2];
             let a0 = buf8[index + 3] / 255;
             if (a1 != 255) {
-              r1 = 255 - (255 - r02) * 255 / (255 - a1);
-              g1 = 255 - (255 - g0) * 255 / (255 - a1);
-              b1 = 255 - (255 - b0) * 255 / (255 - a1);
+              r1 = 255 - ((255 - r02) * 255) / (255 - a1);
+              g1 = 255 - ((255 - g0) * 255) / (255 - a1);
+              b1 = 255 - ((255 - b0) * 255) / (255 - a1);
             } else {
               r1 = 0;
               g1 = 0;
@@ -7244,19 +7585,32 @@
      * @param {boolean} [isPreview=false] - プレビュー描画中かどうか（不透明度やマスクを一時解除）。
      * @returns {void}
      */
-    drawBezier(ctx, x0, y0, x1, y1, x2, y2, x3, y3, type, isReplay, isPreview = false) {
+    drawBezier(
+      ctx,
+      x0,
+      y0,
+      x1,
+      y1,
+      x2,
+      y2,
+      x3,
+      y3,
+      type,
+      isReplay,
+      isPreview = false,
+    ) {
       var points = [
         [x0, y0],
         [x1, y1],
         [x2, y2],
-        [x3, y3]
+        [x3, y3],
       ];
       var ref = this;
       this.draw(
         ctx,
         points,
         /** @type {DrawCallback} */
-        function(left, top, width, height, buf8, imageData) {
+        function (left, top, width, height, buf8, imageData) {
           var n = Math.ceil((width + height) * 2.5);
           var oType = ref._currentMaskType;
           var oAlpha = ref._currentColor[3];
@@ -7265,22 +7619,22 @@
             ref._currentColor[3] = 255;
           }
           for (var i = 0; i < n; i++) {
-            var t = i * 1 / n;
+            var t = (i * 1) / n;
             var p = ref.getBezierPoint(t, x0, y0, x1, y1, x2, y2, x3, y3);
             p[0] = Math.round(p[0]);
             p[1] = Math.round(p[1]);
             ref.plot(
               p,
               /** @param {number} x @param {number} y **/
-              function(x, y) {
+              function (x, y) {
                 ref.setPoint(buf8, imageData.width, x, y, left, top, type);
-              }
+              },
             );
           }
           ref._currentMaskType = oType;
           ref._currentColor[3] = oAlpha;
           ref.prevLine = null;
-        }
+        },
       );
     }
     /**
@@ -7300,7 +7654,7 @@
       y1 = Math.floor(y1);
       var points = [
         [x0, y0],
-        [x1, y1]
+        [x1, y1],
       ];
       var ref = this;
       this.aerr = 0;
@@ -7308,15 +7662,15 @@
         ctx,
         points,
         /** @type {DrawCallback} */
-        function(left, top, width, height, buf8, imageData) {
+        function (left, top, width, height, buf8, imageData) {
           ref.bresenham(
             points,
             /** @param {number} x @param {number} y **/
-            function(x, y) {
+            function (x, y) {
               ref.setPoint(buf8, imageData.width, x, y, left, top, type);
-            }
+            },
           );
-        }
+        },
       );
       this.prevLine = points;
     }
@@ -7330,7 +7684,8 @@
      * @returns {void}
      */
     draw(ctx, points, callback) {
-      var xs = [], ys = [];
+      var xs = [],
+        ys = [];
       for (var i = 0; i < points.length; i++) {
         var point = points[i];
         xs.push(Math.round(point[0]));
@@ -7345,7 +7700,12 @@
       var top = ymin - r;
       var width = xmax - xmin;
       var height = ymax - ymin;
-      var imageData = ctx.getImageData(left, top, width + r * 2, height + r * 2);
+      var imageData = ctx.getImageData(
+        left,
+        top,
+        width + r * 2,
+        height + r * 2,
+      );
       var buf32 = new Uint32Array(imageData.data.buffer);
       var buf8 = new Uint8ClampedArray(imageData.data.buffer);
       callback(left, top, width, height, buf8, imageData);
@@ -7365,11 +7725,19 @@
       var y0 = points[0][1];
       var x1 = points[1][0];
       var y1 = points[1][1];
-      var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-      var dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+      var dx = Math.abs(x1 - x0),
+        sx = x0 < x1 ? 1 : -1;
+      var dy = Math.abs(y1 - y0),
+        sy = y0 < y1 ? 1 : -1;
       var err = (dx > dy ? dx : -dy) / 2;
       while (true) {
-        if (this.prevLine == null || !(this.prevLine[0][0] == x0 && this.prevLine[0][1] == y0 || this.prevLine[1][0] == x0 && this.prevLine[1][1] == y0)) {
+        if (
+          this.prevLine == null ||
+          !(
+            (this.prevLine[0][0] == x0 && this.prevLine[0][1] == y0) ||
+            (this.prevLine[1][0] == x0 && this.prevLine[1][1] == y0)
+          )
+        ) {
           callback(x0, y0);
         }
         if (x0 === x1 && y0 === y1) break;
@@ -7396,7 +7764,10 @@
     plot(point, callback) {
       var x0 = point[0];
       var y0 = point[1];
-      if (this.prevLine == null || !(this.prevLine[0][0] == x0 && this.prevLine[0][1] == y0)) {
+      if (
+        this.prevLine == null ||
+        !(this.prevLine[0][0] == x0 && this.prevLine[0][1] == y0)
+      ) {
         callback(x0, y0);
       }
       this.prevLine = [point, point];
@@ -7513,9 +7884,13 @@
       var imageData = ctx.getImageData(x, y, width, height);
       var buf32 = new Uint32Array(imageData.data.buffer);
       var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-      var a = width - 1, b = height - 1, b1 = b & 1;
-      var dx = 4 * (1 - a) * b * b, dy = 4 * (b1 + 1) * a * a;
-      var err = dx + dy + b1 * a * a, e2;
+      var a = width - 1,
+        b = height - 1,
+        b1 = b & 1;
+      var dx = 4 * (1 - a) * b * b,
+        dy = 4 * (b1 + 1) * a * a;
+      var err = dx + dy + b1 * a * a,
+        e2;
       var x0 = x;
       var y0 = y;
       var x1 = x0 + a;
@@ -7590,11 +7965,19 @@
       var imageData = ctx.getImageData(left, top, width + 1, height + 1);
       var buf32 = new Uint32Array(imageData.data.buffer);
       var buf8 = new Uint8ClampedArray(imageData.data.buffer);
-      var dx = width, sx = x0 < x1 ? 1 : -1;
-      var dy = height, sy = y0 < y1 ? 1 : -1;
+      var dx = width,
+        sx = x0 < x1 ? 1 : -1;
+      var dy = height,
+        sy = y0 < y1 ? 1 : -1;
       var err = (dx > dy ? dx : -dy) / 2;
       while (true) {
-        if (this.prevLine == null || !(this.prevLine[0] == x0 && this.prevLine[1] == y0 || this.prevLine[2] == x0 && this.prevLine[3] == y0)) {
+        if (
+          this.prevLine == null ||
+          !(
+            (this.prevLine[0] == x0 && this.prevLine[1] == y0) ||
+            (this.prevLine[2] == x0 && this.prevLine[3] == y0)
+          )
+        ) {
           this.xorPixel(buf32, imageData.width, x0 - left, y0 - top, c);
         }
         if (x0 === x1 && y0 === y1) break;
@@ -7802,7 +8185,7 @@
           buf8[index + 0] = Math.round(rgba[0]);
           buf8[index + 1] = Math.round(rgba[1]);
           buf8[index + 2] = Math.round(rgba[2]);
-          buf8[index + 3] = Math.ceil(rgba[3] / w * 255);
+          buf8[index + 3] = Math.ceil((rgba[3] / w) * 255);
           index += 4;
         }
       }
@@ -7825,7 +8208,7 @@
       var r1 = buffer[index + 0];
       var g1 = buffer[index + 1];
       var b1 = buffer[index + 2];
-      var a1 = buffer[index + 3] / 255 * a;
+      var a1 = (buffer[index + 3] / 255) * a;
       rgba[4] += a;
       var a = a0 + a1;
       if (a > 0) {
@@ -7849,7 +8232,11 @@
      */
     pickColor(x, y) {
       var _a;
-      let r = 255, g = 255, b = 255, a = 0, result = 16777215;
+      let r = 255,
+        g = 255,
+        b = 255,
+        a = 0,
+        result = 16777215;
       x = Math.floor(x);
       y = Math.floor(y);
       if (x >= 0 && x < this.canvasWidth && y >= 0 && y < this.canvasHeight) {
@@ -7868,7 +8255,7 @@
         r = Math.max(Math.min(Math.round(r), 255), 0);
         g = Math.max(Math.min(Math.round(g), 255), 0);
         b = Math.max(Math.min(Math.round(b), 255), 0);
-        result = r | g << 8 | b << 16;
+        result = r | (g << 8) | (b << 16);
       }
       this.setColor(result);
       if (this.current > 0) {
@@ -7931,7 +8318,7 @@
         0,
         0,
         this.canvasWidth,
-        this.canvasHeight
+        this.canvasHeight,
       );
       const buf32 = new Uint32Array(imageData.data.buffer);
       const buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -7990,7 +8377,12 @@
       for (var i = 0; i < buf32.length; i++) {
         this.temp[i] = buf32[i];
       }
-      const tempImageData = this.tempCanvasCtx.getImageData(x, y, width, height);
+      const tempImageData = this.tempCanvasCtx.getImageData(
+        x,
+        y,
+        width,
+        height,
+      );
       const tempBuf32 = new Uint32Array(tempImageData.data.buffer);
       let tempBuf8 = new Uint8ClampedArray(tempImageData.data.buffer);
       for (var i = 0; i < tempBuf32.length; i++) {
@@ -8054,11 +8446,11 @@
       var temp = new Uint32Array(buf32.length);
       let fillPixel;
       if (Neo.config.neo_disable_turn_original_glitch) {
-        fillPixel = function(index2) {
+        fillPixel = function (index2) {
           return 0;
         };
       } else {
-        fillPixel = function(index2) {
+        fillPixel = function (index2) {
           return buf32[index2 % width];
         };
       }
@@ -8129,7 +8521,10 @@
       for (var j = 0; j < height; j++) {
         for (var i = 0; i < width; i++) {
           if (maskFunc && maskFunc.call(this, i, j, width, height)) {
-            if (this._currentMaskType >= _Painter.MASKTYPE_ADD || !this.isMasked(buf8, index)) {
+            if (
+              this._currentMaskType >= _Painter.MASKTYPE_ADD ||
+              !this.isMasked(buf8, index)
+            ) {
               const r0 = buf8[index + 0];
               const g0 = buf8[index + 1];
               const b0 = buf8[index + 2];
@@ -8179,7 +8574,9 @@
      */
     rectMask(x, y, width, height) {
       var d = this._currentWidth;
-      return x < d || x > width - 1 - d || y < d || y > height - 1 - d ? true : false;
+      return x < d || x > width - 1 - d || y < d || y > height - 1 - d
+        ? true
+        : false;
     }
     /**
      * 楕円
@@ -8240,8 +8637,12 @@
         mx += 0.499;
         my += 0.499;
       }
-      var x = (mx - this.zoomX + this.destCanvas.width * 0.5 / this.zoom) * this.zoom;
-      var y = (my - this.zoomY + this.destCanvas.height * 0.5 / this.zoom) * this.zoom;
+      var x =
+        (mx - this.zoomX + (this.destCanvas.width * 0.5) / this.zoom) *
+        this.zoom;
+      var y =
+        (my - this.zoomY + (this.destCanvas.height * 0.5) / this.zoom) *
+        this.zoom;
       if (isClip) {
         x = Math.max(Math.min(x, this.destCanvas.width), 0);
         y = Math.max(Math.min(y, this.destCanvas.height), 0);
@@ -8260,9 +8661,11 @@
       if (!element || !(element instanceof Element)) return false;
       const root = element.closest("#NEO");
       if (!root) return false;
-      if (element.closest(
-        "#neo-tools, .NEO .buttonOn, .NEO .buttonOff, .NEO .inputText"
-      )) {
+      if (
+        element.closest(
+          "#neo-tools, .NEO .buttonOn, .NEO .buttonOff, .NEO .inputText",
+        )
+      ) {
         return true;
       }
       return false;
@@ -8300,7 +8703,7 @@
       console.log("loadImage " + filename);
       var img = new Image();
       const ref = this;
-      img.onload = function() {
+      img.onload = function () {
         ref.canvasCtx[0].drawImage(img, 0, 0);
         ref.updateDestCanvas(0, 0, ref.canvasWidth, ref.canvasHeight);
       };
@@ -8316,7 +8719,7 @@
       this.busy = true;
       this.busySkipped = Neo.config.neo_animation_skip == "true";
       const ref = this;
-      getPCH(filename, function(pch) {
+      getPCH(filename, function (pch) {
         ref._actionMgr._items = pch.data;
         ref._actionMgr._mark = pch.data.length;
         ref._actionMgr.play();
@@ -8334,9 +8737,9 @@
         const layerData1 = Neo.storage.getItem("layer1");
         if (!layerData0 || !layerData1) return;
         var img0 = new Image();
-        img0.onload = function() {
+        img0.onload = function () {
           var img1 = new Image();
-          img1.onload = function() {
+          img1.onload = function () {
             ref.canvasCtx[0].clearRect(0, 0, ref.canvasWidth, ref.canvasHeight);
             ref.canvasCtx[1].clearRect(0, 0, ref.canvasWidth, ref.canvasHeight);
             ref.canvasCtx[0].drawImage(img0, 0, 0);
@@ -8379,8 +8782,8 @@
      * @returns {number[]} [最小値のインデックス, 中間値のインデックス, 最大値のインデックス]
      */
     sortColor(r0, g0, b0) {
-      var min = r0 < g0 ? r0 < b0 ? 0 : 2 : g0 < b0 ? 1 : 2;
-      var max = r0 > g0 ? r0 > b0 ? 0 : 2 : g0 > b0 ? 1 : 2;
+      var min = r0 < g0 ? (r0 < b0 ? 0 : 2) : g0 < b0 ? 1 : 2;
+      var max = r0 > g0 ? (r0 > b0 ? 0 : 2) : g0 > b0 ? 1 : 2;
       var mid = min + max == 1 ? 2 : min + max == 2 ? 1 : 0;
       return [min, mid, max];
     }
@@ -8416,7 +8819,7 @@
         0,
         0,
         this.canvasWidth,
-        this.canvasHeight
+        this.canvasHeight,
       );
       const buf32 = new Uint32Array(imageData.data.buffer);
       const buf8 = new Uint8ClampedArray(imageData.data.buffer);
@@ -8449,7 +8852,7 @@
         0,
         0,
         this.canvasWidth,
-        this.canvasHeight
+        this.canvasHeight,
       );
       this.tempCanvasCtx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     }
@@ -8684,12 +9087,11 @@
       return this._redoItems.pop();
     }
   };
-  Neo.setColor = function(color) {
+  Neo.setColor = function (color) {
     Neo.painter.setColor(color);
-    var colorTip = (
+    var colorTip =
       /** @type {ColorTip|null} **/
-      ColorTip.getCurrent()
-    );
+      ColorTip.getCurrent();
     if (colorTip) {
       colorTip.setColor(color);
     }
@@ -8709,7 +9111,8 @@
       busy: Neo.painter.busy,
       touchlength: Neo.painter.touchlength,
       hasFocus: document.hasFocus(),
-      activeElement: (_a = document.activeElement) == null ? void 0 : _a.tagName
+      activeElement:
+        (_a = document.activeElement) == null ? void 0 : _a.tagName,
     });
   };
 
@@ -8719,28 +9122,11 @@
       this.CommandBase = class {
         constructor() {
           this.data = null;
-          this.zoom_steps = Neo.config.neo_enable_zoom_out ? [
-            0.2,
-            0.4,
-            0.6,
-            0.8,
-            1,
-            1.5,
-            2,
-            2.5,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            10,
-            11,
-            12
-          ] : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12];
+          this.zoom_steps = Neo.config.neo_enable_zoom_out
+            ? [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 10, 11, 12]
+            : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12];
         }
-        execute() {
-        }
+        execute() {}
       };
       this.ZoomPlusCommand = class extends this.CommandBase {
         /** @param {Painter} data */
@@ -8752,7 +9138,10 @@
           const steps = this.zoom_steps;
           let currentIndex = steps.findIndex((s) => s >= this.data.zoom);
           if (currentIndex === -1) currentIndex = steps.length - 1;
-          if (steps[currentIndex] === this.data.zoom && currentIndex < steps.length - 1) {
+          if (
+            steps[currentIndex] === this.data.zoom &&
+            currentIndex < steps.length - 1
+          ) {
             currentIndex++;
           } else if (steps[currentIndex] > this.data.zoom) {
           } else if (currentIndex < steps.length - 1) {
@@ -8813,12 +9202,20 @@
         }
         execute() {
           if (Neo.fullScreen) {
-            if (confirm(translate("\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F"))) {
+            if (
+              confirm(translate("\u30DA\u30FC\u30B8\u30D3\u30E5\u30FC\uFF1F"))
+            ) {
               Neo.fullScreen = false;
               updateWindow();
             }
           } else {
-            if (confirm(translate("\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F"))) {
+            if (
+              confirm(
+                translate(
+                  "\u30A6\u30A3\u30F3\u30C9\u30A6\u30D3\u30E5\u30FC\uFF1F",
+                ),
+              )
+            ) {
               Neo.fullScreen = true;
               updateWindow();
             }
@@ -8844,11 +9241,13 @@
         }
         execute() {
           var url = "http://github.com/funige/neo/";
-          if (confirm(
-            translate(
-              "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F"
-            ) + "\n"
-          )) {
+          if (
+            confirm(
+              translate(
+                "PaintBBS NEO\u306F\u3001\u304A\u7D75\u304B\u304D\u3057\u3043\u63B2\u793A\u677F PaintBBS (\xA92000-2004 \u3057\u3043\u3061\u3083\u3093) \u3092html5\u5316\u3059\u308B\u30D7\u30ED\u30B8\u30A7\u30AF\u30C8\u3067\u3059\u3002\n\nPaintBBS NEO\u306E\u30DB\u30FC\u30E0\u30DA\u30FC\u30B8\u3092\u8868\u793A\u3057\u307E\u3059\u304B\uFF1F",
+              ) + "\n",
+            )
+          ) {
             Neo.openURL(url);
           }
         }
@@ -8870,13 +9269,17 @@
         e.stopPropagation();
       },
       {
-        passive: false
-      }
+        passive: false,
+      },
     );
   });
-  var extractBootConfig = function(targetName) {
+  var extractBootConfig = function (targetName) {
     Neo.params = Neo.params || Neo.param;
-    if (Neo.params && typeof Neo.params === "object" && Object.keys(Neo.params).length > 0) {
+    if (
+      Neo.params &&
+      typeof Neo.params === "object" &&
+      Object.keys(Neo.params).length > 0
+    ) {
       const params2 = Neo.params;
       return params2[targetName] ? __spreadValues({}, params2[targetName]) : {};
     }
@@ -8894,9 +9297,9 @@
     }
     return config;
   };
-  Neo.init = function() {
+  Neo.init = function () {
     let applets = document.querySelectorAll(
-      "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch"
+      "applet,applet-dummy,.neo-applet-paintbbs,.neo-applet-pch",
     );
     for (const applet of applets) {
       if (applet instanceof HTMLElement) {
@@ -8919,7 +9322,7 @@
             Neo.viewer = true;
             initConfig(applet);
             var filename = getFilename();
-            getPCH(filename, function(pch) {
+            getPCH(filename, function (pch) {
               if (pch) {
                 Neo.createViewer(applet);
                 Neo.config.width = pch.width;
@@ -8934,7 +9337,7 @@
     }
     return false;
   };
-  var init2 = function() {
+  var init2 = function () {
     const pageview = document.getElementById("neo-pageView");
     if (!pageview) return;
     pageview.style.width = Neo.config.applet_width + "px";
@@ -8952,27 +9355,39 @@
     Neo.toolsWrapper = document.getElementById("neo-toolsWrapper");
     Neo.tools = document.getElementById("neo-tools");
     Neo.center = document.getElementById("neo-center");
-    if (Neo.center && Neo.container && Neo.container.clientWidth && Neo.container.clientWidth >= 400 && Neo.config.neo_disable_neo_center_min_width != "true") {
+    if (
+      Neo.center &&
+      Neo.container &&
+      Neo.container.clientWidth &&
+      Neo.container.clientWidth >= 400 &&
+      Neo.config.neo_disable_neo_center_min_width != "true"
+    ) {
       Neo.center.style.minWidth = "397px";
     }
     Neo.painter = new Painter();
     Neo.painter.build(Neo.canvas, Neo.config.width, Neo.config.height);
-    Neo.container.oncontextmenu = function() {
+    Neo.container.oncontextmenu = function () {
       return false;
     };
     Neo.isAnimation = Neo.config.thumbnail_type == "animation";
     Neo.storage = localStorage;
     var filename = getFilename();
-    var message = !filename || filename.slice(-4).toLowerCase() != ".pch" ? "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F" : "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F";
+    var message =
+      !filename || filename.slice(-4).toLowerCase() != ".pch"
+        ? "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F"
+        : "\u63CF\u304D\u304B\u3051\u306E\u753B\u50CF\u304C\u3042\u308A\u307E\u3059\u3002\u52D5\u753B\u306E\u8AAD\u307F\u8FBC\u307F\u3092\u4E2D\u6B62\u3057\u3066\u5FA9\u5143\u3057\u307E\u3059\u304B\uFF1F";
     let storageTimestamp = Neo.storage.getItem("timestamp");
     const nowTimestamp = Date.now();
-    if (Number.isInteger(Number(storageTimestamp)) && nowTimestamp - Number(storageTimestamp) > 3 * 86400 * 1e3) {
+    if (
+      Number.isInteger(Number(storageTimestamp)) &&
+      nowTimestamp - Number(storageTimestamp) > 3 * 86400 * 1e3
+    ) {
       Neo.painter.clearSession();
       storageTimestamp = null;
     }
     if (storageTimestamp && confirm(translate(message))) {
-      setTimeout(function() {
-        Neo.painter.loadSession(function() {
+      setTimeout(function () {
+        Neo.painter.loadSession(function () {
           Neo.painter._pushUndo();
           Neo.painter._actionMgr.restore();
           Neo.painter.dirty = false;
@@ -8992,14 +9407,14 @@
       // "pagehide",
       "beforeunload",
       //ブラウザを終了した時にも復元データを保存
-      function(e) {
+      function (e) {
         if (!Neo.uploaded && Neo.painter.isDirty()) {
           Neo.painter.saveSession();
         } else if (Neo.uploaded) {
           Neo.painter.clearSession();
         }
       },
-      false
+      false,
     );
     const originalTitle = document.title;
     document.addEventListener("visibilitychange", () => {
@@ -9008,7 +9423,10 @@
           document.title = originalTitle;
         } else if (document.visibilityState === "hidden") {
           setTimeout(() => {
-            if (document.visibilityState === "hidden" && document.title === originalTitle) {
+            if (
+              document.visibilityState === "hidden" &&
+              document.title === originalTitle
+            ) {
               document.title = `${originalTitle} *`;
             }
           }, 3e3);
@@ -9016,7 +9434,7 @@
       }
     });
   };
-  var initConfig = function(applet) {
+  var initConfig = function (applet) {
     if (applet) {
       var appletWidth = applet.dataset.width || applet.getAttribute("width");
       var appletHeight = applet.dataset.height || applet.getAttribute("height");
@@ -9068,8 +9486,12 @@
         applyStyle("color_back", "#ccccff");
         applyStyle("color_bar_select", "#407675");
       }
-      if (!Neo.config.color_frame) Neo.config.color_frame = Neo.config.color_text;
-      if (Neo.config.neo_tool_side == "left" || Neo.config.neo_tool_side == "true") {
+      if (!Neo.config.color_frame)
+        Neo.config.color_frame = Neo.config.color_text;
+      if (
+        Neo.config.neo_tool_side == "left" ||
+        Neo.config.neo_tool_side == "true"
+      ) {
         Neo.toolSide = true;
       }
     }
@@ -9079,43 +9501,48 @@
         color: "#000000",
         alpha: 1,
         tool: Painter.TOOLTYPE_PEN,
-        drawType: Painter.DRAWTYPE_FREEHAND
+        drawType: Painter.DRAWTYPE_FREEHAND,
       },
       {
         size: 5,
         color: "#FFFFFF",
         alpha: 1,
         tool: Painter.TOOLTYPE_ERASER,
-        drawType: Painter.DRAWTYPE_FREEHAND
+        drawType: Painter.DRAWTYPE_FREEHAND,
       },
       {
         size: 10,
         color: "#FFFFFF",
         alpha: 1,
         tool: Painter.TOOLTYPE_ERASER,
-        drawType: Painter.DRAWTYPE_FREEHAND
-      }
+        drawType: Painter.DRAWTYPE_FREEHAND,
+      },
     ];
-    Neo.reservePen = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-    clone(Neo.config.reserves[0]);
-    Neo.reserveEraser = /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
-    clone(Neo.config.reserves[1]);
+    Neo.reservePen =
+      /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
+      clone(Neo.config.reserves[0]);
+    Neo.reserveEraser =
+      /** @type {{size:number,color:string,alpha:number,tool:number,drawType:number}} */
+      clone(Neo.config.reserves[1]);
   };
-  var fixConfig = function(value) {
+  var fixConfig = function (value) {
     if (value.match(/^#[0-9a-fA-F]{5}$/)) {
       value = "#0" + value.slice(1);
     }
-    if (value.toLocaleLowerCase() === "true" || value.toLocaleLowerCase() === "false") {
+    if (
+      value.toLocaleLowerCase() === "true" ||
+      value.toLocaleLowerCase() === "false"
+    ) {
       return value.toLocaleLowerCase();
     }
     return value;
   };
-  var getStyleSheet = function() {
+  var getStyleSheet = function () {
     var style = document.createElement("style");
     document.head.appendChild(style);
     return style.sheet;
   };
-  var initSkin = function() {
+  var initSkin = function () {
     Neo.styleSheet = getStyleSheet();
     var lightBorder = multColor(Neo.config.color_icon, 1.3);
     var darkBorder = multColor(Neo.config.color_icon, 0.7);
@@ -9134,22 +9561,30 @@
     addRule(
       ".NEO .layerControl .bg",
       "border-bottom",
-      "1px solid " + Neo.config.tool_color_text
+      "1px solid " + Neo.config.tool_color_text,
     );
     addRule(".NEO .buttonOn", "color", Neo.config.color_text);
     addRule(".NEO .buttonOff", "color", Neo.config.color_text);
     addRule(".NEO .buttonOff", "background-color", Neo.config.color_icon);
-    addRule(".NEO .buttonOff", "border-top", "1px solid ", Neo.config.color_icon);
+    addRule(
+      ".NEO .buttonOff",
+      "border-top",
+      "1px solid ",
+      Neo.config.color_icon,
+    );
     addRule(
       ".NEO .buttonOff",
       "border-left",
       "1px solid ",
-      Neo.config.color_icon
+      Neo.config.color_icon,
     );
     addRule(
       ".NEO .buttonOff",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.color_icon + ", 0 0 0 2px " + Neo.config.color_frame
+      "0 0 0 1px " +
+        Neo.config.color_icon +
+        ", 0 0 0 2px " +
+        Neo.config.color_frame,
     );
     addRule(".NEO .buttonOff:hover", "background-color", Neo.config.color_icon);
     addRule(".NEO .buttonOff:hover", "border-top", "1px solid " + lightBorder);
@@ -9157,135 +9592,153 @@
     addRule(
       ".NEO .buttonOff:hover",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame
+      "0 0 0 1px " +
+        Neo.config.color_iconselect +
+        ", 0 0 0 2px " +
+        Neo.config.color_frame,
     );
     addRule(
       ".NEO .buttonOff:active, .NEO .buttonOn",
       "background-color",
-      darkBorder
+      darkBorder,
     );
     addRule(
       ".NEO .buttonOff:active, .NEO .buttonOn",
       "border-top",
-      "1px solid " + darkBorder
+      "1px solid " + darkBorder,
     );
     addRule(
       ".NEO .buttonOff:active, .NEO .buttonOn",
       "border-left",
-      "1px solid " + darkBorder
+      "1px solid " + darkBorder,
     );
     addRule(
       ".NEO .buttonOff:active, .NEO .buttonOn",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.color_iconselect + ", 0 0 0 2px " + Neo.config.color_frame
+      "0 0 0 1px " +
+        Neo.config.color_iconselect +
+        ", 0 0 0 2px " +
+        Neo.config.color_frame,
     );
-    addRule(".NEO #neo-canvas", "border", "1px solid " + Neo.config.color_frame);
+    addRule(
+      ".NEO #neo-canvas",
+      "border",
+      "1px solid " + Neo.config.color_frame,
+    );
     addRule(
       ".NEO #neo-scrollH, .NEO #neo-scrollV",
       "background-color",
-      Neo.config.color_icon
+      Neo.config.color_icon,
     );
     addRule(
       ".NEO #neo-scrollH, .NEO #neo-scrollV",
       "box-shadow",
-      "0 0 0 1px white, 0 0 0 2px " + Neo.config.color_frame
+      "0 0 0 1px white, 0 0 0 2px " + Neo.config.color_frame,
     );
     addRule(
       ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
       "background-color",
-      Neo.config.color_bar
+      Neo.config.color_bar,
     );
     addRule(
       ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.color_icon
+      "0 0 0 1px " + Neo.config.color_icon,
     );
     addRule(
       ".NEO #neo-scrollH div:hover, .NEO #neo-scrollV div:hover",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.color_iconselect
+      "0 0 0 1px " + Neo.config.color_iconselect,
     );
     addRule(
       ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
       "border-top",
-      "1px solid " + lightBar
+      "1px solid " + lightBar,
     );
     addRule(
       ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
       "border-left",
-      "1px solid " + lightBar
+      "1px solid " + lightBar,
     );
     addRule(
       ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
       "border-right",
-      "1px solid " + darkBar
+      "1px solid " + darkBar,
     );
     addRule(
       ".NEO #neo-scrollH div, .NEO #neo-scrollV div",
       "border-bottom",
-      "1px solid " + darkBar
+      "1px solid " + darkBar,
     );
     addRule(
       ".NEO .toolTipOn",
       "background-color",
-      multColor(Neo.config.tool_color_button, 0.7)
+      multColor(Neo.config.tool_color_button, 0.7),
     );
-    addRule(".NEO .toolTipOff", "background-color", Neo.config.tool_color_button);
+    addRule(
+      ".NEO .toolTipOff",
+      "background-color",
+      Neo.config.tool_color_button,
+    );
     addRule(
       ".NEO .toolTipFixed",
       "background-color",
-      Neo.config.tool_color_button2
+      Neo.config.tool_color_button2,
     );
     addRule(
       ".NEO .colorSlider, .NEO .sizeSlider",
       "background-color",
-      Neo.config.tool_color_bar
+      Neo.config.tool_color_bar,
     );
     addRule(
       ".NEO .reserveControl",
       "background-color",
-      Neo.config.tool_color_bar
+      Neo.config.tool_color_bar,
     );
     addRule(
       ".NEO .reserveControl",
       "background-color",
-      Neo.config.tool_color_bar
+      Neo.config.tool_color_bar,
     );
-    addRule(".NEO .layerControl", "background-color", Neo.config.tool_color_bar);
+    addRule(
+      ".NEO .layerControl",
+      "background-color",
+      Neo.config.tool_color_bar,
+    );
     addRule(
       ".NEO .colorTipOn, .NEO .colorTipOff",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
+      "0 0 0 1px " + Neo.config.tool_color_frame,
     );
     addRule(
       ".NEO .toolTipOn, .NEO .toolTipOff",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
+      "0 0 0 1px " + Neo.config.tool_color_frame,
     );
     addRule(
       ".NEO .toolTipFixed",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
+      "0 0 0 1px " + Neo.config.tool_color_frame,
     );
     addRule(
       ".NEO .colorSlider, .NEO .sizeSlider",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
+      "0 0 0 1px " + Neo.config.tool_color_frame,
     );
     addRule(
       ".NEO .reserveControl",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
+      "0 0 0 1px " + Neo.config.tool_color_frame,
     );
     addRule(
       ".NEO .layerControl",
       "box-shadow",
-      "0 0 0 1px " + Neo.config.tool_color_frame
+      "0 0 0 1px " + Neo.config.tool_color_frame,
     );
     addRule(
       ".NEO .reserveControl .reserve",
       "border",
-      "1px solid " + Neo.config.tool_color_frame
+      "1px solid " + Neo.config.tool_color_frame,
     );
     if (navigator.language.indexOf("ja") != 0) {
       var labels = ["Fixed", "On", "Off"];
@@ -9296,7 +9749,7 @@
     }
     Neo.setToolSide(Neo.toolSide);
   };
-  var addRule = function(selector, styleName, value, sheet = null) {
+  var addRule = function (selector, styleName, value, sheet = null) {
     if (!sheet) {
       sheet = Neo.styleSheet;
     }
@@ -9307,20 +9760,23 @@
       if (sheet == null ? void 0 : sheet.insertRule) {
         sheet.insertRule(
           selector + " { " + styleName + ": " + value + "; }",
-          sheet.cssRules.length
+          sheet.cssRules.length,
         );
       }
     } catch (e) {
-      console.error("addRule: Failed to insert rule for '" + selector + "'.", e);
+      console.error(
+        "addRule: Failed to insert rule for '" + selector + "'.",
+        e,
+      );
     }
   };
-  var readStyles = function() {
+  var readStyles = function () {
     Neo.rules = {};
     for (var i = 0; i < document.styleSheets.length; i++) {
       readStyle(document.styleSheets[i]);
     }
   };
-  var readStyle = function(sheet) {
+  var readStyle = function (sheet) {
     try {
       var rules = sheet.cssRules;
       for (var i = 0; i < rules.length; i++) {
@@ -9344,22 +9800,21 @@
           }
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   };
-  var applyStyle = function(name, defaultColor) {
+  var applyStyle = function (name, defaultColor) {
     if (Neo.config[name] == void 0) {
       Neo.config[name] = Neo.rules[name] || defaultColor;
     }
   };
-  var createBackgroundImage = function() {
+  var createBackgroundImage = function () {
     var c1 = Neo.painter.getColor(Neo.config.color_bk) | 4278190080;
     var c2 = Neo.painter.getColor(Neo.config.color_bk2) | 4278190080;
     var bgCanvas = document.createElement("canvas");
     bgCanvas.width = 16;
     bgCanvas.height = 16;
     var ctx = bgCanvas.getContext("2d", {
-      willReadFrequently: true
+      willReadFrequently: true,
     });
     if (!ctx) {
       return "";
@@ -9377,7 +9832,7 @@
     ctx.putImageData(imageData, 0, 0);
     return bgCanvas.toDataURL("image/png");
   };
-  var multColor = function(c, scale) {
+  var multColor = function (c, scale) {
     const rNum = Math.round(parseInt(c.slice(1, 3), 16) * scale);
     const gNum = Math.round(parseInt(c.slice(3, 5), 16) * scale);
     const bNum = Math.round(parseInt(c.slice(5, 7), 16) * scale);
@@ -9386,7 +9841,7 @@
     const b = ("0" + Math.min(Math.max(bNum, 0), 255).toString(16)).slice(-2);
     return "#" + r + g + b;
   };
-  var colorNameToHex = function(name) {
+  var colorNameToHex = function (name) {
     const colors = {
       aliceblue: "#f0f8ff",
       antiquewhite: "#faebd7",
@@ -9528,7 +9983,7 @@
       white: "#ffffff",
       whitesmoke: "#f5f5f5",
       yellow: "#ffff00",
-      yellowgreen: "#9acd32"
+      yellowgreen: "#9acd32",
     };
     const rgb = name.toLowerCase().match(/rgb\((.*),(.*),(.*)\)/);
     if (rgb) {
@@ -9542,17 +9997,21 @@
     }
     return false;
   };
-  var initComponents = function() {
+  var initComponents = function () {
     const copyright = document.getElementById("neo-copyright");
     if (copyright) copyright.innerHTML += "v" + Neo.version;
     document.addEventListener(
       "mouseup",
-      function(e) {
-        if (Neo.painter && e.target instanceof Element && !Neo.painter.isContainer(e.target)) {
+      function (e) {
+        if (
+          Neo.painter &&
+          e.target instanceof Element &&
+          !Neo.painter.isContainer(e.target)
+        ) {
           Neo.painter.cancelTool();
         }
       },
-      false
+      false,
     );
     showWarning();
     if (Neo.styleSheet) {
@@ -9561,46 +10020,46 @@
       addRule("*", "-ms-user-select", "none");
     }
   };
-  var initButtons = function() {
+  var initButtons = function () {
     const commands = new Commands();
     const neo_undo = new Button().init("neo-undo");
     if (neo_undo) {
-      neo_undo.onmouseup = function() {
+      neo_undo.onmouseup = function () {
         const UndoCommand = new commands.UndoCommand(Neo.painter);
         UndoCommand.execute();
       };
     }
     const neo_redo = new Button().init("neo-redo");
     if (neo_redo) {
-      neo_redo.onmouseup = function() {
+      neo_redo.onmouseup = function () {
         const RedoCommand = new commands.RedoCommand(Neo.painter);
         RedoCommand.execute();
       };
     }
     const neo_window = new Button().init("neo-window");
     if (neo_window) {
-      neo_window.onmouseup = function() {
+      neo_window.onmouseup = function () {
         const WindowCommand = new commands.WindowCommand(Neo.painter);
         WindowCommand.execute();
       };
     }
     const neo_copyright = new Button().init("neo-copyright");
     if (neo_copyright) {
-      neo_copyright.onmouseup = function() {
+      neo_copyright.onmouseup = function () {
         const CopyrightCommand = new commands.CopyrightCommand(Neo.painter);
         CopyrightCommand.execute();
       };
     }
     const neo_zoomPlus = new Button().init("neo-zoomPlus");
     if (neo_zoomPlus) {
-      neo_zoomPlus.onmouseup = function() {
+      neo_zoomPlus.onmouseup = function () {
         const ZoomPlusCommand = new commands.ZoomPlusCommand(Neo.painter);
         ZoomPlusCommand.execute();
       };
     }
     const neo_zoomMinus = new Button().init("neo-zoomMinus");
     if (neo_zoomMinus) {
-      neo_zoomMinus.onmouseup = function() {
+      neo_zoomMinus.onmouseup = function () {
         const ZoomMinusCommand = new commands.ZoomMinusCommand(Neo.painter);
         ZoomMinusCommand.execute();
       };
@@ -9610,7 +10069,7 @@
       console.error("initButtons: SubmitButton not found");
       return;
     }
-    Neo.submitButton.onmouseup = function() {
+    Neo.submitButton.onmouseup = function () {
       var _a;
       (_a = Neo.submitButton) == null ? void 0 : _a.disable(5e3);
       const SubmitCommand = new commands.SubmitCommand(Neo.painter);
@@ -9634,35 +10093,47 @@
     Neo.eraserTip = new EraserTip().init("neo-eraser");
     Neo.drawTip = new DrawTip().init("neo-draw");
     Neo.maskTip = new MaskTip().init("neo-mask");
-    Neo.toolButtons = Neo.fillButton && Neo.penTip && Neo.pen2Tip && Neo.effectTip && Neo.effect2Tip && Neo.drawTip && Neo.eraserTip ? [
-      Neo.fillButton,
-      Neo.penTip,
-      Neo.pen2Tip,
-      Neo.effectTip,
-      Neo.effect2Tip,
-      Neo.drawTip,
+    Neo.toolButtons =
+      Neo.fillButton &&
+      Neo.penTip &&
+      Neo.pen2Tip &&
+      Neo.effectTip &&
+      Neo.effect2Tip &&
+      Neo.drawTip &&
       Neo.eraserTip
-    ] : [];
+        ? [
+            Neo.fillButton,
+            Neo.penTip,
+            Neo.pen2Tip,
+            Neo.effectTip,
+            Neo.effect2Tip,
+            Neo.drawTip,
+            Neo.eraserTip,
+          ]
+        : [];
     for (var i = 1; i <= 14; i++) {
       new ColorTip().init("neo-color" + i, { index: i });
     }
     Neo.sliders[Neo.SLIDERTYPE_RED] = new ColorSlider().init("neo-sliderRed", {
-      type: Neo.SLIDERTYPE_RED
+      type: Neo.SLIDERTYPE_RED,
     });
     Neo.sliders[Neo.SLIDERTYPE_GREEN] = new ColorSlider().init(
       "neo-sliderGreen",
-      { type: Neo.SLIDERTYPE_GREEN }
+      { type: Neo.SLIDERTYPE_GREEN },
     );
-    Neo.sliders[Neo.SLIDERTYPE_BLUE] = new ColorSlider().init("neo-sliderBlue", {
-      type: Neo.SLIDERTYPE_BLUE
-    });
+    Neo.sliders[Neo.SLIDERTYPE_BLUE] = new ColorSlider().init(
+      "neo-sliderBlue",
+      {
+        type: Neo.SLIDERTYPE_BLUE,
+      },
+    );
     Neo.sliders[Neo.SLIDERTYPE_ALPHA] = new ColorSlider().init(
       "neo-sliderAlpha",
-      { type: Neo.SLIDERTYPE_ALPHA }
+      { type: Neo.SLIDERTYPE_ALPHA },
     );
     Neo.sizeslider = new SizeSlider();
     Neo.sliders[Neo.SLIDERTYPE_SIZE] = Neo.sizeslider.init("neo-sliderSize", {
-      type: Neo.SLIDERTYPE_SIZE
+      type: Neo.SLIDERTYPE_SIZE,
     });
     for (var i = 1; i <= 3; i++) {
       new ReserveControl().init("neo-reserve" + i, { index: i });
@@ -9671,7 +10142,7 @@
     new ScrollBarButton().init("neo-scrollH");
     new ScrollBarButton().init("neo-scrollV");
   };
-  Neo.start = function(isApp = false) {
+  Neo.start = function (isApp = false) {
     if (Neo.viewer) return;
     initSkin();
     initComponents();
@@ -9697,12 +10168,12 @@
       }
     }
   };
-  var isMobile = function() {
+  var isMobile = function () {
     if (navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)) return true;
     if (navigator.maxTouchPoints && navigator.maxTouchPoints > 1) return true;
     return false;
   };
-  var showWarning = function() {
+  var showWarning = function () {
     const futaba = location.hostname.match(/^(?:.+\.)?2chan\.net$/i);
     const samplebbs = location.hostname.match(/^(?:.+\.)?neo\.websozai\.jp$/i);
     var edgeMatch = navigator.userAgent.match(/Edge\/(\d+)/i);
@@ -9713,7 +10184,9 @@
     var str = "";
     if (futaba || samplebbs) {
       if (edgeVersion && edgeVersion < 15) {
-        str = translate("\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>");
+        str = translate(
+          "\u3053\u306E\u30D6\u30E9\u30A6\u30B6\u3067\u306F<br>\u6295\u7A3F\u306B\u5931\u6557\u3059\u308B\u3053\u3068\u304C\u3042\u308A\u307E\u3059<br>",
+        );
       }
     }
     if (Neo.config.neo_warning) {
@@ -9724,20 +10197,19 @@
       return;
     }
     warning.innerHTML = str;
-    setTimeout(function() {
+    setTimeout(function () {
       if (!warning) {
         return;
       }
       warning.style.opacity = "0";
     }, 15e3);
   };
-  var updateUI = function() {
+  var updateUI = function () {
     var current = Neo.painter.tool.getToolButton();
     for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
+      const toolTip =
         /** @type {ToolTip} */
-        Neo.toolButtons[i]
-      );
+        Neo.toolButtons[i];
       if (current) {
         if (current == toolTip) {
           toolTip.setSelected(true);
@@ -9752,34 +10224,31 @@
     }
     updateUIColor(true, false);
   };
-  var updateUIColor = function(updateSlider, updateColorTip) {
+  var updateUIColor = function (updateSlider, updateColorTip) {
     for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
+      const toolTip =
         /** @type {ToolTip} */
-        Neo.toolButtons[i]
-      );
+        Neo.toolButtons[i];
       toolTip.update();
     }
     if (updateSlider) {
       for (let i = 0; i < Neo.sliders.length; i++) {
-        const slider = (
+        const slider =
           /** @type {Neo.ColorSlider|Neo.SizeSlider} */
-          Neo.sliders[i]
-        );
+          Neo.sliders[i];
         slider.update();
       }
     }
     if (updateColorTip) {
-      var colorTip = (
+      var colorTip =
         /** @type {ColorTip|null} **/
-        ColorTip.getCurrent()
-      );
+        ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.foregroundColor);
       }
     }
   };
-  var updateWindow = function() {
+  var updateWindow = function () {
     const windowView = document.getElementById("neo-windowView");
     const pageView = document.getElementById("neo-pageView");
     if (!Neo.container) {
@@ -9801,11 +10270,11 @@
     resizeCanvas();
     document.dispatchEvent(
       new CustomEvent("neo:fullscreenchange", {
-        detail: { fullscreen: Neo.fullScreen }
-      })
+        detail: { fullscreen: Neo.fullScreen },
+      }),
     );
   };
-  var resizeCanvas = function() {
+  var resizeCanvas = function () {
     if (!Neo.container) {
       console.error("resizeCanvas: Container element not found");
       return;
@@ -9830,7 +10299,7 @@
     destCanvas.width = width;
     destCanvas.height = height;
     const destctx = destCanvas.getContext("2d", {
-      willReadFrequently: true
+      willReadFrequently: true,
     });
     if (!destctx) {
       console.error("resizeCanvas: Failed to get 2d context");
@@ -9867,7 +10336,8 @@
       Neo.toolsWrapper.style.top = (top > 0 ? top : 0) + "px";
       if (top < 0) {
         var s = Neo.container.clientHeight / toolsWrapper.clientHeight;
-        Neo.toolsWrapper.style.transform = "translate(0, " + top + "px) scale(1," + s + ")";
+        Neo.toolsWrapper.style.transform =
+          "translate(0, " + top + "px) scale(1," + s + ")";
       } else {
         Neo.toolsWrapper.style.transform = "";
       }
@@ -9875,35 +10345,35 @@
     Neo.painter.setZoom(Neo.painter.zoom);
     Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
   };
-  var clone = function(src) {
+  var clone = function (src) {
     const dst = {};
     for (const k in src) {
       dst[k] = src[k];
     }
     return dst;
   };
-  var getSizeString = function(len) {
+  var getSizeString = function (len) {
     var result = String(len);
     while (result.length < 8) {
       result = "0" + result;
     }
     return result;
   };
-  Neo.openURL = function(url) {
+  Neo.openURL = function (url) {
     if (Neo.isApp) {
       __require("electron").shell.openExternal(url);
     } else {
       window.open(url, "_blank");
     }
   };
-  var getAbsoluteURL = function(baseURL, url) {
+  var getAbsoluteURL = function (baseURL, url) {
     if (url && (url.indexOf("://") > 0 || url.indexOf("//") === 0)) {
       return url;
     } else {
       return baseURL + url;
     }
   };
-  var submit = function(baseURL, blob, thumbnail, thumbnail2) {
+  var submit = function (baseURL, blob, thumbnail, thumbnail2) {
     var _a;
     let url = getAbsoluteURL(baseURL, Neo.config.url_save);
     var headerString = Neo.str_header || "";
@@ -9953,7 +10423,10 @@
     }
     if (thumbnail2) {
       const thumbnailSize = thumbnail2.size;
-      if (!isNaN(Neo.config.animation_max) && Number(Neo.config.animation_max)) {
+      if (
+        !isNaN(Neo.config.animation_max) &&
+        Number(Neo.config.animation_max)
+      ) {
         const maxSize = Number(Neo.config.animation_max) * 1024;
         if (maxSize < thumbnailSize) {
           thumbnail2 = null;
@@ -9971,8 +10444,12 @@
         thumbnail_size = thumbnail.size;
       }
       if (thumbnail2) {
-        if (isNaN(Neo.config.neo_max_pch) || //0,-1の場合は無制限
-        Number(Neo.config.neo_max_pch) <= 0 || Number(Neo.config.neo_max_pch) * 1024 * 1024 > headerString.length + blob.size + thumbnail_size + thumbnail2.size) {
+        if (
+          isNaN(Neo.config.neo_max_pch) || //0,-1の場合は無制限
+          Number(Neo.config.neo_max_pch) <= 0 ||
+          Number(Neo.config.neo_max_pch) * 1024 * 1024 >
+            headerString.length + blob.size + thumbnail_size + thumbnail2.size
+        ) {
           formData.append("pch", thumbnail2, "blob");
         } else {
           thumbnail2 = null;
@@ -9989,7 +10466,7 @@
       header,
       imgLength,
       "\r\n",
-      blob
+      blob,
     ];
     if (thumbnail) {
       var thumbnailLength = getSizeString(thumbnail.size);
@@ -10006,94 +10483,104 @@
       var errorMessage = path + "\n";
       const requestOptions = {
         method: "post",
-        body: data2
+        body: data2,
       };
       if (!futaba) {
         requestOptions.mode = "same-origin";
         requestOptions.headers = {
-          "X-Requested-With": "PaintBBS"
+          "X-Requested-With": "PaintBBS",
         };
       }
-      fetch(path, requestOptions).then((response) => {
-        var _a2;
-        if (response.ok) {
-          response.text().then((text) => {
-            var _a3, _b;
-            console.log(text);
-            if (text.match(/^error\n/m)) {
-              (_a3 = Neo.submitButton) == null ? void 0 : _a3.enable();
-              return alert(text.replace(/^error\n/m, ""));
-            }
-            if (Neo.config.neo_validate_exact_ok_text_in_response === "true") {
-              if (text !== "ok") {
-                (_b = Neo.submitButton) == null ? void 0 : _b.enable();
-                return alert(
-                  errorMessage + translate(
-                    "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002"
-                  )
-                );
+      fetch(path, requestOptions)
+        .then((response) => {
+          var _a2;
+          if (response.ok) {
+            response.text().then((text) => {
+              var _a3, _b;
+              console.log(text);
+              if (text.match(/^error\n/m)) {
+                (_a3 = Neo.submitButton) == null ? void 0 : _a3.enable();
+                return alert(text.replace(/^error\n/m, ""));
               }
+              if (
+                Neo.config.neo_validate_exact_ok_text_in_response === "true"
+              ) {
+                if (text !== "ok") {
+                  (_b = Neo.submitButton) == null ? void 0 : _b.enable();
+                  return alert(
+                    errorMessage +
+                      translate(
+                        "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002",
+                      ),
+                  );
+                }
+              }
+              var exitURL = getAbsoluteURL(baseURL, Neo.config.url_exit);
+              var responseURL = text.replace(/&amp;/g, "&");
+              if (responseURL.match(/painttmp=/)) {
+                exitURL = responseURL;
+              }
+              if (responseURL.match(/^URL:/)) {
+                exitURL = responseURL.replace(/^URL:/, "");
+              }
+              Neo.uploaded = true;
+              if (typeof Neo.handleExit === "function") {
+                return Neo.handleExit();
+              }
+              return (location.href = exitURL);
+            });
+          } else {
+            (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
+            const response_status = response.status;
+            let httpErrorMessag = "";
+            switch (response_status) {
+              case 400:
+                httpErrorMessag = "Bad Request";
+                break;
+              case 401:
+                httpErrorMessag = "Unauthorized";
+                break;
+              case 403:
+                httpErrorMessag = "Forbidden";
+                break;
+              case 404:
+                httpErrorMessag = "Not Found";
+                break;
+              case 500:
+                httpErrorMessag = "Internal Server Error";
+                break;
+              case 502:
+                httpErrorMessag = "Bad Gateway";
+                break;
+              case 503:
+                httpErrorMessag = "Service Unavailable";
+                break;
+              default:
+                httpErrorMessag = "Unknown Error";
+                break;
             }
-            var exitURL = getAbsoluteURL(baseURL, Neo.config.url_exit);
-            var responseURL = text.replace(/&amp;/g, "&");
-            if (responseURL.match(/painttmp=/)) {
-              exitURL = responseURL;
-            }
-            if (responseURL.match(/^URL:/)) {
-              exitURL = responseURL.replace(/^URL:/, "");
-            }
-            Neo.uploaded = true;
-            if (typeof Neo.handleExit === "function") {
-              return Neo.handleExit();
-            }
-            return location.href = exitURL;
-          });
-        } else {
-          (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
-          const response_status = response.status;
-          let httpErrorMessag = "";
-          switch (response_status) {
-            case 400:
-              httpErrorMessag = "Bad Request";
-              break;
-            case 401:
-              httpErrorMessag = "Unauthorized";
-              break;
-            case 403:
-              httpErrorMessag = "Forbidden";
-              break;
-            case 404:
-              httpErrorMessag = "Not Found";
-              break;
-            case 500:
-              httpErrorMessag = "Internal Server Error";
-              break;
-            case 502:
-              httpErrorMessag = "Bad Gateway";
-              break;
-            case 503:
-              httpErrorMessag = "Service Unavailable";
-              break;
-            default:
-              httpErrorMessag = "Unknown Error";
-              break;
+            return alert(
+              `${translate("HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9")} ${response_status} : ${httpErrorMessag}
+${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")}`,
+            );
           }
+        })
+        .catch((error) => {
+          var _a2;
+          (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
           return alert(
-            `${translate("HTTP\u30B9\u30C6\u30FC\u30BF\u30B9\u30B3\u30FC\u30C9")} ${response_status} : ${httpErrorMessag}
-${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")}`
+            errorMessage +
+              translate(
+                "\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002",
+              ),
           );
-        }
-      }).catch((error) => {
-        var _a2;
-        (_a2 = Neo.submitButton) == null ? void 0 : _a2.enable();
-        return alert(
-          errorMessage + translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u3092\u7F6E\u3044\u3066\u518D\u5EA6\u6295\u7A3F\u3057\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002")
-        );
-      });
+        });
     };
     if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
       const isConfirmed = window.confirm(
-        translate("\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?")
+        translate(
+          "\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?",
+        ),
       );
       if (!isConfirmed) {
         (_a = Neo.submitButton) == null ? void 0 : _a.enable();
@@ -10108,14 +10595,14 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
       console.error("failed to post data");
     }
   };
-  Neo.getColors = function() {
+  Neo.getColors = function () {
     var array = [];
     for (var i = 0; i < 14; i++) {
       array.push(Neo.colorTips[i].color);
     }
     return array.join("\n");
   };
-  Neo.setColors = function(colors) {
+  Neo.setColors = function (colors) {
     var array = colors.split("\n");
     for (var i = 0; i < 14; i++) {
       var color = array[i];
@@ -10123,17 +10610,18 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
       Neo.colorTips[i].setColor(color);
     }
   };
-  Neo.pExit = function() {
+  Neo.pExit = function () {
     const commands = new Commands();
     new commands.SubmitCommand(Neo.painter).execute();
   };
   Neo.str_header = "";
-  var createContainer = function(applet) {
+  var createContainer = function (applet) {
     var neo = document.createElement("div");
     neo.className = "NEO";
     neo.id = "NEO";
-    const html = '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;"><div id="neo-container" style="visibility:hidden;" class="o"><div id="neo-center" class="o"><div id="neo-painterContainer" class="o"><div id="neo-painterWrapper" class="o"><div id="neo-upper" class="o"><div id="neo-redo">[\u3084\u308A\u76F4\u3057]</div> <div id="neo-undo">[\u5143\u306B\u623B\u3059]</div> <div id="neo-fill">[\u5857\u308A\u6F70\u3057]</div> <div id="neo-right" style="display:none;">[\u53F3]</div> </div><div id="neo-painter"><div id="neo-canvas"><div id="neo-scrollH"></div><div id="neo-scrollV"></div><div id="neo-zoomPlusWrapper"><div id="neo-zoomPlus">+</div></div><div id="neo-zoomMinusWrapper"><div id="neo-zoomMinus">-</div></div><div id="neoWarning"></div></div></div><div id="neo-lower" class="o"></div></div><div id="neo-toolsWrapper"><div id="neo-tools"><div id="neo-toolSet"><div id="neo-pen"></div><div id="neo-pen2"></div><div id="neo-effect"></div><div id="neo-effect2"></div><div id="neo-eraser"></div><div id="neo-draw"></div><div id="neo-mask"></div><div class="colorTips"><div id="neo-color2"></div><div id="neo-color1"></div><br><div id="neo-color4"></div><div id="neo-color3"></div><br><div id="neo-color6"></div><div id="neo-color5"></div><br><div id="neo-color8"></div><div id="neo-color7"></div><br><div id="neo-color10"></div><div id="neo-color9"></div><br><div id="neo-color12"></div><div id="neo-color11"></div><br><div id="neo-color14"></div><div id="neo-color13"></div></div><div id="neo-sliderRed"></div><div id="neo-sliderGreen"></div><div id="neo-sliderBlue"></div><div id="neo-sliderAlpha"></div><div id="neo-sliderSize"></div><div class="reserveControl" style="margin-top:4px;"><div id="neo-reserve1"></div><div id="neo-reserve2"></div><div id="neo-reserve3"></div></div><div id="neo-layerControl" style="margin-top:6px;"></div></div></div></div></div></div><div id="neo-headerButtons"><div id="neo-window">[\u7A93]</div></div><div id="neo-footerButtons"><div id="neo-submit">[\u6295\u7A3F]</div> <div id="neo-copyright">[(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO]</div> </div></div></div><div id="neo-windowView" style="display: none;"></div>';
-    neo.innerHTML = html.replace(/\[(.*?)\]/g, function(match, str) {
+    const html =
+      '<div id="neo-pageView" style="margin:auto; width:450px; height:470px;"><div id="neo-container" style="visibility:hidden;" class="o"><div id="neo-center" class="o"><div id="neo-painterContainer" class="o"><div id="neo-painterWrapper" class="o"><div id="neo-upper" class="o"><div id="neo-redo">[\u3084\u308A\u76F4\u3057]</div> <div id="neo-undo">[\u5143\u306B\u623B\u3059]</div> <div id="neo-fill">[\u5857\u308A\u6F70\u3057]</div> <div id="neo-right" style="display:none;">[\u53F3]</div> </div><div id="neo-painter"><div id="neo-canvas"><div id="neo-scrollH"></div><div id="neo-scrollV"></div><div id="neo-zoomPlusWrapper"><div id="neo-zoomPlus">+</div></div><div id="neo-zoomMinusWrapper"><div id="neo-zoomMinus">-</div></div><div id="neoWarning"></div></div></div><div id="neo-lower" class="o"></div></div><div id="neo-toolsWrapper"><div id="neo-tools"><div id="neo-toolSet"><div id="neo-pen"></div><div id="neo-pen2"></div><div id="neo-effect"></div><div id="neo-effect2"></div><div id="neo-eraser"></div><div id="neo-draw"></div><div id="neo-mask"></div><div class="colorTips"><div id="neo-color2"></div><div id="neo-color1"></div><br><div id="neo-color4"></div><div id="neo-color3"></div><br><div id="neo-color6"></div><div id="neo-color5"></div><br><div id="neo-color8"></div><div id="neo-color7"></div><br><div id="neo-color10"></div><div id="neo-color9"></div><br><div id="neo-color12"></div><div id="neo-color11"></div><br><div id="neo-color14"></div><div id="neo-color13"></div></div><div id="neo-sliderRed"></div><div id="neo-sliderGreen"></div><div id="neo-sliderBlue"></div><div id="neo-sliderAlpha"></div><div id="neo-sliderSize"></div><div class="reserveControl" style="margin-top:4px;"><div id="neo-reserve1"></div><div id="neo-reserve2"></div><div id="neo-reserve3"></div></div><div id="neo-layerControl" style="margin-top:6px;"></div></div></div></div></div></div><div id="neo-headerButtons"><div id="neo-window">[\u7A93]</div></div><div id="neo-footerButtons"><div id="neo-submit">[\u6295\u7A3F]</div> <div id="neo-copyright">[(C)\u3057\u3043\u3061\u3083\u3093 PaintBBS NEO]</div> </div></div></div><div id="neo-windowView" style="display: none;"></div>';
+    neo.innerHTML = html.replace(/\[(.*?)\]/g, function (match, str) {
       return translate(str);
     });
     const parent = applet.parentNode;
@@ -10143,7 +10631,7 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
     }
     parent.appendChild(neo);
     parent.insertBefore(neo, applet);
-    setTimeout(function() {
+    setTimeout(function () {
       const tmp = document.querySelectorAll(".NEO");
       if (tmp.length > 1) {
         for (var i = 1; i < tmp.length; i++) {
@@ -10152,7 +10640,7 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
       }
     }, 0);
   };
-  var tintImage = function(ctx, color) {
+  var tintImage = function (ctx, color) {
     const c = Neo.painter.getColor(color) & 16777215;
     var imageData = ctx.getImageData(0, 0, 46, 18);
     var buf32 = new Uint32Array(imageData.data.buffer);
@@ -10160,13 +10648,13 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
     for (var i = 0; i < buf32.length; i++) {
       var a = buf32[i] & 4278190080;
       if (a) {
-        buf32[i] = buf32[i] & a | c;
+        buf32[i] = (buf32[i] & a) | c;
       }
     }
     imageData.data.set(buf8);
     ctx.putImageData(imageData, 0, 0);
   };
-  Neo.setToolSide = function(htmlConfiguredSide) {
+  Neo.setToolSide = function (htmlConfiguredSide) {
     let side;
     if (htmlConfiguredSide === "left") {
       side = true;
@@ -10190,17 +10678,20 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
   };
   document.addEventListener("DOMContentLoaded", () => {
     let elementNeo_touchMoveListenerAdded = false;
-    const isPinchZooming = function() {
+    const isPinchZooming = function () {
       if ("visualViewport" in window && window.visualViewport) {
         return window.visualViewport.scale > 1;
       } else {
         return document.documentElement.clientWidth > window.innerWidth;
       }
     };
-    const touch_move_grid_control = function(e) {
+    const touch_move_grid_control = function (e) {
       if (Neo.config.neo_disable_grid_touch_move) {
         let screenwidth = Number(screen.width);
-        if (e.touches.length === 1 && (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)) {
+        if (
+          e.touches.length === 1 &&
+          (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)
+        ) {
           if (typeof e.cancelable !== "boolean" || e.cancelable) {
             e.preventDefault();
             e.stopPropagation();
@@ -10209,28 +10700,39 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
       }
     };
     const elementNeo = document.getElementById("NEO");
-    const add_touch_move_grid_control = function() {
+    const add_touch_move_grid_control = function () {
       if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
         if (!elementNeo_touchMoveListenerAdded) {
-          elementNeo == null ? void 0 : elementNeo.addEventListener("touchmove", touch_move_grid_control, {
-            passive: false
-          });
+          elementNeo == null
+            ? void 0
+            : elementNeo.addEventListener(
+                "touchmove",
+                touch_move_grid_control,
+                {
+                  passive: false,
+                },
+              );
           elementNeo_touchMoveListenerAdded = true;
         }
       }
     };
-    elementNeo == null ? void 0 : elementNeo.addEventListener("touchmove", function(e) {
-      if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
-        add_touch_move_grid_control();
-        if (isPinchZooming()) {
-          elementNeo.removeEventListener("touchmove", touch_move_grid_control);
-          elementNeo_touchMoveListenerAdded = false;
-        }
-      }
-    });
+    elementNeo == null
+      ? void 0
+      : elementNeo.addEventListener("touchmove", function (e) {
+          if (elementNeo && Neo.config.neo_disable_grid_touch_move) {
+            add_touch_move_grid_control();
+            if (isPinchZooming()) {
+              elementNeo.removeEventListener(
+                "touchmove",
+                touch_move_grid_control,
+              );
+              elementNeo_touchMoveListenerAdded = false;
+            }
+          }
+        });
     add_touch_move_grid_control();
   });
-  Neo.setStabilizeLevel = function(htmlConfig) {
+  Neo.setStabilizeLevel = function (htmlConfig) {
     let level = parseInt(String(htmlConfig));
     if (isNaN(level) || level < 0) {
       level = 0;
