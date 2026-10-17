@@ -2636,8 +2636,8 @@
     }
     push() {
       if (!Neo.isAnimation) return;
-      var head = this._items[this._head - 1];
-      for (var i = 0; i < arguments.length; i++) {
+      const head = this._items[this._head - 1];
+      for (let i = 0; i < arguments.length; i++) {
         head.push(arguments[i]);
       }
     }
@@ -9761,7 +9761,7 @@
     }, 15e3);
   };
   var updateUI = function() {
-    var current = Neo.painter.tool.getToolButton();
+    const current = Neo.painter.tool.getToolButton();
     for (let i = 0; i < Neo.toolButtons.length; i++) {
       const toolTip = (
         /** @type {ToolTip} */
@@ -9783,26 +9783,17 @@
   };
   var updateUIColor = function(updateSlider, updateColorTip) {
     for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
-        /** @type {ToolTip} */
-        Neo.toolButtons[i]
-      );
+      const toolTip = Neo.toolButtons[i];
       toolTip.update();
     }
     if (updateSlider) {
       for (let i = 0; i < Neo.sliders.length; i++) {
-        const slider = (
-          /** @type {Neo.ColorSlider|Neo.SizeSlider} */
-          Neo.sliders[i]
-        );
+        const slider = Neo.sliders[i];
         slider.update();
       }
     }
     if (updateColorTip) {
-      var colorTip = (
-        /** @type {ColorTip|null} **/
-        ColorTip.getCurrent()
-      );
+      const colorTip = ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.foregroundColor);
       }

@@ -73,8 +73,8 @@ export class ActionManager {
   push() {
     if (!Neo.isAnimation) return;
 
-    var head = this._items[this._head - 1];
-    for (var i = 0; i < arguments.length; i++) {
+    const head = this._items[this._head - 1];
+    for (let i = 0; i < arguments.length; i++) {
       head.push(arguments[i]);
     }
   }
