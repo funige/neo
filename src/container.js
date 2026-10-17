@@ -1083,7 +1083,7 @@ Neo.start = function (isApp = false) {
     Neo.applet.outerHTML = "";
     /** @type {any} */ (document)[name] = Neo;
 
-    resizeCanvas();
+    Neo.resizeCanvas();
 
     if (!Neo.container) {
       console.error("start: Container element not found");
@@ -1227,7 +1227,7 @@ export const updateWindow = function () {
     }
   }
 
-  resizeCanvas();
+  Neo.resizeCanvas();
 
   //ウィンドウビューに切り替わった事を通知するカスタムイベント
   document.dispatchEvent(
@@ -1242,7 +1242,7 @@ export const updateWindow = function () {
  *
  * @returns {void}
  */
-export const resizeCanvas = function () {
+Neo.resizeCanvas = function () {
   if (!Neo.container) {
     console.error("resizeCanvas: Container element not found");
     return;

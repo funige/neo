@@ -147,7 +147,12 @@ Neo.SLIDERTYPE_SIZE = 4;
     LiveConnect
   -----------------------------------------------------------------------
 */
-
+/**
+ * コンテナとズーム倍率に合わせて destCanvas と関連要素のサイズ・スタイルを更新する。
+ *
+ * @returns {void}
+ */
+Neo.resizeCanvas = function () {};
 Neo.playPCH = function () {};
 
 Neo.suspendDraw = function () {};
