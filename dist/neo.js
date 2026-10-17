@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.7 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.8 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -534,7 +534,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.7";
+  Neo.version = "1.8.8";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -607,6 +607,8 @@
   Neo.SLIDERTYPE_BLUE = 2;
   Neo.SLIDERTYPE_ALPHA = 3;
   Neo.SLIDERTYPE_SIZE = 4;
+  Neo.resizeCanvas = function() {
+  };
   Neo.playPCH = function() {
   };
   Neo.suspendDraw = function() {
@@ -8790,7 +8792,7 @@
           if (currentIndex < steps.length) {
             this.data.setZoom(steps[currentIndex]);
           }
-          resizeCanvas();
+          Neo.resizeCanvas();
         }
       };
       this.ZoomMinusCommand = class extends this.CommandBase {
@@ -8810,7 +8812,7 @@
             }
             this.data.setZoom(steps[currentIndex]);
           }
-          resizeCanvas();
+          Neo.resizeCanvas();
         }
       };
       this.UndoCommand = class extends this.CommandBase {
@@ -9710,7 +9712,7 @@
       var name = Neo.applet.getAttribute("name") || "paintbbs";
       Neo.applet.outerHTML = "";
       document[name] = Neo;
-      resizeCanvas();
+      Neo.resizeCanvas();
       if (!Neo.container) {
         console.error("start: Container element not found");
         return;
@@ -9815,14 +9817,14 @@
         pageView.appendChild(Neo.container);
       }
     }
-    resizeCanvas();
+    Neo.resizeCanvas();
     document.dispatchEvent(
       new CustomEvent("neo:fullscreenchange", {
         detail: { fullscreen: Neo.fullScreen }
       })
     );
   };
-  var resizeCanvas = function() {
+  Neo.resizeCanvas = function() {
     if (!Neo.container) {
       console.error("resizeCanvas: Container element not found");
       return;
