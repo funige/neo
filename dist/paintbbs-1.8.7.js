@@ -2636,8 +2636,8 @@
     }
     push() {
       if (!Neo.isAnimation) return;
-      var head = this._items[this._head - 1];
-      for (var i = 0; i < arguments.length; i++) {
+      const head = this._items[this._head - 1];
+      for (let i = 0; i < arguments.length; i++) {
         head.push(arguments[i]);
       }
     }
@@ -4545,11 +4545,15 @@
   var SliderTool = class extends ToolBase {
     constructor() {
       super();
-      this.target = /**@type {any} **/
-      null;
+      this.target = null;
       this.type = Painter.TOOLTYPE_SLIDER;
       this.isUpMove = false;
       this.isAlt = false;
+    }
+    /** @returns {number} */
+    getSliderType() {
+      var _a, _b;
+      return this.isAlt ? Neo.SLIDERTYPE_SIZE : (_b = (_a = this.target) == null ? void 0 : _a["data-slider"]) != null ? _b : Neo.SLIDERTYPE_SIZE;
     }
     /** @param {Painter} oe */
     downHandler(oe) {
@@ -4562,7 +4566,7 @@
         return;
       }
       const rect = this.target.getBoundingClientRect();
-      const sliderType = this.isAlt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
+      const sliderType = this.getSliderType();
       Neo.sliders[sliderType].downHandler(
         oe.rawMouseX - rect.left,
         oe.rawMouseY - rect.top
@@ -4577,7 +4581,7 @@
         return;
       }
       const rect = this.target.getBoundingClientRect();
-      const sliderType = this.isAlt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
+      const sliderType = this.getSliderType();
       Neo.sliders[sliderType].upHandler(
         oe.rawMouseX - rect.left,
         oe.rawMouseY - rect.top
@@ -4591,7 +4595,7 @@
           return;
         }
         const rect = this.target.getBoundingClientRect();
-        const sliderType = this.isAlt ? Neo.SLIDERTYPE_SIZE : this.target["data-slider"];
+        const sliderType = this.getSliderType();
         Neo.sliders[sliderType].moveHandler(
           oe.rawMouseX - rect.left,
           oe.rawMouseY - rect.top
@@ -9757,7 +9761,7 @@
     }, 15e3);
   };
   var updateUI = function() {
-    var current = Neo.painter.tool.getToolButton();
+    const current = Neo.painter.tool.getToolButton();
     for (let i = 0; i < Neo.toolButtons.length; i++) {
       const toolTip = (
         /** @type {ToolTip} */
@@ -9779,26 +9783,17 @@
   };
   var updateUIColor = function(updateSlider, updateColorTip) {
     for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
-        /** @type {ToolTip} */
-        Neo.toolButtons[i]
-      );
+      const toolTip = Neo.toolButtons[i];
       toolTip.update();
     }
     if (updateSlider) {
       for (let i = 0; i < Neo.sliders.length; i++) {
-        const slider = (
-          /** @type {Neo.ColorSlider|Neo.SizeSlider} */
-          Neo.sliders[i]
-        );
+        const slider = Neo.sliders[i];
         slider.update();
       }
     }
     if (updateColorTip) {
-      var colorTip = (
-        /** @type {ColorTip|null} **/
-        ColorTip.getCurrent()
-      );
+      const colorTip = ColorTip.getCurrent();
       if (colorTip) {
         colorTip.setColor(Neo.painter.foregroundColor);
       }

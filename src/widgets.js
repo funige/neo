@@ -1301,7 +1301,7 @@ export class ColorSlider {
     this.slider = null;
     /** @type {Element|null} */
     this.label = null;
-    /** @type {any} */
+    /** @type {Element & {"data-slider"?: number}|null} */
     this.hit = null;
   }
 

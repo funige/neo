@@ -981,11 +981,19 @@ export class HandTool extends ToolBase {
 export class SliderTool extends ToolBase {
   constructor() {
     super();
-    this.target = /**@type {any} **/ (null);
+    /** @type {Element & {"data-slider"?: number}|null} */
+    this.target = null;
     /** @type {number} */
     this.type = Painter.TOOLTYPE_SLIDER;
     this.isUpMove = false;
     this.isAlt = false;
+  }
+
+  /** @returns {number} */
+  getSliderType() {
+    return this.isAlt
+      ? Neo.SLIDERTYPE_SIZE
+      : (this.target?.["data-slider"] ?? Neo.SLIDERTYPE_SIZE);
   }
 
   /** @param {Painter} oe */
@@ -1000,9 +1008,8 @@ export class SliderTool extends ToolBase {
       return;
     }
     const rect = this.target.getBoundingClientRect();
-    const sliderType = this.isAlt
-      ? Neo.SLIDERTYPE_SIZE
-      : this.target["data-slider"];
+    const sliderType = this.getSliderType();
+
     Neo.sliders[sliderType].downHandler(
       oe.rawMouseX - rect.left,
       oe.rawMouseY - rect.top,
@@ -1020,9 +1027,8 @@ export class SliderTool extends ToolBase {
     }
 
     const rect = this.target.getBoundingClientRect();
-    const sliderType = this.isAlt
-      ? Neo.SLIDERTYPE_SIZE
-      : this.target["data-slider"];
+    const sliderType = this.getSliderType();
+
     Neo.sliders[sliderType].upHandler(
       oe.rawMouseX - rect.left,
       oe.rawMouseY - rect.top,
@@ -1038,9 +1044,8 @@ export class SliderTool extends ToolBase {
       }
 
       const rect = this.target.getBoundingClientRect();
-      const sliderType = this.isAlt
-        ? Neo.SLIDERTYPE_SIZE
-        : this.target["data-slider"];
+      const sliderType = this.getSliderType();
+
       Neo.sliders[sliderType].moveHandler(
         oe.rawMouseX - rect.left,
         oe.rawMouseY - rect.top,
