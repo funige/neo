@@ -2644,11 +2644,11 @@
     pushCurrent() {
       if (!Neo.isAnimation) return;
       const oe = Neo.painter;
-      var head = this._items[this._head - 1];
-      var color = oe._currentColor;
-      var mask = oe._currentMask;
-      var width = oe._currentWidth;
-      var type = oe._currentMaskType;
+      const head = this._items[this._head - 1];
+      const color = oe._currentColor;
+      const mask = oe._currentMask;
+      const width = oe._currentWidth;
+      const type = oe._currentMaskType;
       head.push(color[0], color[1], color[2], color[3]);
       head.push(mask[0], mask[1], mask[2]);
       head.push(width);
@@ -2667,7 +2667,7 @@
       oe._currentMaskType = item[10];
     }
     skip() {
-      for (var i = 0; i < this._items.length; i++) {
+      for (let i = 0; i < this._items.length; i++) {
         if (this._items[i][0] == "restore") {
           this._head = i;
         }
@@ -2691,14 +2691,14 @@
         }
         return;
       }
-      var item = this._items[this._head];
+      const item = this._items[this._head];
       if (!Neo.viewer && !painter.busySkipped) {
         painter._pushUndo(0, 0, painter.canvasWidth, painter.canvasHeight, true);
       }
       if (Neo.viewer && Neo.viewerSpeed && this._index == 0) {
         Neo.viewerSpeed.update();
       }
-      var func;
+      let func;
       const hasRestore = this._items.some(
         (item2) => item2[0] === "restore"
       );
@@ -2710,7 +2710,7 @@
         this[item[0]] ? item[0] : "dummy";
       }
       const ref = this;
-      var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
+      const wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
       this[func](item, function(result) {
         if (result) {
           if (painter.busySkipped && ref._head < ref._mark - 2 && ref._mark - 2 >= 0 && ref._items[ref._mark - 1][0] == "restore") {
@@ -2766,7 +2766,7 @@
       if (typeof layer != "object") {
         this.push("floodFill", layer, x, y, color);
       } else {
-        var item = layer;
+        const item = layer;
         layer = item[1];
         x = item[2];
         y = item[3];
@@ -9763,10 +9763,7 @@
   var updateUI = function() {
     const current = Neo.painter.tool.getToolButton();
     for (let i = 0; i < Neo.toolButtons.length; i++) {
-      const toolTip = (
-        /** @type {ToolTip} */
-        Neo.toolButtons[i]
-      );
+      const toolTip = Neo.toolButtons[i];
       if (current) {
         if (current == toolTip) {
           toolTip.setSelected(true);

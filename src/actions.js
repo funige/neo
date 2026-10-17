@@ -84,12 +84,12 @@ export class ActionManager {
 
     /** @type {Painter} */
     const oe = Neo.painter;
-    var head = this._items[this._head - 1];
+    const head = this._items[this._head - 1];
 
-    var color = oe._currentColor;
-    var mask = oe._currentMask;
-    var width = oe._currentWidth;
-    var type = oe._currentMaskType;
+    const color = oe._currentColor;
+    const mask = oe._currentMask;
+    const width = oe._currentWidth;
+    const type = oe._currentMaskType;
 
     head.push(color[0], color[1], color[2], color[3]);
     head.push(mask[0], mask[1], mask[2]);
@@ -113,7 +113,7 @@ export class ActionManager {
   }
 
   skip() {
-    for (var i = 0; i < this._items.length; i++) {
+    for (let i = 0; i < this._items.length; i++) {
       if (this._items[i][0] == "restore") {
         this._head = i;
       }
@@ -143,7 +143,7 @@ export class ActionManager {
       return;
     }
 
-    var item = this._items[this._head];
+    const item = this._items[this._head];
 
     if (!Neo.viewer && !painter.busySkipped) {
       painter._pushUndo(0, 0, painter.canvasWidth, painter.canvasHeight, true);
@@ -154,7 +154,7 @@ export class ActionManager {
       //console.log("play", item[0], this._head + 1, this._items.length);
     }
 
-    var func;
+    let func;
     // restoreが存在するかどうか判定
     //古いPCHファイルにはrestoreが存在しないためアニメーションをスキップできない
     const hasRestore = this._items.some(
@@ -172,7 +172,7 @@ export class ActionManager {
     }
 
     const ref = this;
-    var wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
+    const wait = this._prevSpeed < 0 ? 0 : this._prevSpeed;
 
     /**@type {any}*/ (this)[func](item, function (/**@type {any}*/ result) {
       if (result) {
@@ -239,7 +239,7 @@ export class ActionManager {
     if (typeof layer != "object") {
       this.push("floodFill", layer, x, y, color);
     } else {
-      var item = layer;
+      const item = layer;
       layer = item[1];
       x = item[2];
       y = item[3];

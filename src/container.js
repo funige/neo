@@ -1155,8 +1155,7 @@ const showWarning = function () {
 export const updateUI = function () {
   const current = Neo.painter.tool.getToolButton();
   for (let i = 0; i < Neo.toolButtons.length; i++) {
-    //@ts-ignore
-    const toolTip = /** @type {ToolTip} */ (Neo.toolButtons[i]);
+    const toolTip = Neo.toolButtons[i];
     if (current) {
       if (current == toolTip) {
         toolTip.setSelected(true);
