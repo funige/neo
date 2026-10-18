@@ -1111,7 +1111,8 @@ Neo.initViewer = function (pch) {
 
   var painter = document.getElementById("neo-painter");
 
-  Neo.viewerWrapperOnTop =
+  /**@type {boolean} */
+  const viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
     window.innerHeight < pageHeight + 100;
   if (painter) {
@@ -1122,7 +1123,7 @@ Neo.initViewer = function (pch) {
   }
   if (Neo.container) {
     Neo.container.style.boxSizing = "border-box";
-    Neo.container.style.paddingTop = Neo.viewerWrapperOnTop ? "26px" : "";
+    Neo.container.style.paddingTop = viewerWrapperOnTop ? "26px" : "";
   }
 
   var viewerButtonsWrapper = document.getElementById(
@@ -1130,10 +1131,8 @@ Neo.initViewer = function (pch) {
   );
   if (viewerButtonsWrapper) {
     viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
-    viewerButtonsWrapper.style.position = Neo.viewerWrapperOnTop
-      ? "absolute"
-      : "";
-    viewerButtonsWrapper.style.top = Neo.viewerWrapperOnTop ? "0" : "";
+    viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
+    viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0" : "";
   }
 
   const viewerBar = document.getElementById("neo-viewerBar");

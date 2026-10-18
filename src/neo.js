@@ -41,7 +41,6 @@ Neo.toolSide = false;
 /**@type {HTMLElement|null} */
 Neo.applet = null;
 Neo.isAnimation = false;
-Neo.viewerWrapperOnTop = false;
 Neo.storage = localStorage;
 Neo.stabilize_level = 0;
 /** @type {CSSStyleSheet|null}*/
