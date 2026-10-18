@@ -547,7 +547,6 @@
   Neo.toolSide = false;
   Neo.applet = null;
   Neo.isAnimation = false;
-  Neo.viewerWrapperOnTop = false;
   Neo.storage = localStorage;
   Neo.stabilize_level = 0;
   Neo.styleSheet = null;
@@ -3468,7 +3467,19 @@
     var dx = (pageWidth - Neo.config.width) / 2;
     var dy = (pageHeight - Neo.config.height - 26) / 2;
     var painter = document.getElementById("neo-painter");
-    Neo.viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top && window.innerHeight < pageHeight + 100;
+    const BAR_HEIGHT = 26;
+    const MARGIN = 20;
+    const configWidth = Neo.config.width;
+    const configHeight = Neo.config.height;
+    let displayHeight = configHeight + BAR_HEIGHT;
+    if (Neo.config.neo_viewer_max_width_100) {
+      const availWidth = Math.min(
+        document.documentElement.clientWidth,
+        configWidth
+      );
+      displayHeight = configHeight * (availWidth / configWidth) + BAR_HEIGHT + MARGIN;
+    }
+    const viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top && window.innerHeight < displayHeight;
     if (painter) {
       painter.style.marginTop = "0";
       painter.style.position = "absolute";
@@ -3477,15 +3488,15 @@
     }
     if (Neo.container) {
       Neo.container.style.boxSizing = "border-box";
-      Neo.container.style.paddingTop = Neo.viewerWrapperOnTop ? "26px" : "";
+      Neo.container.style.paddingTop = viewerWrapperOnTop ? "26px" : "";
     }
     var viewerButtonsWrapper = document.getElementById(
       "neo-viewerButtonsWrapper"
     );
     if (viewerButtonsWrapper) {
       viewerButtonsWrapper.style.width = pageWidth - 2 + "px";
-      viewerButtonsWrapper.style.position = Neo.viewerWrapperOnTop ? "absolute" : "";
-      viewerButtonsWrapper.style.top = Neo.viewerWrapperOnTop ? "0" : "";
+      viewerButtonsWrapper.style.position = viewerWrapperOnTop ? "absolute" : "";
+      viewerButtonsWrapper.style.top = viewerWrapperOnTop ? "0" : "";
     }
     const viewerBar = document.getElementById("neo-viewerBar");
     if (viewerBar) {
