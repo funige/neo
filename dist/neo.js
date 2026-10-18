@@ -3467,7 +3467,19 @@
     var dx = (pageWidth - Neo.config.width) / 2;
     var dy = (pageHeight - Neo.config.height - 26) / 2;
     var painter = document.getElementById("neo-painter");
-    const viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top && window.innerHeight < pageHeight + 100;
+    const BAR_HEIGHT = 26;
+    const MARGIN = 20;
+    const configWidth = Neo.config.width;
+    const configHeight = Neo.config.height;
+    let displayHeight = configHeight + BAR_HEIGHT;
+    if (Neo.config.neo_viewer_max_width_100) {
+      const availWidth = Math.min(
+        document.documentElement.clientWidth,
+        configWidth
+      );
+      displayHeight = configHeight * (availWidth / configWidth) + BAR_HEIGHT + MARGIN;
+    }
+    const viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top && window.innerHeight < displayHeight;
     if (painter) {
       painter.style.marginTop = "0";
       painter.style.position = "absolute";

@@ -1111,10 +1111,25 @@ Neo.initViewer = function (pch) {
 
   var painter = document.getElementById("neo-painter");
 
+  const BAR_HEIGHT = 26;
+  const MARGIN = 20;
+  const configWidth = Neo.config.width;
+  const configHeight = Neo.config.height;
+
+  let displayHeight = configHeight + BAR_HEIGHT;
+  if (Neo.config.neo_viewer_max_width_100) {
+    const availWidth = Math.min(
+      document.documentElement.clientWidth,
+      configWidth,
+    );
+    displayHeight =
+      configHeight * (availWidth / configWidth) + BAR_HEIGHT + MARGIN;
+  }
+
   /**@type {boolean} */
   const viewerWrapperOnTop =
     Neo.config.neo_viewer_buttonswrapper_top &&
-    window.innerHeight < pageHeight + 100;
+    window.innerHeight < displayHeight;
   if (painter) {
     painter.style.marginTop = "0";
     painter.style.position = "absolute";
