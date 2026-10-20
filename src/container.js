@@ -1239,10 +1239,12 @@ export const updateWindow = function () {
 
 /**
  * コンテナとズーム倍率に合わせて destCanvas と関連要素のサイズ・スタイルを更新する。
- *
+ * @param {object} [options]
+ * @param {boolean} [options.updateDestCanvas=true]
  * @returns {void}
  */
-Neo.resizeCanvas = function () {
+Neo.resizeCanvas = function (options = {}) {
+  const updateDestCanvas = options.updateDestCanvas ?? true;
   if (!Neo.container) {
     console.error("resizeCanvas: Container element not found");
     return;
@@ -1297,7 +1299,7 @@ Neo.resizeCanvas = function () {
     }
   } else {
     ctx.imageSmoothingEnabled = false;
-    destCanvas.style.imageRendering = "pixelated";
+    destCanvas.style.imageRendering = Neo.viewer ? "auto" : "pixelated";
   }
 
   destCanvas.style.touchAction = "none";
@@ -1332,7 +1334,9 @@ Neo.resizeCanvas = function () {
   }
 
   Neo.painter.setZoom(Neo.painter.zoom);
-  Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
+  if (updateDestCanvas) {
+    Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
+  }
 };
 
 /*

@@ -512,7 +512,8 @@ export class Painter {
     this.destCanvas.width = destWidth;
     this.destCanvas.height = destHeight;
 
-    this.destCanvas.style.imageRendering = "pixelated";
+    this.destCanvas.style.imageRendering = Neo.viewer ? "auto" : "pixelated";
+
     this.destCanvasCtx.imageSmoothingEnabled = false;
 
     const ref = this;
