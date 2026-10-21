@@ -148,10 +148,11 @@ Neo.SLIDERTYPE_SIZE = 4;
 */
 /**
  * コンテナとズーム倍率に合わせて destCanvas と関連要素のサイズ・スタイルを更新する。
- *
+ * @param {object} [options]
+ * @param {boolean} [options.updateDestCanvas=true]
  * @returns {void}
  */
-Neo.resizeCanvas = function () {};
+Neo.resizeCanvas = function (options = {}) {};
 Neo.playPCH = function () {};
 
 Neo.suspendDraw = function () {};

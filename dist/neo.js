@@ -606,7 +606,7 @@
   Neo.SLIDERTYPE_BLUE = 2;
   Neo.SLIDERTYPE_ALPHA = 3;
   Neo.SLIDERTYPE_SIZE = 4;
-  Neo.resizeCanvas = function() {
+  Neo.resizeCanvas = function(options = {}) {
   };
   Neo.playPCH = function() {
   };
