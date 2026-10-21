@@ -43,6 +43,7 @@ Neo.applet = null;
 Neo.isAnimation = false;
 Neo.storage = localStorage;
 Neo.stabilize_level = 0;
+Neo.disableGridTouchMove = false;
 /** @type {CSSStyleSheet|null}*/
 Neo.styleSheet = null;
 /** @type {Record<string, string>} */
