@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.8 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.9 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -534,7 +534,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.8";
+  Neo.version = "1.8.9";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -606,7 +606,7 @@
   Neo.SLIDERTYPE_BLUE = 2;
   Neo.SLIDERTYPE_ALPHA = 3;
   Neo.SLIDERTYPE_SIZE = 4;
-  Neo.resizeCanvas = function() {
+  Neo.resizeCanvas = function(options = {}) {
   };
   Neo.playPCH = function() {
   };
@@ -5557,7 +5557,7 @@
       this.destCanvasCtx = destCanvasCtx;
       this.destCanvas.width = destWidth;
       this.destCanvas.height = destHeight;
-      this.destCanvas.style.imageRendering = "pixelated";
+      this.destCanvas.style.imageRendering = Neo.viewer ? "auto" : "pixelated";
       this.destCanvasCtx.imageSmoothingEnabled = false;
       const ref = this;
       if (!Neo.viewer) {
@@ -9835,7 +9835,9 @@
       })
     );
   };
-  Neo.resizeCanvas = function() {
+  Neo.resizeCanvas = function(options = {}) {
+    var _a;
+    const updateDestCanvas = (_a = options.updateDestCanvas) != null ? _a : true;
     if (!Neo.container) {
       console.error("resizeCanvas: Container element not found");
       return;
@@ -9876,7 +9878,7 @@
       }
     } else {
       ctx.imageSmoothingEnabled = false;
-      destCanvas.style.imageRendering = "pixelated";
+      destCanvas.style.imageRendering = Neo.viewer ? "auto" : "pixelated";
     }
     destCanvas.style.touchAction = "none";
     destCanvas.style.pointerEvents = "auto";
@@ -9903,7 +9905,9 @@
       }
     }
     Neo.painter.setZoom(Neo.painter.zoom);
-    Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
+    if (updateDestCanvas) {
+      Neo.painter.updateDestCanvas(0, 0, canvasWidth, canvasHeight, false);
+    }
   };
   var clone = function(src) {
     const dst = {};
