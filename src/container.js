@@ -1885,7 +1885,9 @@ document.addEventListener("DOMContentLoaded", () => {
       let screenwidth = Number(screen.width);
       if (
         e.touches.length === 1 &&
-        (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen)
+        (screenwidth - Neo.config.applet_width > 100 ||
+          Neo.fullScreen ||
+          Neo.disableGridTouchMove)
       ) {
         if (typeof e.cancelable !== "boolean" || e.cancelable) {
           e.preventDefault();

@@ -1,6 +1,6 @@
 {
   "name": "paintbbs",
-  "version": "1.8.9",
+  "version": "1.8.10",
   "main": "app/main.js",
   "repository": {
     "type": "git",
