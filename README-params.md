@@ -40,7 +40,7 @@
 - **&lt;PARAM NAME="neo_validate_exact_ok_text_in_response" VALUE="true">**  
 このフラグを true にするとサーバから返って来たテキストが正確に文字列の"ok"では無かった時にエラーメッセージをアラートで表示して描画中の画面から移動しません。
 PHP等で、
-```
+```php
 die("ok")
 ```
 のように指定する必要があるため、対応していないPHPで、このフラグをtrueにすると投稿できなくなってしまいます。  
@@ -81,22 +81,26 @@ Windows版Chrome149でテストし有効性を確認しました。
 PaintBBS NEO更新。外部の`<input type="color">`を使用して描画色を設定できるようになりました。   
 その時のIDを実際の実装に合わせて指定します。  
 NEO本体で変更した色が
-`<input type="color" id="neo-colorPicker">`
+```html
+<input type="color" id="neo-colorPicker">
+```
 に入ります。  
 id名は自由に設定可能です。  
 このオプションはそのidを指定するためのものです。   
 実装例。  
-```
+```html
 <input id="neo-colorPicker" type="color" oninput="Neo.setColor(this.value)">  
 ```
-`<input type="color">`ではなく、Javascriptのライブラリを使ったカラーピッカーにNEO本体で変更した色を反映させたい時もあります。  
-そのような時は  
+```html
+<input type="color">
 ```
+ではなく、Javascriptのライブラリを使ったカラーピッカーにNEO本体で変更した色を反映させたい時もあります。  
+そのような時はカスタムイベントを受けとってカラーピッカーに反映させます。   
+```Javascript
 document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
 ```
-カスタムイベントを受けとってカラーピッカーに反映させます。  
 sampleと、sample2に実装しましたので、動作するsampleで確認したほうが早いかもしれません。      
 
 - **&lt;PARAM NAME="neo_viewer_max_width_100" value="true">**   
@@ -110,7 +114,7 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
 これから新しくお絵かき掲示板を開発するのであれば、新しい方式のほうが記述する文字数がすくなくてすみます。 
 
 ### 描画画面の設定例
-```
+```html
 <div class="neo-applet-paintbbs" data-width="400" data-height="460" ></div>
 <script>
  Neo.params = {
@@ -131,7 +135,7 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
 
 ### 動画再生画面の設定例
   
-```
+```html
 <div class="neo-applet-pch" data-width="400" data-height="450" ></div>
 <script>
   Neo.params = {
@@ -143,7 +147,7 @@ sampleと、sample2に実装しましたので、動作するsampleで確認し�
 </script>
 ```
 `class="neo-applet-pch"`と`pch:{`で動画画面判定をしています。  
-```
+```html
 <script>
 Neo.params = {
   paintbbs:{},
@@ -283,13 +287,13 @@ v1.6 からはより安全で扱いやすい formData を使ったデータ送�
 # Neo.handleExit()  
 
 パスワード等の機密データをGETパラメータにセットして送信する事がありました。
-```
+```html
 <param name="url_exit" value="./?pwd="パスワード">
 ```
 これをより安全なPOSTに変更する事ができるようになりました。  
 投稿ボタンを押したあとの画面移動を、`Neo.handleExit()`関数を経由して行います。      
 この関数でFetch APIを使ったPOSTを行えばパスワードなどの機密データをより安全に送信する事ができます。  
-```
+```Javascript
 Neo.handleExit = ()=>{
 	const formData = new FormData();
 	formData.append("pwd", "パスワード"); // 画像差し換え
