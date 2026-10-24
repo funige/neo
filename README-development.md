@@ -24,12 +24,12 @@ distの下のビルドツールで自動生成されるので、直接変更し�
          build.sh
 
          /src
+               neo.js
                container.js
                painter.js
                action.js
                commands.js
                dictionary.js
-               lz-string.js
                tools.js
                widget.js
 
