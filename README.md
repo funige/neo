@@ -77,7 +77,7 @@ PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/
 
 ### iPadで意図せず画面が拡大する場合
 - NEOが起動するHTMLファイルの<head></head>内に以下のJavascriptを記述する事で、意図しないiPadの画面拡大を防止できる場合があります。  
-```
+```Javascript
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
 	document.addEventListener('dblclick', (e)=>{ e.preventDefault()}, { passive: false });
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 ### Chrome(80 以降？)で横に長い線を引いた時にジェスチャーと認識されて、ブラウザバックが発生する場合
 - chrome://flags/#overscroll-history-navigation でジェスチャーを無効にするのもひとつの方法です。
 - PCの場合は以下のCSSで解決する事があります。
-```
+```html
 <style>body{overscroll-behavior-x: none !important; }</style>
 ```
 ただし、SafariやAndroidのChromeではこのCSSを使った場合でもブラウザバックが発生するようです。  
@@ -95,14 +95,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 ### 外部ライブラリのカラーピッカーと連携するためのインターフェース
 - これまでは、外部ライブラリのカラーピッカーと連携させるには、PaintBBS NEOそのものを改造する必要がありました。    
 そのため、外部ライブラリのカラーピッカーにNEO側で変更した色を渡すためのインターフェースを作成しました。  
-```
+```Javascript
 document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
 ```
 このように記述する事で、ライブラリのカラーピッカーにNEOで変更した色を渡す事ができるようになりました。     
 カラーピッカーからNEOへの色のセットは  
-```
+```Javascript
 Neo.setColor(color.hex);
 ```
 このような形式で16進数を渡します。  
@@ -115,7 +115,7 @@ sampleでは`isUpdatingFromNeo`という変数をNEOから受け取った値か�
 
 ### ウィンドウビュー(全画面)モードへの切り替えを検出するカスタムイベント
 ウィンドウビュー(全画面)モードに切り替わった事を通知するカスタムイベントを追加しました。  
-```
+```Javascript
 document.addEventListener("neo:fullscreenchange", (e) => {
 	console.log("fullscreen",e.detail.fullscreen);//true|false
 });
@@ -123,7 +123,7 @@ document.addEventListener("neo:fullscreenchange", (e) => {
 ウィンドウビュー(全画面)の時は、`e.detail.fullscreen`が`true`になり、ページビューの時には`false`になります。
 
 ### 手ぶれ補正機能
-```
+```html
 <script>     
  document.addEventListener("DOMContentLoaded", (e) => {
       Neo.setStabilizeLevel(1);//0-5の範囲で手ぶれ補正の初期値を設定する
