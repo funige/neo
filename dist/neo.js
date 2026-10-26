@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.10 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.11 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -24,6 +24,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+"use strict";
 (() => {
   var __create = Object.create;
   var __defProp = Object.defineProperty;
@@ -534,7 +535,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.10";
+  Neo.version = "1.8.11";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -10275,7 +10276,5 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
     Neo.stabilize_level = level;
   };
   Neo.setStabilizLevel = Neo.setStabilizeLevel;
-
-  // src/main.js
   window.Neo = Neo;
 })();
