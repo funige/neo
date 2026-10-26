@@ -77,7 +77,7 @@ PaintBBS NEO の開発に参加している、[さとぴあ](https://github.com/
 
 ### iPadで意図せず画面が拡大する場合
 - NEOが起動するHTMLファイルの<head></head>内に以下のJavascriptを記述する事で、意図しないiPadの画面拡大を防止できる場合があります。  
-```
+```Javascript
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
 	document.addEventListener('dblclick', (e)=>{ e.preventDefault()}, { passive: false });
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 ### Chrome(80 以降？)で横に長い線を引いた時にジェスチャーと認識されて、ブラウザバックが発生する場合
 - chrome://flags/#overscroll-history-navigation でジェスチャーを無効にするのもひとつの方法です。
 - PCの場合は以下のCSSで解決する事があります。
-```
+```html
 <style>body{overscroll-behavior-x: none !important; }</style>
 ```
 ただし、SafariやAndroidのChromeではこのCSSを使った場合でもブラウザバックが発生するようです。  
@@ -95,14 +95,14 @@ document.addEventListener('DOMContentLoaded',()=>{
 ### 外部ライブラリのカラーピッカーと連携するためのインターフェース
 - これまでは、外部ライブラリのカラーピッカーと連携させるには、PaintBBS NEOそのものを改造する必要がありました。    
 そのため、外部ライブラリのカラーピッカーにNEO側で変更した色を渡すためのインターフェースを作成しました。  
-```
+```Javascript
 document.addEventListener("neo:colorchange", (e) => {
     colorWheel.hex = e.detail.hex;
 });
 ```
 このように記述する事で、ライブラリのカラーピッカーにNEOで変更した色を渡す事ができるようになりました。     
 カラーピッカーからNEOへの色のセットは  
-```
+```Javascript
 Neo.setColor(color.hex);
 ```
 このような形式で16進数を渡します。  
@@ -115,7 +115,7 @@ sampleでは`isUpdatingFromNeo`という変数をNEOから受け取った値か�
 
 ### ウィンドウビュー(全画面)モードへの切り替えを検出するカスタムイベント
 ウィンドウビュー(全画面)モードに切り替わった事を通知するカスタムイベントを追加しました。  
-```
+```Javascript
 document.addEventListener("neo:fullscreenchange", (e) => {
 	console.log("fullscreen",e.detail.fullscreen);//true|false
 });
@@ -123,7 +123,7 @@ document.addEventListener("neo:fullscreenchange", (e) => {
 ウィンドウビュー(全画面)の時は、`e.detail.fullscreen`が`true`になり、ページビューの時には`false`になります。
 
 ### 手ぶれ補正機能
-```
+```html
 <script>     
  document.addEventListener("DOMContentLoaded", (e) => {
       Neo.setStabilizeLevel(1);//0-5の範囲で手ぶれ補正の初期値を設定する
@@ -164,6 +164,22 @@ NEO の入っていない掲示板に投稿して、動作を確認すること�
 -->
 
 ## <a name="history">履歴</a>
+#### ver1.8.10 (2026/10/21)
+- `neo_disable_grid_touch_move:true`に設定した場合でも、NEOの横幅が画面の幅より大きな時は、NEOのキャンバス周囲の網の目をタッチして動かす事ができます。  
+しかしながら、NEOのアプリの横幅を外部で変更する事もあります。    
+NEOの横幅が制限され、タッチスクロールする場所がNEO本体以外の箇所にできる場合があります。   
+そのため、NEOの横幅が画面よりも大きな時にも、NEOのキャンバスの周囲でタッチスクロールが発生しないようにするフラグを追加しました。  
+`Neo.disableGridTouchMove = true;`のうように、外部のJavascriptで設定します。  
+
+#### ver1.8.9 (2026/10/21)
+- 外部のJavaスクリプトからも呼び出すことができる`Neo.resizeCanvas()`にキャンバスの全体更新を省略する引数を渡す事ができるようになりました。  
+`Neo.resizeCanvas({updateDestCanvas:false});`のように引数を渡すと、関数実行時のキャンバスの全体更新を省略します。  
+ただし、ごくわずかな負荷の削減と引き換えに動作不良を起こす可能性がありますので、キャンバスの全体更新を省略する時は慎重に動作確認を行う必要があります。    
+- CSSで動画再生ビューワーを縮小した時に、描線がとぎれとぎれに表示される問題に対応するため、 動画再生ビューワーのimageRenderingをautoに変更しました。
+
+#### ver1.8.8 (2026/10/18)
+- `Neo.resizeCanvas()`をグローバルに呼び出しているスクリプトが存在していたためグローバルスコープに戻しました。
+- ブラウザの高さより動画の高さがのほうが大きな時にビューワーの操作バーを上に移動する`neo_viewer_buttonswrapper_top`がtrueの時に`neo_viewer_max_width_100`でビューワーの高さが縮小されて、ブラウザで全体が表示できるようになった時にもバーが上に表示される問題を修正しました。  
 #### ver1.8.7 (2026/10/14)
 - 暗黙的にanyになっていた関数の型を明確にしました。
 - 明示的なanyを削減し、型を明確にしました。
