@@ -16,7 +16,6 @@
     "src/commands.js",
     "src/actions.js",
     "src/widgets.js",
-    "src/main.js"
   ],
   "include": [
     "src/*.*",

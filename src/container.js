@@ -1948,4 +1948,5 @@ Neo.setStabilizeLevel = function (htmlConfig) {
  *
  */
 Neo.setStabilizLevel = Neo.setStabilizeLevel;
-export { Neo };
+
+/** @type {any} */ (window).Neo = Neo;

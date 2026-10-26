@@ -13,7 +13,7 @@ build() {
   BANNER="/*! PaintBBS NEO v$VERSION | https://github.com/funige/neo */
 $(cat src/THIRD-PARTY-LICENSES.txt)"
 
-  ./node_modules/.bin/esbuild src/main.js \
+  ./node_modules/.bin/esbuild src/container.js \
     --bundle \
     --format=iife \
     --target=es2015 \
