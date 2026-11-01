@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.11 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.12 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -535,7 +535,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.11";
+  Neo.version = "1.8.12";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -5309,6 +5309,9 @@
       this.ellipseFillTool;
       this.blurRectTool;
       this.turnTool;
+      const commands = new Commands();
+      this.zoomPlusCommand = new commands.ZoomPlusCommand(this);
+      this.zoomMinusCommand = new commands.ZoomMinusCommand(this);
     }
     /**
      * ペインターの描画コンポーネントを初期化して、描画可能な状態にする。
@@ -5573,8 +5576,12 @@
         });
         container.addEventListener(
           "mousedown",
-          //pointerdownに変更するとここが先にトリガーされ、線幅を保存できなくなる
           function(e) {
+            if (!(e.target instanceof Element)) return;
+            const inSlider = e.target.closest(".colorSlider, .sizeSlider");
+            if (ref.isWidget(e.target) && !inSlider) {
+              return;
+            }
             ref._mouseDownHandler(e);
           },
           { passive: false, capture: false }
@@ -5843,9 +5850,12 @@
       if (this.tool.keyDownHandler) {
         this.tool.keyDownHandler(e);
       }
-      if (target === this.inputText) {
-        preventCtrlKeyDefaults(e);
-        return;
+      if (this.tool === this.textTool) {
+        if (this.inputText instanceof HTMLElement && this.inputText.style.display === "block") {
+          this.inputText.focus();
+          preventCtrlKeyDefaults(e);
+          return;
+        }
       }
       e.preventDefault();
       if (!this.isShiftDown && this.isCtrlDown) {
@@ -5860,9 +5870,8 @@
         }
       }
       if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-        const commands = new Commands();
-        if (key == "+") new commands.ZoomPlusCommand(this).execute();
-        if (key == "-") new commands.ZoomMinusCommand(this).execute();
+        if (key == "+") this.zoomPlusCommand.execute();
+        if (key == "-") this.zoomMinusCommand.execute();
         if (key == "b") this.setToolByType(_Painter.TOOLTYPE_PEN);
         if (key == "w") this.setToolByType(_Painter.TOOLTYPE_BRUSH);
         if (key == "e") this.setToolByType(_Painter.TOOLTYPE_ERASER);
@@ -6171,7 +6180,7 @@
       y = y === void 0 ? 0 : y;
       w = w === void 0 ? this.canvasWidth : w;
       h = h === void 0 ? this.canvasHeight : h;
-      var undoItem = new UndoItem();
+      const undoItem = new UndoItem();
       undoItem.x = 0;
       undoItem.y = 0;
       undoItem.width = w;
@@ -6201,7 +6210,7 @@
       y = y === void 0 ? 0 : y;
       w = w === void 0 ? this.canvasWidth : w;
       h = h === void 0 ? this.canvasHeight : h;
-      var undoItem = new UndoItem();
+      const undoItem = new UndoItem();
       undoItem.x = 0;
       undoItem.y = 0;
       undoItem.width = w;

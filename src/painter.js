@@ -241,6 +241,10 @@ export class Painter {
     this.ellipseFillTool;
     this.blurRectTool;
     this.turnTool;
+
+    const commands = new Commands();
+    this.zoomPlusCommand = new commands.ZoomPlusCommand(this); // +
+    this.zoomMinusCommand = new commands.ZoomMinusCommand(this); // -
   }
 
   /**
@@ -527,10 +531,17 @@ export class Painter {
       container.addEventListener("mouseout", function (e) {
         ref._rollOutHandler(e);
       });
-      // 先にNeo.Buttonのtouchstart()がトリガーされる
+
       container.addEventListener(
-        "mousedown", //pointerdownに変更するとここが先にトリガーされ、線幅を保存できなくなる
+        "mousedown",
         function (e) {
+          if (!(e.target instanceof Element)) return;
+          //Slider以外のWidgetを除外
+          const inSlider = e.target.closest(".colorSlider, .sizeSlider");
+          if (ref.isWidget(e.target) && !inSlider) {
+            return;
+          }
+
           ref._mouseDownHandler(e);
         },
         { passive: false, capture: false },
@@ -850,11 +861,16 @@ export class Painter {
     if (this.tool.keyDownHandler) {
       this.tool.keyDownHandler(e);
     }
-
     //テキスト入力をしている時はキーボードショートカットキーを使用しないため早期return
-    if (target === this.inputText) {
-      preventCtrlKeyDefaults(e);
-      return;
+    if (this.tool === this.textTool) {
+      if (
+        this.inputText instanceof HTMLElement &&
+        this.inputText.style.display === "block"
+      ) {
+        this.inputText.focus();
+        preventCtrlKeyDefaults(e);
+        return;
+      }
     }
 
     //スペースキーでスクロールしないようにする
@@ -877,9 +893,8 @@ export class Painter {
       }
     }
     if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-      const commands = new Commands();
-      if (key == "+") new commands.ZoomPlusCommand(this).execute(); // +
-      if (key == "-") new commands.ZoomMinusCommand(this).execute(); // -
+      if (key == "+") this.zoomPlusCommand.execute(); // +
+      if (key == "-") this.zoomMinusCommand.execute(); // -
       //鉛筆
       if (key == "b") this.setToolByType(Painter.TOOLTYPE_PEN);
       //水彩
@@ -1308,7 +1323,7 @@ export class Painter {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new UndoItem();
+    const undoItem = new UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -1340,7 +1355,7 @@ export class Painter {
     y = y === undefined ? 0 : y;
     w = w === undefined ? this.canvasWidth : w;
     h = h === undefined ? this.canvasHeight : h;
-    var undoItem = new UndoItem();
+    const undoItem = new UndoItem();
     undoItem.x = 0;
     undoItem.y = 0;
     undoItem.width = w;
@@ -4292,7 +4307,7 @@ export class UndoItem {
 /**
  * Undo/Redo履歴を管理するマネージャー。
  * @description
- * 描画操作のスナップショット（Neo.UndoItem）をスタックとして保持する。
+ * 描画操作のスナップショット（UndoItem）をスタックとして保持する。
  * 最大ステップ数（_maxStep）を設定することで、メモリの肥大化を抑制しつつ
  * ユーザーの操作履歴を安全に管理する。
  */
