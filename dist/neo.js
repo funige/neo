@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.12 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.15 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -535,7 +535,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.12";
+  Neo.version = "1.8.15";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
