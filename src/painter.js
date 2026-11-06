@@ -893,14 +893,15 @@ export class Painter {
       }
     }
     if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-      if (key == "+") this.zoomPlusCommand.execute(); // +
-      if (key == "-") this.zoomMinusCommand.execute(); // -
+      if (key === "+" || key === "=" || key === ";")
+        this.zoomPlusCommand.execute(); // +
+      if (key === "-") this.zoomMinusCommand.execute(); // -
       //鉛筆
-      if (key == "b") this.setToolByType(Painter.TOOLTYPE_PEN);
+      if (key === "b") this.setToolByType(Painter.TOOLTYPE_PEN);
       //水彩
-      if (key == "w") this.setToolByType(Painter.TOOLTYPE_BRUSH);
+      if (key === "w") this.setToolByType(Painter.TOOLTYPE_BRUSH);
       //消しゴム
-      if (key == "e") this.setToolByType(Painter.TOOLTYPE_ERASER);
+      if (key === "e") this.setToolByType(Painter.TOOLTYPE_ERASER);
       //全消し
       if (
         document.activeElement != this.inputText &&

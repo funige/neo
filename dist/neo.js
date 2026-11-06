@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.15 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.16 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -535,7 +535,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.15";
+  Neo.version = "1.8.16";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -5870,11 +5870,12 @@
         }
       }
       if (!this.isShiftDown && !this.isCtrlDown && !this.isAltDown) {
-        if (key == "+") this.zoomPlusCommand.execute();
-        if (key == "-") this.zoomMinusCommand.execute();
-        if (key == "b") this.setToolByType(_Painter.TOOLTYPE_PEN);
-        if (key == "w") this.setToolByType(_Painter.TOOLTYPE_BRUSH);
-        if (key == "e") this.setToolByType(_Painter.TOOLTYPE_ERASER);
+        if (key === "+" || key === "=" || key === ";")
+          this.zoomPlusCommand.execute();
+        if (key === "-") this.zoomMinusCommand.execute();
+        if (key === "b") this.setToolByType(_Painter.TOOLTYPE_PEN);
+        if (key === "w") this.setToolByType(_Painter.TOOLTYPE_BRUSH);
+        if (key === "e") this.setToolByType(_Painter.TOOLTYPE_ERASER);
         if (document.activeElement != this.inputText && key && ["delete", "backspace"].includes(key)) {
           this._pushUndo();
           this._actionMgr.eraseAll();
