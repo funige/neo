@@ -1636,7 +1636,7 @@ export const submit = function (baseURL, blob, thumbnail, thumbnail2) {
       });
   };
 
-  if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
+  if (Neo.config.neo_confirm_layer_info_notsaved === "true" && !thumbnail2) {
     const isConfirmed = window.confirm(
       translate("レイヤー情報は保存されません。\n続行してよろしいですか?"),
     );
@@ -1881,7 +1881,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // グリッド部分の touchmove イベントのデフォルトの動作をキャンセル
   /** @param {TouchEvent} e */
   const touch_move_grid_control = function (e) {
-    if (Neo.config.neo_disable_grid_touch_move) {
+    if (Neo.config.neo_disable_grid_touch_move === "true") {
       let screenwidth = Number(screen.width);
       if (
         e.touches.length === 1 &&

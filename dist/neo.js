@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.16 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.17 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -535,7 +535,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.16";
+  Neo.version = "1.8.17";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -3329,8 +3329,9 @@
         y = Number(y);
         width = Number(width);
         height = Number(height);
-        this.push("turn", layer, x, y, width, height);
-        oe.turn(layer, x, y, width, height);
+        const noGlitch = Neo.config.neo_disable_turn_original_glitch === "true" ? 1 : 0;
+        this.push("turn", layer, x, y, width, height, noGlitch);
+        oe.turn(layer, x, y, width, height, noGlitch === 1);
       } else {
         const item = arguments[0];
         const layer2 = item[1];
@@ -3338,7 +3339,8 @@
         const y2 = item[3];
         const width2 = item[4];
         const height2 = item[5];
-        oe.turn(layer2, x2, y2, width2, height2);
+        const noGlitch = item[6] === void 0 ? void 0 : item[6] == 1;
+        oe.turn(layer2, x2, y2, width2, height2, noGlitch);
       }
       oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
       var callback = arguments[1];
@@ -3474,14 +3476,14 @@
     const configWidth = Neo.config.width;
     const configHeight = Neo.config.height;
     let displayHeight = configHeight + BAR_HEIGHT;
-    if (Neo.config.neo_viewer_max_width_100) {
+    if (Neo.config.neo_viewer_max_width_100 === "true") {
       const availWidth = Math.min(
         document.documentElement.clientWidth,
         configWidth
       );
       displayHeight = configHeight * (availWidth / configWidth) + BAR_HEIGHT + MARGIN;
     }
-    const viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top && window.innerHeight < displayHeight;
+    const viewerWrapperOnTop = Neo.config.neo_viewer_buttonswrapper_top === "true" && window.innerHeight < displayHeight;
     if (painter) {
       painter.style.marginTop = "0";
       painter.style.position = "absolute";
@@ -3505,7 +3507,7 @@
       viewerBar.style.position = "absolute";
       viewerBar.style.right = "2px";
       viewerBar.style.top = "1px";
-      if (Neo.config.neo_viewer_max_width_100) {
+      if (Neo.config.neo_viewer_max_width_100 === "true") {
         viewerBar.style.left = 24 * 6 - 2 + "px";
         viewerBar.style.width = "auto";
       } else {
@@ -3641,7 +3643,7 @@
       "background-color",
       Neo.config.color_text + " !important"
     );
-    if (Neo.config.neo_viewer_max_width_100) {
+    if (Neo.config.neo_viewer_max_width_100 === "true") {
       addRule(".NEO #neo-pageView", "max-width", "100%");
       addRule(".NEO #neo-painter", "max-width", "100%");
       addRule(".NEO #neo-canvas", "max-width", "100%");
@@ -3705,7 +3707,7 @@
       Neo.viewerBar = new ViewerBar().init("neo-viewerBar", {
         length
       });
-      if (Neo.config.neo_viewer_max_width_100 && Neo.viewerBar) {
+      if (Neo.config.neo_viewer_max_width_100 === "true" && Neo.viewerBar) {
         const viewerBar = document.getElementById("neo-viewerBar");
         if (viewerBar) {
           new ResizeObserver(() => {
@@ -6648,7 +6650,7 @@
         );
       }
       ctx.restore();
-      if (Neo.viewer && Neo.config.neo_viewer_max_width_100) {
+      if (Neo.viewer && Neo.config.neo_viewer_max_width_100 === "true") {
         this.clearCanvasHeight();
       }
     }
@@ -8094,20 +8096,22 @@
      * @param {number} y - 開始座標。
      * @param {number} width, height - サイズ。
      * @param {number} height - サイズ。
+     * @param {boolean|undefined} disableGlitch - バグストライプ無効化。
      * @note
      * 「バグストライプ」の再現処理を含む。
      * オリジナルのPaintBBS等の仕様に準じ、回転処理時の境界データ参照に由来するグリッジを
      * 意図的に発生させる。この挙動は Neo.config.neo_disable_turn_original_glitch
      * により無効化できる。
      */
-    turn(layer, x, y, width, height) {
+    turn(layer, x, y, width, height, disableGlitch) {
       var ctx = this.canvasCtx[layer];
       var imageData = ctx.getImageData(x, y, width, height);
       var buf32 = new Uint32Array(imageData.data.buffer);
       var buf8 = new Uint8ClampedArray(imageData.data.buffer);
       var temp = new Uint32Array(buf32.length);
       let fillPixel;
-      if (Neo.config.neo_disable_turn_original_glitch) {
+      const noGlitch = disableGlitch != null ? disableGlitch : Neo.config.neo_disable_turn_original_glitch === "true";
+      if (noGlitch) {
         fillPixel = function(index2) {
           return 0;
         };
@@ -8773,7 +8777,7 @@
       this.CommandBase = class {
         constructor() {
           this.data = null;
-          this.zoom_steps = Neo.config.neo_enable_zoom_out ? [
+          this.zoom_steps = Neo.config.neo_enable_zoom_out === "true" ? [
             0.2,
             0.4,
             0.6,
@@ -10137,7 +10141,7 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
         );
       });
     };
-    if (Neo.config.neo_confirm_layer_info_notsaved && !thumbnail2) {
+    if (Neo.config.neo_confirm_layer_info_notsaved === "true" && !thumbnail2) {
       const isConfirmed = window.confirm(
         translate("\u30EC\u30A4\u30E4\u30FC\u60C5\u5831\u306F\u4FDD\u5B58\u3055\u308C\u307E\u305B\u3093\u3002\n\u7D9A\u884C\u3057\u3066\u3088\u308D\u3057\u3044\u3067\u3059\u304B?")
       );
@@ -10244,7 +10248,7 @@ ${errorMessage}${translate("\u6295\u7A3F\u306B\u5931\u6557\u3002\u6642\u9593\u30
       }
     };
     const touch_move_grid_control = function(e) {
-      if (Neo.config.neo_disable_grid_touch_move) {
+      if (Neo.config.neo_disable_grid_touch_move === "true") {
         let screenwidth = Number(screen.width);
         if (e.touches.length === 1 && (screenwidth - Neo.config.applet_width > 100 || Neo.fullScreen || Neo.disableGridTouchMove)) {
           if (typeof e.cancelable !== "boolean" || e.cancelable) {

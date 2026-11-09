@@ -55,7 +55,6 @@ Neo.rules = {};
  * @property {number} width
  * @property {number} height
  * @property {string[]} colors
- * @property {boolean} [neo_enable_zoom_out]
  * @property {any} [key]
  */
 /** @type {NeoConfig & Record<string, any>} */
