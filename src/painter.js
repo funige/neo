@@ -1901,7 +1901,7 @@ export class Painter {
       );
     }
     ctx.restore();
-    if (Neo.viewer && Neo.config.neo_viewer_max_width_100) {
+    if (Neo.viewer && Neo.config.neo_viewer_max_width_100 === "true") {
       this.clearCanvasHeight();
     }
   }
@@ -3636,13 +3636,14 @@ export class Painter {
    * @param {number} y - 開始座標。
    * @param {number} width, height - サイズ。
    * @param {number} height - サイズ。
+   * @param {boolean|undefined} disableGlitch - バグストライプ無効化。
    * @note
    * 「バグストライプ」の再現処理を含む。
    * オリジナルのPaintBBS等の仕様に準じ、回転処理時の境界データ参照に由来するグリッジを
    * 意図的に発生させる。この挙動は Neo.config.neo_disable_turn_original_glitch
    * により無効化できる。
    */
-  turn(layer, x, y, width, height) {
+  turn(layer, x, y, width, height, disableGlitch) {
     var ctx = this.canvasCtx[layer];
 
     // 傾けツールのバグを再現するため一番上のラインで対象領域を埋める
@@ -3653,7 +3654,9 @@ export class Painter {
 
     // 設定によって「塗りつぶし関数」を切り替える
     let fillPixel;
-    if (Neo.config.neo_disable_turn_original_glitch) {
+    const noGlitch =
+      disableGlitch ?? Neo.config.neo_disable_turn_original_glitch === "true";
+    if (noGlitch) {
       // 常に透明(0)を返す
       // オリジナルのPaintBBSのグリッジ
       // 傾けのバグストライプを再現しない

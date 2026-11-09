@@ -906,8 +906,12 @@ export class ActionManager {
       width = Number(width);
       height = Number(height);
 
-      this.push("turn", layer, x, y, width, height);
-      oe.turn(layer, x, y, width, height);
+      // item[6]: 傾けのバグストライプを無効にして描いたか (1=無効 / 0=再現)
+      // 末尾に足しているだけなので、古いNEOは無視する(互換性あり)
+      const noGlitch =
+        Neo.config.neo_disable_turn_original_glitch === "true" ? 1 : 0;
+      this.push("turn", layer, x, y, width, height, noGlitch);
+      oe.turn(layer, x, y, width, height, noGlitch === 1);
     } else {
       const item = arguments[0];
       const layer = item[1];
@@ -915,7 +919,10 @@ export class ActionManager {
       const y = item[3];
       const width = item[4];
       const height = item[5];
-      oe.turn(layer, x, y, width, height);
+      // item[6]がない古い記録は undefined → 従来どおり再生時の設定に従う
+      const noGlitch = item[6] === undefined ? undefined : item[6] == 1;
+
+      oe.turn(layer, x, y, width, height, noGlitch);
     }
     oe.updateDestCanvas(0, 0, oe.canvasWidth, oe.canvasHeight);
 
@@ -1117,7 +1124,7 @@ Neo.initViewer = function (pch) {
   const configHeight = Neo.config.height;
 
   let displayHeight = configHeight + BAR_HEIGHT;
-  if (Neo.config.neo_viewer_max_width_100) {
+  if (Neo.config.neo_viewer_max_width_100 === "true") {
     const availWidth = Math.min(
       document.documentElement.clientWidth,
       configWidth,
@@ -1128,7 +1135,7 @@ Neo.initViewer = function (pch) {
 
   /**@type {boolean} */
   const viewerWrapperOnTop =
-    Neo.config.neo_viewer_buttonswrapper_top &&
+    Neo.config.neo_viewer_buttonswrapper_top === "true" &&
     window.innerHeight < displayHeight;
   if (painter) {
     painter.style.marginTop = "0";
@@ -1155,7 +1162,7 @@ Neo.initViewer = function (pch) {
     viewerBar.style.position = "absolute";
     viewerBar.style.right = "2px";
     viewerBar.style.top = "1px";
-    if (Neo.config.neo_viewer_max_width_100) {
+    if (Neo.config.neo_viewer_max_width_100 === "true") {
       viewerBar.style.left = 24 * 6 - 2 + "px"; // ボタン6個ぶん
       viewerBar.style.width = "auto";
     } else {
@@ -1318,7 +1325,7 @@ Neo.startViewer = function () {
   );
 
   //幅の狭い端末に動画の幅をあわせる
-  if (Neo.config.neo_viewer_max_width_100) {
+  if (Neo.config.neo_viewer_max_width_100 === "true") {
     addRule(".NEO #neo-pageView", "max-width", "100%");
     addRule(".NEO #neo-painter", "max-width", "100%");
     addRule(".NEO #neo-canvas", "max-width", "100%");
@@ -1388,7 +1395,7 @@ Neo.startViewer = function () {
     Neo.viewerBar = new ViewerBar().init("neo-viewerBar", {
       length: length,
     });
-    if (Neo.config.neo_viewer_max_width_100 && Neo.viewerBar) {
+    if (Neo.config.neo_viewer_max_width_100 === "true" && Neo.viewerBar) {
       const viewerBar = document.getElementById("neo-viewerBar");
       if (viewerBar) {
         // バー幅の変化(画面リサイズやズーム)に合わせて、シーク位置とマークを再計算する
