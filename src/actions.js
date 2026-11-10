@@ -49,11 +49,17 @@ export class ActionManager {
     if (this._items.length > this._head) {
       this._items.length = this._head;
     }
+    //動画容量の肥大化を防止するため
+    //続きを描く時に、直前のrestore(全レイヤーのPNG)の中身を捨てる。
+    // 要素は残す(アンドゥ履歴との1対1の対応を崩さないため)。
+    // 先頭(index 0)のrestoreは、静止画や、セッションの復元の画像として再生に含める必要があるため保持する。
+    const prev = this._items[this._head - 1];
+    if (this._head > 1 && prev && prev[0] === "restore") prev.length = 0;
+
     this._items.push([]);
     this._head++;
     this._index = 0;
   }
-
   back() {
     if (!Neo.isAnimation) return;
 
@@ -230,10 +236,10 @@ export class ActionManager {
 
   /**
    * 画面を指定色で塗りつぶす（バケツツール）。
-   * @param {*} layer - レイヤー番号、または録画データ配列
-   * @param {*} [x] - X座標、または再生用コールバック
-   * @param {*} [y] - Y座標
-   * @param {*} [color] - 塗りつぶし色
+   * @param {number | Array<*>} layer - レイヤー番号、または録画データ配列
+   * @param {number | Function} [x] - X座標、または再生用コールバック
+   * @param {number} [y] - Y座標
+   * @param {number} [color] - 塗りつぶし色（32bit整数）
    */
   floodFill(layer, x, y, color) {
     if (typeof layer != "object") {
@@ -248,7 +254,13 @@ export class ActionManager {
 
     /** @type {Painter} */
     const painter = Neo.painter;
-    painter.doFloodFill(layer, x, y, color);
+    painter.doFloodFill(
+      /** @type {number} */ (layer),
+      /** @type {number} */ (x),
+      /** @type {number} */ (y),
+      /** @type {number} */ (color),
+    );
+
     painter.updateDestCanvas(0, 0, painter.canvasWidth, painter.canvasHeight);
 
     var callback = arguments[1];
