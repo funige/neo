@@ -2762,10 +2762,10 @@
     }
     /**
      * 画面を指定色で塗りつぶす（バケツツール）。
-     * @param {*} layer - レイヤー番号、または録画データ配列
-     * @param {*} [x] - X座標、または再生用コールバック
-     * @param {*} [y] - Y座標
-     * @param {*} [color] - 塗りつぶし色
+     * @param {number | Array<*>} layer - レイヤー番号、または録画データ配列
+     * @param {number | Function} [x] - X座標、または再生用コールバック
+     * @param {number} [y] - Y座標
+     * @param {number} [color] - 塗りつぶし色（32bit整数）
      */
     floodFill(layer, x, y, color) {
       if (typeof layer != "object") {
@@ -2778,7 +2778,16 @@
         color = item[4];
       }
       const painter = Neo.painter;
-      painter.doFloodFill(layer, x, y, color);
+      painter.doFloodFill(
+        /** @type {number} */
+        layer,
+        /** @type {number} */
+        x,
+        /** @type {number} */
+        y,
+        /** @type {number} */
+        color
+      );
       painter.updateDestCanvas(0, 0, painter.canvasWidth, painter.canvasHeight);
       var callback = arguments[1];
       if (callback && typeof callback == "function") callback(true);
