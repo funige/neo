@@ -3975,6 +3975,18 @@ export class Painter {
     img.onload = function () {
       ref.canvasCtx[0].drawImage(img, 0, 0);
       ref.updateDestCanvas(0, 0, ref.canvasWidth, ref.canvasHeight);
+
+      // 静止画から描き始めた時の画像が動画に含まれるようにするため
+      // 動画の先頭にrestoreとして記録する(再生は静止画から始まる)。
+      if (Neo.isAnimation && ref._actionMgr._items.length === 0) {
+        ref._pushUndo();
+        ref._actionMgr.restore();
+        // アンドゥで静止画が記録される前の状態(_head = 0)に戻ると、
+        // 次のstep()で先頭のrestoreが切り捨てられるため、アンドゥ履歴を1つ捨てる。
+        ref._undoMgr.popUndo();
+        // 画像を開いただけでは「描きかけ」にしない
+        ref.dirty = false;
+      }
     };
     img.src = filename;
   }

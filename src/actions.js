@@ -49,11 +49,17 @@ export class ActionManager {
     if (this._items.length > this._head) {
       this._items.length = this._head;
     }
+    //動画容量の肥大化を防止するため
+    //続きを描く時に、直前のrestore(全レイヤーのPNG)の中身を捨てる。
+    // 要素は残す(アンドゥ履歴との1対1の対応を崩さないため)。
+    // 先頭(index 0)のrestoreは、静止画や、セッションの復元の画像として再生に含める必要があるため保持する。
+    const prev = this._items[this._head - 1];
+    if (this._head > 1 && prev && prev[0] === "restore") prev.length = 0;
+
     this._items.push([]);
     this._head++;
     this._index = 0;
   }
-
   back() {
     if (!Neo.isAnimation) return;
 

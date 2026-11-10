@@ -1,4 +1,4 @@
-/*! PaintBBS NEO v1.8.17 | https://github.com/funige/neo */
+/*! PaintBBS NEO v1.8.18 | https://github.com/funige/neo */
 /*! Includes this MIT-licensed library (the license below applies only to it):
  *
  *   lz-string (https://github.com/pieroxy/lz-string)
@@ -535,7 +535,7 @@
 
   // src/neo.js
   var Neo = {};
-  Neo.version = "1.8.17";
+  Neo.version = "1.8.18";
   Neo.painter;
   Neo.fullScreen = false;
   Neo.uploaded = false;
@@ -2621,6 +2621,8 @@
       if (this._items.length > this._head) {
         this._items.length = this._head;
       }
+      const prev = this._items[this._head - 1];
+      if (this._head > 1 && prev && prev[0] === "restore") prev.length = 0;
       this._items.push([]);
       this._head++;
       this._index = 0;
@@ -8361,6 +8363,12 @@
       img.onload = function() {
         ref.canvasCtx[0].drawImage(img, 0, 0);
         ref.updateDestCanvas(0, 0, ref.canvasWidth, ref.canvasHeight);
+        if (Neo.isAnimation && ref._actionMgr._items.length === 0) {
+          ref._pushUndo();
+          ref._actionMgr.restore();
+          ref._undoMgr.popUndo();
+          ref.dirty = false;
+        }
       };
       img.src = filename;
     }
@@ -9033,6 +9041,9 @@
         Neo.painter.loadSession(function() {
           Neo.painter._pushUndo();
           Neo.painter._actionMgr.restore();
+          if (Neo.isAnimation) {
+            Neo.painter._undoMgr.popUndo();
+          }
           Neo.painter.dirty = false;
         });
       }, 1);

@@ -203,6 +203,11 @@ const init2 = function () {
       Neo.painter.loadSession(function () {
         Neo.painter._pushUndo();
         Neo.painter._actionMgr.restore();
+        if (Neo.isAnimation) {
+          // アンドゥで復元画像を記録する前の状態(_head = 0)に戻ると、
+          // 次のstep()で先頭のrestoreが切り捨てられるため、アンドゥ履歴を1つ捨てる。
+          Neo.painter._undoMgr.popUndo();
+        }
         //復元時にサイズが違うキャンバスで開き直した時に画像が切り取られないようにするため
         //復元処理の直後はデータが変更されていない事にする
         Neo.painter.dirty = false;
